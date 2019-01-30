@@ -51,6 +51,7 @@ class SqlStorageMethod {
     const sequelize = new Sequelize({
       dialect: options.sqlDialect,
       storage: options.sqlDatabasePath,
+      operatorsAliases: false,
       logging: () => {},
     });
 

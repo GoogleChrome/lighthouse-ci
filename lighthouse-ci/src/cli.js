@@ -30,9 +30,13 @@ async function run() {
     case 'collect':
       await collectCmd.runCommand(argv);
       break;
-    case 'server':
-      await serverCmd.runCommand(argv);
+    case 'server': {
+      const port = await serverCmd.runCommand(argv);
+      process.stdout.write(`Server listening on port ${port}\n`);
+      // Keep the server open indefinitely
+      await new Promise(_ => {});
       break;
+    }
     default:
       throw new Error(`Unrecognized command ${argv._[0]}`);
   }

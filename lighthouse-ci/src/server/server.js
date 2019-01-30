@@ -5,6 +5,11 @@
  */
 'use strict';
 
+const createServer = require('http').createServer;
+const express = require('express');
+const morgan = require('morgan');
+const bodyParser = require('body-parser');
+const createProjectsRouter = require('./routes/projects');
 const StorageMethod = require('./api/storage/storage-method.js');
 
 /**
@@ -41,20 +46,27 @@ function buildCommand(yargs) {
 
 /**
  * @param {LHCI.ServerCommand.Options} options
- * @return {Promise<void>}
+ * @return {Promise<number>}
  */
 async function runCommand(options) {
   const {port, storage} = options;
 
   const storageMethod = StorageMethod.from(storage);
   await storageMethod.initialize(storage);
-  await storageMethod.createProject({
-    name: 'lighthouse',
-    externalUrl: 'https://github.com/lighthosue',
-  });
 
-  // eslint-disable-next-line no-console,max-len
-  console.log('Would have listened over port', port, 'to create projects', await storageMethod.getProjects());
+  const app = express();
+  app.use(morgan('short'));
+  app.use(bodyParser.json());
+  app.use('/v1/projects', createProjectsRouter({storageMethod}));
+
+  return new Promise(resolve => {
+    const server = createServer(app);
+    server.listen(port, () => {
+      const serverAddress = server.address();
+      const listenPort = typeof serverAddress === 'string' ? port : serverAddress.port;
+      resolve(listenPort);
+    });
+  });
 }
 
 module.exports = {buildCommand, runCommand};

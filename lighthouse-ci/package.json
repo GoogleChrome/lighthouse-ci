@@ -1,0 +1,26 @@
+{
+  "name": "lighthouse-ci",
+  "version": "0.0.0",
+  "license": "Apache-2.0",
+  "scripts": {
+    "start": "./src/cli.js",
+    "test": "npm run test:lint && npm run test:unit",
+    "test:lint": "../node_modules/.bin/eslint .",
+    "test:unit": "jest --testMatch='**/*-test.js'"
+  },
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "express": "^4.16.4",
+    "sequelize": "^4.42.0",
+    "uuid": "^3.3.2",
+    "yargs": "^12.0.5"
+  },
+  "devDependencies": {
+    "@types/body-parser": "^1.17.0",
+    "@types/express": "^4.16.1",
+    "@types/sequelize": "^4.27.34",
+    "@types/uuid": "^3.4.4",
+    "@types/yargs": "^12.0.8",
+    "sqlite3": "^4.0.6"
+  }
+}

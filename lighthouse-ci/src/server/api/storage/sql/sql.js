@@ -92,6 +92,36 @@ class SqlStorageMethod {
   }
 
   /**
+   * @param {LHCI.ServerCommand.Project} project
+   * @return {Promise<string>}
+   */
+  async getProjectToken(project) {
+    return project.id
+  }
+
+  /**
+   * @param {string} token
+   * @return {Promise<LHCI.ServerCommand.Project>}
+   */
+  async findProjectByToken(token) {
+    const {projectModel} = this._sql();
+    const project = await projectModel.findOne({where: {id: token}})
+    if (!project) throw new Error(`No project for token ${token}`)
+    return clone(project)
+  }
+
+  /**
+   * @param {string} projectId
+   * @return {Promise<LHCI.ServerCommand.Project>}
+   */
+  async findProjectById(projectId) {
+    const {projectModel} = this._sql();
+    const project = await projectModel.findById(projectId)
+    if (!project) throw new Error(`No project for projectId ${projectId}`)
+    return clone(project)
+  }
+
+  /**
    * @param {Omit<LHCI.ServerCommand.Project, 'id'>} unsavedProject
    * @return {Promise<LHCI.ServerCommand.Project>}
    */

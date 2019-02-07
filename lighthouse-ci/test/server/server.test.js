@@ -83,6 +83,18 @@ describe('Lighthouse CI Server', () => {
       const projects = await fetchJSON('/v1/projects');
       expect(projects).toEqual([projectB, projectA]);
     });
+
+    let projectAToken;
+    it('should get a project token', async () => {
+      const {token} = await fetchJSON(`/v1/projects/${projectA.id}/token`);
+      expect(typeof token).toBe('string');
+      projectAToken = token;
+    });
+
+    it('should fetch a project by a token', async () => {
+      const project = await fetchJSON('/v1/projects/lookup', {token: projectAToken})
+      expect(project).toEqual(projectA);
+    });
   });
 
   describe('/:projectId/builds', () => {

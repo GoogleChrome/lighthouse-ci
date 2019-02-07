@@ -24,6 +24,30 @@ class StorageMethod {
   }
 
   /**
+   * @param {LHCI.ServerCommand.Project} project
+   * @return {Promise<string>}
+   */
+  async getProjectToken(project) { // eslint-disable-line no-unused-vars
+    throw new Error('Unimplemented');
+  }
+
+  /**
+   * @param {string} token
+   * @return {Promise<LHCI.ServerCommand.Project>}
+   */
+  async findProjectByToken(token) { // eslint-disable-line no-unused-vars
+    throw new Error('Unimplemented');
+  }
+
+  /**
+   * @param {string} projectId
+   * @return {Promise<LHCI.ServerCommand.Project>}
+   */
+  async findProjectById(projectId) { // eslint-disable-line no-unused-vars
+    throw new Error('Unimplemented');
+  }
+
+  /**
    * @param {Omit<LHCI.ServerCommand.Project, 'id'>} project
    * @return {Promise<LHCI.ServerCommand.Project>}
    */

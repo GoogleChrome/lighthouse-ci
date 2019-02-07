@@ -27,6 +27,19 @@ function createRouter(context) {
     res.json(project);
   });
 
+  // POST /projects/lookup
+  router.post('/lookup', async (req, res) => {
+    const token = req.body.token;
+    const project = await context.storageMethod.findProjectByToken(token);
+    res.json(project);
+  });
+
+  // GET /projects/:id/token
+  router.get('/:projectId/token', async (req, res) => {
+    const project = await context.storageMethod.findProjectById(req.params.projectId);
+    res.json({token: await context.storageMethod.getProjectToken(project)});
+  });
+
   // GET /projects/<id>/builds
   router.get('/:projectId/builds', async (req, res) => {
     const builds = await context.storageMethod.getBuilds(req.params.projectId);

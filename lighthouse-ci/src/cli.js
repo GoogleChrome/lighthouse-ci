@@ -17,6 +17,7 @@ async function run() {
     .help('help')
     .version(getVersion())
     .usage('lighthouse-ci <command> <options>')
+    .env('LHCI')
     .demand(1)
     .command('collect', 'Run Lighthouse and save the results to the server', commandYargs =>
       collectCmd.buildCommand(commandYargs)

@@ -96,7 +96,7 @@ class SqlStorageMethod {
    * @return {Promise<string>}
    */
   async getProjectToken(project) {
-    return project.id
+    return project.id;
   }
 
   /**
@@ -105,9 +105,9 @@ class SqlStorageMethod {
    */
   async findProjectByToken(token) {
     const {projectModel} = this._sql();
-    const project = await projectModel.findOne({where: {id: token}})
-    if (!project) throw new Error(`No project for token ${token}`)
-    return clone(project)
+    const project = await projectModel.findOne({where: {id: token}});
+    if (!project) throw new Error(`No project for token ${token}`);
+    return clone(project);
   }
 
   /**
@@ -116,9 +116,9 @@ class SqlStorageMethod {
    */
   async findProjectById(projectId) {
     const {projectModel} = this._sql();
-    const project = await projectModel.findById(projectId)
-    if (!project) throw new Error(`No project for projectId ${projectId}`)
-    return clone(project)
+    const project = await projectModel.findById(projectId);
+    if (!project) throw new Error(`No project for projectId ${projectId}`);
+    return clone(project);
   }
 
   /**

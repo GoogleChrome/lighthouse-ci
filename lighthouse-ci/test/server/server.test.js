@@ -39,7 +39,7 @@ describe('Lighthouse CI Server', () => {
     return response.json();
   }
 
-  const dbPath = path.join(__dirname, 'server-test.db');
+  const dbPath = path.join(__dirname, 'server-test.tmp.sql');
 
   beforeAll(async () => {
     if (fs.existsSync(dbPath)) fs.unlinkSync(dbPath);
@@ -92,7 +92,7 @@ describe('Lighthouse CI Server', () => {
     });
 
     it('should fetch a project by a token', async () => {
-      const project = await fetchJSON('/v1/projects/lookup', {token: projectAToken})
+      const project = await fetchJSON('/v1/projects/lookup', {token: projectAToken});
       expect(project).toEqual(projectA);
     });
   });

@@ -17,12 +17,12 @@ const StorageMethod = require('./api/storage/storage-method.js');
  */
 function buildCommand(yargs) {
   return yargs.options({
-    logLevel: {
+    'logLevel': {
       type: 'string',
       choices: ['silent', 'verbose'],
       default: 'verbose',
     },
-    port: {
+    'port': {
       alias: 'p',
       type: 'number',
       default: 9001,

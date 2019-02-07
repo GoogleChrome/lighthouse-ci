@@ -9,41 +9,41 @@ type StorageMethod_ = import('../src/server/api/storage/storage-method.js');
 declare global {
   namespace LHCI {
     namespace ServerCommand {
-      export type TableAttributes<T, TAllKeys extends keyof T = keyof T> = {[K in TAllKeys]: {}}
+      export type TableAttributes<T, TAllKeys extends keyof T = keyof T> = {[K in TAllKeys]: {}};
 
       export interface Project {
-        id: string
-        name: string
-        externalUrl: string
+        id: string;
+        name: string;
+        externalUrl: string;
       }
 
       export interface Build {
-        id: string
-        projectId: string
-        hash: string
-        externalBuildId: string
+        id: string;
+        projectId: string;
+        hash: string;
+        externalBuildId: string;
       }
 
       export interface Run {
-        id: string
-        projectId: string
-        buildId: string
-        lhr: string
+        id: string;
+        projectId: string;
+        buildId: string;
+        lhr: string;
       }
 
       export type StorageMethod = StorageMethod_;
 
       export interface StorageOptions {
-        storageMethod: 'sql' | 'bigquery'
-        sqlDialect: 'sqlite' | 'mysql'
-        sqlDatabasePath?: string
-        sqlDangerouslyForceMigration?: boolean
+        storageMethod: 'sql' | 'bigquery';
+        sqlDialect: 'sqlite' | 'mysql';
+        sqlDatabasePath?: string;
+        sqlDangerouslyForceMigration?: boolean;
       }
 
       export interface Options {
-        logLevel: 'silent'|'verbose';
-        port: number
-        storage: StorageOptions
+        logLevel: 'silent' | 'verbose';
+        port: number;
+        storage: StorageOptions;
       }
     }
   }

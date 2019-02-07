@@ -28,6 +28,61 @@ function waitForCondition(fn) {
 }
 
 describe('Lighthouse CI CLI', () => {
+  const sqlFile = 'cli-test.tmp.sql';
+
+  let serverPort;
+  let serverProcess;
+  let serverProcessStdout = '';
+
+  let projectToken;
+
+  afterAll(() => {
+    if (fs.existsSync(sqlFile)) fs.unlinkSync(sqlFile);
+    serverProcess.kill();
+  });
+
+  describe('server', () => {
+    it('should bring up the server and accept requests', async () => {
+      serverProcess = spawn(CLI_PATH, [
+        'server',
+        '-p=0',
+        `--storage.sqlDatabasePath=${sqlFile}`,
+      ]);
+
+      serverProcess.stdout.on('data', chunk => serverProcessStdout += chunk.toString());
+
+      await waitForCondition(() => serverProcessStdout.includes('listening'));
+
+      expect(serverProcessStdout).toMatch(/port \d+/);
+      serverPort = serverProcessStdout.match(/port (\d+)/)[1];
+    });
+
+    it('should accept requests', async () => {
+      let response = await fetch(`http://localhost:${serverPort}/v1/projects`);
+      let projects = await response.json();
+      expect(projects).toEqual([]);
+
+      const payload = {name: 'Lighthouse', externalUrl: 'http://example.com'};
+      response = await fetch(`http://localhost:${serverPort}/v1/projects`, {
+        method: 'POST',
+        headers: {'content-type': 'application/json'},
+        body: JSON.stringify(payload),
+      });
+
+      const project = await response.json();
+      expect(project).toMatchObject(payload);
+
+      response = await fetch(`http://localhost:${serverPort}/v1/projects`);
+      projects = await response.json();
+      expect(projects).toEqual([project]);
+
+      response = await fetch(`http://localhost:${serverPort}/v1/projects/${project.id}/token`);
+      const {token} = await response.json();
+      expect(typeof token).toBe('string');
+      projectToken = token;
+    });
+  });
+
   describe('collect', () => {
     it(
       'should collect results',
@@ -36,7 +91,7 @@ describe('Lighthouse CI CLI', () => {
           'collect',
           '--numberOfRuns=2',
           '--auditUrl=chrome://version',
-        ]);
+        ], {env: {...process.env, LHCI_TOKEN: projectToken}});
 
         expect(stdout.toString().replace(/fetched at .*/g, 'fetched at <DATE>'))
           .toMatchInlineSnapshot(`
@@ -49,46 +104,5 @@ Would have beaconed LHR to http://localhost:9001/ fetched at <DATE>
       },
       20000
     );
-  });
-
-  describe('server', () => {
-    it('should bring up the server and accept requests', async () => {
-      const sqlFile = 'server-cmd-test.tmp.sql';
-      const serverProcess = spawn(CLI_PATH, [
-        'server',
-        '-p=0',
-        `--storage.sqlDatabasePath=${sqlFile}`,
-      ]);
-
-      let stdout = '';
-      serverProcess.stdout.on('data', chunk => stdout += chunk.toString());
-
-      try {
-        await waitForCondition(() => stdout.includes('listening'));
-
-        expect(stdout).toMatch(/port \d+/);
-        const port = stdout.match(/port (\d+)/)[1];
-
-        let response = await fetch(`http://localhost:${port}/v1/projects`);
-        let projects = await response.json();
-        expect(projects).toEqual([]);
-
-        const sampleProject = {name: 'Lighthouse', externalUrl: 'http://example.com'};
-        response = await fetch(`http://localhost:${port}/v1/projects`, {
-          method: 'POST',
-          headers: {'content-type': 'application/json'},
-          body: JSON.stringify(sampleProject),
-        });
-        const createdProject = await response.json();
-        expect(createdProject).toMatchObject(sampleProject);
-
-        response = await fetch(`http://localhost:${port}/v1/projects`);
-        projects = await response.json();
-        expect(projects).toEqual([createdProject]);
-      } finally {
-        if (fs.existsSync(sqlFile)) fs.unlinkSync(sqlFile);
-        serverProcess.kill();
-      }
-    });
   });
 });

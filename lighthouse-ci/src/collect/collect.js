@@ -5,16 +5,14 @@
  */
 'use strict';
 
-const childProcess = require('child_process');
 const LighthouseRunner = require('./lighthouse-runner.js');
-const ApiClient = require('../server/api/client.js');
+const {saveLHR, clearSavedLHRs} = require('../shared/saved-reports.js');
 
 /**
  * @param {import('yargs').Argv} yargs
  */
 function buildCommand(yargs) {
   return yargs.options({
-    token: {type: 'string', required: true},
     method: {type: 'string', choices: ['node', 'docker'], default: 'node'},
     auditUrl: {description: 'The URL to audit.', required: true},
     numberOfRuns: {
@@ -22,27 +20,7 @@ function buildCommand(yargs) {
       default: 3,
       type: 'number',
     },
-    serverBaseUrl: {
-      description: 'The base URL of the server where results will be saved.',
-      default: 'http://localhost:9001/',
-    },
   });
-}
-
-/**
- * @return {string}
- */
-function getCurrentHash() {
-  const result = childProcess.spawnSync('git', ['rev-parse', 'HEAD'], {encoding: 'utf8'});
-  if (result.status !== 0) throw new Error('Unable to determine current hash');
-  return result.stdout.trim();
-}
-
-/**
- * @return {string}
- */
-function getExternalBuildId() {
-  return '';
 }
 
 /**
@@ -52,30 +30,18 @@ function getExternalBuildId() {
 async function runCommand(options) {
   if (options.method !== 'node') throw new Error(`Method "${options.method}" not yet supported`);
   const runner = new LighthouseRunner();
-  const api = new ApiClient({rootURL: options.serverBaseUrl});
 
-  const project = await api.findProjectByToken(options.token);
-  const build = await api.createBuild({
-    projectId: project.id,
-    hash: getCurrentHash(),
-    externalBuildId: getExternalBuildId(),
-  });
-
-  process.stdout.write(`Running CI for project ${project.name} (${project.id})\n`);
-  process.stdout.write(`Running CI for build (${build.id})\n`);
+  clearSavedLHRs();
+  process.stdout.write(`Running Lighthouse ${options.numberOfRuns} time(s)\n`);
 
   for (let i = 0; i < options.numberOfRuns; i++) {
+    process.stdout.write(`Run #${i + 1}...`);
     const lhr = await runner.run(options.auditUrl);
-    const run = await api.createRun({
-      projectId: project.id,
-      buildId: build.id,
-      lhr: JSON.stringify(lhr),
-    });
-
-    process.stdout.write(`Saved LHR to ${options.serverBaseUrl} (${run.id})\n`);
+    saveLHR(lhr);
+    process.stdout.write('done.\n');
   }
 
-  process.stdout.write(`Done saving build results to Lighthouse CI!\n`);
+  process.stdout.write(`Done running Lighthouse!\n`);
 }
 
 module.exports = {buildCommand, runCommand};

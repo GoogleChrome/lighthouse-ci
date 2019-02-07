@@ -8,6 +8,7 @@
 
 const yargs = require('yargs');
 const getVersion = require('./shared/version.js').getVersion;
+const reportCmd = require('./report/report.js');
 const collectCmd = require('./collect/collect.js');
 const serverCmd = require('./server/server.js');
 
@@ -19,8 +20,11 @@ async function run() {
     .usage('lighthouse-ci <command> <options>')
     .env('LHCI')
     .demand(1)
-    .command('collect', 'Run Lighthouse and save the results to the server', commandYargs =>
+    .command('collect', 'Run Lighthouse and save the results to a local folder', commandYargs =>
       collectCmd.buildCommand(commandYargs)
+    )
+    .command('report', 'Save the results to the server', commandYargs =>
+      reportCmd.buildCommand(commandYargs)
     )
     .command('server', 'Run Lighthouse CI server', commandYargs =>
       serverCmd.buildCommand(commandYargs)
@@ -30,6 +34,9 @@ async function run() {
   switch (argv._[0]) {
     case 'collect':
       await collectCmd.runCommand(argv);
+      break;
+    case 'report':
+      await reportCmd.runCommand(argv);
       break;
     case 'server': {
       const {port} = await serverCmd.runCommand(argv);

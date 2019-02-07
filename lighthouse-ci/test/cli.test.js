@@ -80,43 +80,62 @@ describe('Lighthouse CI CLI', () => {
   });
 
   describe('collect', () => {
-    let uuids;
-
     it(
       'should collect results',
       () => {
-        let {stdout = '', stderr = '', status = -1} = spawnSync(
-          CLI_PATH,
-          [
-            'collect',
-            '--numberOfRuns=2',
-            '--auditUrl=chrome://version',
-            `--serverBaseUrl=http://localhost:${serverPort}`,
-          ],
-          {env: {...process.env, LHCI_TOKEN: projectToken}}
-        );
+        let {stdout = '', stderr = '', status = -1} = spawnSync(CLI_PATH, [
+          'collect',
+          '--numberOfRuns=2',
+          '--auditUrl=chrome://version',
+        ]);
 
         stdout = stdout.toString();
         stderr = stderr.toString();
         status = status || 0;
 
-        const UUID_REGEX = /[0-9a-f-]{36}/gi;
-        uuids = stdout.match(UUID_REGEX);
-        const cleansedStdout = stdout.replace(UUID_REGEX, '<UUID>').replace(/:\d+/g, '<PORT>');
+        const cleansedStdout = stdout.replace(/:\d+/g, '<PORT>');
         expect(cleansedStdout).toMatchInlineSnapshot(`
-"Running CI for project Lighthouse (<UUID>)
-Running CI for build (<UUID>)
-Saved LHR to http://localhost<PORT> (<UUID>)
-Saved LHR to http://localhost<PORT> (<UUID>)
-Done saving build results to Lighthouse CI!
+"Running Lighthouse 2 time(s)
+Run #1...done.
+Run #2...done.
+Done running Lighthouse!
 "
 `);
         expect(stderr.toString()).toMatchInlineSnapshot(`""`);
         expect(status).toEqual(0);
-        expect(uuids).toHaveLength(4);
       },
       20000
     );
+  });
+
+  describe('report', () => {
+    let uuids;
+    it('should read LHRs from folders', () => {
+      let {stdout = '', stderr = '', status = -1} = spawnSync(
+        CLI_PATH,
+        ['report', `--serverBaseUrl=http://localhost:${serverPort}`],
+        {env: {...process.env, LHCI_TOKEN: projectToken}}
+      );
+
+      stdout = stdout.toString();
+      stderr = stderr.toString();
+      status = status || 0;
+
+      const UUID_REGEX = /[0-9a-f-]{36}/gi;
+      uuids = stdout.match(UUID_REGEX);
+      const cleansedStdout = stdout.replace(UUID_REGEX, '<UUID>').replace(/:\d+/g, '<PORT>');
+      expect(cleansedStdout).toMatchInlineSnapshot(`
+"Saving CI project Lighthouse (<UUID>)
+Saving CI build (<UUID>)
+Saved LHR to http://localhost<PORT> (<UUID>)
+Saved LHR to http://localhost<PORT> (<UUID>)
+Done saving build results to Lighthouse CI
+"
+`);
+      expect(stderr.toString()).toMatchInlineSnapshot(`""`);
+      expect(status).toEqual(0);
+      expect(uuids).toHaveLength(4);
+    });
 
     it('should have saved lhrs to the API', async () => {
       const [projectId, buildId, runAId, runBId] = uuids;

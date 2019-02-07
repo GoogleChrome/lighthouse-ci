@@ -9,7 +9,7 @@ const createServer = require('http').createServer;
 const express = require('express');
 const morgan = require('morgan');
 const bodyParser = require('body-parser');
-const createProjectsRouter = require('./routes/projects');
+const createProjectsRouter = require('./api/routes/projects');
 const StorageMethod = require('./api/storage/storage-method.js');
 
 /**

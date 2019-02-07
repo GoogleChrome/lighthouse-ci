@@ -8,8 +8,12 @@
 const uuid = require('uuid');
 const Sequelize = require('sequelize');
 const projectModelDefn = require('./project-model.js');
+const buildModelDefn = require('./build-model.js');
+const runModelDefn = require('./run-model.js');
 
 /**
+ * Clones the object without the fancy function getters/setters.
+ *
  * @template T
  * @param {T} o
  * @return {T}
@@ -19,12 +23,19 @@ function clone(o) {
 }
 
 /** @typedef {LHCI.ServerCommand.TableAttributes<LHCI.ServerCommand.Project>} ProjectAttrs */
+/** @typedef {LHCI.ServerCommand.TableAttributes<LHCI.ServerCommand.Build>} BuildAttrs */
+/** @typedef {LHCI.ServerCommand.TableAttributes<LHCI.ServerCommand.Run>} RunAttrs */
 
 /**
  * @typedef SqlState
  * @property {import('sequelize').Sequelize} sequelize
  * @property {import('sequelize').Model<LHCI.ServerCommand.Project, ProjectAttrs>} projectModel
+ * @property {import('sequelize').Model<LHCI.ServerCommand.Build, BuildAttrs>} buildModel
+ * @property {import('sequelize').Model<LHCI.ServerCommand.Run, RunAttrs>} runModel
 */
+
+/** Sort all records by most recently updated */
+const order = [['updatedAt', 'desc']];
 
 class SqlStorageMethod {
   constructor() {
@@ -57,9 +68,18 @@ class SqlStorageMethod {
 
     const projectModel = sequelize.define(projectModelDefn.tableName, projectModelDefn.attributes);
 
+    buildModelDefn.attributes.projectId.references.model = projectModel;
+    const buildModel = sequelize.define(buildModelDefn.tableName, buildModelDefn.attributes);
+
+    runModelDefn.attributes.projectId.references.model = projectModel;
+    runModelDefn.attributes.buildId.references.model = buildModel;
+    // SQLite doesn't support long text fields so supress the warning
+    if (options.sqlDialect === 'sqlite') runModelDefn.attributes.lhr.type = Sequelize.TEXT;
+    const runModel = sequelize.define(runModelDefn.tableName, runModelDefn.attributes);
+
     await sequelize.sync({force: options.sqlDangerouslyForceMigration});
 
-    this._sequelize = {sequelize, projectModel};
+    this._sequelize = {sequelize, projectModel, buildModel, runModel};
   }
 
   /**
@@ -67,7 +87,7 @@ class SqlStorageMethod {
    */
   async getProjects() {
     const {projectModel} = this._sql();
-    const projects = await projectModel.findAll();
+    const projects = await projectModel.findAll({order});
     return projects.map(clone);
   }
 
@@ -79,6 +99,46 @@ class SqlStorageMethod {
     const {projectModel} = this._sql();
     const project = await projectModel.create({...unsavedProject, id: uuid.v4()});
     return clone(project);
+  }
+
+  /**
+   * @param {string} projectId
+   * @return {Promise<LHCI.ServerCommand.Build[]>}
+   */
+  async getBuilds(projectId) {
+    const {buildModel} = this._sql();
+    const builds = await buildModel.findAll({where: {projectId}, order});
+    return clone(builds);
+  }
+
+  /**
+   * @param {Omit<LHCI.ServerCommand.Build, 'id'>} unsavedBuild
+   * @return {Promise<LHCI.ServerCommand.Build>}
+   */
+  async createBuild(unsavedBuild) {
+    const {buildModel} = this._sql();
+    const build = await buildModel.create({...unsavedBuild, id: uuid.v4()});
+    return clone(build);
+  }
+
+  /**
+   * @param {string} buildId
+   * @return {Promise<LHCI.ServerCommand.Run[]>}
+   */
+  async getRuns(buildId) {
+    const {runModel} = this._sql();
+    const runs = await runModel.findAll({where: {buildId}, order});
+    return clone(runs);
+  }
+
+  /**
+   * @param {Omit<LHCI.ServerCommand.Run, 'id'>} unsavedRun
+   * @return {Promise<LHCI.ServerCommand.Run>}
+   */
+  async createRun(unsavedRun) {
+    const {runModel} = this._sql();
+    const run = await runModel.create({...unsavedRun, id: uuid.v4()});
+    return clone(run);
   }
 }
 

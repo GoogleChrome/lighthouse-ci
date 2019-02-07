@@ -27,6 +27,35 @@ function createRouter(context) {
     res.json(project);
   });
 
+  // GET /projects/<id>/builds
+  router.get('/:projectId/builds', async (req, res) => {
+    const builds = await context.storageMethod.getBuilds(req.params.projectId);
+    res.json(builds);
+  });
+
+  // POST /projects/<id>/builds
+  router.post('/:projectId/builds', async (req, res) => {
+    const unsavedBuild = req.body;
+    unsavedBuild.projectId = req.params.projectId;
+    const build = await context.storageMethod.createBuild(unsavedBuild);
+    res.json(build);
+  });
+
+  // GET /projects/<id>/builds/<id>/runs
+  router.get('/:projectId/builds/:buildId/runs', async (req, res) => {
+    const runs = await context.storageMethod.getRuns(req.params.buildId);
+    res.json(runs);
+  });
+
+  // POST /projects/<id>/builds/<id>/runs
+  router.post('/:projectId/builds/:buildId/runs', async (req, res) => {
+    const unsavedBuild = req.body;
+    unsavedBuild.projectId = req.params.projectId;
+    unsavedBuild.buildId = req.params.buildId;
+    const run = await context.storageMethod.createRun(unsavedBuild);
+    res.json(run);
+  });
+
   return router;
 }
 

@@ -17,6 +17,20 @@ declare global {
         externalUrl: string
       }
 
+      export interface Build {
+        id: string
+        projectId: string
+        hash: string
+        externalBuildId: string
+      }
+
+      export interface Run {
+        id: string
+        projectId: string
+        buildId: string
+        lhr: string
+      }
+
       export type StorageMethod = StorageMethod_;
 
       export interface StorageOptions {

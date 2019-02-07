@@ -6,7 +6,7 @@
     "start": "./src/cli.js",
     "test": "npm run test:lint && npm run test:unit",
     "test:lint": "../node_modules/.bin/eslint .",
-    "test:unit": "jest --testMatch='**/*-test.js'"
+    "test:unit": "jest"
   },
   "dependencies": {
     "body-parser": "^1.18.3",

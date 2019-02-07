@@ -152,12 +152,13 @@ class SqlStorageMethod {
   }
 
   /**
+   * @param {string} projectId
    * @param {string} buildId
    * @return {Promise<LHCI.ServerCommand.Run[]>}
    */
-  async getRuns(buildId) {
+  async getRuns(projectId, buildId) {
     const {runModel} = this._sql();
-    const runs = await runModel.findAll({where: {buildId}, order});
+    const runs = await runModel.findAll({where: {projectId, buildId}, order});
     return clone(runs);
   }
 

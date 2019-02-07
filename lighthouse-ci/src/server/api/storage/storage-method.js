@@ -72,10 +72,11 @@ class StorageMethod {
   }
 
   /**
+   * @param {string} projectId
    * @param {string} buildId
    * @return {Promise<LHCI.ServerCommand.Run[]>}
    */
-  async getRuns(buildId) { // eslint-disable-line no-unused-vars
+  async getRuns(projectId, buildId) { // eslint-disable-line no-unused-vars
     throw new Error('Unimplemented');
   }
 

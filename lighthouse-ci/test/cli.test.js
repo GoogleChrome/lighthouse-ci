@@ -16,7 +16,7 @@ const CLI_PATH = path.join(__dirname, '../src/cli.js');
 
 function waitForCondition(fn) {
   let resolve;
-  const promise = new Promise(r => resolve = r);
+  const promise = new Promise(r => (resolve = r));
 
   function checkConditionOrContinue() {
     if (fn()) return resolve();
@@ -43,13 +43,9 @@ describe('Lighthouse CI CLI', () => {
 
   describe('server', () => {
     it('should bring up the server and accept requests', async () => {
-      serverProcess = spawn(CLI_PATH, [
-        'server',
-        '-p=0',
-        `--storage.sqlDatabasePath=${sqlFile}`,
-      ]);
+      serverProcess = spawn(CLI_PATH, ['server', '-p=0', `--storage.sqlDatabasePath=${sqlFile}`]);
 
-      serverProcess.stdout.on('data', chunk => serverProcessStdout += chunk.toString());
+      serverProcess.stdout.on('data', chunk => (serverProcessStdout += chunk.toString()));
 
       await waitForCondition(() => serverProcessStdout.includes('listening'));
 
@@ -84,25 +80,56 @@ describe('Lighthouse CI CLI', () => {
   });
 
   describe('collect', () => {
+    let uuids;
+
     it(
       'should collect results',
       () => {
-        const {stdout = '', stderr = '', status = -1} = spawnSync(CLI_PATH, [
-          'collect',
-          '--numberOfRuns=2',
-          '--auditUrl=chrome://version',
-        ], {env: {...process.env, LHCI_TOKEN: projectToken}});
+        let {stdout = '', stderr = '', status = -1} = spawnSync(
+          CLI_PATH,
+          [
+            'collect',
+            '--numberOfRuns=2',
+            '--auditUrl=chrome://version',
+            `--serverBaseUrl=http://localhost:${serverPort}`,
+          ],
+          {env: {...process.env, LHCI_TOKEN: projectToken}}
+        );
 
-        expect(stdout.toString().replace(/fetched at .*/g, 'fetched at <DATE>'))
-          .toMatchInlineSnapshot(`
-"Would have beaconed LHR to http://localhost:9001/ fetched at <DATE>
-Would have beaconed LHR to http://localhost:9001/ fetched at <DATE>
+        stdout = stdout.toString();
+        stderr = stderr.toString();
+        status = status || 0;
+
+        const UUID_REGEX = /[0-9a-f-]{36}/gi;
+        uuids = stdout.match(UUID_REGEX);
+        const cleansedStdout = stdout.replace(UUID_REGEX, '<UUID>').replace(/:\d+/g, '<PORT>');
+        expect(cleansedStdout).toMatchInlineSnapshot(`
+"Running CI for project Lighthouse (<UUID>)
+Running CI for build (<UUID>)
+Saved LHR to http://localhost<PORT> (<UUID>)
+Saved LHR to http://localhost<PORT> (<UUID>)
+Done saving build results to Lighthouse CI!
 "
 `);
         expect(stderr.toString()).toMatchInlineSnapshot(`""`);
         expect(status).toEqual(0);
+        expect(uuids).toHaveLength(4);
       },
       20000
     );
+
+    it('should have saved lhrs to the API', async () => {
+      const [projectId, buildId, runAId, runBId] = uuids;
+      const response = await fetch(
+        `http://localhost:${serverPort}/v1/projects/${projectId}/builds/${buildId}/runs`
+      );
+
+      const runs = await response.json();
+      expect(runs.map(run => run.id)).toEqual([runBId, runAId]);
+      expect(runs.map(run => JSON.parse(run.lhr))).toMatchObject([
+        {requestedUrl: 'chrome://version'},
+        {requestedUrl: 'chrome://version'},
+      ]);
+    });
   });
 });

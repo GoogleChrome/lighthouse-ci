@@ -61,7 +61,7 @@ async function runCommand(options) {
 
   const app = express();
   if (options.logLevel !== 'silent') app.use(morgan('short'));
-  app.use(bodyParser.json());
+  app.use(bodyParser.json({limit: '10mb'}));
   app.use('/v1/projects', createProjectsRouter({storageMethod}));
 
   return new Promise(resolve => {

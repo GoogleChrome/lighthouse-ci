@@ -116,7 +116,7 @@ class SqlStorageMethod {
    */
   async findProjectById(projectId) {
     const {projectModel} = this._sql();
-    const project = await projectModel.findById(projectId);
+    const project = await projectModel.findByPk(projectId);
     if (!project) throw new Error(`No project for projectId ${projectId}`);
     return clone(project);
   }

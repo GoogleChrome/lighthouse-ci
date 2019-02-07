@@ -27,6 +27,7 @@ declare global {
       }
 
       export interface Options {
+        logLevel: 'silent'|'verbose';
         port: number
         storage: StorageOptions
       }

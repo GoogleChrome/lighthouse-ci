@@ -31,7 +31,7 @@ async function run() {
       await collectCmd.runCommand(argv);
       break;
     case 'server': {
-      const port = await serverCmd.runCommand(argv);
+      const {port} = await serverCmd.runCommand(argv);
       process.stdout.write(`Server listening on port ${port}\n`);
       // Keep the server open indefinitely
       await new Promise(_ => {});

@@ -17,7 +17,12 @@ const StorageMethod = require('./api/storage/storage-method.js');
  */
 function buildCommand(yargs) {
   return yargs.options({
-    'port': {
+    logLevel: {
+      type: 'string',
+      choices: ['silent', 'verbose'],
+      default: 'verbose',
+    },
+    port: {
       alias: 'p',
       type: 'number',
       default: 9001,
@@ -46,7 +51,7 @@ function buildCommand(yargs) {
 
 /**
  * @param {LHCI.ServerCommand.Options} options
- * @return {Promise<number>}
+ * @return {Promise<{port: number, close: () => void}>}
  */
 async function runCommand(options) {
   const {port, storage} = options;
@@ -55,7 +60,7 @@ async function runCommand(options) {
   await storageMethod.initialize(storage);
 
   const app = express();
-  app.use(morgan('short'));
+  if (options.logLevel !== 'silent') app.use(morgan('short'));
   app.use(bodyParser.json());
   app.use('/v1/projects', createProjectsRouter({storageMethod}));
 
@@ -64,7 +69,7 @@ async function runCommand(options) {
     server.listen(port, () => {
       const serverAddress = server.address();
       const listenPort = typeof serverAddress === 'string' ? port : serverAddress.port;
-      resolve(listenPort);
+      resolve({port: listenPort, close: () => server.close()});
     });
   });
 }

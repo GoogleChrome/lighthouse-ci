@@ -8,6 +8,7 @@
 
 const yargs = require('yargs');
 const getVersion = require('./shared/version.js').getVersion;
+const assertCmd = require('./assert/assert.js');
 const reportCmd = require('./report/report.js');
 const collectCmd = require('./collect/collect.js');
 const serverCmd = require('./server/server.js');
@@ -26,6 +27,9 @@ async function run() {
     .command('report', 'Save the results to the server', commandYargs =>
       reportCmd.buildCommand(commandYargs)
     )
+    .command('assert', 'Assert that the latest results meet expectations', commandYargs =>
+      assertCmd.buildCommand(commandYargs)
+    )
     .command('server', 'Run Lighthouse CI server', commandYargs =>
       serverCmd.buildCommand(commandYargs)
     )
@@ -34,6 +38,9 @@ async function run() {
   switch (argv._[0]) {
     case 'collect':
       await collectCmd.runCommand(argv);
+      break;
+    case 'assert':
+      await assertCmd.runCommand(argv);
       break;
     case 'report':
       await reportCmd.runCommand(argv);

@@ -2,6 +2,9 @@
   "name": "lighthouse-ci",
   "version": "0.0.0",
   "license": "Apache-2.0",
+  "bin": {
+    "lighthouse-ci": "./src/cli.js"
+  },
   "scripts": {
     "start": "./src/cli.js",
     "test": "npm run test:lint && npm run test:unit",

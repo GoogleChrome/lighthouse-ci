@@ -132,7 +132,7 @@ Saved LHR to http://localhost<PORT> (<UUID>)
 Done saving build results to Lighthouse CI
 "
 `);
-      expect(stderr.toString()).toMatchInlineSnapshot(`""`);
+      expect(stderr).toMatchInlineSnapshot(`""`);
       expect(status).toEqual(0);
       expect(uuids).toHaveLength(4);
     });
@@ -149,6 +149,33 @@ Done saving build results to Lighthouse CI
         {requestedUrl: 'chrome://version'},
         {requestedUrl: 'chrome://version'},
       ]);
+    });
+  });
+
+  describe('assert', () => {
+    it('should assert failures', () => {
+      let {stdout = '', stderr = '', status = -1} = spawnSync(CLI_PATH, [
+        'assert',
+        `--assertions.works-offline=error`,
+      ]);
+
+      stdout = stdout.toString();
+      stderr = stderr.toString();
+      status = status || 0;
+
+      expect(stdout).toMatchInlineSnapshot(`""`);
+      expect(stderr).toMatchInlineSnapshot(`
+"Checking assertions against 2 run(s)
+
+[31m✘[0m [1mworks-offline[0m failure for [1mminScore[0m assertion
+      expected: >=[32m1[0m
+         found: [31m0[0m
+    [2mall values: 0, 0[0m
+
+Assertion failed. Exiting with status code 1.
+"
+`);
+      expect(status).toEqual(1);
     });
   });
 });

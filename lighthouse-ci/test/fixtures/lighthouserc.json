@@ -1,0 +1,19 @@
+{
+  "ci": {
+    "assert": {
+      "assertions": {
+        "works-offline": "error"
+      }
+    },
+    "collect": {
+      "numberOfRuns": 2
+    },
+    "report": {
+      "serverBaseUrl": "http://localhost:9009"
+    },
+    "server": {
+      "port": 9009,
+      "sqlDatabasePath": "cli-test-fixtures.tmp.sql"
+    }
+  }
+}

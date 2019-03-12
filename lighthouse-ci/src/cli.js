@@ -7,6 +7,7 @@
 'use strict';
 
 const yargs = require('yargs');
+const loadAndParseRcFile = require('./shared/lighthouserc.js').loadAndParseRcFile;
 const getVersion = require('./shared/version.js').getVersion;
 const assertCmd = require('./assert/assert.js');
 const reportCmd = require('./report/report.js');
@@ -20,6 +21,7 @@ async function run() {
     .version(getVersion())
     .usage('lighthouse-ci <command> <options>')
     .env('LHCI')
+    .config('rc-file', loadAndParseRcFile)
     .demand(1)
     .command('collect', 'Run Lighthouse and save the results to a local folder', commandYargs =>
       collectCmd.buildCommand(commandYargs)

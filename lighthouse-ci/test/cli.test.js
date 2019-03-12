@@ -29,6 +29,7 @@ function waitForCondition(fn) {
 
 describe('Lighthouse CI CLI', () => {
   const sqlFile = 'cli-test.tmp.sql';
+  const rcFile = path.join(__dirname, 'fixtures/lighthouserc.json');
 
   let serverPort;
   let serverProcess;
@@ -85,7 +86,7 @@ describe('Lighthouse CI CLI', () => {
       () => {
         let {stdout = '', stderr = '', status = -1} = spawnSync(CLI_PATH, [
           'collect',
-          '--numberOfRuns=2',
+          `--rc-file=${rcFile}`,
           '--auditUrl=chrome://version',
         ]);
 
@@ -93,8 +94,7 @@ describe('Lighthouse CI CLI', () => {
         stderr = stderr.toString();
         status = status || 0;
 
-        const cleansedStdout = stdout.replace(/:\d+/g, '<PORT>');
-        expect(cleansedStdout).toMatchInlineSnapshot(`
+        expect(stdout).toMatchInlineSnapshot(`
 "Running Lighthouse 2 time(s)
 Run #1...done.
 Run #2...done.

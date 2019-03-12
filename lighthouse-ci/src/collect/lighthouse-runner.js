@@ -13,9 +13,10 @@ const LH_CLI_PATH = path.join(__dirname, '../../../lighthouse-cli/index.js');
 class LighthouseRunner {
   /**
    * @param {string} url
+   * @param {{headful?: boolean, chromeFlags?: string[]}} [options]
    * @return {Promise<string>}
    */
-  run(url) {
+  run(url, options = {}) {
     /** @type {(lhr: string) => void} */
     let resolve;
     /** @type {(e: Error) => void} */
@@ -28,10 +29,14 @@ class LighthouseRunner {
     let stdout = '';
     let stderr = '';
 
+    let chromeFlagsAsString = options.chromeFlags ? options.chromeFlags.join(' ') : '';
+    if (!options.headful) chromeFlagsAsString += ' --headless';
+
     const lhArgs = [
       url,
       '--output', 'json',
-    ];
+      chromeFlagsAsString ? `--chrome-flags=${chromeFlagsAsString}` : '',
+    ].filter(Boolean);
     const process = childProcess.spawn(LH_CLI_PATH, lhArgs);
 
     process.stdout.on('data', chunk => stdout += chunk.toString());

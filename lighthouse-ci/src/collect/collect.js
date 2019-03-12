@@ -14,6 +14,8 @@ const {saveLHR, clearSavedLHRs} = require('../shared/saved-reports.js');
 function buildCommand(yargs) {
   return yargs.options({
     method: {type: 'string', choices: ['node', 'docker'], default: 'node'},
+    headful: {type: 'boolean', description: 'When enabled runs with a headful Chrome'},
+    chromeFlags: {type: 'array', description: 'The list of flags to pass to Chrome'},
     auditUrl: {description: 'The URL to audit.', required: true},
     numberOfRuns: {
       description: 'The number of times to run Lighthouse.',
@@ -36,7 +38,10 @@ async function runCommand(options) {
 
   for (let i = 0; i < options.numberOfRuns; i++) {
     process.stdout.write(`Run #${i + 1}...`);
-    const lhr = await runner.run(options.auditUrl);
+    const lhr = await runner.run(options.auditUrl, {
+      headful: options.headful,
+      chromeFlags: options.chromeFlags,
+    });
     saveLHR(lhr);
     process.stdout.write('done.\n');
   }

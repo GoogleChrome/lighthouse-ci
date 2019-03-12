@@ -11,6 +11,8 @@ declare global {
         auditUrl: string;
         method: 'node' | 'docker';
         numberOfRuns: number;
+        headful: boolean;
+        chromeFlags?: string[];
       }
     }
   }

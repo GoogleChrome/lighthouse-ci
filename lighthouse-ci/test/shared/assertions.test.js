@@ -50,7 +50,7 @@ describe('getAllAssertionResults', () => {
         name: 'auditRan',
         operator: '>=',
         values: [0, 0],
-      }
+      },
     ]);
   });
 

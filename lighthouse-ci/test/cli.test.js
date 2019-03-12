@@ -87,6 +87,7 @@ describe('Lighthouse CI CLI', () => {
         let {stdout = '', stderr = '', status = -1} = spawnSync(CLI_PATH, [
           'collect',
           `--rc-file=${rcFile}`,
+          '--headful',
           '--auditUrl=chrome://version',
         ]);
 

@@ -2,7 +2,9 @@
   "ci": {
     "assert": {
       "assertions": {
-        "works-offline": "error"
+        "first-contentful-paint": ["error", {"minScore": 0.8}],
+        "speed-index": ["error", {"minScore": 0.8}],
+        "interactive": ["error", {"minScore": 0.8}]
       }
     },
     "collect": {
@@ -13,7 +15,9 @@
     },
     "server": {
       "port": 9009,
-      "sqlDatabasePath": "cli-test-fixtures.tmp.sql"
+      "storage": {
+        "sqlDatabasePath": "cli-test-fixtures.tmp.sql"
+      }
     }
   }
 }

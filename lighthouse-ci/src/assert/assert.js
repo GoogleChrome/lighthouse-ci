@@ -14,6 +14,10 @@ const log = require('lighthouse-logger');
  */
 function buildCommand(yargs) {
   return yargs.options({
+    preset: {
+      description: 'The assertions preset to extend',
+      choices: ['lighthouse:all', 'lighthouse:recommended'],
+    },
     assertions: {
       description: 'The assertions to use.',
     },
@@ -25,9 +29,9 @@ function buildCommand(yargs) {
  * @return {Promise<void>}
  */
 async function runCommand(options) {
-  if (!options.assertions) throw new Error('No assertions to use');
+  if (!options.assertions && !options.preset) throw new Error('No assertions to use');
   const lhrs = getSavedLHRs().map(json => JSON.parse(json));
-  const results = getAllAssertionResults(options.assertions, lhrs);
+  const results = getAllAssertionResults(options, lhrs);
 
   process.stderr.write(`Checking assertions against ${lhrs.length} run(s)\n`);
 

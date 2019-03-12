@@ -5,11 +5,11 @@
  */
 'use strict';
 
-const {kebabCase} = require('./lodash.js');
+const _ = require('./lodash.js');
 
 /**
  * @typedef AssertionResult
- * @property {keyof LHCI.AssertCommand.AssertionOptions} name
+ * @property {'auditRan'|keyof LHCI.AssertCommand.AssertionOptions} name
  * @property {string} operator
  * @property {number} expected
  * @property {number} actual
@@ -58,7 +58,18 @@ function getValueForMergeMethod(values, mergeMethod, property) {
  */
 function getAssertionResults(lhrs, auditId, options) {
   const auditResults = lhrs.map(lhr => lhr.audits[auditId]);
-  if (auditResults.some(result => result === undefined)) throw new Error(`${auditId} did not run`);
+  if (auditResults.some(result => result === undefined)) {
+    return [
+      {
+        name: 'auditRan',
+        expected: 1,
+        actual: 0,
+        values: auditResults.map(result => result === undefined ? 0 : 1),
+        operator: '>=',
+      },
+    ];
+  }
+
   const scores = auditResults.map(audit => audit.score || 0);
   const lengths = auditResults.map(
     audit => audit.details && 'items' in audit.details && audit.details.items.length
@@ -69,7 +80,12 @@ function getAssertionResults(lhrs, auditId, options) {
   /** @type {AssertionResult[]} */
   const results = [];
 
+  // Keep track of if we had a manual assertion so we know whether or not to automatically create a
+  // default minScore assertion.
+  let hadManualAssertion = false;
+
   if (maxLength !== undefined) {
+    hadManualAssertion = true;
     const length = getValueForMergeMethod(lengths, mergeMethod, 'maxLength');
     if (length > maxLength) {
       results.push({
@@ -80,9 +96,11 @@ function getAssertionResults(lhrs, auditId, options) {
         operator: '<=',
       });
     }
-  } else {
+  }
+
+  const realMinScore = minScore === undefined && !hadManualAssertion ? 1 : minScore;
+  if (realMinScore !== undefined) {
     const score = getValueForMergeMethod(scores, mergeMethod, 'minScore');
-    const realMinScore = minScore === undefined ? 1 : minScore;
     if (score < realMinScore) {
       results.push({
         name: 'minScore',
@@ -98,18 +116,28 @@ function getAssertionResults(lhrs, auditId, options) {
 }
 
 /**
- * @param {LHCI.AssertCommand.Assertions} assertions
+ * @param {LHCI.AssertCommand.Options} options
  * @param {LH.Result[]} lhrs
  * @return {AssertionResult[]}
  */
-function getAllAssertionResults(assertions, lhrs) {
+function getAllAssertionResults(options, lhrs) {
+  const {preset = '', ...optionOverrides} = options;
+  let optionsToUse = optionOverrides;
+  const presetMatch = preset.match(/lighthouse:(.*)$/);
+  if (presetMatch) {
+    const presetData = require(`./presets/${presetMatch[1]}.js`);
+    optionsToUse = _.merge(_.cloneDeep(presetData), optionsToUse);
+  }
+
+  const {assertions = {}} = optionsToUse;
+
   /** @type {AssertionResult[]} */
   const results = [];
-  const auditsToAssert = new Set(Object.keys(assertions).map(kebabCase));
+  const auditsToAssert = new Set(Object.keys(assertions).map(_.kebabCase));
   for (const auditId of auditsToAssert) {
-    const [level, options] = normalizeAssertion(assertions[auditId]);
+    const [level, assertionOptions] = normalizeAssertion(assertions[auditId]);
     if (level === 'off') continue;
-    for (const result of getAssertionResults(lhrs, auditId, options)) {
+    for (const result of getAssertionResults(lhrs, auditId, assertionOptions)) {
       results.push({...result, auditId, level});
     }
   }

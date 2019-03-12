@@ -22,6 +22,7 @@ declare global {
       }
 
       export interface Options {
+        preset?: 'lighthouse:all' | 'lighthouse:recommended';
         assertions?: Assertions;
       }
     }

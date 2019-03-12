@@ -7,6 +7,7 @@
 
 /* eslint-env jest */
 
+const lighthouseAllPreset = require('../../src/shared/presets/all.js');
 const {getAllAssertionResults} = require('../../src/shared/assertions.js');
 
 describe('getAllAssertionResults', () => {
@@ -37,9 +38,20 @@ describe('getAllAssertionResults', () => {
     ];
   });
 
-  it('should throw on assertion for audit that did not run', () => {
+  it('should fail on assertion for audit that did not run', () => {
     const assertions = {missing: 'error'};
-    expect(() => getAllAssertionResults(assertions, lhrs)).toThrow();
+    const results = getAllAssertionResults({assertions}, lhrs);
+    expect(results).toEqual([
+      {
+        actual: 0,
+        auditId: 'missing',
+        expected: 1,
+        level: 'error',
+        name: 'auditRan',
+        operator: '>=',
+        values: [0, 0],
+      }
+    ]);
   });
 
   it('should pass assertions', () => {
@@ -48,7 +60,7 @@ describe('getAllAssertionResults', () => {
       'network-requests': ['warn', {maxLength: 10}],
     };
 
-    const results = getAllAssertionResults(assertions, lhrs);
+    const results = getAllAssertionResults({assertions}, lhrs);
     expect(results).toEqual([]);
   });
 
@@ -58,7 +70,7 @@ describe('getAllAssertionResults', () => {
       'network-requests': ['warn', {maxLength: 1}],
     };
 
-    const results = getAllAssertionResults(assertions, lhrs);
+    const results = getAllAssertionResults({assertions}, lhrs);
     expect(results).toEqual([
       {
         actual: 0.8,
@@ -86,7 +98,7 @@ describe('getAllAssertionResults', () => {
       'first-contentful-paint': ['warn', {mergeMethod: 'optimistic', minScore: 1}],
     };
 
-    const results = getAllAssertionResults(assertions, lhrs);
+    const results = getAllAssertionResults({assertions}, lhrs);
     expect(results).toMatchObject([{actual: 0.8}]);
   });
 
@@ -95,7 +107,7 @@ describe('getAllAssertionResults', () => {
       'first-contentful-paint': ['warn', {mergeMethod: 'optimistic', minScore: 1}],
     };
 
-    const results = getAllAssertionResults(assertions, lhrs);
+    const results = getAllAssertionResults({assertions}, lhrs);
     expect(results).toMatchObject([{actual: 0.8}]);
   });
 
@@ -104,7 +116,7 @@ describe('getAllAssertionResults', () => {
       'first-contentful-paint': ['warn', {mergeMethod: 'pessimistic', minScore: 1}],
     };
 
-    const results = getAllAssertionResults(assertions, lhrs);
+    const results = getAllAssertionResults({assertions}, lhrs);
     expect(results).toMatchObject([{actual: 0.6}]);
   });
 
@@ -113,7 +125,7 @@ describe('getAllAssertionResults', () => {
       'first-contentful-paint': ['warn', {mergeMethod: 'median', minScore: 1}],
     };
 
-    const results = getAllAssertionResults(assertions, lhrs);
+    const results = getAllAssertionResults({assertions}, lhrs);
     expect(results).toMatchObject([{actual: 0.7}]);
   });
 
@@ -123,7 +135,53 @@ describe('getAllAssertionResults', () => {
       'first-contentful-paint': ['warn', {mergeMethod: 'optimistic', minScore: 1}],
     };
 
-    const results = getAllAssertionResults(assertions, lhrs);
+    const results = getAllAssertionResults({assertions}, lhrs);
     expect(results).toMatchObject([{actual: 0.8}]);
+  });
+
+  describe('presets', () => {
+    const auditIds = Object.keys(lighthouseAllPreset.assertions);
+
+    beforeEach(() => {
+      const lhrA = {audits: {}};
+      const lhrB = {audits: {}};
+      for (const auditId of auditIds) {
+        lhrA.audits[auditId] = {score: 0.5};
+        lhrB.audits[auditId] = {score: 0.7};
+      }
+
+      lhrs = [lhrA, lhrB];
+    });
+
+    it('should use the preset with changes', () => {
+      const assertions = {
+        'first-contentful-paint': ['warn', {mergeMethod: 'pessimistic', minScore: 0.6}],
+      };
+
+      const results = getAllAssertionResults({preset: 'lighthouse:all', assertions}, lhrs);
+      expect(results).toHaveLength(auditIds.length);
+
+      for (const result of results) {
+        if (result.auditId === 'first-contentful-paint') {
+          expect(result).toMatchObject({level: 'warn', expected: 0.6, actual: 0.5});
+        } else {
+          expect(result).toMatchObject({level: 'error', expected: 1, actual: 0.7});
+        }
+      }
+    });
+
+    it('should use the preset as-is', () => {
+      const results = getAllAssertionResults({preset: 'lighthouse:all'}, lhrs);
+      expect(results).toHaveLength(auditIds.length);
+
+      for (const result of results) {
+        expect(result).toMatchObject({
+          level: 'error',
+          expected: 1,
+          actual: 0.7,
+          values: [0.5, 0.7],
+        });
+      }
+    });
   });
 });

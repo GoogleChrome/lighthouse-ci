@@ -14,5 +14,5 @@ yarn start http://localhost:10200/dobetterweb/dbw_tester.html --chrome-flags="--
 cd ./lighthouse-ci
 export LHCI_RC_FILE="./test/fixtures/lighthouserc.json"
 yarn start server &
-yarn start collect --audit-url=http://localhost:10200/lighthouse-ci/ci-test.report.html
+yarn start collect --url=http://localhost:10200/lighthouse-ci/ci-test.report.html
 yarn start assert

@@ -88,7 +88,7 @@ describe('Lighthouse CI CLI', () => {
           'collect',
           `--rc-file=${rcFile}`,
           '--headful',
-          '--auditUrl=chrome://version',
+          '--url=chrome://version',
         ]);
 
         stdout = stdout.toString();

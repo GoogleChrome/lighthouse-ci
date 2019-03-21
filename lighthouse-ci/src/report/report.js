@@ -27,7 +27,10 @@ function buildCommand(yargs) {
  */
 function getCurrentHash() {
   const result = childProcess.spawnSync('git', ['rev-parse', 'HEAD'], {encoding: 'utf8'});
-  if (result.status !== 0) throw new Error('Unable to determine current hash');
+  if (result.status !== 0) {
+    throw new Error('Unable to determine current hash with `git rev-parse HEAD`');
+  }
+
   return result.stdout.trim();
 }
 

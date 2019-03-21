@@ -105,7 +105,7 @@ Done running Lighthouse!
         expect(stderr.toString()).toMatchInlineSnapshot(`""`);
         expect(status).toEqual(0);
       },
-      20000
+      60000
     );
   });
 

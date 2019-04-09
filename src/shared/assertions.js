@@ -71,9 +71,15 @@ function getAssertionResults(lhrs, auditId, options) {
   }
 
   const scores = auditResults.map(audit => audit.score || 0);
-  const lengths = auditResults.map(
-    audit => audit.details && 'items' in audit.details && audit.details.items.length
-  );
+  const lengths = auditResults
+    .map(
+      audit =>
+        audit.details &&
+        'items' in audit.details &&
+        audit.details.items &&
+        audit.details.items.length
+    )
+    .filter(/** @return {x is number} */ x => typeof x === 'number' && Number.isFinite(x));
 
   const {minScore, maxLength, mergeMethod = 'optimistic'} = options;
 

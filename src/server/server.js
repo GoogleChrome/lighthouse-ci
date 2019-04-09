@@ -68,7 +68,8 @@ async function runCommand(options) {
     const server = createServer(app);
     server.listen(port, () => {
       const serverAddress = server.address();
-      const listenPort = typeof serverAddress === 'string' ? port : serverAddress.port;
+      const listenPort =
+        typeof serverAddress === 'string' || !serverAddress ? port : serverAddress.port;
       resolve({port: listenPort, close: () => server.close()});
     });
   });

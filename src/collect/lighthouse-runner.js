@@ -8,7 +8,7 @@
 const path = require('path');
 const childProcess = require('child_process');
 
-const LH_CLI_PATH = path.join(__dirname, '../../../lighthouse-cli/index.js');
+const LH_CLI_PATH = path.join(require.resolve('lighthouse'), '../../lighthouse-cli/index.js');
 
 class LighthouseRunner {
   /**
@@ -34,13 +34,14 @@ class LighthouseRunner {
 
     const lhArgs = [
       url,
-      '--output', 'json',
+      '--output',
+      'json',
       chromeFlagsAsString ? `--chrome-flags=${chromeFlagsAsString}` : '',
     ].filter(Boolean);
     const process = childProcess.spawn(LH_CLI_PATH, lhArgs);
 
-    process.stdout.on('data', chunk => stdout += chunk.toString());
-    process.stderr.on('data', chunk => stderr += chunk.toString());
+    process.stdout.on('data', chunk => (stdout += chunk.toString()));
+    process.stderr.on('data', chunk => (stderr += chunk.toString()));
 
     process.on('exit', code => {
       if (code === 0) return resolve(stdout);

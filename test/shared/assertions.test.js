@@ -131,7 +131,7 @@ describe('getAllAssertionResults', () => {
 
   it('should de-dupe camelcase audits', () => {
     const assertions = {
-      'firstContentfulPaint': ['warn', {mergeMethod: 'optimistic', minScore: 1}],
+      firstContentfulPaint: ['warn', {mergeMethod: 'optimistic', minScore: 1}],
       'first-contentful-paint': ['warn', {mergeMethod: 'optimistic', minScore: 1}],
     };
 

@@ -34,8 +34,7 @@ async function run() {
     )
     .command('server', 'Run Lighthouse CI server', commandYargs =>
       serverCmd.buildCommand(commandYargs)
-    )
-    .argv;
+    ).argv;
 
   switch (argv._[0]) {
     case 'collect':

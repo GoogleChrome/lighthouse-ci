@@ -12,7 +12,8 @@ class StorageMethod {
    * @param {LHCI.ServerCommand.StorageOptions} options
    * @return {Promise<void>}
    */
-  async initialize(options) { // eslint-disable-line no-unused-vars
+  // eslint-disable-next-line no-unused-vars
+  async initialize(options) {
     throw new Error('Unimplemented');
   }
 
@@ -27,7 +28,8 @@ class StorageMethod {
    * @param {LHCI.ServerCommand.Project} project
    * @return {Promise<string>}
    */
-  async getProjectToken(project) { // eslint-disable-line no-unused-vars
+  // eslint-disable-next-line no-unused-vars
+  async getProjectToken(project) {
     throw new Error('Unimplemented');
   }
 
@@ -35,7 +37,8 @@ class StorageMethod {
    * @param {string} token
    * @return {Promise<LHCI.ServerCommand.Project>}
    */
-  async findProjectByToken(token) { // eslint-disable-line no-unused-vars
+  // eslint-disable-next-line no-unused-vars
+  async findProjectByToken(token) {
     throw new Error('Unimplemented');
   }
 
@@ -43,7 +46,8 @@ class StorageMethod {
    * @param {string} projectId
    * @return {Promise<LHCI.ServerCommand.Project>}
    */
-  async findProjectById(projectId) { // eslint-disable-line no-unused-vars
+  // eslint-disable-next-line no-unused-vars
+  async findProjectById(projectId) {
     throw new Error('Unimplemented');
   }
 
@@ -51,7 +55,8 @@ class StorageMethod {
    * @param {Omit<LHCI.ServerCommand.Project, 'id'>} project
    * @return {Promise<LHCI.ServerCommand.Project>}
    */
-  async createProject(project) { // eslint-disable-line no-unused-vars
+  // eslint-disable-next-line no-unused-vars
+  async createProject(project) {
     throw new Error('Unimplemented');
   }
 
@@ -59,7 +64,8 @@ class StorageMethod {
    * @param {string} projectId
    * @return {Promise<LHCI.ServerCommand.Build[]>}
    */
-  async getBuilds(projectId) { // eslint-disable-line no-unused-vars
+  // eslint-disable-next-line no-unused-vars
+  async getBuilds(projectId) {
     throw new Error('Unimplemented');
   }
 
@@ -67,7 +73,8 @@ class StorageMethod {
    * @param {Omit<LHCI.ServerCommand.Build, 'id'>} unsavedBuild
    * @return {Promise<LHCI.ServerCommand.Build>}
    */
-  async createBuild(unsavedBuild) { // eslint-disable-line no-unused-vars
+  // eslint-disable-next-line no-unused-vars
+  async createBuild(unsavedBuild) {
     throw new Error('Unimplemented');
   }
 
@@ -76,7 +83,8 @@ class StorageMethod {
    * @param {string} buildId
    * @return {Promise<LHCI.ServerCommand.Run[]>}
    */
-  async getRuns(projectId, buildId) { // eslint-disable-line no-unused-vars
+  // eslint-disable-next-line no-unused-vars
+  async getRuns(projectId, buildId) {
     throw new Error('Unimplemented');
   }
 
@@ -84,7 +92,8 @@ class StorageMethod {
    * @param {Omit<LHCI.ServerCommand.Run, 'id'>} unsavedRun
    * @return {Promise<LHCI.ServerCommand.Run>}
    */
-  async createRun(unsavedRun) { // eslint-disable-line no-unused-vars
+  // eslint-disable-next-line no-unused-vars
+  async createRun(unsavedRun) {
     throw new Error('Unimplemented');
   }
 

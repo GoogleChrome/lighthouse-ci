@@ -32,7 +32,7 @@ function clone(o) {
  * @property {import('sequelize').Model<LHCI.ServerCommand.Project, ProjectAttrs>} projectModel
  * @property {import('sequelize').Model<LHCI.ServerCommand.Build, BuildAttrs>} buildModel
  * @property {import('sequelize').Model<LHCI.ServerCommand.Run, RunAttrs>} runModel
-*/
+ */
 
 /** Sort all records by most recently updated */
 const order = [['updatedAt', 'desc']];

@@ -64,7 +64,7 @@ function getAssertionResults(lhrs, auditId, options) {
         name: 'auditRan',
         expected: 1,
         actual: 0,
-        values: auditResults.map(result => result === undefined ? 0 : 1),
+        values: auditResults.map(result => (result === undefined ? 0 : 1)),
         operator: '>=',
       },
     ];

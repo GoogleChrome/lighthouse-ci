@@ -81,32 +81,28 @@ describe('Lighthouse CI CLI', () => {
   });
 
   describe('collect', () => {
-    it(
-      'should collect results',
-      () => {
-        let {stdout = '', stderr = '', status = -1} = spawnSync(CLI_PATH, [
-          'collect',
-          `--rc-file=${rcFile}`,
-          '--headful',
-          '--url=chrome://version',
-        ]);
+    it('should collect results', () => {
+      let {stdout = '', stderr = '', status = -1} = spawnSync(CLI_PATH, [
+        'collect',
+        `--rc-file=${rcFile}`,
+        '--headful',
+        '--url=chrome://version',
+      ]);
 
-        stdout = stdout.toString();
-        stderr = stderr.toString();
-        status = status || 0;
+      stdout = stdout.toString();
+      stderr = stderr.toString();
+      status = status || 0;
 
-        expect(stdout).toMatchInlineSnapshot(`
+      expect(stdout).toMatchInlineSnapshot(`
 "Running Lighthouse 2 time(s)
 Run #1...done.
 Run #2...done.
 Done running Lighthouse!
 "
 `);
-        expect(stderr.toString()).toMatchInlineSnapshot(`""`);
-        expect(status).toEqual(0);
-      },
-      60000
-    );
+      expect(stderr.toString()).toMatchInlineSnapshot(`""`);
+      expect(status).toEqual(0);
+    }, 60000);
   });
 
   describe('report', () => {

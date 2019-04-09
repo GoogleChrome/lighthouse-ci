@@ -8,7 +8,7 @@
   "scripts": {
     "start": "./src/cli.js",
     "test": "npm run test:lint && npm run test:unit",
-    "test:lint": "../node_modules/.bin/eslint .",
+    "test:lint": "eslint .",
     "test:unit": "jest"
   },
   "dependencies": {
@@ -25,9 +25,17 @@
     "@types/express": "^4.16.1",
     "@types/isomorphic-fetch": "^0.0.34",
     "@types/morgan": "^1.7.35",
+    "@types/node": "^11.13.2",
     "@types/sequelize": "^4.27.34",
     "@types/uuid": "^3.4.4",
     "@types/yargs": "^12.0.8",
+    "eslint": "^5.16.0",
+    "eslint-config-google": "^0.12.0",
+    "eslint-config-prettier": "^4.1.0",
+    "eslint-plugin-prettier": "^3.0.1",
+    "jest": "^24.7.1",
+    "lighthouse": "^4.3.0",
+    "prettier": "^1.16.4",
     "sqlite3": "^4.0.6"
   }
 }

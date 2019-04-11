@@ -1,0 +1,26 @@
+sudo: required
+dist: trusty
+language: node_js
+branches:
+  only:
+    - master # Only build master and PRs
+matrix:
+  include:
+    - node_js: '8'
+    - node_js: '10'
+    - node_js: '11'
+cache:
+  yarn: true
+  directories:
+    - node_modules
+before_script:
+  - export DISPLAY=:99.0
+  - export CHROME_PATH="$(which google-chrome-stable)"
+  - sh -e /etc/init.d/xvfb start
+script:
+  - yarn test
+before_cache:
+  # nyc, jest and other projects store files in here. They mess up the travis build cache.
+  - rm -rf ./node_modules/.cache/
+addons:
+  chrome: stable

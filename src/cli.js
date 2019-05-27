@@ -13,6 +13,7 @@ const assertCmd = require('./assert/assert.js');
 const reportCmd = require('./report/report.js');
 const collectCmd = require('./collect/collect.js');
 const serverCmd = require('./server/server.js');
+const wizardCmd = require('./wizard/wizard.js');
 
 async function run() {
   /** @type {any} */
@@ -53,6 +54,9 @@ async function run() {
       await new Promise(_ => {});
       break;
     }
+    case 'wizard':
+      await wizardCmd.runCommand(argv);
+      break;
     default:
       throw new Error(`Unrecognized command ${argv._[0]}`);
   }

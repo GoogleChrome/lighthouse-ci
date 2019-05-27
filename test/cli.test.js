@@ -11,6 +11,7 @@ const fs = require('fs');
 const path = require('path');
 const {spawn, spawnSync} = require('child_process');
 const fetch = require('isomorphic-fetch');
+const log = require('lighthouse-logger');
 
 const CLI_PATH = path.join(__dirname, '../src/cli.js');
 
@@ -20,7 +21,7 @@ function waitForCondition(fn) {
 
   function checkConditionOrContinue() {
     if (fn()) return resolve();
-    setTimeout(checkConditionOrContinue, 500);
+    setTimeout(checkConditionOrContinue, 100);
   }
 
   checkConditionOrContinue();
@@ -55,29 +56,44 @@ describe('Lighthouse CI CLI', () => {
     });
 
     it('should accept requests', async () => {
-      let response = await fetch(`http://localhost:${serverPort}/v1/projects`);
-      let projects = await response.json();
+      const response = await fetch(`http://localhost:${serverPort}/v1/projects`);
+      const projects = await response.json();
       expect(projects).toEqual([]);
-
-      const payload = {name: 'Lighthouse', externalUrl: 'http://example.com'};
-      response = await fetch(`http://localhost:${serverPort}/v1/projects`, {
-        method: 'POST',
-        headers: {'content-type': 'application/json'},
-        body: JSON.stringify(payload),
-      });
-
-      const project = await response.json();
-      expect(project).toMatchObject(payload);
-
-      response = await fetch(`http://localhost:${serverPort}/v1/projects`);
-      projects = await response.json();
-      expect(projects).toEqual([project]);
-
-      response = await fetch(`http://localhost:${serverPort}/v1/projects/${project.id}/token`);
-      const {token} = await response.json();
-      expect(typeof token).toBe('string');
-      projectToken = token;
     });
+  });
+
+  describe('wizard', () => {
+    const ENTER_KEY = '\x0D';
+
+    async function writeAllInputs(wizardProcess, inputs) {
+      for (const input of inputs) {
+        wizardProcess.stdin.write(input);
+        wizardProcess.stdin.write(ENTER_KEY);
+        await waitForCondition(() => wizardProcess.stdoutMemory.includes(input));
+      }
+
+      wizardProcess.stdin.end();
+    }
+
+    it('should create a new project', async () => {
+      const wizardProcess = spawn(CLI_PATH, ['wizard']);
+      wizardProcess.stdoutMemory = '';
+      wizardProcess.stdout.on('data', chunk => (wizardProcess.stdoutMemory += chunk.toString()));
+
+      await waitForCondition(() => wizardProcess.stdoutMemory.includes('Which wizard'));
+      await writeAllInputs(wizardProcess, [
+        '', // Just ENTER key to select "new-project"
+        `http://localhost:${serverPort}`, // The base URL to talk to
+        'Lighthouse', // Project name
+        'https://example.com', // External build URL
+      ]);
+
+      const tokenSentence = wizardProcess.stdoutMemory
+        .match(/Use token [\s\S]+/im)[0]
+        .replace(log.bold, '')
+        .replace(log.reset, '');
+      projectToken = tokenSentence.match(/Use token ([\w-]+)/)[1];
+    }, 30000);
   });
 
   describe('collect', () => {

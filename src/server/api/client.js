@@ -73,7 +73,7 @@ class ApiClient {
    * @return {Promise<string>}
    */
   async getProjectToken(project) {
-    return this._get(`/v1/projects/${project.id}/token`);
+    return (await this._get(`/v1/projects/${project.id}/token`)).token;
   }
 
   /**

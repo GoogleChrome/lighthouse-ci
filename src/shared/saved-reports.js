@@ -52,4 +52,8 @@ function clearSavedLHRs() {
   }
 }
 
-module.exports = {getSavedLHRs, saveLHR, clearSavedLHRs};
+function getSavedReportsDirectory() {
+  return LHCI_DIR;
+}
+
+module.exports = {getSavedLHRs, saveLHR, clearSavedLHRs, getSavedReportsDirectory};

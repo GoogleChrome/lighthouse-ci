@@ -15,8 +15,8 @@ function buildCommand(yargs) {
   return yargs.options({
     method: {type: 'string', choices: ['node', 'docker'], default: 'node'},
     headful: {type: 'boolean', description: 'When enabled runs with a headful Chrome'},
-    chromeFlags: {type: 'array', description: 'The list of flags to pass to Chrome'},
     url: {description: 'The URL to run Lighthouse on.', required: true},
+    settings: {description: 'The Lighthouse settings and flags to use when collecting'},
     numberOfRuns: {
       alias: 'n',
       description: 'The number of times to run Lighthouse.',
@@ -41,7 +41,7 @@ async function runCommand(options) {
     process.stdout.write(`Run #${i + 1}...`);
     const lhr = await runner.run(options.url, {
       headful: options.headful,
-      chromeFlags: options.chromeFlags,
+      settings: options.settings,
     });
     saveLHR(lhr);
     process.stdout.write('done.\n');

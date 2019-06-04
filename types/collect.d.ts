@@ -7,12 +7,43 @@
 declare global {
   namespace LHCI {
     namespace CollectCommand {
+      export interface LighthouseSettings {
+        // From LH.SharedFlagsSettings
+        locale?: string;
+        maxWaitForFcp?: number;
+        maxWaitForLoad?: number;
+        blockedUrlPatterns?: string[] | null;
+        additionalTraceCategories?: string | null;
+        disableStorageReset?: boolean;
+        emulatedFormFactor?: 'mobile' | 'desktop' | 'none';
+        throttlingMethod?: 'devtools' | 'simulate' | 'provided';
+        throttling?: Record<string, number>;
+        onlyAudits?: string[] | null;
+        onlyCategories?: string[] | null;
+        skipAudits?: string[] | null;
+        extraHeaders?: Record<string, string> | null; // See extraHeaders TODO in bin.js
+        precomputedLanternData?: Record<string, any> | null;
+        budgets?: Array<Record<string, any>> | null;
+        // From LH.CliFlags
+        chromeFlags?: string;
+        budgetPath?: string;
+        // Not allowed
+        auditMode?: never;
+        gatherMode?: never;
+        output?: never;
+        outputPath?: never;
+        channel?: never;
+        listAllAudits?: never;
+        listAllCategories?: never;
+        printConfig?: never;
+      }
+
       export interface Options {
         url: string;
         method: 'node' | 'docker';
         numberOfRuns: number;
         headful: boolean;
-        chromeFlags?: string[];
+        settings?: LighthouseSettings;
       }
     }
   }

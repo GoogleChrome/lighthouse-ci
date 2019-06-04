@@ -4,11 +4,15 @@
       "assertions": {
         "first-contentful-paint": ["error", {"minScore": 0.8}],
         "speed-index": ["error", {"minScore": 0.8}],
-        "interactive": ["error", {"minScore": 0.8}]
+        "interactive": ["error", {"minScore": 0.8}],
+        "budgets": ["error", {"minScore": 1}]
       }
     },
     "collect": {
-      "numberOfRuns": 2
+      "numberOfRuns": 2,
+      "settings": {
+        "budgets": [{"resourceSizes": [{"resourceType": "document", "budget": 1}]}]
+      }
     },
     "report": {
       "serverBaseUrl": "http://localhost:9009"

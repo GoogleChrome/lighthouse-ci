@@ -17,6 +17,7 @@
     "express": "^4.16.4",
     "inquirer": "^6.3.1",
     "isomorphic-fetch": "^2.2.1",
+    "lighthouse": "^5.1.0",
     "morgan": "^1.9.1",
     "sequelize": "^4.42.0",
     "uuid": "^3.3.2",
@@ -37,7 +38,6 @@
     "eslint-config-prettier": "^4.1.0",
     "eslint-plugin-prettier": "^3.0.1",
     "jest": "^24.7.1",
-    "lighthouse": "^4.3.0",
     "prettier": "^1.16.4",
     "sqlite3": "^4.0.6",
     "typescript": "^3.4.3"

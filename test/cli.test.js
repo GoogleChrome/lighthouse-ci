@@ -110,12 +110,12 @@ describe('Lighthouse CI CLI', () => {
       status = status || 0;
 
       expect(stdout).toMatchInlineSnapshot(`
-"Running Lighthouse 2 time(s)
-Run #1...done.
-Run #2...done.
-Done running Lighthouse!
-"
-`);
+        "Running Lighthouse 2 time(s)
+        Run #1...done.
+        Run #2...done.
+        Done running Lighthouse!
+        "
+      `);
       expect(stderr.toString()).toMatchInlineSnapshot(`""`);
       expect(status).toEqual(0);
     }, 60000);
@@ -138,13 +138,13 @@ Done running Lighthouse!
       uuids = stdout.match(UUID_REGEX);
       const cleansedStdout = stdout.replace(UUID_REGEX, '<UUID>').replace(/:\d+/g, '<PORT>');
       expect(cleansedStdout).toMatchInlineSnapshot(`
-"Saving CI project Lighthouse (<UUID>)
-Saving CI build (<UUID>)
-Saved LHR to http://localhost<PORT> (<UUID>)
-Saved LHR to http://localhost<PORT> (<UUID>)
-Done saving build results to Lighthouse CI
-"
-`);
+        "Saving CI project Lighthouse (<UUID>)
+        Saving CI build (<UUID>)
+        Saved LHR to http://localhost<PORT> (<UUID>)
+        Saved LHR to http://localhost<PORT> (<UUID>)
+        Done saving build results to Lighthouse CI
+        "
+      `);
       expect(stderr).toMatchInlineSnapshot(`""`);
       expect(status).toEqual(0);
       expect(uuids).toHaveLength(4);
@@ -178,16 +178,44 @@ Done saving build results to Lighthouse CI
 
       expect(stdout).toMatchInlineSnapshot(`""`);
       expect(stderr).toMatchInlineSnapshot(`
-"Checking assertions against 2 run(s)
+        "Checking assertions against 2 run(s)
+        
+        [31m✘[0m [1mworks-offline[0m failure for [1mminScore[0m assertion
+              expected: >=[32m1[0m
+                 found: [31m0[0m
+            [2mall values: 0, 0[0m
+        
+        Assertion failed. Exiting with status code 1.
+        "
+      `);
+      expect(status).toEqual(1);
+    });
 
-[31m✘[0m [1mworks-offline[0m failure for [1mminScore[0m assertion
-      expected: >=[32m1[0m
-         found: [31m0[0m
-    [2mall values: 0, 0[0m
+    it('should assert failures from an rcfile', () => {
+      let {stdout = '', stderr = '', status = -1} = spawnSync(CLI_PATH, [
+        'assert',
+        `--assertions.first-contentful-paint=off`,
+        `--assertions.speed-index=off`,
+        `--assertions.interactive=off`,
+        `--rc-file=${rcFile}`,
+      ]);
 
-Assertion failed. Exiting with status code 1.
-"
-`);
+      stdout = stdout.toString();
+      stderr = stderr.toString();
+      status = status || 0;
+
+      expect(stdout).toMatchInlineSnapshot(`""`);
+      expect(stderr).toMatchInlineSnapshot(`
+        "Checking assertions against 2 run(s)
+        
+        [31m✘[0m [1mbudgets[0m failure for [1mauditRan[0m assertion
+              expected: >=[32m1[0m
+                 found: [31m0[0m
+            [2mall values: 0, 0[0m
+        
+        Assertion failed. Exiting with status code 1.
+        "
+      `);
       expect(status).toEqual(1);
     });
   });

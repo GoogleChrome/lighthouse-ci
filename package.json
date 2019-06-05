@@ -37,7 +37,7 @@
     "eslint-config-google": "^0.12.0",
     "eslint-config-prettier": "^4.1.0",
     "eslint-plugin-prettier": "^3.0.1",
-    "jest": "^24.7.1",
+    "jest": "^24.8.0",
     "prettier": "^1.16.4",
     "sqlite3": "^4.0.6",
     "typescript": "^3.4.3"

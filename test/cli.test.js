@@ -69,7 +69,10 @@ describe('Lighthouse CI CLI', () => {
       for (const input of inputs) {
         wizardProcess.stdin.write(input);
         wizardProcess.stdin.write(ENTER_KEY);
+        // Wait for inquirer to write back our response, that's the signal we can continue.
         await waitForCondition(() => wizardProcess.stdoutMemory.includes(input));
+        // Sometimes it still isn't ready though, give it a bit more time to process.
+        await new Promise(r => setTimeout(r, process.env.CI ? 500 : 50));
       }
 
       wizardProcess.stdin.end();
@@ -179,12 +182,12 @@ describe('Lighthouse CI CLI', () => {
       expect(stdout).toMatchInlineSnapshot(`""`);
       expect(stderr).toMatchInlineSnapshot(`
         "Checking assertions against 2 run(s)
-        
+
         [31m✘[0m [1mworks-offline[0m failure for [1mminScore[0m assertion
               expected: >=[32m1[0m
                  found: [31m0[0m
             [2mall values: 0, 0[0m
-        
+
         Assertion failed. Exiting with status code 1.
         "
       `);
@@ -207,12 +210,12 @@ describe('Lighthouse CI CLI', () => {
       expect(stdout).toMatchInlineSnapshot(`""`);
       expect(stderr).toMatchInlineSnapshot(`
         "Checking assertions against 2 run(s)
-        
+
         [31m✘[0m [1mbudgets[0m failure for [1mauditRan[0m assertion
               expected: >=[32m1[0m
                  found: [31m0[0m
             [2mall values: 0, 0[0m
-        
+
         Assertion failed. Exiting with status code 1.
         "
       `);

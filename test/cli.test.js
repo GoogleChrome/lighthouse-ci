@@ -207,14 +207,15 @@ describe('Lighthouse CI CLI', () => {
       stderr = stderr.toString();
       status = status || 0;
 
+      const stderrClean = stderr.replace(/\d{4}/g, 'XXXX');
       expect(stdout).toMatchInlineSnapshot(`""`);
-      expect(stderr).toMatchInlineSnapshot(`
+      expect(stderrClean).toMatchInlineSnapshot(`
         "Checking assertions against 2 run(s)
 
         [31m✘[0m [1mperformance-budget[0m.document.size failure for [1mmaxNumericValue[0m assertion
-              expected: <=[32m1024[0m
-                 found: [31m3608[0m
-            [2mall values: 3608[0m
+              expected: <=[32mXXXX[0m
+                 found: [31mXXXX[0m
+            [2mall values: XXXX[0m
 
         Assertion failed. Exiting with status code 1.
         "

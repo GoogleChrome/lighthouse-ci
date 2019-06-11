@@ -17,7 +17,7 @@
     "express": "^4.16.4",
     "inquirer": "^6.3.1",
     "isomorphic-fetch": "^2.2.1",
-    "lighthouse": "^5.1.0",
+    "lighthouse": "GoogleChrome/lighthouse#master",
     "morgan": "^1.9.1",
     "sequelize": "^4.42.0",
     "uuid": "^3.3.2",

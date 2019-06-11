@@ -3106,10 +3106,9 @@ lighthouse-logger@^1.0.0, lighthouse-logger@^1.2.0:
     debug "^2.6.8"
     marky "^1.2.0"
 
-lighthouse@^5.1.0:
+lighthouse@GoogleChrome/lighthouse#master:
   version "5.1.0"
-  resolved "https://registry.yarnpkg.com/lighthouse/-/lighthouse-5.1.0.tgz#f4f9a1f46f653cb3e53b0895a8a92162dd84a4a7"
-  integrity sha512-T+6VYefgRgSRHCgWhSQzsS1Jyu6JJ5I3cnrH/Q7BvwoJwnMhHME+JQ4ib5Oek2ZTfOakoarLDqrFPDtYNxk0KA==
+  resolved "https://codeload.github.com/GoogleChrome/lighthouse/tar.gz/162ab75475456f193130480e07a5fbd86f116759"
   dependencies:
     axe-core "3.2.2"
     chrome-launcher "^0.10.7"

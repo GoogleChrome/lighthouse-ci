@@ -18,6 +18,7 @@ const _ = require('./lodash.js');
  * @property {number[]} values
  * @property {LHCI.AssertCommand.AssertionFailureLevel} [level]
  * @property {string} [auditId]
+ * @property {string} [auditProperty]
  */
 
 /** @type {Record<AssertionType, (result: LH.AuditResult) => number | undefined>} */
@@ -112,14 +113,12 @@ function getAssertionResult(auditResults, mergeMethod, assertionType, expectedVa
 }
 
 /**
- * @param {LH.Result[]} lhrs
- * @param {string} auditId
+ * @param {LH.AuditResult[]} auditResults
  * @param {LHCI.AssertCommand.AssertionOptions} options
  * @return {AssertionResult[]}
  */
-function getAssertionResults(lhrs, auditId, options) {
+function getAssertionResults(auditResults, options) {
   const {minScore, maxLength, maxNumericValue, mergeMethod = 'optimistic'} = options;
-  const auditResults = lhrs.map(lhr => lhr.audits[auditId]);
   if (auditResults.some(result => result === undefined)) {
     return [
       {
@@ -160,6 +159,67 @@ function getAssertionResults(lhrs, auditId, options) {
 }
 
 /**
+ * @param {string} key
+ * @param {number} actual
+ * @param {number} expected
+ * @return {AssertionResult[]}
+ */
+function getAssertionResultsForBudgetRow(key, actual, expected) {
+  return getAssertionResult(
+    [{score: 0, numericValue: actual}],
+    'pessimistic',
+    'maxNumericValue',
+    expected
+  ).map(assertion => {
+    return {...assertion, auditProperty: key};
+  });
+}
+
+/**
+ * Budgets are somewhat unique in that they are already asserted at collection time by Lighthouse.
+ * We won't use any of our fancy logic here and we just want to pass on whatever Lighthouse found
+ * by creating fake individual audit results to assert against for each individual table row
+ * (de-duped by "<resource type>.<property>").
+ *
+ * @param {LH.AuditResult[]} auditResults
+ * @return {AssertionResult[]}
+ */
+function getBudgetAssertionResults(auditResults) {
+  /** @type {AssertionResult[]} */
+  const results = [];
+  /** @type {Set<string>} */
+  const resultsKeys = new Set();
+
+  for (const auditResult of auditResults) {
+    if (!auditResult.details || !auditResult.details.items) continue;
+
+    for (const budgetRow of auditResult.details.items) {
+      const sizeKey = `${budgetRow.resourceType}.size`;
+      const countKey = `${budgetRow.resourceType}.count`;
+
+      if (budgetRow.sizeOverBudget && !resultsKeys.has(sizeKey)) {
+        const actual = budgetRow.size;
+        const expected = actual - budgetRow.sizeOverBudget;
+        results.push(...getAssertionResultsForBudgetRow(sizeKey, actual, expected));
+        resultsKeys.add(sizeKey);
+      }
+
+      if (budgetRow.countOverBudget && !resultsKeys.has(countKey)) {
+        const actual = budgetRow.requestCount;
+        const overBudgetMatch = budgetRow.countOverBudget.match(/\d+/);
+        if (!overBudgetMatch) continue;
+        const overBudget = Number(overBudgetMatch[0]) || 0;
+        const expected = actual - overBudget;
+        results.push(...getAssertionResultsForBudgetRow(countKey, actual, expected));
+        resultsKeys.add(countKey);
+      }
+    }
+  }
+
+  return results;
+}
+
+/**
  * @param {LHCI.AssertCommand.Options} options
  * @param {LH.Result[]} lhrs
  * @return {AssertionResult[]}
@@ -181,7 +241,14 @@ function getAllAssertionResults(options, lhrs) {
   for (const auditId of auditsToAssert) {
     const [level, assertionOptions] = normalizeAssertion(assertions[auditId]);
     if (level === 'off') continue;
-    for (const result of getAssertionResults(lhrs, auditId, assertionOptions)) {
+
+    const auditResults = lhrs.map(lhr => lhr.audits[auditId]);
+    const assertionResults =
+      auditId === 'performance-budget'
+        ? getBudgetAssertionResults(auditResults)
+        : getAssertionResults(auditResults, assertionOptions);
+
+    for (const result of assertionResults) {
       results.push({...result, auditId, level});
     }
   }

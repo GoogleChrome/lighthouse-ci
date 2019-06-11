@@ -12,7 +12,7 @@ declare global {
     export interface AuditResult {
       score: number | null;
       numericValue?: number;
-      details?: {items?: never[]};
+      details?: {items?: any[]};
       scoreDisplayMode?:
         | 'notApplicable'
         | 'informative'

@@ -41,9 +41,10 @@ async function runCommand(options) {
     const label = result.level === 'warn' ? 'warning' : 'failure';
     const warningOrErrorIcon = result.level === 'warn' ? '⚠️  ' : log.redify(log.cross);
     const idPart = `${log.bold}${result.auditId}${log.reset}`;
+    const propertyPart = result.auditProperty ? `.${result.auditProperty}` : '';
     const namePart = `${log.bold}${result.name}${log.reset}`;
     process.stderr.write(`
-${warningOrErrorIcon} ${idPart} ${label} for ${namePart} assertion
+${warningOrErrorIcon} ${idPart}${propertyPart} ${label} for ${namePart} assertion
       expected: ${result.operator}${log.greenify(result.expected)}
          found: ${log.redify(result.actual)}
     ${log.dim}all values: ${result.values.join(', ')}${log.reset}

@@ -256,4 +256,78 @@ describe('getAllAssertionResults', () => {
       }
     });
   });
+
+  describe('budgets', () => {
+    it('should return assertion results for budgets UI', () => {
+      const assertions = {
+        'performance-budget': 'error',
+      };
+
+      const lhr = {
+        audits: {
+          'performance-budget': {
+            id: 'performance-budget',
+            score: null,
+            scoreDisplayMode: 'informative',
+            details: {
+              type: 'table',
+              items: [
+                {
+                  resourceType: 'document',
+                  label: 'Document',
+                  requestCount: 1,
+                  size: 3608,
+                  sizeOverBudget: 2584,
+                },
+                {
+                  resourceType: 'script',
+                  label: 'Script',
+                  requestCount: 4,
+                  size: 103675,
+                  countOverBudget: '2 requests',
+                  sizeOverBudget: 72955,
+                },
+              ],
+            },
+          },
+        },
+      };
+
+      // Include the LHR twice to exercise our de-duping logic.
+      const lhrs = [lhr, lhr];
+      const results = getAllAssertionResults({assertions}, lhrs);
+      expect(results).toEqual([
+        {
+          actual: 3608,
+          auditId: 'performance-budget',
+          auditProperty: 'document.size',
+          expected: 1024,
+          level: 'error',
+          name: 'maxNumericValue',
+          operator: '<=',
+          values: [3608],
+        },
+        {
+          actual: 103675,
+          auditId: 'performance-budget',
+          auditProperty: 'script.size',
+          expected: 30720,
+          level: 'error',
+          name: 'maxNumericValue',
+          operator: '<=',
+          values: [103675],
+        },
+        {
+          actual: 4,
+          auditId: 'performance-budget',
+          auditProperty: 'script.count',
+          expected: 2,
+          level: 'error',
+          name: 'maxNumericValue',
+          operator: '<=',
+          values: [4],
+        },
+      ]);
+    });
+  });
 });

@@ -11,6 +11,7 @@ declare global {
   namespace LH {
     export interface AuditResult {
       score: number | null;
+      numericValue?: number;
       details?: {items?: never[]};
     }
 

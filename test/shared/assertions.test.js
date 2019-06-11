@@ -20,6 +20,9 @@ describe('getAllAssertionResults', () => {
           'first-contentful-paint': {
             score: 0.6,
           },
+          'speed-index': {
+            numericValue: 5000,
+          },
           'network-requests': {
             details: {items: [1, 2, 3, 4]},
           },
@@ -29,6 +32,9 @@ describe('getAllAssertionResults', () => {
         audits: {
           'first-contentful-paint': {
             score: 0.8,
+          },
+          'speed-index': {
+            numericValue: 5500,
           },
           'network-requests': {
             details: {items: [1, 2]},
@@ -68,6 +74,7 @@ describe('getAllAssertionResults', () => {
     const assertions = {
       'first-contentful-paint': ['error', {minScore: 0.9}],
       'network-requests': ['warn', {maxLength: 1}],
+      'speed-index': ['error', {maxNumericValue: 2000}],
     };
 
     const results = getAllAssertionResults({assertions}, lhrs);
@@ -89,6 +96,15 @@ describe('getAllAssertionResults', () => {
         name: 'maxLength',
         operator: '<=',
         values: [4, 2],
+      },
+      {
+        actual: 5000,
+        auditId: 'speed-index',
+        expected: 2000,
+        level: 'error',
+        name: 'maxNumericValue',
+        operator: '<=',
+        values: [5000, 5500],
       },
     ]);
   });

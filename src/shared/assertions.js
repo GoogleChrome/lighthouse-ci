@@ -80,8 +80,11 @@ function getAssertionResults(lhrs, auditId, options) {
         audit.details.items.length
     )
     .filter(/** @return {x is number} */ x => typeof x === 'number' && Number.isFinite(x));
+  const numericValues = auditResults
+    .map(audit => audit.numericValue)
+    .filter(/** @return {x is number} */ x => typeof x === 'number' && Number.isFinite(x));
 
-  const {minScore, maxLength, mergeMethod = 'optimistic'} = options;
+  const {minScore, maxLength, maxNumericValue, mergeMethod = 'optimistic'} = options;
 
   /** @type {AssertionResult[]} */
   const results = [];
@@ -99,6 +102,20 @@ function getAssertionResults(lhrs, auditId, options) {
         expected: maxLength,
         actual: length,
         values: lengths,
+        operator: '<=',
+      });
+    }
+  }
+
+  if (maxNumericValue !== undefined) {
+    hadManualAssertion = true;
+    const numericValue = getValueForMergeMethod(numericValues, mergeMethod, 'maxNumericValue');
+    if (numericValue > maxNumericValue) {
+      results.push({
+        name: 'maxNumericValue',
+        expected: maxNumericValue,
+        actual: numericValue,
+        values: numericValues,
         operator: '<=',
       });
     }

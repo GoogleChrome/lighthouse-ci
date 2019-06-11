@@ -15,6 +15,7 @@ declare global {
         mergeMethod?: AssertionMergeMethod;
         minScore?: number;
         maxLength?: number;
+        maxNumericValue?: number;
       }
 
       export interface Assertions {

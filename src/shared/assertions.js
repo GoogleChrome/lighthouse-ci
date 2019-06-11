@@ -7,9 +7,11 @@
 
 const _ = require('./lodash.js');
 
+/** @typedef {keyof Omit<LHCI.AssertCommand.AssertionOptions, 'mergeMethod'>|'auditRan'} AssertionType */
+
 /**
  * @typedef AssertionResult
- * @property {'auditRan'|keyof LHCI.AssertCommand.AssertionOptions} name
+ * @property {AssertionType} name
  * @property {string} operator
  * @property {number} expected
  * @property {number} actual
@@ -17,6 +19,28 @@ const _ = require('./lodash.js');
  * @property {LHCI.AssertCommand.AssertionFailureLevel} [level]
  * @property {string} [auditId]
  */
+
+/** @type {Record<AssertionType, (result: LH.AuditResult) => number | undefined>} */
+const AUDIT_TYPE_VALUE_GETTERS = {
+  auditRan: result => (result === undefined ? 0 : 1),
+  minScore: result => (typeof result.score === 'number' ? result.score : undefined),
+  maxLength: result => result.details && result.details.items && result.details.items.length,
+  maxNumericValue: result => result.numericValue,
+};
+
+/** @type {Record<AssertionType, {operator: string, passesFn(actual: number, expected: number): boolean}>} */
+const AUDIT_TYPE_OPERATORS = {
+  auditRan: {operator: '==', passesFn: (actual, expected) => actual === expected},
+  minScore: {operator: '>=', passesFn: (actual, expected) => actual >= expected},
+  maxLength: {operator: '<=', passesFn: (actual, expected) => actual <= expected},
+  maxNumericValue: {operator: '<=', passesFn: (actual, expected) => actual <= expected},
+};
+
+/**
+ * @param {any} x
+ * @return {x is number}
+ */
+const isFiniteNumber = x => typeof x === 'number' && Number.isFinite(x);
 
 /**
  * @param {LHCI.AssertCommand.AssertionFailureLevel | [LHCI.AssertCommand.AssertionFailureLevel, LHCI.AssertCommand.AssertionOptions] | undefined} assertion
@@ -31,12 +55,10 @@ function normalizeAssertion(assertion) {
 /**
  * @param {number[]} values
  * @param {LHCI.AssertCommand.AssertionMergeMethod} mergeMethod
- * @param {keyof LHCI.AssertCommand.AssertionOptions} property
+ * @param {AssertionType} assertionType
+ * @return {number}
  */
-function getValueForMergeMethod(values, mergeMethod, property) {
-  values = values.filter(x => Number.isFinite(x));
-  if (!values.length) throw new Error('All audit results failed');
-
+function getValueForMergeMethod(values, mergeMethod, assertionType) {
   if (mergeMethod === 'median') {
     const medianIndex = Math.floor((values.length - 1) / 2);
     const sorted = values.slice().sort((a, b) => a - b);
@@ -45,9 +67,43 @@ function getValueForMergeMethod(values, mergeMethod, property) {
   }
 
   const useMin =
-    (mergeMethod === 'optimistic' && property.startsWith('max')) ||
-    (mergeMethod === 'pessimistic' && property.startsWith('min'));
+    (mergeMethod === 'optimistic' && assertionType.startsWith('max')) ||
+    (mergeMethod === 'pessimistic' && assertionType.startsWith('min'));
   return useMin ? Math.min(...values) : Math.max(...values);
+}
+
+/**
+ * @param {LH.AuditResult[]} auditResults
+ * @param {LHCI.AssertCommand.AssertionMergeMethod} mergeMethod
+ * @param {AssertionType} assertionType
+ * @param {number} expectedValue
+ * @return {AssertionResult[]}
+ */
+function getAssertionResult(auditResults, mergeMethod, assertionType, expectedValue) {
+  const values = auditResults.map(AUDIT_TYPE_VALUE_GETTERS[assertionType]);
+  const filteredValues = values.filter(isFiniteNumber);
+
+  if (
+    (!filteredValues.length && mergeMethod !== 'pessimistic') ||
+    (filteredValues.length !== values.length && mergeMethod === 'pessimistic')
+  ) {
+    const didRun = values.map(value => (isFiniteNumber(value) ? 1 : 0));
+    return [{name: 'auditRan', expected: 1, actual: 0, values: didRun, operator: '=='}];
+  }
+
+  const {operator, passesFn} = AUDIT_TYPE_OPERATORS[assertionType];
+  const actualValue = getValueForMergeMethod(filteredValues, mergeMethod, assertionType);
+  if (passesFn(actualValue, expectedValue)) return [];
+
+  return [
+    {
+      name: assertionType,
+      expected: expectedValue,
+      actual: actualValue,
+      values: filteredValues,
+      operator,
+    },
+  ];
 }
 
 /**
@@ -57,6 +113,7 @@ function getValueForMergeMethod(values, mergeMethod, property) {
  * @return {AssertionResult[]}
  */
 function getAssertionResults(lhrs, auditId, options) {
+  const {minScore, maxLength, maxNumericValue, mergeMethod = 'optimistic'} = options;
   const auditResults = lhrs.map(lhr => lhr.audits[auditId]);
   if (auditResults.some(result => result === undefined)) {
     return [
@@ -70,22 +127,6 @@ function getAssertionResults(lhrs, auditId, options) {
     ];
   }
 
-  const scores = auditResults.map(audit => audit.score || 0);
-  const lengths = auditResults
-    .map(
-      audit =>
-        audit.details &&
-        'items' in audit.details &&
-        audit.details.items &&
-        audit.details.items.length
-    )
-    .filter(/** @return {x is number} */ x => typeof x === 'number' && Number.isFinite(x));
-  const numericValues = auditResults
-    .map(audit => audit.numericValue)
-    .filter(/** @return {x is number} */ x => typeof x === 'number' && Number.isFinite(x));
-
-  const {minScore, maxLength, maxNumericValue, mergeMethod = 'optimistic'} = options;
-
   /** @type {AssertionResult[]} */
   const results = [];
 
@@ -95,44 +136,19 @@ function getAssertionResults(lhrs, auditId, options) {
 
   if (maxLength !== undefined) {
     hadManualAssertion = true;
-    const length = getValueForMergeMethod(lengths, mergeMethod, 'maxLength');
-    if (length > maxLength) {
-      results.push({
-        name: 'maxLength',
-        expected: maxLength,
-        actual: length,
-        values: lengths,
-        operator: '<=',
-      });
-    }
+    results.push(...getAssertionResult(auditResults, mergeMethod, 'maxLength', maxLength));
   }
 
   if (maxNumericValue !== undefined) {
     hadManualAssertion = true;
-    const numericValue = getValueForMergeMethod(numericValues, mergeMethod, 'maxNumericValue');
-    if (numericValue > maxNumericValue) {
-      results.push({
-        name: 'maxNumericValue',
-        expected: maxNumericValue,
-        actual: numericValue,
-        values: numericValues,
-        operator: '<=',
-      });
-    }
+    results.push(
+      ...getAssertionResult(auditResults, mergeMethod, 'maxNumericValue', maxNumericValue)
+    );
   }
 
   const realMinScore = minScore === undefined && !hadManualAssertion ? 1 : minScore;
   if (realMinScore !== undefined) {
-    const score = getValueForMergeMethod(scores, mergeMethod, 'minScore');
-    if (score < realMinScore) {
-      results.push({
-        name: 'minScore',
-        expected: realMinScore,
-        actual: score,
-        values: scores,
-        operator: '>=',
-      });
-    }
+    results.push(...getAssertionResult(auditResults, mergeMethod, 'minScore', realMinScore));
   }
 
   return results;

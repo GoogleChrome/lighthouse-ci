@@ -23,7 +23,12 @@ const _ = require('./lodash.js');
 /** @type {Record<AssertionType, (result: LH.AuditResult) => number | undefined>} */
 const AUDIT_TYPE_VALUE_GETTERS = {
   auditRan: result => (result === undefined ? 0 : 1),
-  minScore: result => (typeof result.score === 'number' ? result.score : undefined),
+  minScore: result => {
+    if (typeof result.score === 'number') return result.score;
+    if (result.scoreDisplayMode === 'notApplicable') return 1;
+    if (result.scoreDisplayMode === 'informative') return 0;
+    return undefined;
+  },
   maxLength: result => result.details && result.details.items && result.details.items.length,
   maxNumericValue: result => result.numericValue,
 };

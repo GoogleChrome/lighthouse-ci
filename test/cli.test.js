@@ -211,7 +211,7 @@ describe('Lighthouse CI CLI', () => {
       expect(stderr).toMatchInlineSnapshot(`
         "Checking assertions against 2 run(s)
 
-        [31m✘[0m [1mbudgets[0m failure for [1mauditRan[0m assertion
+        [31m✘[0m [1mperformance-budget[0m failure for [1mminScore[0m assertion
               expected: >=[32m1[0m
                  found: [31m0[0m
             [2mall values: 0, 0[0m

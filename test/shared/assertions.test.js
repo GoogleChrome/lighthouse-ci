@@ -118,6 +118,32 @@ describe('getAllAssertionResults', () => {
     expect(results).toMatchObject([{actual: 0.8, expected: 1}]);
   });
 
+  it('should respect notApplicable', () => {
+    const assertions = {
+      'network-requests': 'error',
+    };
+
+    lhrs[0].audits['network-requests'].score = null;
+    lhrs[1].audits['network-requests'].score = null;
+    lhrs[0].audits['network-requests'].scoreDisplayMode = 'notApplicable';
+    lhrs[1].audits['network-requests'].scoreDisplayMode = 'notApplicable';
+    const results = getAllAssertionResults({assertions}, lhrs);
+    expect(results).toEqual([]);
+  });
+
+  it('should respect informative', () => {
+    const assertions = {
+      'network-requests': 'error',
+    };
+
+    lhrs[0].audits['network-requests'].score = null;
+    lhrs[1].audits['network-requests'].score = null;
+    lhrs[0].audits['network-requests'].scoreDisplayMode = 'informative';
+    lhrs[1].audits['network-requests'].scoreDisplayMode = 'informative';
+    const results = getAllAssertionResults({assertions}, lhrs);
+    expect(results).toMatchObject([{actual: 0, expected: 1, name: 'minScore'}]);
+  });
+
   it('should use mergeMethod optimistic', () => {
     const assertions = {
       'first-contentful-paint': ['warn', {mergeMethod: 'optimistic', minScore: 1}],

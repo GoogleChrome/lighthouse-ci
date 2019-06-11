@@ -13,6 +13,13 @@ declare global {
       score: number | null;
       numericValue?: number;
       details?: {items?: never[]};
+      scoreDisplayMode?:
+        | 'notApplicable'
+        | 'informative'
+        | 'numeric'
+        | 'binary'
+        | 'error'
+        | 'manual';
     }
 
     export interface Result {

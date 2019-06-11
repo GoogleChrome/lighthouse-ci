@@ -5,7 +5,7 @@
         "first-contentful-paint": ["error", {"minScore": 0.8}],
         "speed-index": ["error", {"minScore": 0.8}],
         "interactive": ["error", {"minScore": 0.8}],
-        "budgets": ["error", {"minScore": 1}]
+        "performance-budget": ["error", {"minScore": 1}]
       }
     },
     "collect": {

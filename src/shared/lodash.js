@@ -59,4 +59,23 @@ module.exports = {
   cloneDeep(o) {
     return JSON.parse(JSON.stringify(o));
   },
+  /**
+   * @template T
+   * @param {Array<T>} items
+   * @param {(item: T) => any} keyFn
+   * @return {Array<Array<T>>}
+   */
+  groupBy(items, keyFn) {
+    /** @type {Map<any, Array<T>>} */
+    const groups = new Map();
+
+    for (const item of items) {
+      const key = keyFn(item);
+      const group = groups.get(key) || [];
+      group.push(item);
+      groups.set(key, group);
+    }
+
+    return [...groups.values()];
+  },
 };

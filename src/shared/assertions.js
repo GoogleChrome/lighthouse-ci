@@ -11,6 +11,7 @@ const _ = require('./lodash.js');
 
 /**
  * @typedef AssertionResult
+ * @property {string} url
  * @property {AssertionType} name
  * @property {string} operator
  * @property {number} expected
@@ -18,8 +19,10 @@ const _ = require('./lodash.js');
  * @property {number[]} values
  * @property {LHCI.AssertCommand.AssertionFailureLevel} [level]
  * @property {string} [auditId]
- * @property {string} [auditProperty]
+ * @property {string|undefined} [auditProperty]
  */
+
+/** @typedef {Omit<AssertionResult, 'url'>} AssertionResultNoURL */
 
 /** @type {Record<AssertionType, (result: LH.AuditResult) => number | undefined>} */
 const AUDIT_TYPE_VALUE_GETTERS = {
@@ -83,7 +86,7 @@ function getValueForMergeMethod(values, mergeMethod, assertionType) {
  * @param {LHCI.AssertCommand.AssertionMergeMethod} mergeMethod
  * @param {AssertionType} assertionType
  * @param {number} expectedValue
- * @return {AssertionResult[]}
+ * @return {AssertionResultNoURL[]}
  */
 function getAssertionResult(auditResults, mergeMethod, assertionType, expectedValue) {
   const values = auditResults.map(AUDIT_TYPE_VALUE_GETTERS[assertionType]);
@@ -115,7 +118,7 @@ function getAssertionResult(auditResults, mergeMethod, assertionType, expectedVa
 /**
  * @param {LH.AuditResult[]} auditResults
  * @param {LHCI.AssertCommand.AssertionOptions} options
- * @return {AssertionResult[]}
+ * @return {AssertionResultNoURL[]}
  */
 function getAssertionResults(auditResults, options) {
   const {minScore, maxLength, maxNumericValue, mergeMethod = 'optimistic'} = options;
@@ -131,7 +134,7 @@ function getAssertionResults(auditResults, options) {
     ];
   }
 
-  /** @type {AssertionResult[]} */
+  /** @type {AssertionResultNoURL[]} */
   const results = [];
 
   // Keep track of if we had a manual assertion so we know whether or not to automatically create a
@@ -162,7 +165,7 @@ function getAssertionResults(auditResults, options) {
  * @param {string} key
  * @param {number} actual
  * @param {number} expected
- * @return {AssertionResult[]}
+ * @return {AssertionResultNoURL[]}
  */
 function getAssertionResultsForBudgetRow(key, actual, expected) {
   return getAssertionResult(
@@ -182,10 +185,10 @@ function getAssertionResultsForBudgetRow(key, actual, expected) {
  * (de-duped by "<resource type>.<property>").
  *
  * @param {LH.AuditResult[]} auditResults
- * @return {AssertionResult[]}
+ * @return {AssertionResultNoURL[]}
  */
 function getBudgetAssertionResults(auditResults) {
-  /** @type {AssertionResult[]} */
+  /** @type {AssertionResultNoURL[]} */
   const results = [];
   /** @type {Set<string>} */
   const resultsKeys = new Set();
@@ -220,11 +223,20 @@ function getBudgetAssertionResults(auditResults) {
 }
 
 /**
- * @param {LHCI.AssertCommand.Options} options
+ * @param {string} pattern
+ * @param {LH.Result} lhr
+ * @return {boolean}
+ */
+function doesLHRMatchPattern(pattern, lhr) {
+  return new RegExp(pattern).test(lhr.finalUrl);
+}
+
+/**
+ * @param {LHCI.AssertCommand.BaseOptions} options
  * @param {LH.Result[]} lhrs
  * @return {AssertionResult[]}
  */
-function getAllAssertionResults(options, lhrs) {
+function getAllFilteredAssertionResults(options, lhrs) {
   const {preset = '', ...optionOverrides} = options;
   let optionsToUse = optionOverrides;
   const presetMatch = preset.match(/lighthouse:(.*)$/);
@@ -233,7 +245,14 @@ function getAllAssertionResults(options, lhrs) {
     optionsToUse = _.merge(_.cloneDeep(presetData), optionsToUse);
   }
 
-  const {assertions = {}} = optionsToUse;
+  const {assertions = {}, matchingUrlPattern: urlPattern} = optionsToUse;
+  const lhrsToUse = urlPattern ? lhrs.filter(lhr => doesLHRMatchPattern(urlPattern, lhr)) : lhrs;
+  // If we don't have any LHRs, just return early.
+  if (!lhrsToUse.length) return [];
+  // Double-check we've only got one URL to look at.
+  const uniqueURLs = new Set(lhrsToUse.map(lhr => lhr.finalUrl));
+  if (uniqueURLs.size > 1) throw new Error('Can only assert one URL at a time!');
+  const lhrURL = lhrsToUse[0].finalUrl;
 
   /** @type {AssertionResult[]} */
   const results = [];
@@ -242,14 +261,42 @@ function getAllAssertionResults(options, lhrs) {
     const [level, assertionOptions] = normalizeAssertion(assertions[auditId]);
     if (level === 'off') continue;
 
-    const auditResults = lhrs.map(lhr => lhr.audits[auditId]);
+    const auditResults = lhrsToUse.map(lhr => lhr.audits[auditId]);
     const assertionResults =
       auditId === 'performance-budget'
         ? getBudgetAssertionResults(auditResults)
         : getAssertionResults(auditResults, assertionOptions);
 
     for (const result of assertionResults) {
-      results.push({...result, auditId, level});
+      results.push({...result, auditId, level, url: lhrURL});
+    }
+  }
+
+  return results;
+}
+
+/**
+ * @param {LHCI.AssertCommand.Options} options
+ * @param {LH.Result[]} lhrs
+ * @return {AssertionResult[]}
+ */
+function getAllAssertionResults(options, lhrs) {
+  const groupedByURL = _.groupBy(lhrs, lhr => lhr.finalUrl);
+
+  /** @type {LHCI.AssertCommand.BaseOptions[]} */
+  let arrayOfOptions = [options];
+  if (options.assertMatrix) {
+    const {assertMatrix, ...restOptions} = options;
+    if (Object.keys(restOptions).length)
+      throw new Error('Cannot use assertMatrix with other options');
+    arrayOfOptions = assertMatrix;
+  }
+
+  /** @type {AssertionResult[]} */
+  const results = [];
+  for (const lhrSet of groupedByURL) {
+    for (const baseOptions of arrayOfOptions) {
+      results.push(...getAllFilteredAssertionResults(baseOptions, lhrSet));
     }
   }
 

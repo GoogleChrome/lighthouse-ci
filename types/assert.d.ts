@@ -22,9 +22,14 @@ declare global {
         [auditId: string]: AssertionFailureLevel | [AssertionFailureLevel, AssertionOptions];
       }
 
-      export interface Options {
+      export interface BaseOptions {
+        matchingUrlPattern?: string;
         preset?: 'lighthouse:all' | 'lighthouse:recommended';
         assertions?: Assertions;
+      }
+
+      export interface Options extends BaseOptions {
+        assertMatrix?: BaseOptions[];
       }
     }
   }

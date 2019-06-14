@@ -31,6 +31,7 @@ function waitForCondition(fn) {
 describe('Lighthouse CI CLI', () => {
   const sqlFile = 'cli-test.tmp.sql';
   const rcFile = path.join(__dirname, 'fixtures/lighthouserc.json');
+  const rcExtendedFile = path.join(__dirname, 'fixtures/lighthouserc-extended.json');
 
   let serverPort;
   let serverProcess;

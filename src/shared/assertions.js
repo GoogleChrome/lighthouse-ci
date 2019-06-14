@@ -287,8 +287,10 @@ function getAllAssertionResults(options, lhrs) {
   let arrayOfOptions = [options];
   if (options.assertMatrix) {
     const {assertMatrix, ...restOptions} = options;
-    if (Object.keys(restOptions).length)
+    if (Object.keys(restOptions).length) {
       throw new Error('Cannot use assertMatrix with other options');
+    }
+
     arrayOfOptions = assertMatrix;
   }
 

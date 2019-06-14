@@ -61,9 +61,11 @@ async function runCommand(options) {
   const lhrs = getSavedLHRs();
 
   for (const lhr of lhrs) {
+    const parsedLHR = JSON.parse(lhr);
     const run = await api.createRun({
       projectId: project.id,
       buildId: build.id,
+      url: parsedLHR.finalUrl,
       lhr,
     });
 

@@ -1,0 +1,10 @@
+{
+  "ci": {
+    "assert": {
+      "assertions": {
+        "first-contentful-paint": ["error", {"maxNumericValue": 1}],
+        "performance-budget": ["error", {"minScore": 0}]
+      }
+    }
+  }
+}

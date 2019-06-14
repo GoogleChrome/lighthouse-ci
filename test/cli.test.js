@@ -223,5 +223,41 @@ describe('Lighthouse CI CLI', () => {
       `);
       expect(status).toEqual(1);
     });
+
+    it('should assert failures from an extended rcfile', () => {
+      let {stdout = '', stderr = '', status = -1} = spawnSync(CLI_PATH, [
+        'assert',
+        `--assertions.speed-index=off`,
+        `--assertions.interactive=off`,
+        `--rc-file=${rcExtendedFile}`,
+      ]);
+
+      stdout = stdout.toString();
+      stderr = stderr.toString();
+      status = status || 0;
+
+      const stderrClean = stderr.replace(/\d{4}/g, 'XXXX');
+      expect(stdout).toMatchInlineSnapshot(`""`);
+      // FIXME: first contentful paint can't be computed on `chrome://version`
+      // Update this test and the URL to use LHCI Server UI once it's built
+      expect(stderrClean).toMatchInlineSnapshot(`
+        "Checking assertions against 2 run(s)
+
+        [31m✘[0m [1mfirst-contentful-paint[0m failure for [1mauditRan[0m assertion
+              expected: ==[32m1[0m
+                 found: [31m0[0m
+            [2mall values: 0, 0[0m
+
+
+        [31m✘[0m [1mperformance-budget[0m.document.size failure for [1mmaxNumericValue[0m assertion
+              expected: <=[32mXXXX[0m
+                 found: [31mXXXX[0m
+            [2mall values: XXXX[0m
+
+        Assertion failed. Exiting with status code 1.
+        "
+      `);
+      expect(status).toEqual(1);
+    });
   });
 });

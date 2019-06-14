@@ -161,6 +161,7 @@ describe('Lighthouse CI CLI', () => {
 
       const runs = await response.json();
       expect(runs.map(run => run.id)).toEqual([runBId, runAId]);
+      expect(runs.map(run => run.url)).toEqual(['chrome://version', 'chrome://version']);
       expect(runs.map(run => JSON.parse(run.lhr))).toMatchObject([
         {requestedUrl: 'chrome://version'},
         {requestedUrl: 'chrome://version'},

@@ -28,6 +28,7 @@ declare global {
         id: string;
         projectId: string;
         buildId: string;
+        url: string;
         lhr: string;
       }
 

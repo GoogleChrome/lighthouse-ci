@@ -156,7 +156,7 @@ describe('Lighthouse CI Server', () => {
     });
 
     it('should create a run', async () => {
-      const payload = {lhr: JSON.stringify({lighthouseVersion: '4.1.0'})};
+      const payload = {url: 'chrome://version', lhr: JSON.stringify({lighthouseVersion: '4.1.0'})};
 
       runA = await fetchJSON(`/v1/projects/${projectA.id}/builds/${buildA.id}/runs`, payload);
       expect(runA).toHaveProperty('id');
@@ -166,7 +166,7 @@ describe('Lighthouse CI Server', () => {
     });
 
     it('should create a 2nd run', async () => {
-      const payload = {lhr: JSON.stringify({lighthouseVersion: '4.2.0'})};
+      const payload = {url: 'chrome://version', lhr: JSON.stringify({lighthouseVersion: '4.2.0'})};
 
       runB = await fetchJSON(`/v1/projects/${projectA.id}/builds/${buildA.id}/runs`, payload);
       expect(runB).toHaveProperty('id');

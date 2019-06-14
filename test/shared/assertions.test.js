@@ -16,6 +16,7 @@ describe('getAllAssertionResults', () => {
   beforeEach(() => {
     lhrs = [
       {
+        finalUrl: 'http://page-1.com',
         audits: {
           'first-contentful-paint': {
             score: 0.6,
@@ -29,6 +30,7 @@ describe('getAllAssertionResults', () => {
         },
       },
       {
+        finalUrl: 'http://page-1.com',
         audits: {
           'first-contentful-paint': {
             score: 0.8,
@@ -49,6 +51,7 @@ describe('getAllAssertionResults', () => {
     const results = getAllAssertionResults({assertions}, lhrs);
     expect(results).toEqual([
       {
+        url: 'http://page-1.com',
         actual: 0,
         auditId: 'missing',
         expected: 1,
@@ -80,6 +83,7 @@ describe('getAllAssertionResults', () => {
     const results = getAllAssertionResults({assertions}, lhrs);
     expect(results).toEqual([
       {
+        url: 'http://page-1.com',
         actual: 0.8,
         auditId: 'first-contentful-paint',
         expected: 0.9,
@@ -89,6 +93,7 @@ describe('getAllAssertionResults', () => {
         values: [0.6, 0.8],
       },
       {
+        url: 'http://page-1.com',
         actual: 2,
         auditId: 'network-requests',
         expected: 1,
@@ -98,6 +103,7 @@ describe('getAllAssertionResults', () => {
         values: [4, 2],
       },
       {
+        url: 'http://page-1.com',
         actual: 5000,
         auditId: 'speed-index',
         expected: 2000,
@@ -264,6 +270,7 @@ describe('getAllAssertionResults', () => {
       };
 
       const lhr = {
+        finalUrl: 'http://page-1.com',
         audits: {
           'performance-budget': {
             id: 'performance-budget',
@@ -298,6 +305,7 @@ describe('getAllAssertionResults', () => {
       const results = getAllAssertionResults({assertions}, lhrs);
       expect(results).toEqual([
         {
+          url: 'http://page-1.com',
           actual: 3608,
           auditId: 'performance-budget',
           auditProperty: 'document.size',
@@ -308,6 +316,7 @@ describe('getAllAssertionResults', () => {
           values: [3608],
         },
         {
+          url: 'http://page-1.com',
           actual: 103675,
           auditId: 'performance-budget',
           auditProperty: 'script.size',
@@ -318,6 +327,7 @@ describe('getAllAssertionResults', () => {
           values: [103675],
         },
         {
+          url: 'http://page-1.com',
           actual: 4,
           auditId: 'performance-budget',
           auditProperty: 'script.count',
@@ -328,6 +338,110 @@ describe('getAllAssertionResults', () => {
           values: [4],
         },
       ]);
+    });
+  });
+
+  describe('URL-grouping', () => {
+    beforeEach(() => {
+      for (const lhr of [...lhrs]) {
+        lhrs.push({...lhr, finalUrl: 'http://page-2.com'});
+      }
+    });
+
+    it('should report for URLs separately', () => {
+      const assertions = {'first-contentful-paint': ['error', {minScore: 0.9}]};
+      const results = getAllAssertionResults({assertions}, lhrs);
+      expect(results).toEqual([
+        {
+          url: 'http://page-1.com',
+          actual: 0.8,
+          auditId: 'first-contentful-paint',
+          expected: 0.9,
+          level: 'error',
+          name: 'minScore',
+          operator: '>=',
+          values: [0.6, 0.8],
+        },
+        {
+          url: 'http://page-2.com',
+          actual: 0.8,
+          auditId: 'first-contentful-paint',
+          expected: 0.9,
+          level: 'error',
+          name: 'minScore',
+          operator: '>=',
+          values: [0.6, 0.8],
+        },
+      ]);
+    });
+
+    it('should filter to matching URLs', () => {
+      const assertions = {'first-contentful-paint': ['error', {minScore: 0.9}]};
+      const matchingUrlPattern = '.*-2.com';
+      const results = getAllAssertionResults({assertions, matchingUrlPattern}, lhrs);
+
+      expect(results).toEqual([
+        {
+          url: 'http://page-2.com',
+          actual: 0.8,
+          auditId: 'first-contentful-paint',
+          expected: 0.9,
+          level: 'error',
+          name: 'minScore',
+          operator: '>=',
+          values: [0.6, 0.8],
+        },
+      ]);
+    });
+  });
+
+  describe('assertMatrix', () => {
+    beforeEach(() => {
+      for (const lhr of [...lhrs]) {
+        lhrs.push({...lhr, finalUrl: 'http://page-2.com'});
+      }
+    });
+
+    it('should support multiple assertion sets', () => {
+      const assertMatrix = [
+        {
+          matchingUrlPattern: '.*-1.com',
+          assertions: {'first-contentful-paint': ['error', {minScore: 0.9}]},
+        },
+        {
+          matchingUrlPattern: '.*-2.com',
+          assertions: {'first-contentful-paint': ['error', {minScore: 0.95}]},
+        },
+      ];
+      const results = getAllAssertionResults({assertMatrix}, lhrs);
+
+      expect(results).toEqual([
+        {
+          url: 'http://page-1.com',
+          actual: 0.8,
+          auditId: 'first-contentful-paint',
+          expected: 0.9,
+          level: 'error',
+          name: 'minScore',
+          operator: '>=',
+          values: [0.6, 0.8],
+        },
+        {
+          url: 'http://page-2.com',
+          actual: 0.8,
+          auditId: 'first-contentful-paint',
+          expected: 0.95,
+          level: 'error',
+          name: 'minScore',
+          operator: '>=',
+          values: [0.6, 0.8],
+        },
+      ]);
+    });
+
+    it('should throw when trying to use assertMatrix with other options', () => {
+      const options = {assertMatrix: [], matchingUrlPattern: '', assertions: {}};
+      expect(() => getAllAssertionResults(options, [])).toThrow();
     });
   });
 });

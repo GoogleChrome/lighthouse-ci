@@ -23,6 +23,7 @@ declare global {
     }
 
     export interface Result {
+      finalUrl: string;
       audits: {[auditId: string]: AuditResult};
     }
   }

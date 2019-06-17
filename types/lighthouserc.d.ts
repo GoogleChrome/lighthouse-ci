@@ -8,11 +8,12 @@ declare global {
   namespace LHCI {
     export interface LighthouseRc {
       ci?: {
-        assert?: Partial<AssertCommand.Options>
-        collect?: Partial<CollectCommand.Options>
-        report?: Partial<ReportCommand.Options>
-        server?: Partial<ServerCommand.Options>
-      }
+        extends?: string;
+        assert?: Partial<AssertCommand.Options>;
+        collect?: Partial<CollectCommand.Options>;
+        report?: Partial<ReportCommand.Options>;
+        server?: Partial<ServerCommand.Options>;
+      };
     }
   }
 }

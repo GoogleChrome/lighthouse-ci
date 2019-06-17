@@ -6,8 +6,10 @@
 'use strict';
 
 const fs = require('fs');
+const path = require('path');
+const _ = require('./lodash.js');
 
-/** @typedef {Partial<LHCI.AssertCommand.Options & LHCI.CollectCommand.Options & LHCI.ReportCommand.Options & LHCI.ServerCommand.Options>} YargsOptions */
+/** @typedef {Partial<LHCI.AssertCommand.Options & LHCI.CollectCommand.Options & LHCI.ReportCommand.Options & LHCI.ServerCommand.Options & {extends?: string | undefined}>} YargsOptions */
 
 /**
  * @param {string} pathToRcFile
@@ -17,17 +19,26 @@ function loadAndParseRcFile(pathToRcFile) {
   const contents = fs.readFileSync(pathToRcFile, 'utf8');
   /** @type {LHCI.LighthouseRc} */
   const rcFile = JSON.parse(contents);
-  return convertRcFileToYargsOptions(rcFile);
+  return convertRcFileToYargsOptions(rcFile, pathToRcFile);
 }
 
 /**
  *
  * @param {LHCI.LighthouseRc} rcFile
+ * @param {string} pathToRcFile
  * @return {YargsOptions}
  */
-function convertRcFileToYargsOptions(rcFile) {
+function convertRcFileToYargsOptions(rcFile, pathToRcFile) {
   const {ci = {}} = rcFile;
-  return {...ci.assert, ...ci.collect, ...ci.report, ...ci.server};
+  /** @type {YargsOptions} */
+  let merged = {...ci.assert, ...ci.collect, ...ci.report, ...ci.server};
+  if (ci.extends) {
+    const extendedRcFilePath = path.resolve(path.dirname(pathToRcFile), ci.extends);
+    const extensionBase = loadAndParseRcFile(extendedRcFilePath);
+    merged = _.merge(extensionBase, merged);
+  }
+
+  return merged;
 }
 
 module.exports = {loadAndParseRcFile};

@@ -244,16 +244,16 @@ describe('Lighthouse CI CLI', () => {
       expect(stderrClean).toMatchInlineSnapshot(`
         "Checking assertions against 2 run(s)
 
-        [31m✘[0m [1mfirst-contentful-paint[0m failure for [1mauditRan[0m assertion
-              expected: ==[32m1[0m
-                 found: [31m0[0m
-            [2mall values: 0, 0[0m
-
-
         [31m✘[0m [1mperformance-budget[0m.document.size failure for [1mmaxNumericValue[0m assertion
               expected: <=[32mXXXX[0m
                  found: [31mXXXX[0m
             [2mall values: XXXX[0m
+
+
+        [31m✘[0m [1mfirst-contentful-paint[0m failure for [1mauditRan[0m assertion
+              expected: ==[32m1[0m
+                 found: [31m0[0m
+            [2mall values: 0, 0[0m
 
         Assertion failed. Exiting with status code 1.
         "

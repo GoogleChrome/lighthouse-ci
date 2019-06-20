@@ -7,8 +7,9 @@
     "checkJs": true,
     "strict": true,
 
+    "jsx": "preserve",
     "resolveJsonModule": true,
     "diagnostics": true
   },
-  "include": ["src/**/*.js", "./types/**/*.ts"]
+  "include": ["src/**/*.js", "./types/**/*.ts", "src/**/*.jsx"]
 }

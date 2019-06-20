@@ -5,12 +5,15 @@
  */
 'use strict';
 
+const path = require('path');
 const createServer = require('http').createServer;
 const express = require('express');
 const morgan = require('morgan');
 const bodyParser = require('body-parser');
 const createProjectsRouter = require('./api/routes/projects');
 const StorageMethod = require('./api/storage/storage-method.js');
+
+const DIST_FOLDER = path.join(__dirname, '../../dist');
 
 /**
  * @param {import('yargs').Argv} yargs
@@ -63,6 +66,8 @@ async function runCommand(options) {
   if (options.logLevel !== 'silent') app.use(morgan('short'));
   app.use(bodyParser.json({limit: '10mb'}));
   app.use('/v1/projects', createProjectsRouter({storageMethod}));
+  app.use('/app', express.static(DIST_FOLDER));
+  app.get('/app/*', (_, res) => res.sendFile(path.join(DIST_FOLDER, 'index.html')));
 
   return new Promise(resolve => {
     const server = createServer(app);

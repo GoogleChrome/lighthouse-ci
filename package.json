@@ -6,6 +6,8 @@
     "lighthouse-ci": "./src/cli.js"
   },
   "scripts": {
+    "build": "parcel build ./src/ui/index.html",
+    "build:dev": "parcel ./src/ui/index.html",
     "start": "./src/cli.js",
     "test": "npm run test:typecheck && npm run test:lint && npm run test:unit",
     "test:typecheck": "tsc -p .",
@@ -38,8 +40,15 @@
     "eslint-config-prettier": "^4.1.0",
     "eslint-plugin-prettier": "^3.0.1",
     "jest": "^24.8.0",
+    "parcel-bundler": "^1.12.3",
+    "preact": "^10.0.0-beta.2",
     "prettier": "^1.16.4",
     "sqlite3": "^4.0.6",
     "typescript": "^3.4.3"
-  }
+  },
+  "browserslist": [
+    "last 2 Chrome versions",
+    "last 2 Firefox versions",
+    "last 2 Safari versions"
+  ]
 }

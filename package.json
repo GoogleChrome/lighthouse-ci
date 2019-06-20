@@ -6,8 +6,8 @@
     "lighthouse-ci": "./src/cli.js"
   },
   "scripts": {
-    "build": "parcel build ./src/ui/index.html",
-    "build:dev": "parcel ./src/ui/index.html",
+    "build": "parcel build ./src/ui/index.html --public-url=/app",
+    "build:watch": "parcel watch ./src/ui/index.html  --public-url=/app",
     "start": "./src/cli.js",
     "test": "npm run test:typecheck && npm run test:lint && npm run test:unit",
     "test:typecheck": "tsc -p .",

@@ -1,2 +1,4 @@
 *.tmp.sql
 .lighthouseci/
+.cache/
+dist/

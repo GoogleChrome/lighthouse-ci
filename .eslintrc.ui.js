@@ -12,6 +12,7 @@ module.exports = {
     browser: true,
   },
   rules: {
+    'react/prop-types': 'off',
     'no-unused-vars': [
       'error',
       {
@@ -22,11 +23,14 @@ module.exports = {
       },
     ],
   },
+  parser: 'babel-eslint',
   parserOptions: {
+    ecmaVersion: 2019,
     ecmaFeatures: {
       jsx: true,
     },
     sourceType: 'module',
+    allowImportExportEverywhere: true,
   },
   settings: {
     react: {

@@ -1,33 +1,37 @@
 import {h} from 'preact';
-import {useState, useEffect} from 'preact/hooks';
+import {useEffect} from 'preact/hooks';
+import Router, {route} from 'preact-router';
+import LazyRoute from 'preact-async-route';
 
-/** @typedef {'loading'|'error'|'connected'} LoadingState */
+const Loader = () => <h1>Loading route...</h1>;
 
-/** @type {Record<LoadingState, string>} */
-const messagesForLoadingState = {
-  loading: 'is trying to connect...',
-  error: 'has failed to connect.',
-  connected: 'is connected!',
+/** @param {{to: string, default?: boolean}} props */
+const Redirect = props => {
+  useEffect(() => {
+    route(props.to);
+  }, []);
+
+  return <div {...props} />;
 };
 
 export const App = () => {
-  const [loadingState, setLoadingState] = useState(/** @type {LoadingState} */ ('loading'));
-
-  useEffect(
-    () => {
-      // Wrap in IIFE because the return value of useEffect should be a cleanup function, not a Promise.
-      (async () => {
-        try {
-          const response = await fetch('/v1/projects');
-          if (response.status !== 200) throw new Error('Could not connect.');
-          setLoadingState('connected');
-        } catch (err) {
-          setLoadingState('error');
+  return (
+    <Router>
+      <LazyRoute
+        path="/app/projects"
+        loading={() => <Loader />}
+        getComponent={() =>
+          import('./routes/project-list/project-list.jsx').then(m => m.ProjectList)
         }
-      })();
-    },
-    /* no state dependencies, only run this connection check on initial mount */ []
+      />
+      <LazyRoute
+        path="/app/projects/:id"
+        loading={() => <Loader />}
+        getComponent={() =>
+          import('./routes/project-dashboard/project-dashboard.jsx').then(m => m.ProjectDashboard)
+        }
+      />
+      <Redirect default to="/app/projects" />
+    </Router>
   );
-
-  return <h1>Lighthouse CI {messagesForLoadingState[loadingState]}</h1>;
 };

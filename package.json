@@ -36,7 +36,6 @@
     "@types/isomorphic-fetch": "^0.0.34",
     "@types/morgan": "^1.7.35",
     "@types/node": "^11.13.2",
-    "@types/react": "^16.8.21",
     "@types/sequelize": "^4.27.34",
     "@types/uuid": "^3.4.4",
     "@types/yargs": "^12.0.8",
@@ -50,6 +49,8 @@
     "jest": "^24.8.0",
     "parcel-bundler": "^1.12.3",
     "preact": "^10.0.0-beta.2",
+    "preact-async-route": "^2.2.1",
+    "preact-router": "^3.0.0",
     "prettier": "^1.16.4",
     "sqlite3": "^4.0.6",
     "typescript": "^3.4.3"

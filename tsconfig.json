@@ -8,6 +8,7 @@
     "strict": true,
 
     "jsx": "preserve",
+    "jsxFactory": "preact.h",
     "resolveJsonModule": true,
     "diagnostics": true
   },

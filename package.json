@@ -11,6 +11,7 @@
     "build:watch": "parcel watch ./src/ui/index.html  --public-url=/app",
     "build:source-map-explorer": "npm run clean && npm run build && ./scripts/source-map-explorer.sh",
     "start": "./src/cli.js",
+    "start:server": "./src/cli.js server --rc-file=./test/fixtures/lighthouserc.json",
     "test": "npm run test:typecheck && npm run test:lint && npm run test:unit",
     "test:typecheck": "tsc -p .",
     "test:lint": "npm run test:lint:js && npm run test:lint:jsx",

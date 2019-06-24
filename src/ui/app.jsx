@@ -25,7 +25,7 @@ export const App = () => {
         }
       />
       <LazyRoute
-        path="/app/projects/:id"
+        path="/app/projects/:projectId"
         loading={() => <Loader />}
         getComponent={() =>
           import('./routes/project-dashboard/project-dashboard.jsx').then(m => m.ProjectDashboard)

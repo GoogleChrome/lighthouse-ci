@@ -12,6 +12,7 @@ const path = require('path');
 const {spawn, spawnSync} = require('child_process');
 const fetch = require('isomorphic-fetch');
 const log = require('lighthouse-logger');
+const puppeteer = require('puppeteer');
 
 const CLI_PATH = path.join(__dirname, '../src/cli.js');
 
@@ -88,7 +89,7 @@ describe('Lighthouse CI CLI', () => {
       await writeAllInputs(wizardProcess, [
         '', // Just ENTER key to select "new-project"
         `http://localhost:${serverPort}`, // The base URL to talk to
-        'Lighthouse', // Project name
+        'AwesomeCIProjectName', // Project name
         'https://example.com', // External build URL
       ]);
 
@@ -142,7 +143,7 @@ describe('Lighthouse CI CLI', () => {
       uuids = stdout.match(UUID_REGEX);
       const cleansedStdout = stdout.replace(UUID_REGEX, '<UUID>').replace(/:\d+/g, '<PORT>');
       expect(cleansedStdout).toMatchInlineSnapshot(`
-        "Saving CI project Lighthouse (<UUID>)
+        "Saving CI project AwesomeCIProjectName (<UUID>)
         Saving CI build (<UUID>)
         Saved LHR to http://localhost<PORT> (<UUID>)
         Saved LHR to http://localhost<PORT> (<UUID>)
@@ -259,6 +260,31 @@ describe('Lighthouse CI CLI', () => {
         "
       `);
       expect(status).toEqual(1);
+    });
+  });
+
+  describe('ui', () => {
+    /** @type {import('puppeteer').Browser} */
+    let browser;
+    /** @type {import('puppeteer').Page} */
+    let page;
+
+    beforeAll(async () => {
+      browser = await puppeteer.launch();
+    });
+
+    afterAll(async () => {
+      await browser.close();
+    });
+
+    it('should load the page', async () => {
+      page = await browser.newPage();
+      await page.goto(`http://localhost:${serverPort}/app`, {waitUntil: 'networkidle0'});
+    });
+
+    it('should list the projects', async () => {
+      const contents = await page.evaluate('document.body.innerHTML');
+      expect(contents).toContain('AwesomeCIProjectName');
     });
   });
 });

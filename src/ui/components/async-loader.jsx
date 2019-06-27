@@ -1,9 +1,8 @@
 import {h} from 'preact';
-import {LoadingState} from '../hooks/use-api-data';
 
 /**
  * @template T
- * @param {{loadingState: LoadingState, asyncData: T | undefined, render: (data: T) => JSX.Element}} props */
+ * @param {{loadingState: import('../hooks/use-api-data').LoadingState, asyncData: T | undefined, render: (data: T) => JSX.Element}} props */
 export const AsyncLoader = props => {
   const {asyncData, loadingState, render} = props;
 

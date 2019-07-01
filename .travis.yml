@@ -17,6 +17,7 @@ before_script:
   - export CHROME_PATH="$(which google-chrome-stable)"
   - sh -e /etc/init.d/xvfb start
 script:
+  - yarn build
   - yarn test
 before_cache:
   # nyc, jest and other projects store files in here. They mess up the travis build cache.

@@ -12,5 +12,5 @@
     "resolveJsonModule": true,
     "diagnostics": true
   },
-  "include": ["src/**/*.js", "./types/**/*.ts", "src/**/*.jsx"]
+  "include": ["src/**/*.js", "types/**/*.ts", "src/**/*.jsx", "scripts/*.js"]
 }

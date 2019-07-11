@@ -39,3 +39,10 @@ Object.keys(testingLibrary.fireEvent).forEach(key => {
     return new Promise(resolve => process.nextTick(resolve));
   };
 });
+
+export const wait = testingLibrary.wait;
+
+export const prettyDOM = testingLibrary.prettyDOM;
+
+/** PrettyDOM but without the color control characters. */
+export const snapshotDOM = (el, maxLength) => prettyDOM(el, maxLength).replace(/\[\d{1,2}m/g, '');

@@ -8,6 +8,26 @@
 import {h} from 'preact';
 import {useProjectList} from '../../hooks/use-api-data';
 import {AsyncLoader} from '../../components/async-loader';
+import {Link} from 'preact-router';
+
+/** @param {{projects: Array<LHCI.ServerCommand.Project>}} props */
+const ProjectList_ = ({projects}) => {
+  if (!projects.length) {
+    return <span>No projects yet, create one by running `lighthouse-ci wizard`</span>;
+  }
+
+  return (
+    <ul>
+      {projects.map(project => (
+        <li key={project.id}>
+          <Link href={`/app/projects/${project.id}`}>
+            {project.name} ({project.externalUrl})
+          </Link>
+        </li>
+      ))}
+    </ul>
+  );
+};
 
 export const ProjectList = () => {
   const [loadingState, projects] = useProjectList();
@@ -16,7 +36,7 @@ export const ProjectList = () => {
     <AsyncLoader
       loadingState={loadingState}
       asyncData={projects}
-      render={projects => <pre>{JSON.stringify(projects, null, 2)}</pre>}
+      render={projects => <ProjectList_ projects={projects} />}
     />
   );
 };

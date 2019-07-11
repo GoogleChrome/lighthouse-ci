@@ -53,6 +53,7 @@
     "eslint-plugin-prettier": "^3.0.1",
     "eslint-plugin-react": "^7.13.0",
     "jest": "^24.8.0",
+    "jest-fetch-mock": "^2.1.2",
     "parcel-bundler": "^1.12.3",
     "preact": "^10.0.0-beta.2",
     "preact-async-route": "^2.2.1",

@@ -5,16 +5,19 @@
  */
 
 import {useState, useEffect} from 'preact/hooks';
+import ApiClient from '../../server/api/client.js';
+
+const api = new ApiClient({rootURL: window.location.origin});
 
 /** @typedef {'loading'|'error'|'loaded'} LoadingState */
 
 /**
- * @template T
- * @param {string} url
- * @param {RequestInit} fetchOptions
- * @return {[LoadingState, T | undefined]}
+ * @template {keyof StrictOmit<ApiClient, '_rootURL'>} T
+ * @param {T} apiMethod
+ * @param {Parameters<ApiClient[T]>} apiParameters
+ * @return {[LoadingState, UnPromisify<ReturnType<ApiClient[T]>> | undefined]}
  */
-function useApiData(url, fetchOptions) {
+function useApiData(apiMethod, apiParameters) {
   const [loadingState, setLoadingState] = useState(/** @type {LoadingState} */ ('loading'));
   const [apiData, setApiData] = useState(/** @type {any} */ (undefined));
 
@@ -22,15 +25,15 @@ function useApiData(url, fetchOptions) {
     // Wrap in IIFE because the return value of useEffect should be a cleanup function, not a Promise.
     (async () => {
       try {
-        const response = await fetch(url, fetchOptions);
-        if (response.status !== 200) throw new Error('Could not connect.');
+        // @ts-ignore - tsc can't figure out that apiParameters matches our apiMethod signature
+        const response = await api[apiMethod](...apiParameters);
         setLoadingState('loaded');
-        setApiData(await response.json());
+        setApiData(response);
       } catch (err) {
         setLoadingState('error');
       }
     })();
-  }, []);
+  }, apiParameters);
 
   return [loadingState, apiData];
 }
@@ -39,7 +42,7 @@ function useApiData(url, fetchOptions) {
  * @return {[LoadingState, Array<LHCI.ServerCommand.Project> | undefined]}
  */
 export function useProjectList() {
-  return useApiData('/v1/projects', {});
+  return useApiData('getProjects', []);
 }
 
 /**
@@ -47,5 +50,5 @@ export function useProjectList() {
  * @return {[LoadingState, Array<LHCI.ServerCommand.Build> | undefined]}
  */
 export function useProjectBuilds(projectId) {
-  return useApiData(`/v1/projects/${projectId}/builds`, {});
+  return useApiData('getBuilds', [projectId]);
 }

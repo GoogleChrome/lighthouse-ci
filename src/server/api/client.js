@@ -94,7 +94,7 @@ class ApiClient {
   }
 
   /**
-   * @param {Omit<LHCI.ServerCommand.Project, 'id'>} unsavedProject
+   * @param {StrictOmit<LHCI.ServerCommand.Project, 'id'>} unsavedProject
    * @return {Promise<LHCI.ServerCommand.Project>}
    */
   async createProject(unsavedProject) {
@@ -110,7 +110,7 @@ class ApiClient {
   }
 
   /**
-   * @param {Omit<LHCI.ServerCommand.Build, 'id'>} unsavedBuild
+   * @param {StrictOmit<LHCI.ServerCommand.Build, 'id'>} unsavedBuild
    * @return {Promise<LHCI.ServerCommand.Build>}
    */
   async createBuild(unsavedBuild) {
@@ -127,7 +127,7 @@ class ApiClient {
   }
 
   /**
-   * @param {Omit<LHCI.ServerCommand.Run, 'id'>} run
+   * @param {StrictOmit<LHCI.ServerCommand.Run, 'id'>} run
    * @return {Promise<LHCI.ServerCommand.Run>}
    */
   async createRun(run) {

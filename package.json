@@ -62,7 +62,7 @@
     "prettier": "^1.16.4",
     "puppeteer": "^1.18.1",
     "sqlite3": "^4.0.6",
-    "typescript": "^3.4.3"
+    "typescript": "^3.5.3"
   },
   "browserslist": [
     "last 2 Chrome versions",

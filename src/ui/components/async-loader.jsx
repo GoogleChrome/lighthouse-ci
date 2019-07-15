@@ -6,9 +6,11 @@
 
 import {h} from 'preact';
 
+/** @typedef {import('../hooks/use-api-data').LoadingState} LoadingState */
+
 /**
  * @template T
- * @param {{loadingState: import('../hooks/use-api-data').LoadingState, asyncData: T | undefined, render: (data: T) => JSX.Element}} props */
+ * @param {{loadingState: LoadingState, asyncData: T | undefined, render: (data: T) => JSX.Element}} props */
 export const AsyncLoader = props => {
   const {asyncData, loadingState, render} = props;
 
@@ -22,3 +24,35 @@ export const AsyncLoader = props => {
 
   return null;
 };
+
+/**
+ * @param {Array<[LoadingState, *]>} states
+ */
+export function combineLoadingStates(...states) {
+  if (states.some(state => state[0] === 'error')) return 'error';
+  if (states.some(state => state[0] === 'loading')) return 'loading';
+  return 'loaded';
+}
+
+/**
+ * @template T1
+ * @template T2
+ * @template T3
+ * @template T4
+ * @param {[LoadingState, T1 | undefined]} l1
+ * @param {[LoadingState, T2 | undefined]} l2
+ * @param {[LoadingState, T3 | undefined]} [l3]
+ * @param {[LoadingState, T4 | undefined]} [l4]
+ * @return {[T1, T2, T3, T4] | undefined}
+ */
+export function combineAsyncData(l1, l2, l3, l4) {
+  const tuples = [l1, l2, l3, l4].filter(tuple => tuple !== undefined);
+  const values = tuples.map(tuple => tuple && tuple[1]);
+
+  if (values.every(value => value !== undefined)) {
+    // @ts-ignore - tsc doesn't know that the tuples are in order.
+    return values;
+  }
+
+  return undefined;
+}

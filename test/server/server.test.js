@@ -111,7 +111,7 @@ describe('Lighthouse CI Server', () => {
     it('should create a build', async () => {
       const payload = {
         hash: 'e0acdd50ed0fdcfdceb2508498be50cc55c696ef',
-        externalBuildId: 'travis#1',
+        externalBuildUrl: 'http://travis-ci.org/org/repo/1',
       };
 
       buildA = await fetchJSON(`/v1/projects/${projectA.id}/builds`, payload);
@@ -123,7 +123,7 @@ describe('Lighthouse CI Server', () => {
     it('should create a 2nd build', async () => {
       const payload = {
         hash: 'e0acdd50ed0fdcfdceb2508498be50cc55c696ef',
-        externalBuildId: 'travis#2',
+        externalBuildUrl: 'http://travis-ci.org/org/repo/2',
       };
 
       buildB = await fetchJSON(`/v1/projects/${projectA.id}/builds`, payload);
@@ -135,7 +135,7 @@ describe('Lighthouse CI Server', () => {
     it('should create a build in different project', async () => {
       const payload = {
         hash: '2edeb6a233aff298fbeccfbbb2d09282b21ec5ea',
-        externalBuildId: 'travis#1',
+        externalBuildUrl: 'http://travis-ci.org/org/repo/1',
       };
 
       buildC = await fetchJSON(`/v1/projects/${projectB.id}/builds`, payload);

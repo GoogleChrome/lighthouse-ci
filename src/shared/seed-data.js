@@ -23,37 +23,37 @@ const BUILDS = [
     id: '',
     projectId: '0',
     hash: '6e0d172cbf4ce1252fce0b2297c7a1c2b5646ce0',
-    externalBuildId: '1020',
+    externalBuildUrl: 'http://travis-ci.org/org/repo/1020',
   },
   {
     id: '',
     projectId: '0',
     hash: '30cf658d9d72669af568d37ea60d945bfb3b0fc3',
-    externalBuildId: '1021',
+    externalBuildUrl: 'http://travis-ci.org/org/repo/1021',
   },
   {
     id: '',
     projectId: '0',
     hash: 'ac839abb9aa3c1ea447b8c3c9ba5b0ad9f6824d2',
-    externalBuildId: '1022',
+    externalBuildUrl: 'http://travis-ci.org/org/repo/1022',
   },
   {
     id: '',
     projectId: '0',
     hash: 'bb9aa3c1ea447b8c3c9ba5b0adac839a9f6824d2',
-    externalBuildId: '1023',
+    externalBuildUrl: 'http://travis-ci.org/org/repo/1023',
   },
   {
     id: '',
     projectId: '0',
     hash: 'aaa5b0a3c1ea447b8c3c9bac839abb9d9f6824d2',
-    externalBuildId: '1024',
+    externalBuildUrl: 'http://travis-ci.org/org/repo/1024',
   },
   {
     id: '',
     projectId: '0',
     hash: 'c1ea447b8c3c9ba5b0ad9f6824d2ac839abb9aa3',
-    externalBuildId: '1025',
+    externalBuildUrl: 'http://travis-ci.org/org/repo/1025',
   },
 ];
 

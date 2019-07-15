@@ -6,7 +6,10 @@
 
 declare global {
   /** Remove properties K from T. */
-  type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
+  type StrictOmit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
+
+  /** Unwrap the type from the Promise wrapper. */
+  type UnPromisify<T> = T extends Promise<infer U> ? U : T;
 
   namespace LH {
     export interface AuditResult {

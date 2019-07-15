@@ -37,7 +37,7 @@ function getCurrentHash() {
 /**
  * @return {string}
  */
-function getExternalBuildId() {
+function getExternalBuildUrl() {
   return '';
 }
 
@@ -52,7 +52,7 @@ async function runCommand(options) {
   const build = await api.createBuild({
     projectId: project.id,
     hash: getCurrentHash(),
-    externalBuildId: getExternalBuildId(),
+    externalBuildUrl: getExternalBuildUrl(),
   });
 
   process.stdout.write(`Saving CI project ${project.name} (${project.id})\n`);

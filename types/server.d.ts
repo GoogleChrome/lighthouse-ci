@@ -21,7 +21,7 @@ declare global {
         id: string;
         projectId: string;
         hash: string;
-        externalBuildId: string;
+        externalBuildUrl: string;
       }
 
       export interface Run {

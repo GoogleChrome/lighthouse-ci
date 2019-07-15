@@ -5,7 +5,11 @@
  */
 
 import {h} from 'preact';
-import {AsyncLoader} from '../../../src/ui/components/async-loader.jsx';
+import {
+  AsyncLoader,
+  combineLoadingStates,
+  combineAsyncData,
+} from '../../../src/ui/components/async-loader.jsx';
 import {render, cleanup} from '../test-utils.jsx';
 
 afterEach(cleanup);
@@ -31,5 +35,54 @@ describe('AsyncLoader', () => {
     );
 
     expect(container.innerHTML).toMatchInlineSnapshot(`"<span>{\\"x\\":1}</span>"`);
+  });
+});
+
+describe('combineLoadingStates', () => {
+  it('should combine loaded states', () => {
+    expect(combineLoadingStates(['loaded', 1], ['loaded', 2], ['loaded', 3])).toEqual('loaded');
+  });
+
+  it('should combine error states', () => {
+    expect(
+      combineLoadingStates(['loaded', 1], ['error', undefined], ['loading', undefined])
+    ).toEqual('error');
+  });
+
+  it('should combine loading states', () => {
+    expect(combineLoadingStates(['loaded', 1], ['loading', undefined], ['loaded', 1])).toEqual(
+      'loading'
+    );
+  });
+});
+
+describe('combineAsyncData', () => {
+  it('should return undefined when 2 undefined', () => {
+    expect(combineAsyncData(['loading', undefined], ['error', undefined])).toEqual(undefined);
+  });
+
+  it('should return undefined when 1 undefined, 1 set', () => {
+    expect(combineAsyncData(['loaded', 1], ['loading', undefined])).toEqual(undefined);
+  });
+
+  it('should return values when 2 set', () => {
+    expect(combineAsyncData(['loaded', 1], ['loaded', 2])).toEqual([1, 2]);
+  });
+
+  it('should return undefined when 1 undefined, 3 set', () => {
+    const values = [
+      ['loaded', 1],
+      ['loading', undefined],
+      ['loading', undefined],
+      ['loading', undefined],
+    ];
+
+    expect(combineAsyncData(...values)).toEqual(undefined);
+  });
+
+  it('should return values when 4 set', () => {
+    const values = [['loaded', 1], ['loaded', 2], ['loaded', 3], ['loaded', 4]];
+
+    expect(combineAsyncData(...values)).toEqual([1, 2, 3, 4]);
   });
 });

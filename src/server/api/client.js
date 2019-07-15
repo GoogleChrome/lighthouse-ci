@@ -85,10 +85,11 @@ class ApiClient {
   }
 
   /**
+   * @param {string} projectId
    * @return {Promise<LHCI.ServerCommand.Project>}
    */
-  async findProjectById() {
-    throw new Error('Unimplemented');
+  async findProjectById(projectId) {
+    return await this._get(`/v1/projects/${projectId}`);
   }
 
   /**

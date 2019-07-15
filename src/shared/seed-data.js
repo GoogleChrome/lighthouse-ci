@@ -94,7 +94,7 @@ function createLHR(url, auditDefs) {
 
 /**
  * @param {Pick<LHCI.ServerCommand.Run, 'projectId'|'buildId'|'url'>} run
- * @param {Record<string, Omit<AuditGenDef, 'auditId'>>} audits
+ * @param {Record<string, StrictOmit<AuditGenDef, 'auditId'>>} audits
  * @param {number} [numberOfRuns]
  * @return {Array<LHCI.ServerCommand.Run>}
  */

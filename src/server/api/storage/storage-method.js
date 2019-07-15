@@ -52,7 +52,7 @@ class StorageMethod {
   }
 
   /**
-   * @param {Omit<LHCI.ServerCommand.Project, 'id'>} project
+   * @param {StrictOmit<LHCI.ServerCommand.Project, 'id'>} project
    * @return {Promise<LHCI.ServerCommand.Project>}
    */
   // eslint-disable-next-line no-unused-vars
@@ -70,7 +70,7 @@ class StorageMethod {
   }
 
   /**
-   * @param {Omit<LHCI.ServerCommand.Build, 'id'>} unsavedBuild
+   * @param {StrictOmit<LHCI.ServerCommand.Build, 'id'>} unsavedBuild
    * @return {Promise<LHCI.ServerCommand.Build>}
    */
   // eslint-disable-next-line no-unused-vars
@@ -89,7 +89,7 @@ class StorageMethod {
   }
 
   /**
-   * @param {Omit<LHCI.ServerCommand.Run, 'id'>} unsavedRun
+   * @param {StrictOmit<LHCI.ServerCommand.Run, 'id'>} unsavedRun
    * @return {Promise<LHCI.ServerCommand.Run>}
    */
   // eslint-disable-next-line no-unused-vars

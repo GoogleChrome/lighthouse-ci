@@ -7,7 +7,7 @@
 
 const _ = require('./lodash.js');
 
-/** @typedef {keyof Omit<LHCI.AssertCommand.AssertionOptions, 'mergeMethod'>|'auditRan'} AssertionType */
+/** @typedef {keyof StrictOmit<LHCI.AssertCommand.AssertionOptions, 'mergeMethod'>|'auditRan'} AssertionType */
 
 /**
  * @typedef AssertionResult
@@ -22,7 +22,7 @@ const _ = require('./lodash.js');
  * @property {string|undefined} [auditProperty]
  */
 
-/** @typedef {Omit<AssertionResult, 'url'>} AssertionResultNoURL */
+/** @typedef {StrictOmit<AssertionResult, 'url'>} AssertionResultNoURL */
 
 /** @type {Record<AssertionType, (result: LH.AuditResult) => number | undefined>} */
 const AUDIT_TYPE_VALUE_GETTERS = {

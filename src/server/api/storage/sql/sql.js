@@ -122,7 +122,7 @@ class SqlStorageMethod {
   }
 
   /**
-   * @param {Omit<LHCI.ServerCommand.Project, 'id'>} unsavedProject
+   * @param {StrictOmit<LHCI.ServerCommand.Project, 'id'>} unsavedProject
    * @return {Promise<LHCI.ServerCommand.Project>}
    */
   async createProject(unsavedProject) {
@@ -142,7 +142,7 @@ class SqlStorageMethod {
   }
 
   /**
-   * @param {Omit<LHCI.ServerCommand.Build, 'id'>} unsavedBuild
+   * @param {StrictOmit<LHCI.ServerCommand.Build, 'id'>} unsavedBuild
    * @return {Promise<LHCI.ServerCommand.Build>}
    */
   async createBuild(unsavedBuild) {
@@ -163,7 +163,7 @@ class SqlStorageMethod {
   }
 
   /**
-   * @param {Omit<LHCI.ServerCommand.Run, 'id'>} unsavedRun
+   * @param {StrictOmit<LHCI.ServerCommand.Run, 'id'>} unsavedRun
    * @return {Promise<LHCI.ServerCommand.Run>}
    */
   async createRun(unsavedRun) {

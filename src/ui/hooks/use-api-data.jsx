@@ -7,7 +7,7 @@
 import {useState, useEffect} from 'preact/hooks';
 import ApiClient from '../../server/api/client.js';
 
-const api = new ApiClient({rootURL: window.location.origin, URL: window.URL});
+export const api = new ApiClient({rootURL: window.location.origin, URL: window.URL, fetch});
 
 /** @typedef {'loading'|'error'|'loaded'} LoadingState */
 

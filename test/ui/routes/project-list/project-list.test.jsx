@@ -5,6 +5,7 @@
  */
 
 import {h} from 'preact';
+import {api} from '../../../../src/ui/hooks/use-api-data.jsx';
 import {ProjectList} from '../../../../src/ui/routes/project-list/project-list.jsx';
 import {render, cleanup, wait, snapshotDOM} from '../../test-utils.jsx';
 
@@ -16,6 +17,7 @@ describe('ProjectList', () => {
 
   beforeEach(() => {
     fetchMock = global.fetch = require('jest-fetch-mock');
+    api._fetch = fetchMock;
   });
 
   afterEach(() => {

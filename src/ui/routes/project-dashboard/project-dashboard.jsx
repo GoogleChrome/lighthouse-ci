@@ -5,18 +5,26 @@
  */
 
 import {h} from 'preact';
-import {useProjectBuilds} from '../../hooks/use-api-data';
-import {AsyncLoader} from '../../components/async-loader';
+import {useProjectBuilds, useProject} from '../../hooks/use-api-data';
+import {AsyncLoader, combineLoadingStates, combineAsyncData} from '../../components/async-loader';
+import {ProjectGettingStarted} from './getting-started';
 
 /** @param {{projectId: string}} props */
 export const ProjectDashboard = props => {
-  const [loadingState, builds] = useProjectBuilds(props.projectId);
+  const projectApiData = useProject(props.projectId);
+  const projectBuildData = useProjectBuilds(props.projectId);
 
   return (
     <AsyncLoader
-      loadingState={loadingState}
-      asyncData={builds}
-      render={builds => <pre>{JSON.stringify(builds, null, 2)}</pre>}
+      loadingState={combineLoadingStates(projectApiData, projectBuildData)}
+      asyncData={combineAsyncData(projectApiData, projectBuildData)}
+      render={([project, builds]) =>
+        builds.length ? (
+          <pre>{JSON.stringify(builds, null, 2)}</pre>
+        ) : (
+          <ProjectGettingStarted project={project} />
+        )
+      }
     />
   );
 };

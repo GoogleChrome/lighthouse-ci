@@ -10,11 +10,12 @@ const fetch = require('isomorphic-fetch');
 
 class ApiClient {
   /**
-   * @param {{rootURL: string, fetch?: import('isomorphic-fetch')}} options
+   * @param {{rootURL: string, fetch?: import('isomorphic-fetch'), URL?: typeof import('url').URL}} options
    */
   constructor(options) {
     this._rootURL = options.rootURL;
     this._fetch = options.fetch || fetch;
+    this._URL = options.URL || URL;
 
     /** @type {LHCI.ServerCommand.StorageMethod} */
     const typecheck = this; // eslint-disable-line no-unused-vars
@@ -25,7 +26,7 @@ class ApiClient {
    * @return {string}
    */
   _normalizeURL(url) {
-    return new URL(url, this._rootURL).href;
+    return new this._URL(url, this._rootURL).href;
   }
 
   /**

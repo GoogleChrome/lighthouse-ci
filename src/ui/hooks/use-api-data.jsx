@@ -7,12 +7,12 @@
 import {useState, useEffect} from 'preact/hooks';
 import ApiClient from '../../server/api/client.js';
 
-const api = new ApiClient({rootURL: window.location.origin});
+const api = new ApiClient({rootURL: window.location.origin, URL: window.URL});
 
 /** @typedef {'loading'|'error'|'loaded'} LoadingState */
 
 /**
- * @template {keyof StrictOmit<ApiClient, '_rootURL'>} T
+ * @template {keyof StrictOmit<ApiClient, '_rootURL'|'_URL'>} T
  * @param {T} apiMethod
  * @param {Parameters<ApiClient[T]>} apiParameters
  * @return {[LoadingState, UnPromisify<ReturnType<ApiClient[T]>> | undefined]}
@@ -30,6 +30,7 @@ function useApiData(apiMethod, apiParameters) {
         setLoadingState('loaded');
         setApiData(response);
       } catch (err) {
+        console.error(err); // eslint-disable-line no-console
         setLoadingState('error');
       }
     })();
@@ -43,6 +44,14 @@ function useApiData(apiMethod, apiParameters) {
  */
 export function useProjectList() {
   return useApiData('getProjects', []);
+}
+
+/**
+ * @param {string} projectId
+ * @return {[LoadingState, LHCI.ServerCommand.Project | undefined]}
+ */
+export function useProject(projectId) {
+  return useApiData('findProjectById', [projectId]);
 }
 
 /**

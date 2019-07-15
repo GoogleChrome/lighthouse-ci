@@ -39,6 +39,7 @@
     "@types/express": "^4.16.1",
     "@types/inquirer": "^6.0.3",
     "@types/isomorphic-fetch": "^0.0.34",
+    "@types/jest": "^24.0.15",
     "@types/morgan": "^1.7.35",
     "@types/node": "^11.13.2",
     "@types/sequelize": "^4.27.34",

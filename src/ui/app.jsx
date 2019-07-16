@@ -5,8 +5,7 @@
  */
 
 import {h} from 'preact';
-import {useEffect} from 'preact/hooks';
-import Router, {route} from 'preact-router';
+import Router from 'preact-router';
 import LazyRoute from 'preact-async-route';
 import {Redirect} from './components/redirect.jsx';
 

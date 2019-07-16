@@ -9,6 +9,33 @@ import {useProjectBuilds, useProject} from '../../hooks/use-api-data';
 import {AsyncLoader, combineLoadingStates, combineAsyncData} from '../../components/async-loader';
 import {ProjectGettingStarted} from './getting-started';
 
+/** @param {{project: LHCI.ServerCommand.Project, builds: Array<LHCI.ServerCommand.Build>}} props */
+const ProjectDashboard_ = props => {
+  const {project, builds} = props;
+
+  return (
+    <div>
+      <h1>{project.name}</h1>
+
+      <h3>Recent Builds</h3>
+      <table>
+        {builds.map(build => {
+          return (
+            <tr key={build.id}>
+              <td>
+                <a href={build.externalBuildUrl}>
+                  {build.branch} ({build.hash.slice(0, 8)}){' '}
+                </a>
+              </td>
+              <td>{build.createdAt}</td>
+            </tr>
+          );
+        })}
+      </table>
+    </div>
+  );
+};
+
 /** @param {{projectId: string}} props */
 export const ProjectDashboard = props => {
   const projectApiData = useProject(props.projectId);
@@ -20,7 +47,7 @@ export const ProjectDashboard = props => {
       asyncData={combineAsyncData(projectApiData, projectBuildData)}
       render={([project, builds]) =>
         builds.length ? (
-          <pre>{JSON.stringify(builds, null, 2)}</pre>
+          <ProjectDashboard_ project={project} builds={builds} />
         ) : (
           <ProjectGettingStarted project={project} />
         )

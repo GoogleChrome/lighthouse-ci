@@ -22,4 +22,15 @@ describe('Lighthouse CI API Client', () => {
     await client.getProjects();
     expect(fetchMock).toHaveBeenCalledWith(`http://localhost:9000/v1/projects`);
   });
+
+  describe('getBuilds', () => {
+    it('pass branch through to API', async () => {
+      const fetchMock = jest.fn().mockImplementation(fetchMockImpl);
+      const client = new ApiClient({rootURL: 'http://localhost:9000', fetch: fetchMock});
+      await client.getBuilds('124', {branch: 'master'});
+      expect(fetchMock).toHaveBeenCalledWith(
+        `http://localhost:9000/v1/projects/124/builds?branch=master`
+      );
+    });
+  });
 });

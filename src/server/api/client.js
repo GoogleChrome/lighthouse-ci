@@ -23,18 +23,28 @@ class ApiClient {
 
   /**
    * @param {string} url
-   * @return {string}
+   * @return {URL}
    */
   _normalizeURL(url) {
-    return new this._URL(url, this._rootURL).href;
+    return new this._URL(url, this._rootURL);
   }
 
   /**
-   * @param {string} url
+   * @template {string} T
+   * @param {string} rawUrl
+   * @param {Partial<Record<T, string|number|undefined>>} [query]
    * @return {Promise<any>}
    */
-  async _get(url) {
-    const response = await this._fetch(this._normalizeURL(url));
+  async _get(rawUrl, query) {
+    const url = this._normalizeURL(rawUrl);
+    if (query) {
+      for (const [key, value] of Object.entries(query)) {
+        if (value === undefined) continue;
+        url.searchParams.append(key, value.toString());
+      }
+    }
+
+    const response = await this._fetch(url.href);
     const json = await response.json();
     return json;
   }
@@ -45,7 +55,7 @@ class ApiClient {
    * @return {Promise<any>}
    */
   async _post(url, body) {
-    const response = await this._fetch(this._normalizeURL(url), {
+    const response = await this._fetch(this._normalizeURL(url).href, {
       method: 'POST',
       body: JSON.stringify(body),
       headers: {'content-type': 'application/json'},
@@ -103,10 +113,11 @@ class ApiClient {
 
   /**
    * @param {string} projectId
+   * @param {LHCI.ServerCommand.GetBuildsOptions} [options]
    * @return {Promise<LHCI.ServerCommand.Build[]>}
    */
-  async getBuilds(projectId) {
-    return this._get(`/v1/projects/${projectId}/builds`);
+  async getBuilds(projectId, options = {}) {
+    return this._get(`/v1/projects/${projectId}/builds`, options);
   }
 
   /**

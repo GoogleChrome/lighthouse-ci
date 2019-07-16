@@ -48,7 +48,7 @@ function createRouter(context) {
 
   // GET /projects/<id>/builds
   router.get('/:projectId/builds', async (req, res) => {
-    const builds = await context.storageMethod.getBuilds(req.params.projectId);
+    const builds = await context.storageMethod.getBuilds(req.params.projectId, req.query);
     res.json(builds);
   });
 

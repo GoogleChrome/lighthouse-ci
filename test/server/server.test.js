@@ -152,6 +152,11 @@ describe('Lighthouse CI Server', () => {
       expect(builds).toEqual([buildB, buildA]);
     });
 
+    it('should list builds filtered by branch', async () => {
+      const builds = await fetchJSON(`/v1/projects/${projectA.id}/builds?branch=master`);
+      expect(builds).toEqual([buildA]);
+    });
+
     it('should list builds for another project', async () => {
       const builds = await fetchJSON(`/v1/projects/${projectB.id}/builds`);
       expect(builds).toEqual([buildC]);

@@ -20,6 +20,7 @@ const runModelDefn = require('./run-model.js');
  * @return {T}
  */
 function clone(o) {
+  if (o === undefined) return o;
   return JSON.parse(JSON.stringify(o));
 }
 
@@ -102,24 +103,22 @@ class SqlStorageMethod {
 
   /**
    * @param {string} token
-   * @return {Promise<LHCI.ServerCommand.Project>}
+   * @return {Promise<LHCI.ServerCommand.Project | undefined>}
    */
   async findProjectByToken(token) {
     const {projectModel} = this._sql();
     const project = await projectModel.findOne({where: {id: token}});
-    if (!project) throw new Error(`No project for token ${token}`);
-    return clone(project);
+    return clone(project || undefined);
   }
 
   /**
    * @param {string} projectId
-   * @return {Promise<LHCI.ServerCommand.Project>}
+   * @return {Promise<LHCI.ServerCommand.Project | undefined>}
    */
   async findProjectById(projectId) {
     const {projectModel} = this._sql();
     const project = await projectModel.findByPk(projectId);
-    if (!project) throw new Error(`No project for projectId ${projectId}`);
-    return clone(project);
+    return clone(project || undefined);
   }
 
   /**

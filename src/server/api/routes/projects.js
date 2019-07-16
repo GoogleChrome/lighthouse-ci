@@ -6,6 +6,7 @@
 'use strict';
 
 const express = require('express');
+const {handleAsyncError} = require('../express-utils.js');
 
 /**
  * @param {{storageMethod: LHCI.ServerCommand.StorageMethod}} context
@@ -15,65 +16,95 @@ function createRouter(context) {
   const router = express.Router(); // eslint-disable-line new-cap
 
   // GET /projects
-  router.get('/', async (_, res) => {
-    const projects = await context.storageMethod.getProjects();
-    res.json(projects);
-  });
+  router.get(
+    '/',
+    handleAsyncError(async (_, res) => {
+      const projects = await context.storageMethod.getProjects();
+      res.json(projects);
+    })
+  );
 
   // POST /projects
-  router.post('/', async (req, res) => {
-    const unsavedProject = req.body;
-    const project = await context.storageMethod.createProject(unsavedProject);
-    res.json(project);
-  });
+  router.post(
+    '/',
+    handleAsyncError(async (req, res) => {
+      const unsavedProject = req.body;
+      const project = await context.storageMethod.createProject(unsavedProject);
+      res.json(project);
+    })
+  );
 
   // POST /projects/lookup
-  router.post('/lookup', async (req, res) => {
-    const token = req.body.token;
-    const project = await context.storageMethod.findProjectByToken(token);
-    res.json(project);
-  });
+  router.post(
+    '/lookup',
+    handleAsyncError(async (req, res) => {
+      const token = req.body.token;
+      const project = await context.storageMethod.findProjectByToken(token);
+      if (!project) return res.sendStatus(404);
+      res.json(project);
+    })
+  );
 
   // GET /projects/:id
-  router.get('/:projectId', async (req, res) => {
-    const project = await context.storageMethod.findProjectById(req.params.projectId);
-    res.json(project);
-  });
+  router.get(
+    '/:projectId',
+    handleAsyncError(async (req, res) => {
+      const project = await context.storageMethod.findProjectById(req.params.projectId);
+      if (!project) return res.sendStatus(404);
+      res.json(project);
+    })
+  );
 
   // GET /projects/:id/token
-  router.get('/:projectId/token', async (req, res) => {
-    const project = await context.storageMethod.findProjectById(req.params.projectId);
-    res.json({token: await context.storageMethod.getProjectToken(project)});
-  });
+  router.get(
+    '/:projectId/token',
+    handleAsyncError(async (req, res) => {
+      const project = await context.storageMethod.findProjectById(req.params.projectId);
+      if (!project) return res.sendStatus(404);
+      res.json({token: await context.storageMethod.getProjectToken(project)});
+    })
+  );
 
   // GET /projects/<id>/builds
-  router.get('/:projectId/builds', async (req, res) => {
-    const builds = await context.storageMethod.getBuilds(req.params.projectId, req.query);
-    res.json(builds);
-  });
+  router.get(
+    '/:projectId/builds',
+    handleAsyncError(async (req, res) => {
+      const builds = await context.storageMethod.getBuilds(req.params.projectId, req.query);
+      res.json(builds);
+    })
+  );
 
   // POST /projects/<id>/builds
-  router.post('/:projectId/builds', async (req, res) => {
-    const unsavedBuild = req.body;
-    unsavedBuild.projectId = req.params.projectId;
-    const build = await context.storageMethod.createBuild(unsavedBuild);
-    res.json(build);
-  });
+  router.post(
+    '/:projectId/builds',
+    handleAsyncError(async (req, res) => {
+      const unsavedBuild = req.body;
+      unsavedBuild.projectId = req.params.projectId;
+      const build = await context.storageMethod.createBuild(unsavedBuild);
+      res.json(build);
+    })
+  );
 
   // GET /projects/<id>/builds/<id>/runs
-  router.get('/:projectId/builds/:buildId/runs', async (req, res) => {
-    const runs = await context.storageMethod.getRuns(req.params.projectId, req.params.buildId);
-    res.json(runs);
-  });
+  router.get(
+    '/:projectId/builds/:buildId/runs',
+    handleAsyncError(async (req, res) => {
+      const runs = await context.storageMethod.getRuns(req.params.projectId, req.params.buildId);
+      res.json(runs);
+    })
+  );
 
   // POST /projects/<id>/builds/<id>/runs
-  router.post('/:projectId/builds/:buildId/runs', async (req, res) => {
-    const unsavedBuild = req.body;
-    unsavedBuild.projectId = req.params.projectId;
-    unsavedBuild.buildId = req.params.buildId;
-    const run = await context.storageMethod.createRun(unsavedBuild);
-    res.json(run);
-  });
+  router.post(
+    '/:projectId/builds/:buildId/runs',
+    handleAsyncError(async (req, res) => {
+      const unsavedBuild = req.body;
+      unsavedBuild.projectId = req.params.projectId;
+      unsavedBuild.buildId = req.params.buildId;
+      const run = await context.storageMethod.createRun(unsavedBuild);
+      res.json(run);
+    })
+  );
 
   return router;
 }

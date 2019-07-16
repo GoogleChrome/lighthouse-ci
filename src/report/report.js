@@ -63,6 +63,10 @@ async function runCommand(options) {
   const api = new ApiClient({rootURL: options.serverBaseUrl});
 
   const project = await api.findProjectByToken(options.token);
+  if (!project) {
+    throw new Error('Could not find active project with provided token');
+  }
+
   const build = await api.createBuild({
     projectId: project.id,
     hash: getCurrentHash(),

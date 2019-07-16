@@ -193,4 +193,11 @@ describe('Lighthouse CI Server', () => {
       expect(runs).toEqual([runB, runA]);
     });
   });
+
+  describe('error handling', () => {
+    it('should return 404 in the case of missing data', async () => {
+      const response = await fetch(`${rootURL}/v1/projects/non-sense`);
+      expect(response.status).toEqual(404);
+    });
+  });
 });

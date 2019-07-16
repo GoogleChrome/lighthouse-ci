@@ -18,6 +18,7 @@ module.exports = {
     id: {type: Sequelize.UUID(), primaryKey: true},
     projectId: {type: Sequelize.UUID(), references: {model: ModelRef, key: 'id'}},
     hash: {type: Sequelize.STRING(40)},
+    branch: {type: Sequelize.STRING(40)},
     externalBuildUrl: {type: Sequelize.STRING(256)},
   },
   indexes: [],

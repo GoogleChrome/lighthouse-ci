@@ -36,6 +36,11 @@ describe('AsyncLoader', () => {
 
     expect(container.innerHTML).toMatchInlineSnapshot(`"<span>{\\"x\\":1}</span>"`);
   });
+
+  it('should redirect in the loaded but undefined state', async () => {
+    const {container} = render(<AsyncLoader loadingState="loaded" asyncData={undefined} />);
+    expect(container.innerHTML).toMatchInlineSnapshot(`"<div to=\\"/app/projects\\"></div>"`);
+  });
 });
 
 describe('combineLoadingStates', () => {

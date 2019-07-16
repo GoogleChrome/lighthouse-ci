@@ -33,6 +33,10 @@ declare global {
         lhr: string;
       }
 
+      export interface GetBuildsOptions {
+        branch?: string;
+      }
+
       export type StorageMethod = StorageMethod_;
 
       export interface StorageOptions {

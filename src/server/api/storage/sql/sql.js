@@ -7,6 +7,7 @@
 
 const uuid = require('uuid');
 const Sequelize = require('sequelize');
+const {omit} = require('../../../../shared/lodash.js');
 const projectModelDefn = require('./project-model.js');
 const buildModelDefn = require('./build-model.js');
 const runModelDefn = require('./run-model.js');
@@ -133,11 +134,15 @@ class SqlStorageMethod {
 
   /**
    * @param {string} projectId
+   * @param {LHCI.ServerCommand.GetBuildsOptions} [options]
    * @return {Promise<LHCI.ServerCommand.Build[]>}
    */
-  async getBuilds(projectId) {
+  async getBuilds(projectId, options = {}) {
     const {buildModel} = this._sql();
-    const builds = await buildModel.findAll({where: {projectId}, order});
+    const builds = await buildModel.findAll({
+      where: {projectId, ...omit(options, [], {dropUndefined: true})},
+      order,
+    });
     return clone(builds);
   }
 

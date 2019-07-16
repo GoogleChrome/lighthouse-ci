@@ -78,4 +78,23 @@ module.exports = {
 
     return [...groups.values()];
   },
+  /**
+   * @template T
+   * @param {T} object
+   * @param {Array<keyof T>} propertiesToDrop
+   * @param {{dropUndefined?: boolean}} [options]
+   * @return {Partial<T>}
+   */
+  omit(object, propertiesToDrop, options = {}) {
+    /** @type {Partial<T>} */
+    const out = {};
+    for (const [key_, value] of Object.entries(object)) {
+      const key = /** @type {keyof T} */ (key_);
+      if (propertiesToDrop.includes(key)) continue;
+      if (options.dropUndefined && value === undefined) continue;
+      out[key] = value;
+    }
+
+    return out;
+  },
 };

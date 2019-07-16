@@ -111,6 +111,7 @@ describe('Lighthouse CI Server', () => {
     it('should create a build', async () => {
       const payload = {
         hash: 'e0acdd50ed0fdcfdceb2508498be50cc55c696ef',
+        branch: 'master',
         externalBuildUrl: 'http://travis-ci.org/org/repo/1',
       };
 
@@ -123,6 +124,7 @@ describe('Lighthouse CI Server', () => {
     it('should create a 2nd build', async () => {
       const payload = {
         hash: 'e0acdd50ed0fdcfdceb2508498be50cc55c696ef',
+        branch: 'test_branch',
         externalBuildUrl: 'http://travis-ci.org/org/repo/2',
       };
 
@@ -135,6 +137,7 @@ describe('Lighthouse CI Server', () => {
     it('should create a build in different project', async () => {
       const payload = {
         hash: '2edeb6a233aff298fbeccfbbb2d09282b21ec5ea',
+        branch: 'master',
         externalBuildUrl: 'http://travis-ci.org/org/repo/1',
       };
 

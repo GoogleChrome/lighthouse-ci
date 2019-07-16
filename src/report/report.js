@@ -37,6 +37,20 @@ function getCurrentHash() {
 /**
  * @return {string}
  */
+function getCurrentBranch() {
+  const result = childProcess.spawnSync('git', ['rev-parse', '--abbrev-ref', 'HEAD'], {
+    encoding: 'utf8',
+  });
+  if (result.status !== 0) {
+    throw new Error('Unable to determine current branch with `git rev-parse --abbrev-ref HEAD`');
+  }
+
+  return result.stdout.trim();
+}
+
+/**
+ * @return {string}
+ */
 function getExternalBuildUrl() {
   return '';
 }
@@ -52,6 +66,7 @@ async function runCommand(options) {
   const build = await api.createBuild({
     projectId: project.id,
     hash: getCurrentHash(),
+    branch: getCurrentBranch(),
     externalBuildUrl: getExternalBuildUrl(),
   });
 

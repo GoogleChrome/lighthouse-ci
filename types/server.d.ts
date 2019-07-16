@@ -21,6 +21,7 @@ declare global {
         id: string;
         projectId: string;
         hash: string;
+        branch: string;
         externalBuildUrl: string;
       }
 

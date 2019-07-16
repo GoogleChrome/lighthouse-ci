@@ -35,7 +35,7 @@ class StorageMethod {
 
   /**
    * @param {string} token
-   * @return {Promise<LHCI.ServerCommand.Project>}
+   * @return {Promise<LHCI.ServerCommand.Project | undefined>}
    */
   // eslint-disable-next-line no-unused-vars
   async findProjectByToken(token) {
@@ -44,7 +44,7 @@ class StorageMethod {
 
   /**
    * @param {string} projectId
-   * @return {Promise<LHCI.ServerCommand.Project>}
+   * @return {Promise<LHCI.ServerCommand.Project | undefined>}
    */
   // eslint-disable-next-line no-unused-vars
   async findProjectById(projectId) {

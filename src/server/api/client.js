@@ -45,6 +45,7 @@ class ApiClient {
     }
 
     const response = await this._fetch(url.href);
+    if (response.status === 404) return undefined;
     const json = await response.json();
     return json;
   }
@@ -89,7 +90,7 @@ class ApiClient {
 
   /**
    * @param {string} token
-   * @return {Promise<LHCI.ServerCommand.Project>}
+   * @return {Promise<LHCI.ServerCommand.Project | undefined>}
    */
   async findProjectByToken(token) {
     return this._post(`/v1/projects/lookup`, {token});
@@ -97,7 +98,7 @@ class ApiClient {
 
   /**
    * @param {string} projectId
-   * @return {Promise<LHCI.ServerCommand.Project>}
+   * @return {Promise<LHCI.ServerCommand.Project | undefined>}
    */
   async findProjectById(projectId) {
     return await this._get(`/v1/projects/${projectId}`);

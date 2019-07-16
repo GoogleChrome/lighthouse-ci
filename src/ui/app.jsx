@@ -8,17 +8,9 @@ import {h} from 'preact';
 import {useEffect} from 'preact/hooks';
 import Router, {route} from 'preact-router';
 import LazyRoute from 'preact-async-route';
+import {Redirect} from './components/redirect.jsx';
 
 const Loader = () => <h1>Loading route...</h1>;
-
-/** @param {{to: string, default?: boolean}} props */
-const Redirect = props => {
-  useEffect(() => {
-    route(props.to);
-  }, []);
-
-  return <div {...props} />;
-};
 
 export const App = () => {
   return (

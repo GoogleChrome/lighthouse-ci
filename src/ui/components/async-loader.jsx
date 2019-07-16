@@ -5,6 +5,7 @@
  */
 
 import {h} from 'preact';
+import {Redirect} from './redirect.jsx';
 
 /** @typedef {import('../hooks/use-api-data').LoadingState} LoadingState */
 
@@ -14,8 +15,8 @@ import {h} from 'preact';
 export const AsyncLoader = props => {
   const {asyncData, loadingState, render} = props;
 
-  if (loadingState === 'loaded' && asyncData) {
-    return render(asyncData);
+  if (loadingState === 'loaded') {
+    return asyncData === undefined ? <Redirect to="/app/projects" /> : render(asyncData);
   } else if (loadingState === 'error') {
     return <h1>Lighthouse Error</h1>;
   } else if (loadingState === 'loading') {

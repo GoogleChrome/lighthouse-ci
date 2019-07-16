@@ -31,8 +31,8 @@ function useApiData(apiMethod, apiParameters) {
       try {
         // @ts-ignore - tsc can't figure out that apiParameters matches our apiMethod signature
         const response = await api[apiMethod](...apiParameters);
-        setLoadingState('loaded');
         setApiData(response);
+        setLoadingState('loaded');
       } catch (err) {
         console.error(err); // eslint-disable-line no-console
         setLoadingState('error');

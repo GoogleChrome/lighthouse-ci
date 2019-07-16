@@ -15,6 +15,8 @@ declare global {
         id: string;
         name: string;
         externalUrl: string;
+        createdAt?: string;
+        updatedAt?: string;
       }
 
       export interface Build {
@@ -23,6 +25,8 @@ declare global {
         hash: string;
         branch: string;
         externalBuildUrl: string;
+        createdAt?: string;
+        updatedAt?: string;
       }
 
       export interface Run {
@@ -31,6 +35,8 @@ declare global {
         buildId: string;
         url: string;
         lhr: string;
+        createdAt?: string;
+        updatedAt?: string;
       }
 
       export interface GetBuildsOptions {

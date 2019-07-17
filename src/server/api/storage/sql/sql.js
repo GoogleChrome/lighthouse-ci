@@ -158,6 +158,18 @@ class SqlStorageMethod {
   /**
    * @param {string} projectId
    * @param {string} buildId
+   * @return {Promise<LHCI.ServerCommand.Build | undefined>}
+   */
+  async findBuildById(projectId, buildId) {
+    const {buildModel} = this._sql();
+    const build = await buildModel.findByPk(buildId);
+    if (build && build.projectId !== projectId) return undefined;
+    return clone(build || undefined);
+  }
+
+  /**
+   * @param {string} projectId
+   * @param {string} buildId
    * @return {Promise<LHCI.ServerCommand.Run[]>}
    */
   async getRuns(projectId, buildId) {

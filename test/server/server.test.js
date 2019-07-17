@@ -161,6 +161,11 @@ describe('Lighthouse CI Server', () => {
       const builds = await fetchJSON(`/v1/projects/${projectB.id}/builds`);
       expect(builds).toEqual([buildC]);
     });
+
+    it('should find a specific build', async () => {
+      const build = await fetchJSON(`/v1/projects/${projectA.id}/builds/${buildA.id}`);
+      expect(build).toEqual(buildA);
+    });
   });
 
   describe('/:projectId/builds/:buildId/runs', () => {

@@ -132,6 +132,15 @@ class ApiClient {
   /**
    * @param {string} projectId
    * @param {string} buildId
+   * @return {Promise<LHCI.ServerCommand.Build | undefined>}
+   */
+  async findBuildById(projectId, buildId) {
+    return await this._get(`/v1/projects/${projectId}/builds/${buildId}`);
+  }
+
+  /**
+   * @param {string} projectId
+   * @param {string} buildId
    * @return {Promise<LHCI.ServerCommand.Run[]>}
    */
   async getRuns(projectId, buildId) {

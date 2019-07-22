@@ -49,12 +49,14 @@
     "@types/yargs": "^12.0.8",
     "babel-eslint": "^10.0.2",
     "babel-jest": "^24.8.0",
+    "clsx": "^1.0.4",
     "eslint": "^5.16.0",
     "eslint-config-google": "^0.12.0",
     "eslint-config-prettier": "^4.1.0",
     "eslint-config-react": "^1.1.7",
     "eslint-plugin-prettier": "^3.0.1",
     "eslint-plugin-react": "^7.13.0",
+    "identity-obj-proxy": "^3.0.0",
     "jest": "^24.8.0",
     "jest-fetch-mock": "^2.1.2",
     "parcel-bundler": "^1.12.3",
@@ -65,6 +67,11 @@
     "puppeteer": "^1.18.1",
     "sqlite3": "^4.0.6",
     "typescript": "^3.5.3"
+  },
+  "jest": {
+    "moduleNameMapper": {
+      "\\.css$": "identity-obj-proxy"
+    }
   },
   "browserslist": [
     "last 2 Chrome versions",

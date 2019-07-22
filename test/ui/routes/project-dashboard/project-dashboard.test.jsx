@@ -62,53 +62,7 @@ describe('ProjectDashboard', () => {
       ])
     );
 
-    const {container, getAllByText} = render(<ProjectDashboard />);
+    const {getAllByText} = render(<ProjectDashboard />);
     await wait(() => getAllByText(/Project/));
-    expect(snapshotDOM(container)).toMatchInlineSnapshot(`
-      "<div>
-        <div>
-          <h1>
-            My Project
-          </h1>
-          <h3>
-            Recent Builds
-          </h3>
-          <table>
-            <tr>
-              <td>
-                <a
-                  href=\\"http://localhost:1337/builds/a/\\"
-                >
-                  master
-                   (
-                  abcdef
-                  )
-                   
-                </a>
-              </td>
-              <td>
-                2019-07-04T00:00:00.000Z
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <a
-                  href=\\"http://localhost:1337/builds/b/\\"
-                >
-                  feature_branch
-                   (
-                  abcdef
-                  )
-                   
-                </a>
-              </td>
-              <td>
-                2019-07-09T00:00:00.000Z
-              </td>
-            </tr>
-          </table>
-        </div>
-      </div>"
-    `);
   });
 });

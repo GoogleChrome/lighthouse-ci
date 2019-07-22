@@ -102,7 +102,7 @@ class StorageMethod {
 
   /**
    * @param {string} projectId
-   * @param {string} buildId
+   * @param {string} [buildId]
    * @return {Promise<Array<string>>}
    */
   // eslint-disable-next-line no-unused-vars

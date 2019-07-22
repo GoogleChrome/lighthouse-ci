@@ -21,6 +21,7 @@ describe('Lighthouse CI Server', () => {
   let buildC;
   let runA;
   let runB;
+  let runC;
   let closeServer;
 
   async function fetchJSON(url, requestBody) {
@@ -216,13 +217,6 @@ describe('Lighthouse CI Server', () => {
     });
   });
 
-  describe('/:projectId/builds/:buildId/urls', () => {
-    it('should list urls', async () => {
-      const urls = await fetchJSON(`/v1/projects/${projectA.id}/builds/${buildA.id}/urls`);
-      expect(urls).toEqual(['https://example.com']);
-    });
-  });
-
   describe('/:projectId/builds/:buildId/statistics', () => {
     beforeEach(() => {
       expect(buildA).toBeDefined();
@@ -254,11 +248,32 @@ describe('Lighthouse CI Server', () => {
       ]);
     });
 
+    it('should create a 3rd run of a different url', async () => {
+      const payload = {
+        url: 'https://example.com/blog',
+        lhr: JSON.stringify({
+          finalUrl: 'https://example.com/blog',
+          lighthouseVersion: '4.2.0',
+          audits: {
+            interactive: {numericValue: 1000},
+            'speed-index': {numericValue: 1000},
+            'first-contentful-paint': {numericValue: 1000},
+          },
+        }),
+      };
+
+      runC = await fetchJSON(`/v1/projects/${projectA.id}/builds/${buildA.id}/runs`, payload);
+      expect(runC).toHaveProperty('id');
+      expect(runC.projectId).toEqual(projectA.id);
+      expect(runC.buildId).toEqual(buildA.id);
+      expect(runC).toMatchObject(payload);
+    });
+
     it('should get the statistics a second time', async () => {
       const statistics = await fetchJSON(
         `/v1/projects/${projectA.id}/builds/${buildA.id}/statistics`
       );
-      statistics.sort((a, b) => a.name.localeCompare(b.name));
+      statistics.sort((a, b) => a.url.localeCompare(b.url) || a.name.localeCompare(b.name));
 
       expect(statistics).toMatchObject([
         {
@@ -276,7 +291,36 @@ describe('Lighthouse CI Server', () => {
           name: 'audit_speed-index_average',
           value: 5000,
         },
+        {
+          url: 'https://example.com/blog',
+          name: 'audit_first-contentful-paint_average',
+          value: 1000,
+        },
+        {
+          url: 'https://example.com/blog',
+          name: 'audit_interactive_average',
+          value: 1000,
+        },
+        {
+          url: 'https://example.com/blog',
+          name: 'audit_speed-index_average',
+          value: 1000,
+        },
       ]);
+    });
+  });
+
+  describe('/:projectId/urls', () => {
+    it('should list urls', async () => {
+      const urls = await fetchJSON(`/v1/projects/${projectA.id}/urls`);
+      expect(urls).toEqual(['https://example.com/blog', 'https://example.com']);
+    });
+  });
+
+  describe('/:projectId/builds/:buildId/urls', () => {
+    it('should list urls', async () => {
+      const urls = await fetchJSON(`/v1/projects/${projectA.id}/builds/${buildA.id}/urls`);
+      expect(urls).toEqual(['https://example.com/blog', 'https://example.com']);
     });
   });
 

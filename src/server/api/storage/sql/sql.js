@@ -191,13 +191,13 @@ class SqlStorageMethod {
 
   /**
    * @param {string} projectId
-   * @param {string} buildId
+   * @param {string} [buildId]
    * @return {Promise<Array<string>>}
    */
   async getUrls(projectId, buildId) {
     const {runModel} = this._sql();
     const runs = await runModel.findAll({
-      where: {projectId, buildId},
+      where: buildId ? {projectId, buildId} : {projectId},
       order,
       group: 'url',
       attributes: ['url'],

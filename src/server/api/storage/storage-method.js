@@ -101,6 +101,16 @@ class StorageMethod {
   }
 
   /**
+   * @param {string} projectId
+   * @param {string} buildId
+   * @return {Promise<Array<string>>}
+   */
+  // eslint-disable-next-line no-unused-vars
+  async getUrls(projectId, buildId) {
+    throw new Error('Unimplemented');
+  }
+
+  /**
    * @param {StrictOmit<LHCI.ServerCommand.Run, 'id'>} unsavedRun
    * @return {Promise<LHCI.ServerCommand.Run>}
    */
@@ -130,6 +140,16 @@ class StorageMethod {
   }
 
   /**
+   * @param {string} projectId
+   * @param {string} buildId
+   * @return {Promise<Array<LHCI.ServerCommand.Statistic>>}
+   */
+  // eslint-disable-next-line no-unused-vars
+  async _getStatistics(projectId, buildId) {
+    throw new Error('Unimplemented');
+  }
+
+  /**
    * @param {StorageMethod} storageMethod
    * @param {string} projectId
    * @param {string} buildId
@@ -139,12 +159,19 @@ class StorageMethod {
     const build = await storageMethod.findBuildById(projectId, buildId);
     if (!build) throw new Error('Cannot create statistics for non-existent build');
 
+    const urls = await storageMethod.getUrls(projectId, buildId);
+    const statisicDefinitionEntries = Object.entries(statisticDefinitions);
+    const precomputedStatistics = await storageMethod._getStatistics(projectId, buildId);
+    if (precomputedStatistics.length === urls.length * statisicDefinitionEntries.length) {
+      return precomputedStatistics;
+    }
+
     const runs = await storageMethod.getRuns(projectId, buildId);
     /** @type {Array<Array<LH.Result>>} */
     const lhrsByUrl = _.groupBy(runs.map(run => JSON.parse(run.lhr)), lhr => lhr.finalUrl);
 
     const statistics = await Promise.all(
-      Object.entries(statisticDefinitions).map(([key, fn]) => {
+      statisicDefinitionEntries.map(([key, fn]) => {
         const name = /** @type {LHCI.ServerCommand.StatisticName} */ (key);
         return Promise.all(
           lhrsByUrl.map(lhrs => {

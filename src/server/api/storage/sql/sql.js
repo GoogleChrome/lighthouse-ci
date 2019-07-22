@@ -190,6 +190,23 @@ class SqlStorageMethod {
   }
 
   /**
+   * @param {string} projectId
+   * @param {string} buildId
+   * @return {Promise<Array<string>>}
+   */
+  async getUrls(projectId, buildId) {
+    const {runModel} = this._sql();
+    const runs = await runModel.findAll({
+      where: {projectId, buildId},
+      order,
+      group: 'url',
+      attributes: ['url'],
+    });
+
+    return clone(runs.map(run => run.url));
+  }
+
+  /**
    * @param {StrictOmit<LHCI.ServerCommand.Run, 'id'>} unsavedRun
    * @return {Promise<LHCI.ServerCommand.Run>}
    */
@@ -235,6 +252,17 @@ class SqlStorageMethod {
     }
 
     return clone(statistic);
+  }
+
+  /**
+   * @param {string} projectId
+   * @param {string} buildId
+   * @return {Promise<Array<LHCI.ServerCommand.Statistic>>}
+   */
+  async _getStatistics(projectId, buildId) {
+    const {statisticModel} = this._sql();
+    const statistics = await statisticModel.findAll({where: {projectId, buildId}, order});
+    return clone(statistics);
   }
 }
 

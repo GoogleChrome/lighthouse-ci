@@ -8,7 +8,6 @@
 /** @typedef {(lhrs: Array<LH.Result>) => ({value: number})} StatisticFn */
 
 /**
- *
  * @param {string} auditId
  * @return {StatisticFn}
  */

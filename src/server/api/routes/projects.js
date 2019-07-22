@@ -83,6 +83,15 @@ function createRouter(context) {
     })
   );
 
+  // GET /projects/<id>/branches
+  router.get(
+    '/:projectId/branches',
+    handleAsyncError(async (req, res) => {
+      const branches = await context.storageMethod.getBranches(req.params.projectId);
+      res.json(branches);
+    })
+  );
+
   // POST /projects/<id>/builds
   router.post(
     '/:projectId/builds',

@@ -73,6 +73,15 @@ class StorageMethod {
 
   /**
    * @param {string} projectId
+   * @return {Promise<Array<{branch: string}>>}
+   */
+  // eslint-disable-next-line no-unused-vars
+  async getBranches(projectId) {
+    throw new Error('Unimplemented');
+  }
+
+  /**
+   * @param {string} projectId
    * @param {string} buildId
    * @return {Promise<LHCI.ServerCommand.Build | undefined>}
    */
@@ -103,7 +112,7 @@ class StorageMethod {
   /**
    * @param {string} projectId
    * @param {string} [buildId]
-   * @return {Promise<Array<string>>}
+   * @return {Promise<Array<{url: string}>>}
    */
   // eslint-disable-next-line no-unused-vars
   async getUrls(projectId, buildId) {

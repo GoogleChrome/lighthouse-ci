@@ -149,11 +149,12 @@ class ApiClient {
 
   /**
    * @param {string} projectId
-   * @param {string} buildId
+   * @param {string} [buildId]
    * @return {Promise<string[]>}
    */
   async getUrls(projectId, buildId) {
-    return this._get(`/v1/projects/${projectId}/builds/${buildId}/urls`);
+    if (buildId) return this._get(`/v1/projects/${projectId}/builds/${buildId}/urls`);
+    return this._get(`/v1/projects/${projectId}/urls`);
   }
 
   /**

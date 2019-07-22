@@ -74,6 +74,15 @@ function createRouter(context) {
     })
   );
 
+  // GET /projects/<id>/urls
+  router.get(
+    '/:projectId/urls',
+    handleAsyncError(async (req, res) => {
+      const urls = await context.storageMethod.getUrls(req.params.projectId);
+      res.json(urls);
+    })
+  );
+
   // POST /projects/<id>/builds
   router.post(
     '/:projectId/builds',

@@ -148,6 +148,15 @@ class ApiClient {
   }
 
   /**
+   * @param {string} projectId
+   * @param {string} buildId
+   * @return {Promise<string[]>}
+   */
+  async getUrls(projectId, buildId) {
+    return this._get(`/v1/projects/${projectId}/builds/${buildId}/urls`);
+  }
+
+  /**
    * @param {StrictOmit<LHCI.ServerCommand.Run, 'id'>} run
    * @return {Promise<LHCI.ServerCommand.Run>}
    */
@@ -171,6 +180,16 @@ class ApiClient {
    */
   // eslint-disable-next-line no-unused-vars
   async _createOrUpdateStatistic(unsavedStatistic) {
+    throw new Error('Unimplemented');
+  }
+
+  /**
+   * @param {string} projectId
+   * @param {string} buildId
+   * @return {Promise<Array<LHCI.ServerCommand.Statistic>>}
+   */
+  // eslint-disable-next-line no-unused-vars
+  async _getStatistics(projectId, buildId) {
     throw new Error('Unimplemented');
   }
 }

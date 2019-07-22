@@ -205,16 +205,35 @@ class SqlStorageMethod {
    * @return {Promise<Array<LHCI.ServerCommand.Statistic>>}
    */
   async getStatistics(projectId, buildId) {
-    return StorageMethod.getStatistics(this, projectId, buildId);
+    return StorageMethod.getOrCreateStatistics(this, projectId, buildId);
   }
 
   /**
    * @param {StrictOmit<LHCI.ServerCommand.Statistic, 'id'>} unsavedStatistic
    * @return {Promise<LHCI.ServerCommand.Statistic>}
    */
-  async _createStatistic(unsavedStatistic) {
+  async _createOrUpdateStatistic(unsavedStatistic) {
     const {statisticModel} = this._sql();
-    const statistic = await statisticModel.create({...unsavedStatistic, id: uuid.v4()});
+    const existing = await statisticModel.findOne({
+      where: {
+        projectId: unsavedStatistic.projectId,
+        buildId: unsavedStatistic.buildId,
+        url: unsavedStatistic.url,
+        name: unsavedStatistic.name,
+      },
+    });
+
+    /** @type {LHCI.ServerCommand.Statistic} */
+    let statistic;
+    if (existing) {
+      await statisticModel.update({...unsavedStatistic}, {where: {id: existing.id}});
+      const updated = await statisticModel.findByPk(existing.id);
+      if (!updated) throw new Error('Failed to update statistic');
+      statistic = updated;
+    } else {
+      statistic = await statisticModel.create({...unsavedStatistic, id: uuid.v4()});
+    }
+
     return clone(statistic);
   }
 }

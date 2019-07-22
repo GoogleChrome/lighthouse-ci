@@ -170,7 +170,7 @@ class ApiClient {
    * @return {Promise<LHCI.ServerCommand.Statistic>}
    */
   // eslint-disable-next-line no-unused-vars
-  async _createStatistic(unsavedStatistic) {
+  async _createOrUpdateStatistic(unsavedStatistic) {
     throw new Error('Unimplemented');
   }
 }

@@ -125,7 +125,7 @@ class StorageMethod {
    * @return {Promise<LHCI.ServerCommand.Statistic>}
    */
   // eslint-disable-next-line no-unused-vars
-  async _createStatistic(unsavedStatistic) {
+  async _createOrUpdateStatistic(unsavedStatistic) {
     throw new Error('Unimplemented');
   }
 
@@ -135,11 +135,11 @@ class StorageMethod {
    * @param {string} buildId
    * @return {Promise<Array<LHCI.ServerCommand.Statistic>>}
    */
-  static async getStatistics(storageMethod, projectId, buildId) {
+  static async getOrCreateStatistics(storageMethod, projectId, buildId) {
     const build = await storageMethod.findBuildById(projectId, buildId);
     if (!build) throw new Error('Cannot create statistics for non-existent build');
 
-    const runs = await storageMethod.getRuns(build.projectId, build.id);
+    const runs = await storageMethod.getRuns(projectId, buildId);
     /** @type {Array<Array<LH.Result>>} */
     const lhrsByUrl = _.groupBy(runs.map(run => JSON.parse(run.lhr)), lhr => lhr.finalUrl);
 
@@ -150,9 +150,9 @@ class StorageMethod {
           lhrsByUrl.map(lhrs => {
             const url = lhrs[0].finalUrl;
             const {value} = fn(lhrs);
-            return storageMethod._createStatistic({
-              projectId: build.projectId,
-              buildId: build.id,
+            return storageMethod._createOrUpdateStatistic({
+              projectId,
+              buildId,
               url,
               name,
               value,

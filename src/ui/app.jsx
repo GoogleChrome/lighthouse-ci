@@ -8,27 +8,38 @@ import {h} from 'preact';
 import Router from 'preact-router';
 import LazyRoute from 'preact-async-route';
 import {Redirect} from './components/redirect.jsx';
+import {PageHeader} from './layout/page-header.jsx';
+import './app.css';
 
 const Loader = () => <h1>Loading route...</h1>;
 
 export const App = () => {
   return (
-    <Router>
-      <LazyRoute
-        path="/app/projects"
-        loading={() => <Loader />}
-        getComponent={() =>
-          import('./routes/project-list/project-list.jsx').then(m => m.ProjectList)
-        }
-      />
-      <LazyRoute
-        path="/app/projects/:projectId"
-        loading={() => <Loader />}
-        getComponent={() =>
-          import('./routes/project-dashboard/project-dashboard.jsx').then(m => m.ProjectDashboard)
-        }
-      />
-      <Redirect default to="/app/projects" />
-    </Router>
+    <div className="lhci">
+      <Router>
+        <PageHeader path="/app/:slug?/:projectId?" />
+      </Router>
+      <div className="page-body">
+        <Router>
+          <LazyRoute
+            path="/app/projects"
+            loading={() => <Loader />}
+            getComponent={() =>
+              import('./routes/project-list/project-list.jsx').then(m => m.ProjectList)
+            }
+          />
+          <LazyRoute
+            path="/app/projects/:projectId"
+            loading={() => <Loader />}
+            getComponent={() =>
+              import('./routes/project-dashboard/project-dashboard.jsx').then(
+                m => m.ProjectDashboard
+              )
+            }
+          />
+          <Redirect default to="/app/projects" />
+        </Router>
+      </div>
+    </div>
   );
 };

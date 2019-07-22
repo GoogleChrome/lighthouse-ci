@@ -154,6 +154,25 @@ class ApiClient {
   async createRun(run) {
     return this._post(`/v1/projects/${run.projectId}/builds/${run.buildId}/runs`, run);
   }
+
+  /**
+   * @param {string} projectId
+   * @param {string} buildId
+   * @return {Promise<Array<LHCI.ServerCommand.Statistic>>}
+   */
+  async getStatistics(projectId, buildId) {
+    return this._get(`/v1/projects/${projectId}/builds/${buildId}/statistics`);
+  }
+
+  /**
+   * @protected
+   * @param {StrictOmit<LHCI.ServerCommand.Statistic, 'id'>} unsavedStatistic
+   * @return {Promise<LHCI.ServerCommand.Statistic>}
+   */
+  // eslint-disable-next-line no-unused-vars
+  async _createStatistic(unsavedStatistic) {
+    throw new Error('Unimplemented');
+  }
 }
 
 module.exports = ApiClient;

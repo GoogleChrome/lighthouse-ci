@@ -5,7 +5,8 @@
  */
 'use strict';
 
-const SqlStorageMethod = require('./sql/sql.js');
+const _ = require('../../../shared/lodash.js');
+const statisticDefinitions = require('../statistic-definitions.js');
 
 class StorageMethod {
   /**
@@ -109,10 +110,68 @@ class StorageMethod {
   }
 
   /**
+   * @param {string} projectId
+   * @param {string} buildId
+   * @return {Promise<Array<LHCI.ServerCommand.Statistic>>}
+   */
+  // eslint-disable-next-line no-unused-vars
+  async getStatistics(projectId, buildId) {
+    throw new Error('Unimplemented');
+  }
+
+  /**
+   * @protected
+   * @param {StrictOmit<LHCI.ServerCommand.Statistic, 'id'>} unsavedStatistic
+   * @return {Promise<LHCI.ServerCommand.Statistic>}
+   */
+  // eslint-disable-next-line no-unused-vars
+  async _createStatistic(unsavedStatistic) {
+    throw new Error('Unimplemented');
+  }
+
+  /**
+   * @param {StorageMethod} storageMethod
+   * @param {string} projectId
+   * @param {string} buildId
+   * @return {Promise<Array<LHCI.ServerCommand.Statistic>>}
+   */
+  static async getStatistics(storageMethod, projectId, buildId) {
+    const build = await storageMethod.findBuildById(projectId, buildId);
+    if (!build) throw new Error('Cannot create statistics for non-existent build');
+
+    const runs = await storageMethod.getRuns(build.projectId, build.id);
+    /** @type {Array<Array<LH.Result>>} */
+    const lhrsByUrl = _.groupBy(runs.map(run => JSON.parse(run.lhr)), lhr => lhr.finalUrl);
+
+    const statistics = await Promise.all(
+      Object.entries(statisticDefinitions).map(([key, fn]) => {
+        const name = /** @type {LHCI.ServerCommand.StatisticName} */ (key);
+        return Promise.all(
+          lhrsByUrl.map(lhrs => {
+            const url = lhrs[0].finalUrl;
+            const {value} = fn(lhrs);
+            return storageMethod._createStatistic({
+              projectId: build.projectId,
+              buildId: build.id,
+              url,
+              name,
+              value,
+            });
+          })
+        );
+      })
+    );
+
+    return statistics.reduce((a, b) => a.concat(b));
+  }
+
+  /**
    * @param {LHCI.ServerCommand.StorageOptions} options
    * @return {StorageMethod}
    */
   static from(options) {
+    const SqlStorageMethod = require('./sql/sql.js');
+
     switch (options.storageMethod) {
       case 'sql':
         return new SqlStorageMethod();

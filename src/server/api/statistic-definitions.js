@@ -30,8 +30,11 @@ function auditNumericValueAverage(auditId) {
 }
 
 /** @type {Record<LHCI.ServerCommand.StatisticName, StatisticFn>} */
-module.exports = {
+const definitions = {
   audit_interactive_average: auditNumericValueAverage('interactive'),
   'audit_speed-index_average': auditNumericValueAverage('speed-index'),
   'audit_first-contentful-paint_average': auditNumericValueAverage('first-contentful-paint'),
 };
+
+// Keep the export separate from declaration to enable tsc to typecheck the `@type` annotation.
+module.exports = definitions;

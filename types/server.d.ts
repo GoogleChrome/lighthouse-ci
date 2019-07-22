@@ -39,6 +39,22 @@ declare global {
         updatedAt?: string;
       }
 
+      export type StatisticName =
+        | 'audit_interactive_average'
+        | 'audit_first-contentful-paint_average'
+        | 'audit_speed-index_average';
+
+      export interface Statistic {
+        id: string;
+        projectId: string;
+        buildId: string;
+        url: string;
+        name: StatisticName;
+        value: number;
+        createdAt?: string;
+        updatedAt?: string;
+      }
+
       export interface GetBuildsOptions {
         branch?: string;
       }

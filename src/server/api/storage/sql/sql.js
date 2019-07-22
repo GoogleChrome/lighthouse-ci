@@ -8,9 +8,11 @@
 const uuid = require('uuid');
 const Sequelize = require('sequelize');
 const {omit} = require('../../../../shared/lodash.js');
+const StorageMethod = require('../storage-method.js');
 const projectModelDefn = require('./project-model.js');
 const buildModelDefn = require('./build-model.js');
 const runModelDefn = require('./run-model.js');
+const statisticModelDefn = require('./statistic-model.js');
 
 /**
  * Clones the object without the fancy function getters/setters.
@@ -27,6 +29,7 @@ function clone(o) {
 /** @typedef {LHCI.ServerCommand.TableAttributes<LHCI.ServerCommand.Project>} ProjectAttrs */
 /** @typedef {LHCI.ServerCommand.TableAttributes<LHCI.ServerCommand.Build>} BuildAttrs */
 /** @typedef {LHCI.ServerCommand.TableAttributes<LHCI.ServerCommand.Run>} RunAttrs */
+/** @typedef {LHCI.ServerCommand.TableAttributes<LHCI.ServerCommand.Statistic>} StatisticAttrs */
 
 /**
  * @typedef SqlState
@@ -34,6 +37,7 @@ function clone(o) {
  * @property {import('sequelize').Model<LHCI.ServerCommand.Project, ProjectAttrs>} projectModel
  * @property {import('sequelize').Model<LHCI.ServerCommand.Build, BuildAttrs>} buildModel
  * @property {import('sequelize').Model<LHCI.ServerCommand.Run, RunAttrs>} runModel
+ * @property {import('sequelize').Model<LHCI.ServerCommand.Statistic, StatisticAttrs>} statisticModel
  */
 
 /** Sort all records by most recently updated */
@@ -79,9 +83,16 @@ class SqlStorageMethod {
     if (options.sqlDialect === 'sqlite') runModelDefn.attributes.lhr.type = Sequelize.TEXT;
     const runModel = sequelize.define(runModelDefn.tableName, runModelDefn.attributes);
 
+    statisticModelDefn.attributes.projectId.references.model = projectModel;
+    statisticModelDefn.attributes.buildId.references.model = buildModel;
+    const statisticModel = sequelize.define(
+      statisticModelDefn.tableName,
+      statisticModelDefn.attributes
+    );
+
     await sequelize.sync({force: options.sqlDangerouslyForceMigration});
 
-    this._sequelize = {sequelize, projectModel, buildModel, runModel};
+    this._sequelize = {sequelize, projectModel, buildModel, runModel, statisticModel};
   }
 
   /**
@@ -186,6 +197,25 @@ class SqlStorageMethod {
     const {runModel} = this._sql();
     const run = await runModel.create({...unsavedRun, id: uuid.v4()});
     return clone(run);
+  }
+
+  /**
+   * @param {string} projectId
+   * @param {string} buildId
+   * @return {Promise<Array<LHCI.ServerCommand.Statistic>>}
+   */
+  async getStatistics(projectId, buildId) {
+    return StorageMethod.getStatistics(this, projectId, buildId);
+  }
+
+  /**
+   * @param {StrictOmit<LHCI.ServerCommand.Statistic, 'id'>} unsavedStatistic
+   * @return {Promise<LHCI.ServerCommand.Statistic>}
+   */
+  async _createStatistic(unsavedStatistic) {
+    const {statisticModel} = this._sql();
+    const statistic = await statisticModel.create({...unsavedStatistic, id: uuid.v4()});
+    return clone(statistic);
   }
 }
 

@@ -7,7 +7,7 @@
 import {h} from 'preact';
 import {useProjectBuilds, useProject} from '../../hooks/use-api-data';
 import {AsyncLoader, combineLoadingStates, combineAsyncData} from '../../components/async-loader';
-import {ProjectGettingStarted} from './getting-started';
+import {ProjectGettingStarted} from './getting-started.jsx';
 
 /** @param {{project: LHCI.ServerCommand.Project, builds: Array<LHCI.ServerCommand.Build>}} props */
 const ProjectDashboard_ = props => {

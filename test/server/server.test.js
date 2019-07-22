@@ -169,12 +169,22 @@ describe('Lighthouse CI Server', () => {
   });
 
   describe('/:projectId/builds/:buildId/runs', () => {
+    const lhr = {
+      lighthouseVersion: '4.1.0',
+      finalUrl: 'https://example.com/',
+      audits: {
+        interactive: {numericValue: 5000},
+        'speed-index': {numericValue: 5000},
+        'first-contentful-paint': {numericValue: 2000},
+      },
+    };
+
     beforeEach(() => {
       expect(buildA).toBeDefined();
     });
 
     it('should create a run', async () => {
-      const payload = {url: 'chrome://version', lhr: JSON.stringify({lighthouseVersion: '4.1.0'})};
+      const payload = {url: 'chrome://version', lhr: JSON.stringify(lhr)};
 
       runA = await fetchJSON(`/v1/projects/${projectA.id}/builds/${buildA.id}/runs`, payload);
       expect(runA).toHaveProperty('id');
@@ -184,7 +194,14 @@ describe('Lighthouse CI Server', () => {
     });
 
     it('should create a 2nd run', async () => {
-      const payload = {url: 'chrome://version', lhr: JSON.stringify({lighthouseVersion: '4.2.0'})};
+      const payload = {
+        url: 'chrome://version',
+        lhr: JSON.stringify({
+          ...lhr,
+          lighthouseVersion: '4.2.0',
+          audits: {...lhr.audits, interactive: {numericValue: 6000}},
+        }),
+      };
 
       runB = await fetchJSON(`/v1/projects/${projectA.id}/builds/${buildA.id}/runs`, payload);
       expect(runB).toHaveProperty('id');
@@ -196,6 +213,38 @@ describe('Lighthouse CI Server', () => {
     it('should list runs', async () => {
       const runs = await fetchJSON(`/v1/projects/${projectA.id}/builds/${buildA.id}/runs`);
       expect(runs).toEqual([runB, runA]);
+    });
+  });
+
+  describe('/:projectId/builds/:buildId/statistics', () => {
+    beforeEach(() => {
+      expect(buildA).toBeDefined();
+      expect(runA).toBeDefined();
+    });
+
+    it('should get the statistics', async () => {
+      const statistics = await fetchJSON(
+        `/v1/projects/${projectA.id}/builds/${buildA.id}/statistics`
+      );
+      statistics.sort((a, b) => a.name.localeCompare(b.name));
+
+      expect(statistics).toMatchObject([
+        {
+          url: 'https://example.com/',
+          name: 'audit_first-contentful-paint_average',
+          value: 2000,
+        },
+        {
+          url: 'https://example.com/',
+          name: 'audit_interactive_average',
+          value: 5500,
+        },
+        {
+          url: 'https://example.com/',
+          name: 'audit_speed-index_average',
+          value: 5000,
+        },
+      ]);
     });
   });
 

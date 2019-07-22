@@ -120,6 +120,18 @@ function createRouter(context) {
     })
   );
 
+  // GET /projects/<id>/builds/<id>/statistics
+  router.get(
+    '/:projectId/builds/:buildId/statistics',
+    handleAsyncError(async (req, res) => {
+      const statistics = await context.storageMethod.getStatistics(
+        req.params.projectId,
+        req.params.buildId
+      );
+      res.json(statistics);
+    })
+  );
+
   return router;
 }
 

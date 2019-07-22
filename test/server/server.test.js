@@ -169,6 +169,13 @@ describe('Lighthouse CI Server', () => {
     });
   });
 
+  describe('/:projectId/branches', () => {
+    it('should list branches', async () => {
+      const branches = await fetchJSON(`/v1/projects/${projectA.id}/branches`);
+      expect(branches).toEqual([{branch: 'test_branch'}, {branch: 'master'}]);
+    });
+  });
+
   describe('/:projectId/builds/:buildId/runs', () => {
     const lhr = {
       lighthouseVersion: '4.1.0',
@@ -313,14 +320,14 @@ describe('Lighthouse CI Server', () => {
   describe('/:projectId/urls', () => {
     it('should list urls', async () => {
       const urls = await fetchJSON(`/v1/projects/${projectA.id}/urls`);
-      expect(urls).toEqual(['https://example.com/blog', 'https://example.com']);
+      expect(urls).toEqual([{url: 'https://example.com/blog'}, {url: 'https://example.com'}]);
     });
   });
 
   describe('/:projectId/builds/:buildId/urls', () => {
     it('should list urls', async () => {
       const urls = await fetchJSON(`/v1/projects/${projectA.id}/builds/${buildA.id}/urls`);
-      expect(urls).toEqual(['https://example.com/blog', 'https://example.com']);
+      expect(urls).toEqual([{url: 'https://example.com/blog'}, {url: 'https://example.com'}]);
     });
   });
 

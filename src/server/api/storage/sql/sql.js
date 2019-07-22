@@ -157,6 +157,23 @@ class SqlStorageMethod {
   }
 
   /**
+   * @param {string} projectId
+   * @return {Promise<Array<{branch: string}>>}
+   */
+  // eslint-disable-next-line no-unused-vars
+  async getBranches(projectId) {
+    const {buildModel} = this._sql();
+    const builds = await buildModel.findAll({
+      where: {projectId},
+      order,
+      group: 'branch',
+      attributes: ['branch'],
+    });
+
+    return clone(builds.map(build => ({branch: build.branch})));
+  }
+
+  /**
    * @param {StrictOmit<LHCI.ServerCommand.Build, 'id'>} unsavedBuild
    * @return {Promise<LHCI.ServerCommand.Build>}
    */
@@ -192,7 +209,7 @@ class SqlStorageMethod {
   /**
    * @param {string} projectId
    * @param {string} [buildId]
-   * @return {Promise<Array<string>>}
+   * @return {Promise<Array<{url: string}>>}
    */
   async getUrls(projectId, buildId) {
     const {runModel} = this._sql();
@@ -203,7 +220,7 @@ class SqlStorageMethod {
       attributes: ['url'],
     });
 
-    return clone(runs.map(run => run.url));
+    return clone(runs.map(run => ({url: run.url})));
   }
 
   /**

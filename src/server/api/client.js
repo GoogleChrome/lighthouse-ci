@@ -122,6 +122,15 @@ class ApiClient {
   }
 
   /**
+   * @param {string} projectId
+   * @return {Promise<Array<{branch: string}>>}
+   */
+  // eslint-disable-next-line no-unused-vars
+  async getBranches(projectId) {
+    return this._get(`/v1/projects/${projectId}/branches`);
+  }
+
+  /**
    * @param {StrictOmit<LHCI.ServerCommand.Build, 'id'>} unsavedBuild
    * @return {Promise<LHCI.ServerCommand.Build>}
    */
@@ -150,7 +159,7 @@ class ApiClient {
   /**
    * @param {string} projectId
    * @param {string} [buildId]
-   * @return {Promise<string[]>}
+   * @return {Promise<{url: string}[]>}
    */
   async getUrls(projectId, buildId) {
     if (buildId) return this._get(`/v1/projects/${projectId}/builds/${buildId}/urls`);

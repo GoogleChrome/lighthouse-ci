@@ -177,6 +177,11 @@ class StorageMethod {
           lhrsByUrl.map(lhrs => {
             const url = lhrs[0].finalUrl;
             const {value} = fn(lhrs);
+            const existing = precomputedStatistics.find(
+              s => s.name === name && s.value === value && s.url === url
+            );
+            if (existing) return existing;
+
             return storageMethod._createOrUpdateStatistic({
               projectId,
               buildId,

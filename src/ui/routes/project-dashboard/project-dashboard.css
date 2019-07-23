@@ -17,9 +17,10 @@
 
 .dashboard__project-name {
   font-size: var(--title-font-size);
-  font-weight: var(--base-font-weight);
+  font-weight: var(--medium-font-weight);
   color: var(--secondary-text-color);
   padding: var(--base-spacing);
+  padding-left: calc(var(--base-spacing) * 2);
   grid-row-start: 1;
   grid-row-end: 1;
 }

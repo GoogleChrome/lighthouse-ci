@@ -4,9 +4,10 @@
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
  */
 // @ts-nocheck
+'use strict';
 
-import PlotlyCore from 'plotly.js/lib/core';
+const PlotlyCore = require('plotly.js/lib/core');
 
-export const Plotly = PlotlyCore;
+PlotlyCore.register([require('plotly.js/lib/scatter'), require('plotly.js/lib/bar')]);
 
-Plotly.register([require('plotly.js/lib/scatter'), require('plotly.js/lib/bar')]);
+module.exports = {Plotly: PlotlyCore};

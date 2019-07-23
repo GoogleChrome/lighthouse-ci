@@ -5,16 +5,87 @@
  */
 
 import {h} from 'preact';
-import {useProjectBuilds, useProject} from '../../hooks/use-api-data';
+import {useMemo} from 'preact/hooks';
+import {useProjectBuilds, useProject, useBuildStatistics} from '../../hooks/use-api-data';
 import {AsyncLoader, combineLoadingStates, combineAsyncData} from '../../components/async-loader';
 import {Paper} from '../../components/paper.jsx';
 import {Plot} from '../../components/plot.jsx';
 import {ProjectGettingStarted} from './getting-started.jsx';
 import './project-dashboard.css';
 
+/** @param {{title: string, statisticName: LHCI.ServerCommand.StatisticName, statistics?: Array<LHCI.ServerCommand.Statistic>, loadingState: import('../../components/async-loader').LoadingState, builds: LHCI.ServerCommand.Build[]}} props */
+const StatisticPlot = props => {
+  return (
+    <AsyncLoader
+      loadingState={props.loadingState}
+      asyncData={props.statistics}
+      render={allStats => {
+        const stats = allStats
+          .filter(stat => stat.name === props.statisticName)
+          .sort((a, b) => (a.createdAt || '').localeCompare(b.createdAt || ''));
+
+        const xs = stats.map((_, i) => i);
+        return (
+          <Paper className="dashboard-graph">
+            <h3 className="dashboard-graph__title">{props.title}</h3>
+            <Plot
+              useResizeHandler
+              data={[
+                {
+                  x: xs,
+                  y: stats.map(x => x.value),
+                  type: 'scatter',
+                  mode: 'lines+markers',
+                  marker: {color: '#4587f4'},
+                  hoverinfo: /** @type {*} */ ('y'),
+                },
+              ]}
+              layout={{
+                height: 300,
+                autosize: true,
+                margin: {l: 40, r: 20, t: 20, b: 40},
+                showlegend: false,
+                spikedistance: -1,
+                xaxis: {
+                  tickfont: {color: '#888'},
+                  tickvals: xs,
+                  ticktext: stats.map(x => {
+                    const build = props.builds.find(build => build.id === x.buildId);
+                    if (!build) return 'Unknown';
+                    return build.hash.slice(0, 8);
+                  }),
+                  showgrid: false,
+                  fixedrange: true,
+                  zeroline: false,
+                  spikecolor: 'rgba(0, 0, 255, 0.3)',
+                  spikethickness: 1,
+                  spikemode: 'across+toaxis+marker',
+                  // @ts-ignore - property not documented in tsc https://plot.ly/javascript/reference/#layout-xaxis-spikesnap
+                  spikesnap: 'cursor',
+                },
+                yaxis: {
+                  tickfont: {color: '#888'},
+                  fixedrange: true,
+                  spikecolor: 'rgba(0, 0, 255, 0.3)',
+                  spikethickness: 1,
+                  spikemode: 'across+toaxis+marker',
+                  // @ts-ignore - property not documented in tsc https://plot.ly/javascript/reference/#layout-xaxis-spikesnap
+                  spikesnap: 'cursor',
+                },
+              }}
+            />
+          </Paper>
+        );
+      }}
+    />
+  );
+};
+
 /** @param {{project: LHCI.ServerCommand.Project, builds: Array<LHCI.ServerCommand.Build>}} props */
 const ProjectDashboard_ = props => {
   const {project, builds} = props;
+  const buildIds = useMemo(() => builds.map(build => build.id), builds);
+  const [loadingState, stats] = useBuildStatistics(project.id, buildIds);
 
   return (
     <div className="dashboard">
@@ -43,31 +114,27 @@ const ProjectDashboard_ = props => {
         </Paper>
       </div>
       <div className="dashboard_graphs-container">
-        <Paper className="dashboard__graph">
-          <Plot
-            useResizeHandler
-            data={[
-              {
-                x: [1, 2, 3],
-                y: [2, 6, 3],
-                type: 'scatter',
-                mode: 'lines+markers',
-                marker: {color: 'red'},
-              },
-            ]}
-            layout={{
-              showlegend: false,
-              spikedistance: -1,
-              xaxis: {
-                spikecolor: 'rgba(255, 0, 0, 0.3)',
-                spikedash: 'solid',
-                spikemode: 'across+toaxis+marker',
-                // @ts-ignore - property not documented in tsc https://plot.ly/javascript/reference/#layout-xaxis-spikesnap
-                spikesnap: 'cursor',
-              },
-            }}
-          />
-        </Paper>
+        <StatisticPlot
+          title="First Contentful Paint"
+          statisticName="audit_first-contentful-paint_average"
+          loadingState={loadingState}
+          statistics={stats}
+          builds={builds}
+        />
+        <StatisticPlot
+          title="Time to Interactive"
+          statisticName="audit_interactive_average"
+          loadingState={loadingState}
+          statistics={stats}
+          builds={builds}
+        />
+        <StatisticPlot
+          title="Speed Index"
+          statisticName="audit_speed-index_average"
+          loadingState={loadingState}
+          statistics={stats}
+          builds={builds}
+        />
       </div>
     </div>
   );

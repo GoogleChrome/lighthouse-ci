@@ -65,3 +65,41 @@ export function useProject(projectId) {
 export function useProjectBuilds(projectId) {
   return useApiData('getBuilds', [projectId]);
 }
+
+/**
+ * @param {string|undefined} projectId
+ * @param {string[]|undefined} buildIds
+ * @return {[LoadingState, Array<LHCI.ServerCommand.Statistic> | undefined]}
+ */
+export function useBuildStatistics(projectId, buildIds) {
+  const [loadingState, setLoadingState] = useState(/** @type {LoadingState} */ ('loading'));
+  const [statistics, setStatistics] = useState(
+    /** @type {Array<LHCI.ServerCommand.Statistic> | undefined} */ (undefined)
+  );
+
+  useEffect(() => {
+    if (!buildIds || !projectId) return;
+
+    // Wrap in IIFE because the return value of useEffect should be a cleanup function, not a Promise.
+    (async () => {
+      try {
+        setStatistics(undefined);
+        setLoadingState('loading');
+
+        await Promise.all(
+          buildIds.map(async buildId => {
+            const response = await api.getStatistics(projectId, buildId);
+            setStatistics(existing => (existing || []).concat(response));
+          })
+        );
+
+        setLoadingState('loaded');
+      } catch (err) {
+        console.error(err); // eslint-disable-line no-console
+        setLoadingState('error');
+      }
+    })();
+  }, [projectId, buildIds]);
+
+  return [loadingState, statistics];
+}

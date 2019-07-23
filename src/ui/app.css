@@ -43,6 +43,7 @@
   --page-header-padding: 12px;
   --page-header-content-height: calc(var(--page-header-height) - 2 * var(--page-header-padding));
   --paper-min-width: 200px;
+  --dashboard-graph-min-height: 300px;
 }
 
 html,

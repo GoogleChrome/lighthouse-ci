@@ -55,7 +55,17 @@ const ProjectDashboard_ = props => {
                 marker: {color: 'red'},
               },
             ]}
-            layout={{showlegend: false}}
+            layout={{
+              showlegend: false,
+              spikedistance: -1,
+              xaxis: {
+                spikecolor: 'rgba(255, 0, 0, 0.3)',
+                spikedash: 'solid',
+                spikemode: 'across+toaxis+marker',
+                // @ts-ignore - property not documented in tsc https://plot.ly/javascript/reference/#layout-xaxis-spikesnap
+                spikesnap: 'cursor',
+              },
+            }}
           />
         </Paper>
       </div>

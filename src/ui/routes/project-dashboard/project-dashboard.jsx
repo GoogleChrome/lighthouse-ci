@@ -8,6 +8,7 @@ import {h} from 'preact';
 import {useProjectBuilds, useProject} from '../../hooks/use-api-data';
 import {AsyncLoader, combineLoadingStates, combineAsyncData} from '../../components/async-loader';
 import {Paper} from '../../components/paper.jsx';
+import {Plot} from '../../components/plot.jsx';
 import {ProjectGettingStarted} from './getting-started.jsx';
 import './project-dashboard.css';
 
@@ -39,6 +40,23 @@ const ProjectDashboard_ = props => {
           Compared to previous builds, the commit afd3591e on July 4 scored -18 pts for Performance,
           +11 pts for Accessibility, -5 pts for SEO, +2 pts for Best Practices, and -10 pts for
           Progressive Web App.
+        </Paper>
+      </div>
+      <div className="dashboard_graphs-container">
+        <Paper className="dashboard__graph">
+          <Plot
+            useResizeHandler
+            data={[
+              {
+                x: [1, 2, 3],
+                y: [2, 6, 3],
+                type: 'scatter',
+                mode: 'lines+markers',
+                marker: {color: 'red'},
+              },
+            ]}
+            layout={{showlegend: false}}
+          />
         </Paper>
       </div>
     </div>

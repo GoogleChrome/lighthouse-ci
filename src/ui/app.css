@@ -32,8 +32,8 @@
   --medium-font-weight: 500;
 
   --base-font-size: 16px;
-  --header-font-size: 22px;
-  --title-font-size: 30px;
+  --header-font-size: 20px;
+  --title-font-size: 24px;
 
   --base-spacing: 12px;
   --large-spacing: 20px;
@@ -70,4 +70,5 @@ h4,
 h5,
 h6 {
   font-size: var(--header-font-size);
+  font-weight: var(--base-font-weight);
 }

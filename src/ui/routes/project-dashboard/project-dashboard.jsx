@@ -20,9 +20,8 @@ const ProjectDashboard_ = props => {
       <div className="dashboard__header">
         <h2 className="dashboard__project-name">{project.name}</h2>
         <Paper className="dashboard__build-list">
-          <h2>Latest Builds</h2>
           <table>
-            {builds.map(build => {
+            {builds.slice(0, 3).map(build => {
               return (
                 <tr key={build.id}>
                   <td>
@@ -37,9 +36,9 @@ const ProjectDashboard_ = props => {
           </table>
         </Paper>
         <Paper className="dashboard__summary">
-          Compared to the previous commit, the commit afd3591e on July 4 scored -18 pts for
-          Performance, +11 pts for Accessibility, -5 pts for SEO, +2 pts for Best Practices, and -10
-          pts for Progressive Web App.
+          Compared to previous builds, the commit afd3591e on July 4 scored -18 pts for Performance,
+          +11 pts for Accessibility, -5 pts for SEO, +2 pts for Best Practices, and -10 pts for
+          Progressive Web App.
         </Paper>
       </div>
     </div>

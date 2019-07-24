@@ -18,7 +18,7 @@ export const api = new ApiClient({
 /**
  * @template {keyof StrictOmit<ApiClient, '_rootURL'|'_URL'>} T
  * @param {T} apiMethod
- * @param {Parameters<ApiClient[T]>} apiParameters
+ * @param {Parameters<ApiClient[T]>|undefined} apiParameters
  * @return {[LoadingState, UnPromisify<ReturnType<ApiClient[T]>> | undefined]}
  */
 function useApiData(apiMethod, apiParameters) {
@@ -26,6 +26,8 @@ function useApiData(apiMethod, apiParameters) {
   const [apiData, setApiData] = useState(/** @type {any} */ (undefined));
 
   useEffect(() => {
+    if (!apiParameters) return;
+
     // Wrap in IIFE because the return value of useEffect should be a cleanup function, not a Promise.
     (async () => {
       try {
@@ -64,6 +66,22 @@ export function useProject(projectId) {
  */
 export function useProjectBuilds(projectId) {
   return useApiData('getBuilds', [projectId]);
+}
+
+/**
+ * @param {string|undefined} projectId
+ * @return {[LoadingState, Array<{url: string}> | undefined]}
+ */
+export function useProjectURLs(projectId) {
+  return useApiData('getUrls', projectId ? [projectId] : undefined);
+}
+
+/**
+ * @param {string|undefined} projectId
+ * @return {[LoadingState, Array<{branch: string}> | undefined]}
+ */
+export function useProjectBranches(projectId) {
+  return useApiData('getBranches', projectId ? [projectId] : undefined);
 }
 
 /**

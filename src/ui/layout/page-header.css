@@ -44,3 +44,25 @@
   color: var(--secondary-text-color);
   margin-right: var(--base-spacing);
 }
+
+.page-header-picker__select {
+  --arrow-size: calc(3 * var(--base-font-size) / 4);
+
+  background-color: transparent;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' fill='%23666666'><polygon points='0,0 100,0 50,50'/></svg>");
+  background-repeat: no-repeat;
+  background-size: var(--arrow-size);
+  background-position: calc(100% - var(--arrow-size) / 2) calc(var(--arrow-size) / 2);
+
+  border: none;
+
+  -moz-appearance: none;
+  -webkit-appearance: none;
+  appearance: none;
+
+  color: var(--base-text-color);
+  font-size: var(--base-font-size);
+  font-family: var(--base-font-family);
+  font-weight: var(--medium-font-weight);
+  padding-right: calc(2 * var(--base-spacing));
+}

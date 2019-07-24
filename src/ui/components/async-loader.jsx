@@ -11,16 +11,16 @@ import {Redirect} from './redirect.jsx';
 
 /**
  * @template T
- * @param {{loadingState: LoadingState, asyncData: T | undefined, render: (data: T) => JSX.Element}} props */
+ * @param {{loadingState: LoadingState, asyncData: T | undefined, render: (data: T) => JSX.Element, renderLoading?: () => JSX.Element}} props */
 export const AsyncLoader = props => {
-  const {asyncData, loadingState, render} = props;
+  const {asyncData, loadingState, render, renderLoading} = props;
 
   if (loadingState === 'loaded') {
     return asyncData === undefined ? <Redirect to="/app/projects" /> : render(asyncData);
   } else if (loadingState === 'error') {
     return <h1>Lighthouse Error</h1>;
   } else if (loadingState === 'loading') {
-    return <h1>Loading...</h1>;
+    return renderLoading ? renderLoading() : <h1>Loading...</h1>;
   }
 
   return null;

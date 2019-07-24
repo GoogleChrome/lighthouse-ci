@@ -6,6 +6,7 @@
 
 import {h} from 'preact';
 import {useMemo} from 'preact/hooks';
+import _ from '../../../shared/lodash.js';
 import {useProjectBuilds, useProject, useBuildStatistics} from '../../hooks/use-api-data';
 import {AsyncLoader, combineLoadingStates, combineAsyncData} from '../../components/async-loader';
 import {Paper} from '../../components/paper.jsx';
@@ -38,7 +39,7 @@ const StatisticPlot = props => {
               data={[
                 {
                   x: xs,
-                  y: stats.map(x => x.value),
+                  y: stats.map(x => Math.round(x.value * 100)),
                   type: 'scatter',
                   mode: 'lines+markers',
                   marker: {color: '#4587f4'},
@@ -71,6 +72,9 @@ const StatisticPlot = props => {
                 yaxis: {
                   tickfont: {color: '#888'},
                   fixedrange: true,
+                  range: [0, 100],
+                  tickvals: _.range(0, 101, 20),
+                  ticktext: _.range(0, 101, 20).map(x => x.toString()),
                   spikecolor: 'rgba(0, 0, 255, 0.3)',
                   spikethickness: 1,
                   spikemode: 'across+toaxis+marker',
@@ -120,22 +124,29 @@ const ProjectDashboard_ = props => {
       </div>
       <div className="dashboard_graphs-container">
         <StatisticPlot
-          title="First Contentful Paint"
-          statisticName="audit_first-contentful-paint_average"
+          title="Performance"
+          statisticName="category_performance_average"
           loadingState={loadingState}
           statistics={stats}
           builds={builds}
         />
         <StatisticPlot
-          title="Time to Interactive"
-          statisticName="audit_interactive_average"
+          title="PWA"
+          statisticName="category_pwa_average"
           loadingState={loadingState}
           statistics={stats}
           builds={builds}
         />
         <StatisticPlot
-          title="Speed Index"
-          statisticName="audit_speed-index_average"
+          title="Accessibility"
+          statisticName="category_accessibility_average"
+          loadingState={loadingState}
+          statistics={stats}
+          builds={builds}
+        />
+        <StatisticPlot
+          title="SEO"
+          statisticName="category_seo_average"
           loadingState={loadingState}
           statistics={stats}
           builds={builds}

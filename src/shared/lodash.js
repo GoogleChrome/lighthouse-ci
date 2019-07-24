@@ -44,6 +44,21 @@ function merge(v1, v2) {
 module.exports = {
   merge,
   /**
+   * Generates an array of numbers from `from` (inclusive) to `to` (exclusive)
+   * @param {number} from
+   * @param {number} to
+   * @param {number} [by]
+   * @return {Array<number>}
+   */
+  range(from, to, by = 1) {
+    /** @type {Array<number>} */
+    const numbers = [];
+    for (let i = from; i < to; i += by) {
+      numbers.push(i);
+    }
+    return numbers;
+  },
+  /**
    * Converts a string from camelCase to kebab-case.
    * @param {string} s
    */

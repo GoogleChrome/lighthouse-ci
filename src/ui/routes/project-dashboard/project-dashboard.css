@@ -30,11 +30,33 @@
   grid-row-start: 2;
 }
 
-.dashboard__summary {
+.dashboard-summary {
   font-size: var(--header-font-size);
   min-width: var(--paper-min-width);
   grid-row-start: 1;
   grid-row-end: 3;
+}
+
+.dashboard-summary__commit {
+  font-weight: var(--medium-font-weight);
+}
+
+.dashboard-summary__badge {
+  font-family: monospace;
+  white-space: pre;
+
+  color: var(--inverted-text-color);
+  background: var(--secondary-background-color);
+  padding: 0 calc(var(--base-spacing) / 4);
+  border-radius: calc(var(--base-spacing) / 4);
+}
+
+.dashboard-summary__badge--positive {
+  background: var(--color-green-a700);
+}
+
+.dashboard-summary__badge--negative {
+  background: var(--color-red-a200);
 }
 
 .dashboard_graphs-container {

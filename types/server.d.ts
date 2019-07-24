@@ -42,7 +42,12 @@ declare global {
       export type StatisticName =
         | 'audit_interactive_average'
         | 'audit_first-contentful-paint_average'
-        | 'audit_speed-index_average';
+        | 'audit_speed-index_average'
+        | 'category_performance_average'
+        | 'category_pwa_average'
+        | 'category_seo_average'
+        | 'category_accessibility_average'
+        | 'category_best-practices_average';
 
       export interface Statistic {
         id: string;

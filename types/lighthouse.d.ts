@@ -25,8 +25,13 @@ declare global {
         | 'manual';
     }
 
+    export interface CategoryResult {
+      score: number;
+    }
+
     export interface Result {
       finalUrl: string;
+      categories: {[categoryId: string]: CategoryResult};
       audits: {[auditId: string]: AuditResult};
     }
   }

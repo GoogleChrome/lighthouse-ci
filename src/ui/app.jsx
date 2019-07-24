@@ -13,11 +13,14 @@ import './app.css';
 
 const Loader = () => <h1>Loading route...</h1>;
 
+/** @type {any} Router types do not work properly, so fallback to any. */
+const PageHeaderNoTypes = PageHeader;
+
 export const App = () => {
   return (
     <div className="lhci">
       <Router>
-        <PageHeader path="/app/:slug?/:projectId?" />
+        <PageHeaderNoTypes path="/app/:slug?/:projectId?" />
       </Router>
       <div className="page-body">
         <Router>

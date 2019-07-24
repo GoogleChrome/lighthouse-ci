@@ -5,25 +5,99 @@
  */
 
 import {h} from 'preact';
+import {route} from 'preact-router';
 import './page-header.css';
+import {AsyncLoader} from '../components/async-loader';
+import {useProjectList, useProjectURLs, useProjectBranches} from '../hooks/use-api-data';
 
-/** @param {{label: string, value: string}} props */
-const FakeSelect = props => {
+/**
+ * @template T
+ * @typedef ToplevelSelectProps
+ * @prop {string} label
+ * @prop {T|undefined} value
+ * @prop {T[]|undefined} options
+ * @prop {import('../components/async-loader').LoadingState} loadingState
+ * @prop {(entry: T) => string} createLabelFromOption
+ * @prop {(entry: T) => void} onSelect
+ */
+
+/** @template T @param {ToplevelSelectProps<T>} props */
+const ToplevelSelect = props => {
   return (
     <div className="page-header-picker">
       <span className="page-header-picker__label">{props.label}</span>
-      <span>{props.value}</span>
+      <AsyncLoader
+        loadingState={props.loadingState}
+        asyncData={props.options}
+        renderLoading={() => <span>Loading...</span>}
+        render={options => {
+          return (
+            <select
+              className="page-header-picker__select"
+              value={(props.value && options.indexOf(props.value)) || 0}
+              onChange={e => {
+                const target = /** @type {*} */ (e.target);
+                const option = options[target.value];
+                props.onSelect(option);
+              }}
+            >
+              {options.map((option, index) => (
+                <option key={index} value={index}>
+                  {props.createLabelFromOption(option)}
+                </option>
+              ))}
+            </select>
+          );
+        }}
+      />
     </div>
   );
 };
 
-export const PageHeader = () => {
+/** @param {string} key @param {string} value */
+const setQueryParamsAndNavigate = (key, value) => {
+  const url = new URL(window.location.href);
+  url.searchParams.set(key, value);
+  route(`${url.pathname}${url.search}`);
+};
+
+/** @param {{matches: {projectId?: string, runUrl?: string, branch?: string}}} props */
+export const PageHeader = props => {
+  const projectsApiData = useProjectList();
+  const selectedProject =
+    props.matches.projectId && projectsApiData[1]
+      ? projectsApiData[1].find(project => project.id === props.matches.projectId)
+      : undefined;
+  const urlsApiData = useProjectURLs(selectedProject && selectedProject.id);
+  const branchesApiData = useProjectBranches(selectedProject && selectedProject.id);
+
   return (
     <div className="page-header">
       <div className="page-header__logo" />
-      <FakeSelect label="Project" value="Sample Project" />
-      <FakeSelect label="URL" value="https://example.com/blog" />
-      <FakeSelect label="Branch" value="master" />
+      <ToplevelSelect
+        label="Project"
+        value={selectedProject}
+        loadingState={projectsApiData[0]}
+        options={projectsApiData[1]}
+        createLabelFromOption={project => project.name}
+        onSelect={project => route(`/app/projects/${project.id}`)}
+      />
+      <ToplevelSelect
+        label="URL"
+        value={props.matches.runUrl}
+        loadingState={urlsApiData[0]}
+        options={urlsApiData[1] && urlsApiData[1].map(({url}) => url)}
+        createLabelFromOption={url => url}
+        onSelect={url => setQueryParamsAndNavigate('runUrl', url)}
+      />
+      <ToplevelSelect
+        label="Branch"
+        value={props.matches.branch}
+        loadingState={branchesApiData[0]}
+        options={branchesApiData[1] && branchesApiData[1].map(({branch}) => branch)}
+        createLabelFromOption={branch => branch}
+        onSelect={branch => setQueryParamsAndNavigate('branch', branch)}
+      />
     </div>
   );
 };

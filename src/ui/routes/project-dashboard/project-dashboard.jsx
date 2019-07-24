@@ -21,8 +21,13 @@ const StatisticPlot = props => {
       asyncData={props.statistics}
       render={allStats => {
         const stats = allStats
+          .map(stat => ({...stat, build: props.builds.find(build => build.id === stat.buildId)}))
           .filter(stat => stat.name === props.statisticName)
-          .sort((a, b) => (a.createdAt || '').localeCompare(b.createdAt || ''));
+          .sort((a, b) =>
+            ((a.build && a.build.createdAt) || '').localeCompare(
+              (b.build && b.build.createdAt) || ''
+            )
+          );
 
         const xs = stats.map((_, i) => i);
         return (

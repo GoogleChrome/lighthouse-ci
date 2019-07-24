@@ -14,7 +14,13 @@ import {Plot} from '../../components/plot.jsx';
 import {ProjectGettingStarted} from './getting-started.jsx';
 import './project-dashboard.css';
 
-/** @param {{title: string, statisticName: LHCI.ServerCommand.StatisticName, statistics?: Array<LHCI.ServerCommand.Statistic>, loadingState: import('../../components/async-loader').LoadingState, builds: LHCI.ServerCommand.Build[]}} props */
+/** @typedef {LHCI.ServerCommand.Statistic & {build: LHCI.ServerCommand.Build}} StatisticWithBuild */
+
+/** @param {Array<StatisticWithBuild>} stats */
+const sortByMostRecentLast = stats =>
+  stats.slice().sort((a, b) => (a.build.createdAt || '').localeCompare(b.build.createdAt || ''));
+
+/** @param {{title: string, statisticName: LHCI.ServerCommand.StatisticName, statistics?: Array<StatisticWithBuild>, loadingState: import('../../components/async-loader').LoadingState, builds: LHCI.ServerCommand.Build[]}} props */
 const StatisticPlot = props => {
   return (
     <AsyncLoader
@@ -22,13 +28,8 @@ const StatisticPlot = props => {
       asyncData={props.statistics}
       render={allStats => {
         const stats = allStats
-          .map(stat => ({...stat, build: props.builds.find(build => build.id === stat.buildId)}))
           .filter(stat => stat.name === props.statisticName)
-          .sort((a, b) =>
-            ((a.build && a.build.createdAt) || '').localeCompare(
-              (b.build && b.build.createdAt) || ''
-            )
-          );
+          .sort((a, b) => (a.build.createdAt || '').localeCompare(b.build.createdAt || ''));
 
         const xs = stats.map((_, i) => i);
         return (
@@ -90,11 +91,99 @@ const StatisticPlot = props => {
   );
 };
 
+/**
+ * @typedef CategoryDiffBadgeProps
+ * @prop {LHCI.ServerCommand.StatisticName} statisticName
+ * @prop {Array<StatisticWithBuild>} stats
+ */
+
+/**
+ * @param {CategoryDiffBadgeProps} props
+ */
+const CategoryDiffBadge = props => {
+  const {statisticName, stats} = props;
+  const [mostRecent, ...rest] = stats.filter(stat => stat.name === statisticName);
+  let classification = 'neutral';
+  let stringLabel = '0 pts';
+  if (rest.length) {
+    const diff = Math.round(
+      100 * (mostRecent.value - rest.reduce((a, b) => a + b.value, 0) / rest.length)
+    );
+
+    classification = 'negative';
+    stringLabel = `${diff} pt${diff === 1 ? '' : 's'}`;
+    if (diff >= 0) {
+      classification = 'positive';
+      stringLabel = `+${stringLabel}`;
+    }
+  }
+
+  return (
+    <span className={`dashboard-summary__badge dashboard-summary__badge--${classification}`}>
+      {stringLabel}
+    </span>
+  );
+};
+
+/** @param {{statsWithBuilds: Array<StatisticWithBuild>|undefined, loadingState: import('../../components/async-loader').LoadingState}} props */
+const DashboardSummary = props => {
+  return (
+    <Paper className="dashboard-summary">
+      <AsyncLoader
+        loadingState={props.loadingState}
+        asyncData={props.statsWithBuilds}
+        render={unsortedStats => {
+          const stats = sortByMostRecentLast(unsortedStats).reverse();
+          const mostRecent = stats[0];
+          const performance = (
+            <CategoryDiffBadge statisticName="category_performance_average" stats={stats} />
+          );
+          const a11y = (
+            <CategoryDiffBadge statisticName="category_accessibility_average" stats={stats} />
+          );
+          const seo = <CategoryDiffBadge statisticName="category_seo_average" stats={stats} />;
+          const bestPractices = (
+            <CategoryDiffBadge statisticName="category_best-practices_average" stats={stats} />
+          );
+          const pwa = <CategoryDiffBadge statisticName="category_pwa_average" stats={stats} />;
+
+          return (
+            <span>
+              Compared to previous builds, the commit{' '}
+              <span className="dashboard-summary__commit">{mostRecent.build.hash.slice(0, 8)}</span>{' '}
+              on <span>{new Date(mostRecent.createdAt || 0).toLocaleString()}</span> scored{' '}
+              {performance} for Performance, {a11y} for Accessibility, {seo} for SEO,{' '}
+              {bestPractices} for Best Practices, and {pwa} for Progressive Web App.
+            </span>
+          );
+        }}
+      />
+    </Paper>
+  );
+};
+
+/**
+ * @param {LHCI.ServerCommand.Statistic[]|undefined} stats
+ * @param {LHCI.ServerCommand.Build[]} builds
+ * @return {Array<StatisticWithBuild>|undefined}
+ */
+const augmentStatsWithBuilds = (stats, builds) => {
+  if (!stats) return undefined;
+
+  return stats
+    .map(stat => ({
+      ...stat,
+      build: builds.find(build => build.id === stat.buildId),
+    }))
+    .filter(/** @return {stat is StatisticWithBuild} */ stat => !!stat.build);
+};
+
 /** @param {{project: LHCI.ServerCommand.Project, builds: Array<LHCI.ServerCommand.Build>}} props */
 const ProjectDashboard_ = props => {
   const {project, builds} = props;
   const buildIds = useMemo(() => builds.map(build => build.id), builds);
   const [loadingState, stats] = useBuildStatistics(project.id, buildIds);
+  const statsWithBuilds = augmentStatsWithBuilds(stats, builds);
 
   return (
     <div className="dashboard">
@@ -116,39 +205,35 @@ const ProjectDashboard_ = props => {
             })}
           </table>
         </Paper>
-        <Paper className="dashboard__summary">
-          Compared to previous builds, the commit afd3591e on July 4 scored -18 pts for Performance,
-          +11 pts for Accessibility, -5 pts for SEO, +2 pts for Best Practices, and -10 pts for
-          Progressive Web App.
-        </Paper>
+        <DashboardSummary loadingState={loadingState} statsWithBuilds={statsWithBuilds} />
       </div>
       <div className="dashboard_graphs-container">
         <StatisticPlot
           title="Performance"
           statisticName="category_performance_average"
           loadingState={loadingState}
-          statistics={stats}
+          statistics={statsWithBuilds}
           builds={builds}
         />
         <StatisticPlot
           title="PWA"
           statisticName="category_pwa_average"
           loadingState={loadingState}
-          statistics={stats}
+          statistics={statsWithBuilds}
           builds={builds}
         />
         <StatisticPlot
           title="Accessibility"
           statisticName="category_accessibility_average"
           loadingState={loadingState}
-          statistics={stats}
+          statistics={statsWithBuilds}
           builds={builds}
         />
         <StatisticPlot
           title="SEO"
           statisticName="category_seo_average"
           loadingState={loadingState}
-          statistics={stats}
+          statistics={statsWithBuilds}
           builds={builds}
         />
       </div>

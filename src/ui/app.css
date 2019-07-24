@@ -16,10 +16,13 @@
   --color-gray-700: #616161;
   --color-gray-800: #424242;
   --color-gray-900: #212121;
+  --color-red-a200: #ff5252;
+  --color-green-a700: #00c853;
 
   /** Themematic constants */
   --base-text-color: var(--color-gray-900);
   --secondary-text-color: var(--color-gray-600);
+  --inverted-text-color: var(--color-gray-50);
 
   --base-background-color: var(--color-gray-50);
   --secondary-background-color: var(--color-gray-200);

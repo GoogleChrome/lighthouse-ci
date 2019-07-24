@@ -178,12 +178,17 @@ const augmentStatsWithBuilds = (stats, builds) => {
     .filter(/** @return {stat is StatisticWithBuild} */ stat => !!stat.build);
 };
 
-/** @param {{project: LHCI.ServerCommand.Project, builds: Array<LHCI.ServerCommand.Build>}} props */
+/** @param {{project: LHCI.ServerCommand.Project, builds: Array<LHCI.ServerCommand.Build>, runUrl?: string, branch?: string}} props */
 const ProjectDashboard_ = props => {
   const {project, builds} = props;
   const buildIds = useMemo(() => builds.map(build => build.id), builds);
   const [loadingState, stats] = useBuildStatistics(project.id, buildIds);
-  const statsWithBuilds = augmentStatsWithBuilds(stats, builds);
+  const statsWithBuildsUnfiltered = augmentStatsWithBuilds(stats, builds);
+  const statsWithBuilds =
+    statsWithBuildsUnfiltered &&
+    statsWithBuildsUnfiltered
+      .filter(stat => !props.branch || stat.build.branch === props.branch)
+      .filter(stat => !props.runUrl || stat.url === props.runUrl);
 
   return (
     <div className="dashboard">
@@ -241,7 +246,7 @@ const ProjectDashboard_ = props => {
   );
 };
 
-/** @param {{projectId: string}} props */
+/** @param {{projectId: string, runUrl?: string, branch?: string}} props */
 export const ProjectDashboard = props => {
   const projectApiData = useProject(props.projectId);
   const projectBuildData = useProjectBuilds(props.projectId);
@@ -252,7 +257,7 @@ export const ProjectDashboard = props => {
       asyncData={combineAsyncData(projectApiData, projectBuildData)}
       render={([project, builds]) =>
         builds.length ? (
-          <ProjectDashboard_ project={project} builds={builds} />
+          <ProjectDashboard_ project={project} builds={builds} {...props} />
         ) : (
           <ProjectGettingStarted project={project} />
         )

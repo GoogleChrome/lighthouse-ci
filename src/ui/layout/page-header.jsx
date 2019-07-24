@@ -86,17 +86,17 @@ export const PageHeader = props => {
         label="URL"
         value={props.matches.runUrl}
         loadingState={urlsApiData[0]}
-        options={urlsApiData[1] && urlsApiData[1].map(({url}) => url)}
-        createLabelFromOption={url => url}
-        onSelect={url => setQueryParamsAndNavigate('runUrl', url)}
+        options={urlsApiData[1] && [undefined, ...urlsApiData[1].map(({url}) => url)]}
+        createLabelFromOption={url => url || 'All'}
+        onSelect={url => setQueryParamsAndNavigate('runUrl', url || '')}
       />
       <ToplevelSelect
         label="Branch"
         value={props.matches.branch}
         loadingState={branchesApiData[0]}
-        options={branchesApiData[1] && branchesApiData[1].map(({branch}) => branch)}
-        createLabelFromOption={branch => branch}
-        onSelect={branch => setQueryParamsAndNavigate('branch', branch)}
+        options={branchesApiData[1] && [undefined, ...branchesApiData[1].map(({branch}) => branch)]}
+        createLabelFromOption={branch => branch || 'All'}
+        onSelect={branch => setQueryParamsAndNavigate('branch', branch || '')}
       />
     </div>
   );

@@ -184,6 +184,18 @@ const RUNS = [
     auditsToFake
   ),
   ...createRuns(
+    {projectId: '0', buildId: '0', url: 'http://localhost:1234/viewer/#checkout'},
+    auditsToFake
+  ),
+  ...createRuns(
+    {projectId: '0', buildId: '1', url: 'http://localhost:1234/viewer/#checkout'},
+    auditsToFake
+  ),
+  ...createRuns(
+    {projectId: '0', buildId: '2', url: 'http://localhost:1234/viewer/#checkout'},
+    auditsToFake
+  ),
+  ...createRuns(
     {projectId: '0', buildId: '3', url: 'http://localhost:1234/viewer/#home'},
     {...auditsToFake, interactive: {averageNumericValue: 4000}}
   ),

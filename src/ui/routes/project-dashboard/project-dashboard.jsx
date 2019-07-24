@@ -27,9 +27,14 @@ const StatisticPlot = props => {
       loadingState={props.loadingState}
       asyncData={props.statistics}
       render={allStats => {
-        const stats = allStats
+        const statsUngrouped = allStats
           .filter(stat => stat.name === props.statisticName)
           .sort((a, b) => (a.build.createdAt || '').localeCompare(b.build.createdAt || ''));
+        // We need to merge the stats by hash to handle multiple URLs.
+        const stats = _.groupBy(statsUngrouped, stat => stat.build.hash).map(group => {
+          const value = group.map(stat => stat.value).reduce((a, b) => a + b) / group.length;
+          return {...group[0], value};
+        });
 
         const xs = stats.map((_, i) => i);
         return (

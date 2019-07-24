@@ -5,6 +5,8 @@
  */
 'use strict';
 
+const _ = require('./lodash.js');
+
 /** @typedef {import('../server/api/client.js')} ApiClient */
 
 /** @type {Array<LHCI.ServerCommand.Project>} */
@@ -65,6 +67,15 @@ const BUILDS = [
 
 /** @typedef {{auditId: string, passRate?: number, averageNumericValue?: number}} AuditGenDef */
 
+/** @param {string} auditId */
+function getCategoryForAuditId(auditId) {
+  if (auditId.startsWith('a11y')) return 'accessibility';
+  if (auditId.startsWith('seo')) return 'seo';
+  if (auditId.startsWith('best-practices')) return 'best-practices';
+  if (auditId.startsWith('pwa')) return 'pwa';
+  return 'performance';
+}
+
 /**
  *
  * @param {string} url
@@ -92,8 +103,21 @@ function createLHR(url, auditDefs) {
     }
   }
 
+  /** @type {LH.Result['categories']} */
+  const categories = {};
+
+  const auditsGroupedByCategory = _.groupBy(Object.entries(audits), pair =>
+    getCategoryForAuditId(pair[0])
+  );
+  for (const audits of auditsGroupedByCategory) {
+    const category = getCategoryForAuditId(audits[0][0]);
+    const sum = audits.reduce((sum, next) => sum + (next[1].score || 0), 0);
+    categories[category] = {score: sum / audits.length};
+  }
+
   return {
     finalUrl: url,
+    categories,
     audits,
   };
 }
@@ -124,6 +148,25 @@ const auditsToFake = {
   'speed-index': {averageNumericValue: 3000},
   interactive: {averageNumericValue: 5000},
   'max-potential-fid': {averageNumericValue: 250},
+
+  'a11y-color-contrast': {passRate: 0.5},
+  'a11y-labels': {passRate: 0.5},
+  'a11y-duplicate-id': {passRate: 0.5},
+  'a11y-alt-text': {passRate: 0.5},
+
+  'pwa-https': {passRate: 0.8},
+  'pwa-manifest': {passRate: 0.4},
+  'pwa-service-worker': {passRate: 0.2},
+  'pwa-start-url': {passRate: 0.2},
+  'pwa-offline': {passRate: 0.2},
+
+  'best-practices-console-errors': {passRate: 0.2},
+  'best-practices-rel-noopener': {passRate: 0.8},
+  'best-practices-password-paste': {passRate: 0.9},
+
+  'seo-font-size': {passRate: 0.5},
+  'seo-indexable': {passRate: 0.9},
+  'seo-title': {passRate: 0.9},
 };
 
 /** @type {Array<LHCI.ServerCommand.Run>} */

@@ -185,6 +185,11 @@ describe('Lighthouse CI Server', () => {
         'speed-index': {numericValue: 5000},
         'first-contentful-paint': {numericValue: 2000},
       },
+      categories: {
+        performance: {score: 0.5},
+        pwa: {score: 0.1},
+        seo: {score: 0.9},
+      },
     };
 
     beforeEach(() => {
@@ -208,6 +213,7 @@ describe('Lighthouse CI Server', () => {
           ...lhr,
           lighthouseVersion: '4.2.0',
           audits: {...lhr.audits, interactive: {numericValue: 6000}},
+          categories: {...lhr.categories, performance: {score: 0.4}},
         }),
       };
 
@@ -252,6 +258,31 @@ describe('Lighthouse CI Server', () => {
           name: 'audit_speed-index_average',
           value: 5000,
         },
+        {
+          url: 'https://example.com/',
+          name: 'category_accessibility_average',
+          value: -1,
+        },
+        {
+          url: 'https://example.com/',
+          name: 'category_best-practices_average',
+          value: -1,
+        },
+        {
+          url: 'https://example.com/',
+          name: 'category_performance_average',
+          value: 0.45,
+        },
+        {
+          url: 'https://example.com/',
+          name: 'category_pwa_average',
+          value: 0.1,
+        },
+        {
+          url: 'https://example.com/',
+          name: 'category_seo_average',
+          value: 0.9,
+        },
       ]);
     });
 
@@ -265,6 +296,11 @@ describe('Lighthouse CI Server', () => {
             interactive: {numericValue: 1000},
             'speed-index': {numericValue: 1000},
             'first-contentful-paint': {numericValue: 1000},
+          },
+          categories: {
+            performance: {score: 0.9},
+            pwa: {score: 0.4},
+            seo: {score: 0.7},
           },
         }),
       };
@@ -299,6 +335,31 @@ describe('Lighthouse CI Server', () => {
           value: 5000,
         },
         {
+          url: 'https://example.com/',
+          name: 'category_accessibility_average',
+          value: -1,
+        },
+        {
+          url: 'https://example.com/',
+          name: 'category_best-practices_average',
+          value: -1,
+        },
+        {
+          url: 'https://example.com/',
+          name: 'category_performance_average',
+          value: 0.45,
+        },
+        {
+          url: 'https://example.com/',
+          name: 'category_pwa_average',
+          value: 0.1,
+        },
+        {
+          url: 'https://example.com/',
+          name: 'category_seo_average',
+          value: 0.9,
+        },
+        {
           url: 'https://example.com/blog',
           name: 'audit_first-contentful-paint_average',
           value: 1000,
@@ -312,6 +373,31 @@ describe('Lighthouse CI Server', () => {
           url: 'https://example.com/blog',
           name: 'audit_speed-index_average',
           value: 1000,
+        },
+        {
+          url: 'https://example.com/blog',
+          name: 'category_accessibility_average',
+          value: -1,
+        },
+        {
+          url: 'https://example.com/blog',
+          name: 'category_best-practices_average',
+          value: -1,
+        },
+        {
+          url: 'https://example.com/blog',
+          name: 'category_performance_average',
+          value: 0.9,
+        },
+        {
+          url: 'https://example.com/blog',
+          name: 'category_pwa_average',
+          value: 0.4,
+        },
+        {
+          url: 'https://example.com/blog',
+          name: 'category_seo_average',
+          value: 0.7,
         },
       ]);
     });

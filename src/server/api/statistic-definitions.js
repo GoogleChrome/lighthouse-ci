@@ -7,6 +7,15 @@
 
 /** @typedef {(lhrs: Array<LH.Result>) => ({value: number})} StatisticFn */
 
+/** @param {Array<number>} values */
+function average(values) {
+  const sum = values.reduce((x, y) => x + y, 0);
+  const count = values.length;
+
+  if (count === 0) return {value: -1};
+  return {value: sum / count};
+}
+
 /**
  * @param {string} auditId
  * @return {StatisticFn}
@@ -20,11 +29,24 @@ function auditNumericValueAverage(auditId) {
           typeof value === 'number' && Number.isFinite(value)
       );
 
-    const sum = values.reduce((x, y) => x + y, 0);
-    const count = values.length;
+    return average(values);
+  };
+}
 
-    if (count === 0) return {value: 0};
-    return {value: sum / count};
+/**
+ * @param {string} categoryId
+ * @return {StatisticFn}
+ */
+function categoryScoreAverage(categoryId) {
+  return lhrs => {
+    const values = lhrs
+      .map(lhr => lhr.categories[categoryId] && lhr.categories[categoryId].score)
+      .filter(
+        /** @return {value is number} */ value =>
+          typeof value === 'number' && Number.isFinite(value)
+      );
+
+    return average(values);
   };
 }
 
@@ -33,6 +55,11 @@ const definitions = {
   audit_interactive_average: auditNumericValueAverage('interactive'),
   'audit_speed-index_average': auditNumericValueAverage('speed-index'),
   'audit_first-contentful-paint_average': auditNumericValueAverage('first-contentful-paint'),
+  category_performance_average: categoryScoreAverage('performance'),
+  category_pwa_average: categoryScoreAverage('pwa'),
+  category_seo_average: categoryScoreAverage('seo'),
+  category_accessibility_average: categoryScoreAverage('accessibility'),
+  'category_best-practices_average': categoryScoreAverage('best-practices'),
 };
 
 // Keep the export separate from declaration to enable tsc to typecheck the `@type` annotation.

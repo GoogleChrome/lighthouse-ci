@@ -7,15 +7,12 @@
 
 /* eslint-env jest */
 
-const fs = require('fs');
 const path = require('path');
 const {spawn, spawnSync} = require('child_process');
 const fetch = require('isomorphic-fetch');
 const log = require('lighthouse-logger');
 const puppeteer = require('puppeteer');
-const {waitForCondition} = require('./test-utils.js');
-
-const CLI_PATH = path.join(__dirname, '../src/cli.js');
+const {startServer, cleanup, waitForCondition, CLI_PATH} = require('./test-utils.js');
 
 describe('Lighthouse CI CLI', () => {
   const sqlFile = 'cli-test.tmp.sql';
@@ -23,27 +20,15 @@ describe('Lighthouse CI CLI', () => {
   const rcExtendedFile = path.join(__dirname, 'fixtures/lighthouserc-extended.json');
 
   let serverPort;
-  let serverProcess;
-  let serverProcessStdout = '';
-
   let projectToken;
   let urlToCollect;
 
-  afterAll(() => {
-    if (fs.existsSync(sqlFile)) fs.unlinkSync(sqlFile);
-    serverProcess.kill();
-  });
+  afterAll(cleanup);
 
   describe('server', () => {
     it('should bring up the server and accept requests', async () => {
-      serverProcess = spawn(CLI_PATH, ['server', '-p=0', `--storage.sqlDatabasePath=${sqlFile}`]);
-
-      serverProcess.stdout.on('data', chunk => (serverProcessStdout += chunk.toString()));
-
-      await waitForCondition(() => serverProcessStdout.includes('listening'));
-
-      expect(serverProcessStdout).toMatch(/port \d+/);
-      serverPort = serverProcessStdout.match(/port (\d+)/)[1];
+      const server = await startServer(sqlFile);
+      serverPort = server.port;
       urlToCollect = `http://localhost:${serverPort}/app/`;
     });
 

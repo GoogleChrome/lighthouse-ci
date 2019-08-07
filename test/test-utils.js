@@ -7,22 +7,38 @@
 
 /* eslint-env jest, browser */
 
+const fs = require('fs');
+const path = require('path');
+const {spawn} = require('child_process');
 const preactRender = require('preact').render;
 const testingLibrary = require('@testing-library/dom');
 
+const CLI_PATH = path.join(__dirname, '../src/cli.js');
+
+const servers = [];
 const renderedComponents = new Set();
 
-function waitForCondition(fn) {
-  let resolve;
-  const promise = new Promise(r => (resolve = r));
-
-  function checkConditionOrContinue() {
-    if (fn()) return resolve();
-    setTimeout(checkConditionOrContinue, 100);
+async function startServer(sqlFile) {
+  if (!sqlFile) {
+    sqlFile = `cli-test-${Math.round(Math.random() * 1e9)}.tmp.sql`;
   }
 
-  checkConditionOrContinue();
-  return promise;
+  let stdout = '';
+  const serverProcess = spawn(CLI_PATH, ['server', '-p=0', `--storage.sqlDatabasePath=${sqlFile}`]);
+  serverProcess.stdout.on('data', chunk => (stdout += chunk.toString()));
+
+  await waitForCondition(() => stdout.includes('listening'));
+
+  const port = stdout.match(/port (\d+)/)[1];
+  const server = {port, process: serverProcess, sqlFile};
+  servers.push(server);
+  return server;
+}
+
+function waitForCondition(fn, label) {
+  return testingLibrary.wait(() => {
+    if (!fn()) throw new Error(label || 'Condition not met');
+  });
 }
 
 function render(preactNodeToRender, {container} = {}) {
@@ -42,6 +58,13 @@ function render(preactNodeToRender, {container} = {}) {
 function cleanup() {
   for (const container of renderedComponents) {
     preactRender('', document.body, container);
+  }
+
+  if (servers.length > 1) throw new Error('Cannot have multiple servers in same jest context');
+
+  for (const server of servers) {
+    if (fs.existsSync(server.sqlFile)) fs.unlinkSync(server.sqlFile);
+    server.process.kill();
   }
 }
 
@@ -63,6 +86,8 @@ const prettyDOM = testingLibrary.prettyDOM;
 const snapshotDOM = (el, maxLength) => prettyDOM(el, maxLength).replace(/\[\d{1,2}m/g, '');
 
 module.exports = {
+  CLI_PATH,
+  startServer,
   waitForCondition,
   render,
   cleanup,

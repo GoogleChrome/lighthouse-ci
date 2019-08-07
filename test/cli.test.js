@@ -13,21 +13,9 @@ const {spawn, spawnSync} = require('child_process');
 const fetch = require('isomorphic-fetch');
 const log = require('lighthouse-logger');
 const puppeteer = require('puppeteer');
+const {waitForCondition} = require('./test-utils.js');
 
 const CLI_PATH = path.join(__dirname, '../src/cli.js');
-
-function waitForCondition(fn) {
-  let resolve;
-  const promise = new Promise(r => (resolve = r));
-
-  function checkConditionOrContinue() {
-    if (fn()) return resolve();
-    setTimeout(checkConditionOrContinue, 100);
-  }
-
-  checkConditionOrContinue();
-  return promise;
-}
 
 describe('Lighthouse CI CLI', () => {
   const sqlFile = 'cli-test.tmp.sql';

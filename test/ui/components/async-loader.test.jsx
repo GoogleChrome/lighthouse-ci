@@ -10,7 +10,7 @@ import {
   combineLoadingStates,
   combineAsyncData,
 } from '../../../src/ui/components/async-loader.jsx';
-import {render, cleanup} from '../test-utils.jsx';
+import {render, cleanup} from '../../test-utils.js';
 
 afterEach(cleanup);
 

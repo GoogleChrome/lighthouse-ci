@@ -7,7 +7,7 @@
 import {h} from 'preact';
 import {api} from '../../../../src/ui/hooks/use-api-data.jsx';
 import {ProjectDashboard} from '../../../../src/ui/routes/project-dashboard/project-dashboard.jsx';
-import {render, cleanup, wait, snapshotDOM} from '../../test-utils.jsx';
+import {render, cleanup, wait, snapshotDOM} from '../../../test-utils.js';
 
 afterEach(cleanup);
 

@@ -10,7 +10,7 @@
     "collect": {
       "numberOfRuns": 2,
       "settings": {
-        "budgets": [{"resourceSizes": [{"resourceType": "document", "budget": 1}]}]
+        "budgets": [{"resourceSizes": [{"resourceType": "script", "budget": 1}]}]
       }
     },
     "report": {

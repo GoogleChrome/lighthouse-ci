@@ -39,6 +39,7 @@ describe('Lighthouse CI CLI', () => {
   let serverProcessStdout = '';
 
   let projectToken;
+  let urlToCollect;
 
   afterAll(() => {
     if (fs.existsSync(sqlFile)) fs.unlinkSync(sqlFile);
@@ -55,6 +56,7 @@ describe('Lighthouse CI CLI', () => {
 
       expect(serverProcessStdout).toMatch(/port \d+/);
       serverPort = serverProcessStdout.match(/port (\d+)/)[1];
+      urlToCollect = `http://localhost:${serverPort}/app/`;
     });
 
     it('should accept requests', async () => {
@@ -106,8 +108,7 @@ describe('Lighthouse CI CLI', () => {
       let {stdout = '', stderr = '', status = -1} = spawnSync(CLI_PATH, [
         'collect',
         `--rc-file=${rcFile}`,
-        '--headful',
-        '--url=chrome://version',
+        `--url=${urlToCollect}`,
       ]);
 
       stdout = stdout.toString();
@@ -163,10 +164,10 @@ describe('Lighthouse CI CLI', () => {
 
       const runs = await response.json();
       expect(runs.map(run => run.id)).toEqual([runBId, runAId]);
-      expect(runs.map(run => run.url)).toEqual(['chrome://version', 'chrome://version']);
+      expect(runs.map(run => run.url)).toEqual([urlToCollect, urlToCollect]);
       expect(runs.map(run => JSON.parse(run.lhr))).toMatchObject([
-        {requestedUrl: 'chrome://version'},
-        {requestedUrl: 'chrome://version'},
+        {requestedUrl: urlToCollect},
+        {requestedUrl: urlToCollect},
       ]);
     });
   });
@@ -210,12 +211,12 @@ describe('Lighthouse CI CLI', () => {
       stderr = stderr.toString();
       status = status || 0;
 
-      const stderrClean = stderr.replace(/\d{4}/g, 'XXXX');
+      const stderrClean = stderr.replace(/\d{4,8}(\.\d{1,8})?/g, 'XXXX');
       expect(stdout).toMatchInlineSnapshot(`""`);
       expect(stderrClean).toMatchInlineSnapshot(`
         "Checking assertions against 2 run(s)
 
-        [31m✘[0m [1mperformance-budget[0m.document.size failure for [1mmaxNumericValue[0m assertion
+        [31m✘[0m [1mperformance-budget[0m.script.size failure for [1mmaxNumericValue[0m assertion
               expected: <=[32mXXXX[0m
                  found: [31mXXXX[0m
             [2mall values: XXXX[0m
@@ -238,23 +239,22 @@ describe('Lighthouse CI CLI', () => {
       stderr = stderr.toString();
       status = status || 0;
 
-      const stderrClean = stderr.replace(/\d{4}/g, 'XXXX');
+      const stderrClean = stderr.replace(/\d{4,}(\.\d{2,})?/g, 'XXXX');
       expect(stdout).toMatchInlineSnapshot(`""`);
-      // FIXME: first contentful paint can't be computed on `chrome://version`
       // Update this test and the URL to use LHCI Server UI once it's built
       expect(stderrClean).toMatchInlineSnapshot(`
         "Checking assertions against 2 run(s)
 
-        [31m✘[0m [1mperformance-budget[0m.document.size failure for [1mmaxNumericValue[0m assertion
+        [31m✘[0m [1mperformance-budget[0m.script.size failure for [1mmaxNumericValue[0m assertion
               expected: <=[32mXXXX[0m
                  found: [31mXXXX[0m
             [2mall values: XXXX[0m
 
 
-        [31m✘[0m [1mfirst-contentful-paint[0m failure for [1mauditRan[0m assertion
-              expected: ==[32m1[0m
-                 found: [31m0[0m
-            [2mall values: 0, 0[0m
+        [31m✘[0m [1mfirst-contentful-paint[0m failure for [1mmaxNumericValue[0m assertion
+              expected: <=[32m1[0m
+                 found: [31mXXXX[0m
+            [2mall values: XXXX, XXXX[0m
 
         Assertion failed. Exiting with status code 1.
         "

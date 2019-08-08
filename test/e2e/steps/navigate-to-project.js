@@ -29,6 +29,8 @@ module.exports = (state, projectName) => {
 
     it('should wait for the dashboard to load', async () => {
       await state.page.waitFor('.dashboard');
+      await state.page.waitFor('.dashboard-summary');
+      await state.page.waitFor('.dashboard-graph');
     });
   });
 };

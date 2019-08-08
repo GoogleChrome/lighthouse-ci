@@ -21,7 +21,6 @@ async function run() {
     dataTransfer.setData('text', lhr);
     const event = new ClipboardEvent('paste', {clipboardData: dataTransfer});
     document.dispatchEvent(event);
-    window.__event = event;
   }, RUNS[0].lhr);
 
   console.log(JSON.stringify(JSON.parse(RUNS[0].lhr), null, 2));

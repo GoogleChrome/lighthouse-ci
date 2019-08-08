@@ -18,7 +18,7 @@ import './project-dashboard.css';
 
 /** @param {Array<StatisticWithBuild>} stats */
 const sortByMostRecentLast = stats =>
-  stats.slice().sort((a, b) => (a.build.createdAt || '').localeCompare(b.build.createdAt || ''));
+  stats.slice().sort((a, b) => a.build.runAt.localeCompare(b.build.runAt));
 
 /** @param {{title: string, statisticName: LHCI.ServerCommand.StatisticName, statistics?: Array<StatisticWithBuild>, loadingState: import('../../components/async-loader').LoadingState, builds: LHCI.ServerCommand.Build[]}} props */
 const StatisticPlot = props => {
@@ -29,7 +29,7 @@ const StatisticPlot = props => {
       render={allStats => {
         const statsUngrouped = allStats
           .filter(stat => stat.name === props.statisticName)
-          .sort((a, b) => (a.build.createdAt || '').localeCompare(b.build.createdAt || ''));
+          .sort((a, b) => a.build.runAt.localeCompare(b.build.runAt));
         // We need to merge the stats by hash to handle multiple URLs.
         const stats = _.groupBy(statsUngrouped, stat => stat.build.hash).map(group => {
           const value = group.map(stat => stat.value).reduce((a, b) => a + b) / group.length;
@@ -156,7 +156,7 @@ const DashboardSummary = props => {
             <span>
               Compared to previous builds, the commit{' '}
               <span className="dashboard-summary__commit">{mostRecent.build.hash.slice(0, 8)}</span>{' '}
-              on <span>{new Date(mostRecent.createdAt || 0).toLocaleString()}</span> scored{' '}
+              on <span>{new Date(mostRecent.build.runAt).toLocaleString()}</span> scored{' '}
               {performance} for Performance, {a11y} for Accessibility, {seo} for SEO,{' '}
               {bestPractices} for Best Practices, and {pwa} for Progressive Web App.
             </span>
@@ -209,7 +209,7 @@ const ProjectDashboard_ = props => {
                       {build.branch} ({build.hash.slice(0, 8)}){' '}
                     </a>
                   </td>
-                  <td>{new Date(build.createdAt || 0).toLocaleTimeString()}</td>
+                  <td>{new Date(build.runAt).toLocaleTimeString()}</td>
                 </tr>
               );
             })}

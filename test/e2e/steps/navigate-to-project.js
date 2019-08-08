@@ -12,7 +12,7 @@ module.exports = (state, projectName) => {
     it('should navigate to the project list', async () => {
       await Promise.all([
         state.page.goto(`${state.rootURL}/app`),
-        state.page.waitForNavigation({waitUntil: 'networkidle0'}),
+        state.page.waitForNavigation({waitUntil: ['networkidle0', 'load']}),
       ]);
     });
 
@@ -24,7 +24,10 @@ module.exports = (state, projectName) => {
         throw new Error(`${links.map(link => link.textContent)} did not include ${name}`);
       }, projectName);
 
-      await Promise.all([clickPromise, state.page.waitForNavigation({waitUntil: 'networkidle0'})]);
+      await Promise.all([
+        clickPromise,
+        state.page.waitForNavigation({waitUntil: ['networkidle0', 'load']}),
+      ]);
     });
 
     it('should wait for the dashboard to load', async () => {

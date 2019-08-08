@@ -29,7 +29,7 @@ module.exports = state => {
     });
 
     it('should initialize a browser', async () => {
-      state.browser = await puppeteer.launch();
+      state.browser = await puppeteer.launch({env: {...process.env, TZ: 'America/Chicago'}});
       state.page = await state.browser.newPage();
     });
   });

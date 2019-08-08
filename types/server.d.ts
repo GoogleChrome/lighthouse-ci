@@ -25,6 +25,7 @@ declare global {
         hash: string;
         branch: string;
         externalBuildUrl: string;
+        runAt: string;
         createdAt?: string;
         updatedAt?: string;
       }

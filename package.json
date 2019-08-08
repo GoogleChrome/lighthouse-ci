@@ -13,6 +13,7 @@
     "start": "./src/cli.js",
     "start:seed-database": "node ./scripts/seed-database.js ./test/fixtures/lighthouserc.json",
     "start:server": "./src/cli.js server --rc-file=./test/fixtures/lighthouserc.json",
+    "update:fixture-seed-data": "node ./scripts/update-seed-fixtures.js",
     "test": "npm run test:typecheck && npm run test:lint && npm run test:unit",
     "test:quick": "npm run test:typecheck && npm run test:lint && npm run test:unit -- --testPathIgnorePatterns=\"cli.test.js\"",
     "test:typecheck": "tsc -p .",

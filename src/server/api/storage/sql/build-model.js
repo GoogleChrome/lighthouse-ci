@@ -20,6 +20,7 @@ module.exports = {
     hash: {type: Sequelize.STRING(40)},
     branch: {type: Sequelize.STRING(40)},
     externalBuildUrl: {type: Sequelize.STRING(256)},
+    runAt: {type: Sequelize.DATE()}, // should mostly be equal to createdAt but modifiable by the consumer
   },
   indexes: [],
 };

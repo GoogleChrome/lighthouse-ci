@@ -114,6 +114,7 @@ describe('Lighthouse CI Server', () => {
         hash: 'e0acdd50ed0fdcfdceb2508498be50cc55c696ef',
         branch: 'master',
         externalBuildUrl: 'http://travis-ci.org/org/repo/1',
+        runAt: new Date().toISOString(),
       };
 
       buildA = await fetchJSON(`/v1/projects/${projectA.id}/builds`, payload);
@@ -127,6 +128,7 @@ describe('Lighthouse CI Server', () => {
         hash: 'e0acdd50ed0fdcfdceb2508498be50cc55c696ef',
         branch: 'test_branch',
         externalBuildUrl: 'http://travis-ci.org/org/repo/2',
+        runAt: new Date().toISOString(),
       };
 
       buildB = await fetchJSON(`/v1/projects/${projectA.id}/builds`, payload);
@@ -140,6 +142,7 @@ describe('Lighthouse CI Server', () => {
         hash: '2edeb6a233aff298fbeccfbbb2d09282b21ec5ea',
         branch: 'master',
         externalBuildUrl: 'http://travis-ci.org/org/repo/1',
+        runAt: new Date().toISOString(),
       };
 
       buildC = await fetchJSON(`/v1/projects/${projectB.id}/builds`, payload);

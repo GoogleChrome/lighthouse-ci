@@ -72,6 +72,7 @@ async function runCommand(options) {
     hash: getCurrentHash(),
     branch: getCurrentBranch(),
     externalBuildUrl: getExternalBuildUrl(),
+    runAt: new Date().toISOString(),
   });
 
   process.stdout.write(`Saving CI project ${project.name} (${project.id})\n`);

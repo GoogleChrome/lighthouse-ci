@@ -17,16 +17,16 @@ describe('Project dashboard', () => {
   describe('render the dashboard', () => {
     it('should show the commits', async () => {
       const commits = await state.page.evaluate(() => {
-        return [...document.querySelectorAll('.dashboard__build-list tr')]
-          .map(row => row.textContent.replace(/\d+:\d+:\d+ (AM|PM)/, 'DATETIME'))
-          .sort();
+        return [...document.querySelectorAll('.dashboard__build-list tr')].map(
+          row => row.textContent
+        );
       });
 
       expect(commits).toMatchInlineSnapshot(`
         Array [
-          "master (bb9aa3c1) DATETIME",
-          "test_0 (aaa5b0a3) DATETIME",
-          "test_1 (c1ea447b) DATETIME",
+          "test_1 (c1ea447b) 6:15:28 PM",
+          "test_0 (aaa5b0a3) 3:15:28 PM",
+          "master (bb9aa3c1) 3:51:28 PM",
         ]
       `);
     });

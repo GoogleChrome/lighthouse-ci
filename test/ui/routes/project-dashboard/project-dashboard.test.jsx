@@ -50,14 +50,14 @@ describe('ProjectDashboard', () => {
           branch: 'master',
           hash: 'abcdef',
           externalBuildUrl: 'http://localhost:1337/builds/a/',
-          createdAt: new Date('2019-07-04').toISOString(),
+          runAt: new Date('2019-07-04').toISOString(),
         },
         {
           id: '2',
           branch: 'feature_branch',
           hash: 'abcdef',
           externalBuildUrl: 'http://localhost:1337/builds/b/',
-          createdAt: new Date('2019-07-09').toISOString(),
+          runAt: new Date('2019-07-09').toISOString(),
         },
       ])
     );

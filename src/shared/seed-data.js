@@ -27,6 +27,7 @@ const BUILDS = [
     branch: 'master',
     hash: '6e0d172cbf4ce1252fce0b2297c7a1c2b5646ce0',
     externalBuildUrl: 'http://travis-ci.org/org/repo/1020',
+    runAt: '2019-08-05T20:25:28.904Z',
   },
   {
     id: '',
@@ -34,6 +35,7 @@ const BUILDS = [
     branch: 'master',
     hash: '30cf658d9d72669af568d37ea60d945bfb3b0fc3',
     externalBuildUrl: 'http://travis-ci.org/org/repo/1021',
+    runAt: '2019-08-05T22:45:28.904Z',
   },
   {
     id: '',
@@ -41,6 +43,7 @@ const BUILDS = [
     branch: 'master',
     hash: 'ac839abb9aa3c1ea447b8c3c9ba5b0ad9f6824d2',
     externalBuildUrl: 'http://travis-ci.org/org/repo/1022',
+    runAt: '2019-08-06T22:13:28.904Z',
   },
   {
     id: '',
@@ -48,6 +51,7 @@ const BUILDS = [
     branch: 'master',
     hash: 'bb9aa3c1ea447b8c3c9ba5b0adac839a9f6824d2',
     externalBuildUrl: 'http://travis-ci.org/org/repo/1023',
+    runAt: '2019-08-07T20:51:28.904Z',
   },
   {
     id: '',
@@ -55,6 +59,7 @@ const BUILDS = [
     branch: 'test_0',
     hash: 'aaa5b0a3c1ea447b8c3c9bac839abb9d9f6824d2',
     externalBuildUrl: 'http://travis-ci.org/org/repo/1024',
+    runAt: '2019-08-09T20:15:28.904Z',
   },
   {
     id: '',
@@ -62,6 +67,7 @@ const BUILDS = [
     branch: 'test_1',
     hash: 'c1ea447b8c3c9ba5b0ad9f6824d2ac839abb9aa3',
     externalBuildUrl: 'http://travis-ci.org/org/repo/1025',
+    runAt: '2019-08-09T23:15:28.904Z',
   },
 ];
 

@@ -40,8 +40,8 @@ function clone(o) {
  * @property {import('sequelize').Model<LHCI.ServerCommand.Statistic, StatisticAttrs>} statisticModel
  */
 
-/** Sort all records by most recently updated */
-const order = [['updatedAt', 'desc']];
+/** Sort all records by most recently created */
+const order = [['createdAt', 'desc']];
 
 class SqlStorageMethod {
   constructor() {

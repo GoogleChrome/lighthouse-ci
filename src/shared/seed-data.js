@@ -269,29 +269,27 @@ async function writeSeedDataToApi(client, data) {
   data = JSON.parse(JSON.stringify(data));
   if (!data) throw new Error('TS cannot infer truth');
 
-  const projects = await Promise.all(
-    data.projects.map(project => {
-      delete project.id;
-      return client.createProject(project);
-    })
-  );
+  /** @type {Array<LHCI.ServerCommand.Project>} */
+  const projects = [];
+  for (const project of data.projects) {
+    delete project.id;
+    projects.push(await client.createProject(project));
+  }
 
-  const builds = await Promise.all(
-    data.builds.map(build => {
-      delete build.id;
-      build.projectId = projects[Number(build.projectId)].id;
-      return client.createBuild(build);
-    })
-  );
+  /** @type {Array<LHCI.ServerCommand.Build>} */
+  const builds = [];
+  for (const build of data.builds) {
+    delete build.id;
+    build.projectId = projects[Number(build.projectId)].id;
+    builds.push(await client.createBuild(build));
+  }
 
-  await Promise.all(
-    data.runs.map(run => {
-      delete run.id;
-      run.projectId = projects[Number(run.projectId)].id;
-      run.buildId = builds[Number(run.buildId)].id;
-      return client.createRun(run);
-    })
-  );
+  for (const run of data.runs) {
+    delete run.id;
+    run.projectId = projects[Number(run.projectId)].id;
+    run.buildId = builds[Number(run.buildId)].id;
+    await client.createRun(run);
+  }
 }
 
 module.exports = {PROJECTS, BUILDS, RUNS, writeSeedDataToApi};

@@ -30,6 +30,10 @@ describe('Project dashboard', () => {
         ]
       `);
     });
+
+    it('should look correct', async () => {
+      expect(await state.page.screenshot()).toMatchImageSnapshot();
+    });
   });
 
   require('./steps/teardown')(state);

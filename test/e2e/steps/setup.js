@@ -10,11 +10,14 @@
 const fs = require('fs');
 const path = require('path');
 const puppeteer = require('puppeteer');
+const {toMatchImageSnapshot} = require('jest-image-snapshot');
 const {startServer} = require('../../test-utils');
 const ApiClient = require('../../../src/server/api/client');
 const {writeSeedDataToApi} = require('../../../src/shared/seed-data');
 
 const SEED_DATA_PATH = path.join(__dirname, '../../fixtures/seed-data.json');
+
+expect.extend({toMatchImageSnapshot});
 
 module.exports = state => {
   describe('initialize', () => {

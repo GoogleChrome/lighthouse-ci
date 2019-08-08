@@ -45,6 +45,7 @@
     "@types/morgan": "^1.7.35",
     "@types/node": "^11.13.2",
     "@types/plotly.js": "^1.44.9",
+    "@types/puppeteer": "^1.19.0",
     "@types/sequelize": "^4.27.34",
     "@types/uuid": "^3.4.4",
     "@types/yargs": "^12.0.8",

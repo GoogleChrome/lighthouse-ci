@@ -65,7 +65,7 @@ const BUILDS = [
   },
 ];
 
-/** @typedef {{auditId: string, passRate?: number, averageNumericValue?: number}} AuditGenDef */
+/** @typedef {{auditId: string, passRate?: number, averageNumericValue?: number, averageWastedMs?: number}} AuditGenDef */
 
 /** @param {string} auditId */
 function getCategoryForAuditId(auditId) {
@@ -74,6 +74,24 @@ function getCategoryForAuditId(auditId) {
   if (auditId.startsWith('best-practices')) return 'best-practices';
   if (auditId.startsWith('pwa')) return 'pwa';
   return 'performance';
+}
+
+/** @param {string} auditId */
+function getGroupForAuditId(auditId) {
+  if (auditId === 'first-contentful-paint') return 'metrics';
+  if (auditId === 'first-meaningful-paint') return 'metrics';
+  if (auditId === 'speed-index') return 'metrics';
+  if (auditId === 'interactive') return 'metrics';
+  if (auditId === 'uses-responsive-images') return 'load-opportunities';
+  if (auditId === 'bootup-time') return 'diagnostics';
+}
+
+/** @param {number} average */
+function generateNumericValue(average) {
+  const maxDeltaAsPercent = 0.1;
+  const maxDelta = average * maxDeltaAsPercent;
+  const percentile = Math.random();
+  return (percentile - 0.5) * 2 * maxDelta + average;
 }
 
 /**
@@ -87,20 +105,30 @@ function createLHR(url, auditDefs) {
   const audits = {};
 
   for (const auditDef of auditDefs) {
-    const {auditId, averageNumericValue} = auditDef;
+    const {auditId, averageNumericValue, averageWastedMs} = auditDef;
     if (typeof averageNumericValue === 'number') {
-      const maxDeltaAsPercent = 0.1;
-      const maxDelta = averageNumericValue * maxDeltaAsPercent;
-      const percentile = Math.random();
-      const numericValue = (percentile - 0.5) * 2 * maxDelta + averageNumericValue;
+      const numericValue = generateNumericValue(averageNumericValue);
       // score of 100 = <1000
       // score of 0 = >10000
       const score = 1 - Math.min(1, Math.max((numericValue - 1000) / 9000, 0));
-      audits[auditId] = {score, numericValue};
+      audits[auditId] = {score, numericValue, scoreDisplayMode: 'numeric'};
+    } else if (typeof averageWastedMs === 'number') {
+      const wastedMs = generateNumericValue(averageWastedMs);
+      // score of 100 = <100
+      // score of 0 = >1000
+      const score = 1 - Math.min(1, Math.max((wastedMs - 100) / 900, 0));
+      audits[auditId] = {
+        score,
+        scoreDisplayMode: 'numeric',
+        details: {type: 'opportunity', overallSavingsMs: wastedMs, items: []},
+      };
     } else {
       const {passRate = 1} = auditDef;
-      audits[auditId] = {score: Math.random() <= passRate ? 1 : 0};
+      audits[auditId] = {score: Math.random() <= passRate ? 1 : 0, scoreDisplayMode: 'binary'};
     }
+
+    audits[auditId].title = auditId.toUpperCase();
+    audits[auditId].description = 'Help text for ' + auditId.toUpperCase();
   }
 
   /** @type {LH.Result['categories']} */
@@ -112,13 +140,33 @@ function createLHR(url, auditDefs) {
   for (const audits of auditsGroupedByCategory) {
     const category = getCategoryForAuditId(audits[0][0]);
     const sum = audits.reduce((sum, next) => sum + (next[1].score || 0), 0);
-    categories[category] = {score: sum / audits.length};
+    categories[category] = {
+      id: category,
+      title: category.toUpperCase(),
+      score: sum / audits.length,
+      auditRefs: audits.map(([id]) => ({id, weight: 0, group: getGroupForAuditId(id)})),
+    };
   }
 
   return {
+    requestedUrl: url,
     finalUrl: url,
     categories,
     audits,
+
+    fetchTime: new Date().toISOString(),
+    lighthouseVersion: '5.2.0',
+    configSettings: {channel: 'cli'},
+    categoryGroups: {
+      metrics: {title: 'Metrics'},
+      'load-opportunities': {title: 'Opportunities'},
+      diagnostics: {title: 'Diagnostics'},
+    },
+    runWarnings: [],
+    userAgent: 'Chrome!',
+    environment: {hostUserAgent: '', networkUserAgent: '', benchmarkIndex: 500},
+    timing: {total: 1, entries: []},
+    i18n: {rendererFormattedStrings: {}, icuMessagePaths: {}},
   };
 }
 
@@ -148,6 +196,9 @@ const auditsToFake = {
   'speed-index': {averageNumericValue: 3000},
   interactive: {averageNumericValue: 5000},
   'max-potential-fid': {averageNumericValue: 250},
+
+  'uses-responsive-images': {averageWastedMs: 400},
+  'bootup-time': {passRate: 0.5},
 
   'a11y-color-contrast': {passRate: 0.5},
   'a11y-labels': {passRate: 0.5},

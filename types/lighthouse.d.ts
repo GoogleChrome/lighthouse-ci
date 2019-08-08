@@ -13,9 +13,11 @@ declare global {
 
   namespace LH {
     export interface AuditResult {
+      title?: string;
+      description?: string;
       score: number | null;
       numericValue?: number;
-      details?: {items?: any[]};
+      details?: {type: string; items?: any[]; overallSavingsMs?: number};
       scoreDisplayMode?:
         | 'notApplicable'
         | 'informative'
@@ -26,13 +28,30 @@ declare global {
     }
 
     export interface CategoryResult {
+      id: string;
       score: number;
+      title: string;
+      auditRefs: Array<{id: string; weight: number}>;
     }
 
     export interface Result {
+      requestedUrl: string;
       finalUrl: string;
+      fetchTime: string;
+      lighthouseVersion: string;
       categories: {[categoryId: string]: CategoryResult};
       audits: {[auditId: string]: AuditResult};
+      categoryGroups?: Record<string, {title: string; description?: string}>;
+      configSettings: Record<string, any>;
+      runWarnings: string[];
+      userAgent: string;
+      environment: {hostUserAgent: string; networkUserAgent: string; benchmarkIndex: number};
+      timing: {total: number; entries: any[]};
+      i18n: {
+        rendererFormattedStrings: Record<string, string>;
+        icuMessagePaths: Record<string, string>;
+      };
+      stackPacks?: any[];
     }
   }
 }

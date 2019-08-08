@@ -6,21 +6,21 @@
  */
 'use strict';
 
-const {loadAndParseRcFile} = require('../src/shared/lighthouserc.js');
-const ApiClient = require('../src/server/api/client.js');
-const {writeSeedDataToApi} = require('../src/shared/seed-data.js');
+const fs = require('fs');
+const path = require('path');
+const seedData = require('../src/shared/seed-data.js');
 
-if (process.argv.length !== 3) {
-  process.stderr.write(`Usage ./scripts/seed-database.js <path to rc file>`);
-  process.exit(1);
-}
+const FIXTURE_PATH = path.join(__dirname, '../test/fixtures/seed-data.json');
 
-async function run() {
-  const {serverBaseUrl} = loadAndParseRcFile(process.argv[2]);
-  if (!serverBaseUrl) throw new Error('RC file did not set the serverBaseUrl');
-
-  const api = new ApiClient({rootURL: serverBaseUrl});
-  await writeSeedDataToApi(api);
+function run() {
+  fs.writeFileSync(
+    FIXTURE_PATH,
+    JSON.stringify(
+      {projects: seedData.PROJECTS, builds: seedData.BUILDS, runs: seedData.RUNS},
+      null,
+      2
+    )
+  );
 }
 
 run();

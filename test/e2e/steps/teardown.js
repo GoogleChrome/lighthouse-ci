@@ -9,10 +9,14 @@
 
 const {cleanup} = require('../../test-utils');
 
-module.exports = () => {
+module.exports = state => {
   describe('teardown', () => {
     it('should teardown the server', async () => {
       await cleanup();
+    });
+
+    it('should teardown the browser', async () => {
+      await state.browser.close();
     });
   });
 };

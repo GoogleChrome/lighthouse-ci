@@ -7,12 +7,30 @@
 
 /* eslint-env jest */
 
+const fs = require('fs');
+const path = require('path');
+const puppeteer = require('puppeteer');
 const {startServer} = require('../../test-utils');
+const ApiClient = require('../../../src/server/api/client');
+const {writeSeedDataToApi} = require('../../../src/shared/seed-data');
+
+const SEED_DATA_PATH = path.join(__dirname, '../../fixtures/seed-data.json');
 
 module.exports = state => {
   describe('initialize', () => {
     it('should initialize a server', async () => {
       state.server = await startServer();
+      state.rootURL = `http://localhost:${state.server.port}`;
+      state.client = new ApiClient({rootURL: state.rootURL});
+    });
+
+    it('should write seed data to the server', async () => {
+      await writeSeedDataToApi(state.client, JSON.parse(fs.readFileSync(SEED_DATA_PATH, 'utf8')));
+    });
+
+    it('should initialize a browser', async () => {
+      state.browser = await puppeteer.launch();
+      state.page = await state.browser.newPage();
     });
   });
 };

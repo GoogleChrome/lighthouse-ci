@@ -5,12 +5,32 @@
  */
 'use strict';
 
-/* eslint-env jest */
+/* eslint-env jest, browser */
 
 describe('Project dashboard', () => {
   const state = {};
 
   require('./steps/setup')(state);
+
+  require('./steps/navigate-to-project')(state, 'Lighthouse Viewer');
+
+  describe('render the dashboard', () => {
+    it('should show the commits', async () => {
+      const commits = await state.page.evaluate(() => {
+        return [...document.querySelectorAll('.dashboard__build-list tr')]
+          .map(row => row.textContent.replace(/\d+:\d+:\d+ (AM|PM)/, 'DATETIME'))
+          .sort();
+      });
+
+      expect(commits).toMatchInlineSnapshot(`
+        Array [
+          "master (bb9aa3c1) DATETIME",
+          "test_0 (aaa5b0a3) DATETIME",
+          "test_1 (c1ea447b) DATETIME",
+        ]
+      `);
+    });
+  });
 
   require('./steps/teardown')(state);
 });

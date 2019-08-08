@@ -262,17 +262,22 @@ const RUNS = [
 
 /**
  * @param {ApiClient} client
+ * @param {{projects: LHCI.ServerCommand.Project[], builds: LHCI.ServerCommand.Build[], runs: LHCI.ServerCommand.Run[]}} [data]
  */
-async function writeSeedData(client) {
+async function writeSeedDataToApi(client, data) {
+  data = data || {projects: PROJECTS, builds: BUILDS, runs: RUNS};
+  data = JSON.parse(JSON.stringify(data));
+  if (!data) throw new Error('TS cannot infer truth');
+
   const projects = await Promise.all(
-    PROJECTS.map(project => {
+    data.projects.map(project => {
       delete project.id;
       return client.createProject(project);
     })
   );
 
   const builds = await Promise.all(
-    BUILDS.map(build => {
+    data.builds.map(build => {
       delete build.id;
       build.projectId = projects[Number(build.projectId)].id;
       return client.createBuild(build);
@@ -280,7 +285,7 @@ async function writeSeedData(client) {
   );
 
   await Promise.all(
-    RUNS.map(run => {
+    data.runs.map(run => {
       delete run.id;
       run.projectId = projects[Number(run.projectId)].id;
       run.buildId = builds[Number(run.buildId)].id;
@@ -289,4 +294,4 @@ async function writeSeedData(client) {
   );
 }
 
-module.exports = {PROJECTS, BUILDS, RUNS, writeSeedData};
+module.exports = {PROJECTS, BUILDS, RUNS, writeSeedDataToApi};

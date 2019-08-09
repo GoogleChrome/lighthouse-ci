@@ -10,12 +10,18 @@
 const fs = require('fs');
 const path = require('path');
 const puppeteer = require('puppeteer');
-const {toMatchImageSnapshot} = require('jest-image-snapshot');
+const {configureToMatchImageSnapshot} = require('jest-image-snapshot');
 const {startServer} = require('../../test-utils');
 const ApiClient = require('../../../src/server/api/client');
 const {writeSeedDataToApi} = require('../../../src/shared/seed-data');
 
 const SEED_DATA_PATH = path.join(__dirname, '../../fixtures/seed-data.json');
+
+const toMatchImageSnapshot = configureToMatchImageSnapshot({
+  // FIXME: we're more forgiving in Travis where font rendering on linux creates small changes
+  failureThreshold: process.env.TRAVIS ? 0.05 : 0.001,
+  failureThresholdType: 'percent',
+});
 
 expect.extend({toMatchImageSnapshot});
 

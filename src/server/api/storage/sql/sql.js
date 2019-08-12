@@ -64,6 +64,9 @@ class SqlStorageMethod {
    */
   async initialize(options) {
     if (!options.sqlDatabasePath) throw new Error('Cannot use sqlite without a database path');
+    if (!buildModelDefn.attributes.projectId.references) throw new Error('Invalid buildModel');
+    if (!runModelDefn.attributes.projectId.references) throw new Error('Invalid runModel');
+    if (!runModelDefn.attributes.buildId.references) throw new Error('Invalid runModel');
 
     const sequelize = new Sequelize({
       dialect: options.sqlDialect,

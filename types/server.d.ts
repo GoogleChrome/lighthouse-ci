@@ -9,6 +9,10 @@ type StorageMethod_ = import('../src/server/api/storage/storage-method.js');
 declare global {
   namespace LHCI {
     namespace ServerCommand {
+      export type TableDefinition<T, TAllKeys extends keyof T = keyof T> = {
+        [K in TAllKeys]: import('sequelize').DefineAttributeColumnOptions
+      };
+
       export type TableAttributes<T, TAllKeys extends keyof T = keyof T> = {[K in TAllKeys]: {}};
 
       export interface Project {
@@ -26,6 +30,9 @@ declare global {
         branch: string;
         externalBuildUrl: string;
         runAt: string;
+        commitMessage?: string;
+        author?: string;
+        avatarUrl?: string;
         createdAt?: string;
         updatedAt?: string;
       }

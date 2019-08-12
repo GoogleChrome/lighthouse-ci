@@ -12,14 +12,17 @@ const Sequelize = require('sequelize');
 /** @type {import('sequelize').Model<any, any>} */
 const ModelRef = /** @type {any} */ (undefined);
 
+/** @type {LHCI.ServerCommand.TableDefinition<LHCI.ServerCommand.Run>} */
+const attributes = {
+  id: {type: Sequelize.UUID(), primaryKey: true},
+  projectId: {type: Sequelize.UUID(), references: {model: ModelRef, key: 'id'}},
+  buildId: {type: Sequelize.UUID(), references: {model: ModelRef, key: 'id'}},
+  url: {type: Sequelize.STRING({length: 256})},
+  lhr: {type: Sequelize.TEXT('long')},
+};
+
 module.exports = {
   tableName: 'runs',
-  attributes: {
-    id: {type: Sequelize.UUID(), primaryKey: true},
-    projectId: {type: Sequelize.UUID(), references: {model: ModelRef, key: 'id'}},
-    buildId: {type: Sequelize.UUID(), references: {model: ModelRef, key: 'id'}},
-    url: {type: Sequelize.STRING({length: 256})},
-    lhr: {type: Sequelize.TEXT('long')},
-  },
+  attributes,
   indexes: [],
 };

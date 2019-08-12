@@ -12,15 +12,21 @@ const Sequelize = require('sequelize');
 /** @type {import('sequelize').Model<any, any>} */
 const ModelRef = /** @type {any} */ (undefined);
 
+/** @type {LHCI.ServerCommand.TableDefinition<LHCI.ServerCommand.Build>} */
+const attributes = {
+  id: {type: Sequelize.UUID(), primaryKey: true},
+  projectId: {type: Sequelize.UUID(), references: {model: ModelRef, key: 'id'}},
+  hash: {type: Sequelize.STRING(40)},
+  branch: {type: Sequelize.STRING(40)},
+  commitMessage: {type: Sequelize.STRING(80)},
+  author: {type: Sequelize.STRING(40)},
+  avatarUrl: {type: Sequelize.STRING(256)},
+  externalBuildUrl: {type: Sequelize.STRING(256)},
+  runAt: {type: Sequelize.DATE()}, // should mostly be equal to createdAt but modifiable by the consumer
+};
+
 module.exports = {
   tableName: 'builds',
-  attributes: {
-    id: {type: Sequelize.UUID(), primaryKey: true},
-    projectId: {type: Sequelize.UUID(), references: {model: ModelRef, key: 'id'}},
-    hash: {type: Sequelize.STRING(40)},
-    branch: {type: Sequelize.STRING(40)},
-    externalBuildUrl: {type: Sequelize.STRING(256)},
-    runAt: {type: Sequelize.DATE()}, // should mostly be equal to createdAt but modifiable by the consumer
-  },
+  attributes,
   indexes: [],
 };

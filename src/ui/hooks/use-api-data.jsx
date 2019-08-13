@@ -4,7 +4,7 @@
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
  */
 
-import {useState, useEffect} from 'preact/hooks';
+import {useState, useEffect, useMemo} from 'preact/hooks';
 import ApiClient from '../../server/api/client.js';
 
 export const api = new ApiClient({
@@ -82,6 +82,47 @@ export function useProjectURLs(projectId) {
  */
 export function useProjectBranches(projectId) {
   return useApiData('getBranches', projectId ? [projectId] : undefined);
+}
+
+/**
+ * @param {string|undefined} projectId
+ * @param {string|undefined} buildId
+ * @return {[LoadingState, LHCI.ServerCommand.Build | undefined]}
+ */
+export function useBuild(projectId, buildId) {
+  return useApiData('findBuildById', projectId && buildId ? [projectId, buildId] : undefined);
+}
+
+/**
+ * @param {string|undefined} projectId
+ * @param {LHCI.ServerCommand.Build | undefined} build
+ * @return {[LoadingState, LHCI.ServerCommand.Build | null | undefined]}
+ */
+export function useOptionalAncestorBuild(projectId, build) {
+  // Construct this options object in a `useMemo` to prevent infinitely re-requesting.
+  const getBuildsOptions = useMemo(() => build && {hash: build.ancestorHash}, [build]);
+  const [apiLoadingState, builds] = useApiData(
+    'getBuilds',
+    projectId && build && build.ancestorHash ? [projectId, getBuildsOptions] : undefined
+  );
+
+  let loadingState = apiLoadingState;
+  /** @type {LHCI.ServerCommand.Build | null | undefined} */
+  let ancestorBuild = undefined;
+  // If there was no hash to lookup in the first place or there were no matching builds...
+  // Then it's "loaded" and the result is just `null`.
+  if ((build && !build.ancestorHash) || (builds && !builds.length)) {
+    ancestorBuild = null;
+    loadingState = 'loaded';
+  }
+  // If there were matching builds,
+  // Then it's "loaded" and the result is the first matched build.
+  if (builds && builds.length) {
+    ancestorBuild = builds[0];
+    loadingState = 'loaded';
+  }
+
+  return [loadingState, ancestorBuild];
 }
 
 /**

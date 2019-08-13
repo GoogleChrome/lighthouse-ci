@@ -20,7 +20,7 @@ export const App = () => {
   return (
     <div className="lhci">
       <Router>
-        <PageHeaderNoTypes path="/app/:slug?/:projectId?" />
+        <PageHeaderNoTypes path="/app/:slug?/:projectId?/:slugLevel2?/:idLevel2?" />
       </Router>
       <div className="page-body">
         <Router>
@@ -39,6 +39,11 @@ export const App = () => {
                 m => m.ProjectDashboard
               )
             }
+          />
+          <LazyRoute
+            path="/app/projects/:projectId/builds/:buildId"
+            loading={() => <Loader />}
+            getComponent={() => import('./routes/build-view/build-view.jsx').then(m => m.BuildView)}
           />
           <Redirect default to="/app/projects" />
         </Router>

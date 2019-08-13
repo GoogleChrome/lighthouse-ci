@@ -6,6 +6,7 @@
 
 import {h} from 'preact';
 import {useMemo} from 'preact/hooks';
+import {Link} from 'preact-router';
 import _ from '../../../shared/lodash.js';
 import {useProjectBuilds, useProject, useBuildStatistics} from '../../hooks/use-api-data';
 import {AsyncLoader, combineLoadingStates, combineAsyncData} from '../../components/async-loader';
@@ -205,9 +206,9 @@ const ProjectDashboard_ = props => {
               return (
                 <tr key={build.id}>
                   <td>
-                    <a href={build.externalBuildUrl}>
+                    <Link href={`/app/projects/${project.id}/builds/${build.id}`}>
                       {build.branch} ({build.hash.slice(0, 8)}){' '}
-                    </a>
+                    </Link>
                   </td>
                   <td>{new Date(build.runAt).toLocaleTimeString()}</td>
                 </tr>

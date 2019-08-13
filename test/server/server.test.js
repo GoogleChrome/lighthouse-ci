@@ -114,6 +114,10 @@ describe('Lighthouse CI Server', () => {
         hash: 'e0acdd50ed0fdcfdceb2508498be50cc55c696ef',
         branch: 'master',
         externalBuildUrl: 'http://travis-ci.org/org/repo/1',
+        author: 'Patrick Hulce <patrick@example.com>',
+        avatarUrl: 'https://avatars1.githubusercontent.com/u/2301202?s=460&v=4',
+        commitMessage: 'feat: add some awesome features',
+        ancestorHash: '0ed0fdcfdce0acdd5eb2508498be50cc55c696ea',
         runAt: new Date().toISOString(),
       };
 
@@ -125,9 +129,13 @@ describe('Lighthouse CI Server', () => {
 
     it('should create a 2nd build', async () => {
       const payload = {
-        hash: 'e0acdd50ed0fdcfdceb2508498be50cc55c696ef',
+        hash: 'b25084e0acdd50ed0fdcfdce98be50cc55c696ea',
         branch: 'test_branch',
         externalBuildUrl: 'http://travis-ci.org/org/repo/2',
+        author: 'Paul Irish <paul@example.com>',
+        avatarUrl: 'https://avatars1.githubusercontent.com/u/39191?s=460&v=4',
+        commitMessage: 'feat: add some more awesome features',
+        ancestorHash: 'e0acdd50ed0fdcfdceb2508498be50cc55c696ef',
         runAt: new Date().toISOString(),
       };
 
@@ -142,6 +150,10 @@ describe('Lighthouse CI Server', () => {
         hash: '2edeb6a233aff298fbeccfbbb2d09282b21ec5ea',
         branch: 'master',
         externalBuildUrl: 'http://travis-ci.org/org/repo/1',
+        author: 'Paul Irish <paul@example.com>',
+        avatarUrl: 'https://avatars1.githubusercontent.com/u/39191?s=460&v=4',
+        commitMessage: 'feat: initial commit',
+        ancestorHash: '',
         runAt: new Date().toISOString(),
       };
 

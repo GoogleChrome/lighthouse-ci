@@ -33,6 +33,7 @@ declare global {
         commitMessage?: string;
         author?: string;
         avatarUrl?: string;
+        ancestorHash?: string;
         createdAt?: string;
         updatedAt?: string;
       }

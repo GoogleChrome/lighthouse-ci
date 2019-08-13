@@ -19,8 +19,9 @@ const attributes = {
   hash: {type: Sequelize.STRING(40)},
   branch: {type: Sequelize.STRING(40)},
   commitMessage: {type: Sequelize.STRING(80)},
-  author: {type: Sequelize.STRING(40)},
+  author: {type: Sequelize.STRING(256)},
   avatarUrl: {type: Sequelize.STRING(256)},
+  ancestorHash: {type: Sequelize.STRING(40)},
   externalBuildUrl: {type: Sequelize.STRING(256)},
   runAt: {type: Sequelize.DATE()}, // should mostly be equal to createdAt but modifiable by the consumer
 };

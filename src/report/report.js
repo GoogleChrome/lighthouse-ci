@@ -56,6 +56,56 @@ function getExternalBuildUrl() {
 }
 
 /**
+ * @return {string}
+ */
+function getCommitMessage() {
+  const result = childProcess.spawnSync('git', ['log', '--format=%s', '-n', '1'], {
+    encoding: 'utf8',
+  });
+  if (result.status !== 0) {
+    throw new Error('Unable to determine commit message with `git log --format=%s -n 1`');
+  }
+
+  return result.stdout.trim();
+}
+
+/**
+ * @return {string}
+ */
+function getAuthor() {
+  const result = childProcess.spawnSync('git', ['log', '--format=%aN <%aE>', '-n', '1'], {
+    encoding: 'utf8',
+  });
+  if (result.status !== 0) {
+    throw new Error('Unable to determine commit message with `git log --format=%aN <%aE> -n 1`');
+  }
+
+  return result.stdout.trim();
+}
+
+/**
+ * @return {string}
+ */
+function getAvatarUrl() {
+  return '';
+}
+
+/**
+ * @return {string}
+ */
+function getAncestorHash() {
+  const result = childProcess.spawnSync('git', ['merge-base', 'HEAD', 'master'], {
+    encoding: 'utf8',
+  });
+
+  if (result.status !== 0) {
+    throw new Error('Unable to determine current hash with `git merge-base HEAD master`');
+  }
+
+  return result.stdout.trim();
+}
+
+/**
  * @param {LHCI.ReportCommand.Options} options
  * @return {Promise<void>}
  */
@@ -71,6 +121,10 @@ async function runCommand(options) {
     projectId: project.id,
     hash: getCurrentHash(),
     branch: getCurrentBranch(),
+    commitMessage: getCommitMessage(),
+    author: getAuthor(),
+    avatarUrl: getAvatarUrl(),
+    ancestorHash: getAncestorHash(),
     externalBuildUrl: getExternalBuildUrl(),
     runAt: new Date().toISOString(),
   });

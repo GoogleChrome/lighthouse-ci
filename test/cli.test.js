@@ -58,7 +58,9 @@ describe('Lighthouse CI CLI', () => {
     it('should create a new project', async () => {
       const wizardProcess = spawn(CLI_PATH, ['wizard']);
       wizardProcess.stdoutMemory = '';
+      wizardProcess.stderrMemory = '';
       wizardProcess.stdout.on('data', chunk => (wizardProcess.stdoutMemory += chunk.toString()));
+      wizardProcess.stderr.on('data', chunk => (wizardProcess.stderrMemory += chunk.toString()));
 
       await waitForCondition(() => wizardProcess.stdoutMemory.includes('Which wizard'));
       await writeAllInputs(wizardProcess, [
@@ -68,6 +70,8 @@ describe('Lighthouse CI CLI', () => {
         'https://example.com', // External build URL
       ]);
 
+      expect(wizardProcess.stdoutMemory).toContain('Use token');
+      expect(wizardProcess.stderrMemory).toEqual('');
       const tokenSentence = wizardProcess.stdoutMemory
         .match(/Use token [\s\S]+/im)[0]
         .replace(log.bold, '')
@@ -212,7 +216,7 @@ describe('Lighthouse CI CLI', () => {
       stderr = stderr.toString();
       status = status || 0;
 
-      const stderrClean = stderr.replace(/\d{4,}(\.\d{2,})?/g, 'XXXX');
+      const stderrClean = stderr.replace(/\d{4,}(\.\d{1,})?/g, 'XXXX');
       expect(stdout).toMatchInlineSnapshot(`""`);
       // Update this test and the URL to use LHCI Server UI once it's built
       expect(stderrClean).toMatchInlineSnapshot(`

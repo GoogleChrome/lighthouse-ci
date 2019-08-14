@@ -26,6 +26,8 @@ const toMatchImageSnapshot = configureToMatchImageSnapshot({
 expect.extend({toMatchImageSnapshot});
 
 module.exports = state => {
+  state.debug = Boolean(process.env.DEBUG);
+
   describe('initialize', () => {
     it('should initialize a server', async () => {
       state.server = await startServer();
@@ -38,7 +40,12 @@ module.exports = state => {
     });
 
     it('should initialize a browser', async () => {
-      state.browser = await puppeteer.launch({env: {...process.env, TZ: 'America/Chicago'}});
+      state.browser = await puppeteer.launch({
+        headless: !state.debug,
+        slowMo: state.debug ? 250 : undefined,
+        devtools: state.debug,
+        env: {...process.env, TZ: 'America/Chicago'},
+      });
       state.page = await state.browser.newPage();
     });
   });

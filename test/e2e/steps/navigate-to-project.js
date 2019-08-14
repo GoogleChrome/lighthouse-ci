@@ -35,5 +35,15 @@ module.exports = (state, projectName) => {
       await state.page.waitFor('.dashboard-summary');
       await state.page.waitFor('.dashboard-graph');
     });
+
+    if (state.debug) {
+      it(
+        'should wait for the user to poke around',
+        async () => {
+          await new Promise(r => setTimeout(r, 5 * 60 * 1000));
+        },
+        5 * 60 * 1000
+      );
+    }
   });
 };

@@ -8,6 +8,7 @@
 const uuid = require('uuid');
 const Sequelize = require('sequelize');
 const {omit} = require('../../../../shared/lodash.js');
+const {E422} = require('../../express-utils.js');
 const StorageMethod = require('../storage-method.js');
 const projectModelDefn = require('./project-model.js');
 const buildModelDefn = require('./build-model.js');
@@ -182,8 +183,45 @@ class SqlStorageMethod {
    */
   async createBuild(unsavedBuild) {
     const {buildModel} = this._sql();
+    if (unsavedBuild.lifecycle !== 'unsealed') throw new E422('Invalid lifecycle value');
     const build = await buildModel.create({...unsavedBuild, id: uuid.v4()});
     return clone(build);
+  }
+
+  /**
+   * @param {string} projectId
+   * @param {string} buildId
+   * @return {Promise<void>}
+   */
+  // eslint-disable-next-line no-unused-vars
+  async sealBuild(projectId, buildId) {
+    const {sequelize, buildModel, runModel} = this._sql();
+    let build = await buildModel.findByPk(buildId);
+    if (!build) throw new E422('Invalid build');
+    if (build.projectId !== projectId) throw new E422('Invalid project');
+    build = {...clone(build), lifecycle: 'sealed'};
+
+    const runs = await this.getRuns(projectId, buildId);
+    if (!runs.length) throw new E422('Invalid build');
+
+    const transaction = await sequelize.transaction();
+
+    try {
+      await buildModel.update({lifecycle: 'sealed'}, {where: {id: build.id}, transaction});
+
+      const {representativeRuns} = await StorageMethod.createStatistics(this, build, {transaction});
+      const runIds = representativeRuns.map(run => run.id);
+
+      await runModel.update(
+        {representative: true},
+        {where: {id: {[Sequelize.Op.in]: runIds}}, transaction}
+      );
+
+      await transaction.commit();
+    } catch (err) {
+      await transaction.rollback();
+      throw err;
+    }
   }
 
   /**
@@ -232,7 +270,11 @@ class SqlStorageMethod {
    */
   async createRun(unsavedRun) {
     const {runModel} = this._sql();
-    const run = await runModel.create({...unsavedRun, id: uuid.v4()});
+    const build = await this.findBuildById(unsavedRun.projectId, unsavedRun.buildId);
+    if (!build || build.lifecycle !== 'unsealed') throw new E422('Invalid build');
+    if (unsavedRun.representative) throw new E422('Invalid representative value');
+
+    const run = await runModel.create({...unsavedRun, representative: false, id: uuid.v4()});
     return clone(run);
   }
 
@@ -247,9 +289,11 @@ class SqlStorageMethod {
 
   /**
    * @param {StrictOmit<LHCI.ServerCommand.Statistic, 'id'>} unsavedStatistic
+   * @param {{transaction?: import('sequelize').Transaction}} [context]
    * @return {Promise<LHCI.ServerCommand.Statistic>}
    */
-  async _createOrUpdateStatistic(unsavedStatistic) {
+  async _createOrUpdateStatistic(unsavedStatistic, context) {
+    const transaction = context && context.transaction;
     const {statisticModel} = this._sql();
     const existing = await statisticModel.findOne({
       where: {
@@ -258,17 +302,18 @@ class SqlStorageMethod {
         url: unsavedStatistic.url,
         name: unsavedStatistic.name,
       },
+      transaction,
     });
 
     /** @type {LHCI.ServerCommand.Statistic} */
     let statistic;
     if (existing) {
-      await statisticModel.update({...unsavedStatistic}, {where: {id: existing.id}});
+      await statisticModel.update({...unsavedStatistic}, {where: {id: existing.id}, transaction});
       const updated = await statisticModel.findByPk(existing.id);
       if (!updated) throw new Error('Failed to update statistic');
       statistic = updated;
     } else {
-      statistic = await statisticModel.create({...unsavedStatistic, id: uuid.v4()});
+      statistic = await statisticModel.create({...unsavedStatistic, id: uuid.v4()}, {transaction});
     }
 
     return clone(statistic);

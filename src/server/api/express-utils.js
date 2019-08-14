@@ -5,7 +5,10 @@
  */
 'use strict';
 
+class E422 extends Error {}
+
 module.exports = {
+  E422,
   /**
    * @param {import('express-serve-static-core').RequestHandler} handler
    * @return {import('express-serve-static-core').RequestHandler}

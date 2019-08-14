@@ -17,6 +17,7 @@ const attributes = {
   id: {type: Sequelize.UUID(), primaryKey: true},
   projectId: {type: Sequelize.UUID(), references: {model: ModelRef, key: 'id'}},
   buildId: {type: Sequelize.UUID(), references: {model: ModelRef, key: 'id'}},
+  representative: {type: Sequelize.BOOLEAN},
   url: {type: Sequelize.STRING({length: 256})},
   lhr: {type: Sequelize.TEXT('long')},
 };

@@ -22,6 +22,7 @@ describe('Lighthouse CI Server', () => {
   let runA;
   let runB;
   let runC;
+  let runD;
   let closeServer;
 
   async function fetchJSON(url, requestBody) {

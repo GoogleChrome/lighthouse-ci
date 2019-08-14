@@ -24,6 +24,7 @@ const BUILDS = [
   {
     id: '',
     projectId: '0',
+    lifecycle: 'unsealed',
     branch: 'master',
     hash: '6e0d172cbf4ce1252fce0b2297c7a1c2b5646ce0',
     externalBuildUrl: 'http://travis-ci.org/org/repo/1020',
@@ -36,6 +37,7 @@ const BUILDS = [
   {
     id: '',
     projectId: '0',
+    lifecycle: 'unsealed',
     branch: 'master',
     hash: '30cf658d9d72669af568d37ea60d945bfb3b0fc3',
     externalBuildUrl: 'http://travis-ci.org/org/repo/1021',
@@ -48,6 +50,7 @@ const BUILDS = [
   {
     id: '',
     projectId: '0',
+    lifecycle: 'unsealed',
     branch: 'master',
     hash: 'ac839abb9aa3c1ea447b8c3c9ba5b0ad9f6824d2',
     externalBuildUrl: 'http://travis-ci.org/org/repo/1022',
@@ -60,6 +63,7 @@ const BUILDS = [
   {
     id: '',
     projectId: '0',
+    lifecycle: 'unsealed',
     branch: 'master',
     hash: 'bb9aa3c1ea447b8c3c9ba5b0adac839a9f6824d2',
     externalBuildUrl: 'http://travis-ci.org/org/repo/1023',
@@ -72,6 +76,7 @@ const BUILDS = [
   {
     id: '',
     projectId: '0',
+    lifecycle: 'unsealed',
     branch: 'test_0',
     hash: 'aaa5b0a3c1ea447b8c3c9bac839abb9d9f6824d2',
     externalBuildUrl: 'http://travis-ci.org/org/repo/1024',
@@ -84,6 +89,7 @@ const BUILDS = [
   {
     id: '',
     projectId: '0',
+    lifecycle: 'unsealed',
     branch: 'test_1',
     hash: 'c1ea447b8c3c9ba5b0ad9f6824d2ac839abb9aa3',
     externalBuildUrl: 'http://travis-ci.org/org/repo/1025',
@@ -213,7 +219,12 @@ function createRuns(run, audits, numberOfRuns = 5) {
   const runs = [];
 
   for (let i = 0; i < numberOfRuns; i++) {
-    runs.push({...run, id: '', lhr: JSON.stringify(createLHR(run.url, auditDefs))});
+    runs.push({
+      ...run,
+      representative: false,
+      id: '',
+      lhr: JSON.stringify(createLHR(run.url, auditDefs)),
+    });
   }
 
   return runs;
@@ -319,6 +330,10 @@ async function writeSeedDataToApi(client, data) {
     run.projectId = projects[Number(run.projectId)].id;
     run.buildId = builds[Number(run.buildId)].id;
     await client.createRun(run);
+  }
+
+  for (const build of builds) {
+    await client.sealBuild(build.projectId, build.id);
   }
 }
 

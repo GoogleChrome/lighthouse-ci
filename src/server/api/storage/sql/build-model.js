@@ -16,6 +16,7 @@ const ModelRef = /** @type {any} */ (undefined);
 const attributes = {
   id: {type: Sequelize.UUID(), primaryKey: true},
   projectId: {type: Sequelize.UUID(), references: {model: ModelRef, key: 'id'}},
+  lifecycle: {type: Sequelize.STRING(40)},
   hash: {type: Sequelize.STRING(40)},
   branch: {type: Sequelize.STRING(40)},
   commitMessage: {type: Sequelize.STRING(80)},

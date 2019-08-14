@@ -26,6 +26,7 @@ declare global {
       export interface Build {
         id: string;
         projectId: string;
+        lifecycle: 'unsealed' | 'sealed';
         hash: string;
         branch: string;
         externalBuildUrl: string;
@@ -42,6 +43,7 @@ declare global {
         id: string;
         projectId: string;
         buildId: string;
+        representative: boolean;
         url: string;
         lhr: string;
         createdAt?: string;

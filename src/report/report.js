@@ -119,6 +119,7 @@ async function runCommand(options) {
 
   const build = await api.createBuild({
     projectId: project.id,
+    lifecycle: 'unsealed',
     hash: getCurrentHash(),
     branch: getCurrentBranch(),
     commitMessage: getCommitMessage(),
@@ -139,6 +140,7 @@ async function runCommand(options) {
     const run = await api.createRun({
       projectId: project.id,
       buildId: build.id,
+      representative: false,
       url: parsedLHR.finalUrl,
       lhr,
     });

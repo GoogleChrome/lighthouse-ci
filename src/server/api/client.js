@@ -30,6 +30,28 @@ class ApiClient {
   }
 
   /**
+   * @param {string} method
+   * @param {string} url
+   * @param {*} body
+   * @return {Promise<any>}
+   */
+  async _fetchWithRequestBody(method, url, body) {
+    const response = await this._fetch(this._normalizeURL(url).href, {
+      method,
+      body: JSON.stringify(body),
+      headers: {'content-type': 'application/json'},
+    });
+
+    if (response.status >= 400) {
+      throw new Error(`Unexpected status code ${response.status}\n  ${await response.text()}`);
+    }
+
+    if (response.status === 204) return;
+    const json = await response.json();
+    return json;
+  }
+
+  /**
    * @template {string} T
    * @param {string} rawUrl
    * @param {Partial<Record<T, string|number|undefined>>} [query]
@@ -56,14 +78,16 @@ class ApiClient {
    * @return {Promise<any>}
    */
   async _post(url, body) {
-    const response = await this._fetch(this._normalizeURL(url).href, {
-      method: 'POST',
-      body: JSON.stringify(body),
-      headers: {'content-type': 'application/json'},
-    });
+    return this._fetchWithRequestBody('POST', url, body);
+  }
 
-    const json = await response.json();
-    return json;
+  /**
+   * @param {string} url
+   * @param {*} body
+   * @return {Promise<any>}
+   */
+  async _put(url, body) {
+    return this._fetchWithRequestBody('PUT', url, body);
   }
 
   /**
@@ -136,6 +160,15 @@ class ApiClient {
    */
   async createBuild(unsavedBuild) {
     return this._post(`/v1/projects/${unsavedBuild.projectId}/builds`, unsavedBuild);
+  }
+
+  /**
+   * @param {string} projectId
+   * @param {string} buildId
+   * @return {Promise<void>}
+   */
+  async sealBuild(projectId, buildId) {
+    return this._put(`/v1/projects/${projectId}/builds/${buildId}/lifecycle`, 'sealed');
   }
 
   /**

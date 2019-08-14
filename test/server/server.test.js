@@ -38,6 +38,7 @@ describe('Lighthouse CI Server', () => {
 
     const response = await fetch(`${rootURL}${url}`, opts);
     if (response.status === 204) return;
+    if (response.status >= 400) return {status: response.status, body: await response.text()};
     return response.json();
   }
 
@@ -112,6 +113,7 @@ describe('Lighthouse CI Server', () => {
 
     it('should create a build', async () => {
       const payload = {
+        lifecycle: 'unsealed',
         hash: 'e0acdd50ed0fdcfdceb2508498be50cc55c696ef',
         branch: 'master',
         externalBuildUrl: 'http://travis-ci.org/org/repo/1',
@@ -130,6 +132,7 @@ describe('Lighthouse CI Server', () => {
 
     it('should create a 2nd build', async () => {
       const payload = {
+        lifecycle: 'unsealed',
         hash: 'b25084e0acdd50ed0fdcfdce98be50cc55c696ea',
         branch: 'test_branch',
         externalBuildUrl: 'http://travis-ci.org/org/repo/2',
@@ -148,6 +151,7 @@ describe('Lighthouse CI Server', () => {
 
     it('should create a build in different project', async () => {
       const payload = {
+        lifecycle: 'unsealed',
         hash: '2edeb6a233aff298fbeccfbbb2d09282b21ec5ea',
         branch: 'master',
         externalBuildUrl: 'http://travis-ci.org/org/repo/1',
@@ -233,8 +237,8 @@ describe('Lighthouse CI Server', () => {
         lhr: JSON.stringify({
           ...lhr,
           lighthouseVersion: '4.2.0',
-          audits: {...lhr.audits, interactive: {numericValue: 6000}},
-          categories: {...lhr.categories, performance: {score: 0.4}},
+          audits: {...lhr.audits, interactive: {numericValue: 5500}},
+          categories: {...lhr.categories, performance: {score: 0.45}},
         }),
       };
 
@@ -245,69 +249,25 @@ describe('Lighthouse CI Server', () => {
       expect(runB).toMatchObject(payload);
     });
 
-    it('should list runs', async () => {
-      const runs = await fetchJSON(`/v1/projects/${projectA.id}/builds/${buildA.id}/runs`);
-      expect(runs).toEqual([runB, runA]);
-    });
-  });
+    it('should create a 3rd run', async () => {
+      const payload = {
+        url: 'https://example.com',
+        lhr: JSON.stringify({
+          ...lhr,
+          lighthouseVersion: '4.2.0',
+          audits: {...lhr.audits, interactive: {numericValue: 6000}},
+          categories: {...lhr.categories, performance: {score: 0.4}},
+        }),
+      };
 
-  describe('/:projectId/builds/:buildId/statistics', () => {
-    beforeEach(() => {
-      expect(buildA).toBeDefined();
-      expect(runA).toBeDefined();
-    });
-
-    it('should get the statistics', async () => {
-      const statistics = await fetchJSON(
-        `/v1/projects/${projectA.id}/builds/${buildA.id}/statistics`
-      );
-      statistics.sort((a, b) => a.name.localeCompare(b.name));
-
-      expect(statistics).toMatchObject([
-        {
-          url: 'https://example.com/',
-          name: 'audit_first-contentful-paint_average',
-          value: 2000,
-        },
-        {
-          url: 'https://example.com/',
-          name: 'audit_interactive_average',
-          value: 5500,
-        },
-        {
-          url: 'https://example.com/',
-          name: 'audit_speed-index_average',
-          value: 5000,
-        },
-        {
-          url: 'https://example.com/',
-          name: 'category_accessibility_average',
-          value: -1,
-        },
-        {
-          url: 'https://example.com/',
-          name: 'category_best-practices_average',
-          value: -1,
-        },
-        {
-          url: 'https://example.com/',
-          name: 'category_performance_average',
-          value: 0.45,
-        },
-        {
-          url: 'https://example.com/',
-          name: 'category_pwa_average',
-          value: 0.1,
-        },
-        {
-          url: 'https://example.com/',
-          name: 'category_seo_average',
-          value: 0.9,
-        },
-      ]);
+      runC = await fetchJSON(`/v1/projects/${projectA.id}/builds/${buildA.id}/runs`, payload);
+      expect(runC).toHaveProperty('id');
+      expect(runC.projectId).toEqual(projectA.id);
+      expect(runC.buildId).toEqual(buildA.id);
+      expect(runC).toMatchObject(payload);
     });
 
-    it('should create a 3rd run of a different url', async () => {
+    it('should create a 4th run of a different url', async () => {
       const payload = {
         url: 'https://example.com/blog',
         lhr: JSON.stringify({
@@ -326,14 +286,71 @@ describe('Lighthouse CI Server', () => {
         }),
       };
 
-      runC = await fetchJSON(`/v1/projects/${projectA.id}/builds/${buildA.id}/runs`, payload);
-      expect(runC).toHaveProperty('id');
-      expect(runC.projectId).toEqual(projectA.id);
-      expect(runC.buildId).toEqual(buildA.id);
-      expect(runC).toMatchObject(payload);
+      runD = await fetchJSON(`/v1/projects/${projectA.id}/builds/${buildA.id}/runs`, payload);
+      expect(runD).toHaveProperty('id');
+      expect(runD.projectId).toEqual(projectA.id);
+      expect(runD.buildId).toEqual(buildA.id);
+      expect(runD).toMatchObject(payload);
     });
 
-    it('should get the statistics a second time', async () => {
+    it('should list runs', async () => {
+      const runs = await fetchJSON(`/v1/projects/${projectA.id}/builds/${buildA.id}/runs`);
+      expect(runs).toEqual([runD, runC, runB, runA]);
+    });
+  });
+
+  describe('/:projectId/builds/:buildId/statistics', () => {
+    beforeEach(() => {
+      expect(buildA).toBeDefined();
+      expect(buildB).toBeDefined();
+      expect(runA).toBeDefined();
+    });
+
+    it('should get empty data for unsealed build', async () => {
+      const statistics = await fetchJSON(
+        `/v1/projects/${projectA.id}/builds/${buildA.id}/statistics`
+      );
+
+      expect(statistics).toEqual([]);
+    });
+
+    it('should seal the build', async () => {
+      const response = await fetch(
+        `${rootURL}/v1/projects/${projectA.id}/builds/${buildA.id}/lifecycle`,
+        {
+          method: 'PUT',
+          headers: {'content-type': 'application/json'},
+          body: JSON.stringify('sealed'),
+        }
+      );
+
+      // Assert on these together for a nicer debugging experience
+      expect({
+        status: response.status,
+        body: await response.text(),
+      }).toEqual({
+        status: 204,
+        body: '',
+      });
+
+      // Build should now be sealed
+      expect(await fetchJSON(`/v1/projects/${projectA.id}/builds/${buildA.id}`)).toHaveProperty(
+        'lifecycle',
+        'sealed'
+      );
+
+      // Runs should have been marked representative
+      expect(await fetchJSON(`/v1/projects/${projectA.id}/builds/${buildA.id}/runs`)).toMatchObject(
+        [
+          {id: runD.id, representative: true},
+          {id: runC.id, representative: false},
+          {id: runB.id, representative: true},
+          {id: runA.id, representative: false},
+        ]
+      );
+    });
+
+    it('should get the statistics', async () => {
       const statistics = await fetchJSON(
         `/v1/projects/${projectA.id}/builds/${buildA.id}/statistics`
       );
@@ -373,7 +390,7 @@ describe('Lighthouse CI Server', () => {
         {
           url: 'https://example.com/',
           name: 'category_pwa_average',
-          value: 0.1,
+          value: 0.10000000000000002,
         },
         {
           url: 'https://example.com/',
@@ -442,6 +459,38 @@ describe('Lighthouse CI Server', () => {
     it('should return 404 in the case of missing data', async () => {
       const response = await fetch(`${rootURL}/v1/projects/non-sense`);
       expect(response.status).toEqual(404);
+    });
+
+    it('should fail to create a sealed build', async () => {
+      const payload = {...buildA, lifecycle: 'sealed', id: undefined};
+      expect(await fetchJSON(`/v1/projects/${projectB.id}/builds`, payload)).toEqual({
+        status: 422,
+        body: '{"message":"Invalid lifecycle value"}',
+      });
+    });
+
+    it('should reject new runs after sealing', async () => {
+      const response = await fetchJSON(
+        `/v1/projects/${projectA.id}/builds/${buildA.id}/runs`,
+        runA
+      );
+
+      expect(response).toEqual({
+        status: 422,
+        body: '{"message":"Invalid build"}',
+      });
+    });
+
+    it('should reject runs with representative flag', async () => {
+      const response = await fetchJSON(`/v1/projects/${projectA.id}/builds/${buildB.id}/runs`, {
+        ...runA,
+        representative: true,
+      });
+
+      expect(response).toEqual({
+        status: 422,
+        body: '{"message":"Invalid representative value"}',
+      });
     });
   });
 });

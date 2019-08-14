@@ -64,7 +64,11 @@ async function runCommand(options) {
 
   const app = express();
   if (options.logLevel !== 'silent') app.use(morgan('short'));
-  app.use(bodyParser.json({limit: '10mb'}));
+
+  // 1. Support large payloads because LHRs are big.
+  // 2. Support JSON primitives because `PUT /builds/<id>/lifecycle "sealed"`
+  app.use(bodyParser.json({limit: '10mb', strict: false}));
+
   app.use('/v1/projects', createProjectsRouter({storageMethod}));
   app.use('/app', express.static(DIST_FOLDER));
   app.get('/app/*', (_, res) => res.sendFile(path.join(DIST_FOLDER, 'index.html')));

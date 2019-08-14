@@ -147,6 +147,16 @@ function createRouter(context) {
     })
   );
 
+  // PUT /projects/<id>/builds/<id>/lifecycle
+  router.put(
+    '/:projectId/builds/:buildId/lifecycle',
+    handleAsyncError(async (req, res) => {
+      if (req.body !== 'sealed') throw new Error('Invalid lifecycle');
+      await context.storageMethod.sealBuild(req.params.projectId, req.params.buildId);
+      res.sendStatus(204);
+    })
+  );
+
   // GET /projects/<id>/builds/<id>/statistics
   router.get(
     '/:projectId/builds/:buildId/statistics',

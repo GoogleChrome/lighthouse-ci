@@ -20,4 +20,19 @@ module.exports = {
         .catch(next);
     };
   },
+  /**
+   * @param {Error} err
+   * @param {import('express-serve-static-core').Request} req
+   * @param {import('express-serve-static-core').Response} res
+   * @param {*} next
+   */
+  errorMiddleware(err, req, res, next) {
+    if (err instanceof E422) {
+      res.status(422);
+      res.send(JSON.stringify({message: err.message}));
+      return;
+    }
+
+    next(err);
+  },
 };

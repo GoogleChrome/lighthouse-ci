@@ -12,6 +12,7 @@ const morgan = require('morgan');
 const bodyParser = require('body-parser');
 const createProjectsRouter = require('./api/routes/projects');
 const StorageMethod = require('./api/storage/storage-method.js');
+const {errorMiddleware} = require('./api/express-utils.js');
 
 const DIST_FOLDER = path.join(__dirname, '../../dist');
 
@@ -72,6 +73,7 @@ async function runCommand(options) {
   app.use('/v1/projects', createProjectsRouter({storageMethod}));
   app.use('/app', express.static(DIST_FOLDER));
   app.get('/app/*', (_, res) => res.sendFile(path.join(DIST_FOLDER, 'index.html')));
+  app.use(errorMiddleware);
 
   return new Promise(resolve => {
     const server = createServer(app);

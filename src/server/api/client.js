@@ -30,6 +30,39 @@ class ApiClient {
   }
 
   /**
+   * @param {Promise<any>} returnValuePromise
+   * @return {Promise<any>}
+   */
+  _convert404ToUndefined(returnValuePromise) {
+    return returnValuePromise.catch(err => {
+      if ('status' in err && err.status === 404) return undefined;
+      throw err;
+    });
+  }
+
+  /**
+   * @param {Response} response
+   */
+  async _convertFetchResponseToReturnValue(response) {
+    if (response.status === 204) {
+      return undefined;
+    }
+
+    if (response.status >= 400) {
+      const body = await response.text();
+      /** @type {Error & {status?: number, body?: string}} */
+      const error = new Error(`Unexpected status code ${response.status}\n  ${body}`);
+      error.status = response.status;
+      error.body = body;
+      throw error;
+    }
+
+    if (response.status === 204) return;
+    const json = await response.json();
+    return json;
+  }
+
+  /**
    * @param {string} method
    * @param {string} url
    * @param {*} body
@@ -42,13 +75,7 @@ class ApiClient {
       headers: {'content-type': 'application/json'},
     });
 
-    if (response.status >= 400) {
-      throw new Error(`Unexpected status code ${response.status}\n  ${await response.text()}`);
-    }
-
-    if (response.status === 204) return;
-    const json = await response.json();
-    return json;
+    return this._convertFetchResponseToReturnValue(response);
   }
 
   /**
@@ -67,9 +94,7 @@ class ApiClient {
     }
 
     const response = await this._fetch(url.href);
-    if (response.status === 404) return undefined;
-    const json = await response.json();
-    return json;
+    return this._convertFetchResponseToReturnValue(response);
   }
 
   /**
@@ -117,7 +142,7 @@ class ApiClient {
    * @return {Promise<LHCI.ServerCommand.Project | undefined>}
    */
   async findProjectByToken(token) {
-    return this._post(`/v1/projects/lookup`, {token});
+    return this._convert404ToUndefined(this._post(`/v1/projects/lookup`, {token}));
   }
 
   /**
@@ -125,7 +150,7 @@ class ApiClient {
    * @return {Promise<LHCI.ServerCommand.Project | undefined>}
    */
   async findProjectById(projectId) {
-    return await this._get(`/v1/projects/${projectId}`);
+    return this._convert404ToUndefined(this._get(`/v1/projects/${projectId}`));
   }
 
   /**
@@ -177,7 +202,7 @@ class ApiClient {
    * @return {Promise<LHCI.ServerCommand.Build | undefined>}
    */
   async findBuildById(projectId, buildId) {
-    return await this._get(`/v1/projects/${projectId}/builds/${buildId}`);
+    return this._convert404ToUndefined(this._get(`/v1/projects/${projectId}/builds/${buildId}`));
   }
 
   /**

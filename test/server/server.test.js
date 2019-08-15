@@ -9,11 +9,13 @@
 
 const fs = require('fs');
 const path = require('path');
+const ApiClient = require('../../src/server/api/client.js');
 const runServer = require('../../src/server/server.js').runCommand;
 const fetch = require('isomorphic-fetch');
 
 describe('Lighthouse CI Server', () => {
   let rootURL = '';
+  let client;
   let projectA;
   let projectB;
   let buildA;
@@ -24,23 +26,6 @@ describe('Lighthouse CI Server', () => {
   let runC;
   let runD;
   let closeServer;
-
-  async function fetchJSON(url, requestBody) {
-    let opts;
-
-    if (requestBody) {
-      opts = {
-        method: 'POST',
-        body: JSON.stringify(requestBody),
-        headers: {'content-type': 'application/json'},
-      };
-    }
-
-    const response = await fetch(`${rootURL}${url}`, opts);
-    if (response.status === 204) return;
-    if (response.status >= 400) return {status: response.status, body: await response.text()};
-    return response.json();
-  }
 
   const dbPath = path.join(__dirname, 'server-test.tmp.sql');
 
@@ -58,6 +43,7 @@ describe('Lighthouse CI Server', () => {
     });
 
     rootURL = `http://localhost:${port}`;
+    client = new ApiClient({rootURL});
     closeServer = close;
   });
 
@@ -69,38 +55,38 @@ describe('Lighthouse CI Server', () => {
   describe('/v1/projects', () => {
     it('should create a project', async () => {
       const payload = {name: 'Lighthouse', externalUrl: 'https://github.com/lighthouse'};
-      projectA = await fetchJSON('/v1/projects', payload);
+      projectA = await client.createProject(payload);
       expect(projectA).toHaveProperty('id');
       expect(projectA).toMatchObject(payload);
     });
 
     it('should create a 2nd project', async () => {
       const payload = {name: 'Lighthouse 2', externalUrl: 'https://gitlab.com/lighthouse'};
-      projectB = await fetchJSON('/v1/projects', payload);
+      projectB = await client.createProject(payload);
       expect(projectB.id).not.toEqual(projectA.id);
       expect(projectB).toHaveProperty('id');
       expect(projectB).toMatchObject(payload);
     });
 
     it('should list projects', async () => {
-      const projects = await fetchJSON('/v1/projects');
+      const projects = await client.getProjects();
       expect(projects).toEqual([projectB, projectA]);
     });
 
     let projectAToken;
     it('should get a project token', async () => {
-      const {token} = await fetchJSON(`/v1/projects/${projectA.id}/token`);
+      const token = await client.getProjectToken(projectA);
       expect(typeof token).toBe('string');
       projectAToken = token;
     });
 
     it('should fetch a project by a token', async () => {
-      const project = await fetchJSON('/v1/projects/lookup', {token: projectAToken});
+      const project = await client.findProjectByToken(projectAToken);
       expect(project).toEqual(projectA);
     });
 
     it('should fetch a project by ID', async () => {
-      const project = await fetchJSON(`/v1/projects/${projectA.id}`);
+      const project = await client.findProjectById(projectA.id);
       expect(project).toEqual(projectA);
     });
   });
@@ -113,6 +99,7 @@ describe('Lighthouse CI Server', () => {
 
     it('should create a build', async () => {
       const payload = {
+        projectId: projectA.id,
         lifecycle: 'unsealed',
         hash: 'e0acdd50ed0fdcfdceb2508498be50cc55c696ef',
         branch: 'master',
@@ -124,7 +111,7 @@ describe('Lighthouse CI Server', () => {
         runAt: new Date().toISOString(),
       };
 
-      buildA = await fetchJSON(`/v1/projects/${projectA.id}/builds`, payload);
+      buildA = await client.createBuild(payload);
       expect(buildA).toHaveProperty('id');
       expect(buildA.projectId).toEqual(projectA.id);
       expect(buildA).toMatchObject(payload);
@@ -132,6 +119,7 @@ describe('Lighthouse CI Server', () => {
 
     it('should create a 2nd build', async () => {
       const payload = {
+        projectId: projectA.id,
         lifecycle: 'unsealed',
         hash: 'b25084e0acdd50ed0fdcfdce98be50cc55c696ea',
         branch: 'test_branch',
@@ -143,7 +131,7 @@ describe('Lighthouse CI Server', () => {
         runAt: new Date().toISOString(),
       };
 
-      buildB = await fetchJSON(`/v1/projects/${projectA.id}/builds`, payload);
+      buildB = await client.createBuild(payload);
       expect(buildB).toHaveProperty('id');
       expect(buildB.projectId).toEqual(projectA.id);
       expect(buildB).toMatchObject(payload);
@@ -151,6 +139,7 @@ describe('Lighthouse CI Server', () => {
 
     it('should create a build in different project', async () => {
       const payload = {
+        projectId: projectB.id,
         lifecycle: 'unsealed',
         hash: '2edeb6a233aff298fbeccfbbb2d09282b21ec5ea',
         branch: 'master',
@@ -162,41 +151,41 @@ describe('Lighthouse CI Server', () => {
         runAt: new Date().toISOString(),
       };
 
-      buildC = await fetchJSON(`/v1/projects/${projectB.id}/builds`, payload);
+      buildC = await client.createBuild(payload);
       expect(buildC).toHaveProperty('id');
       expect(buildC.projectId).toEqual(projectB.id);
       expect(buildC).toMatchObject(payload);
     });
 
     it('should list builds', async () => {
-      const builds = await fetchJSON(`/v1/projects/${projectA.id}/builds`);
+      const builds = await client.getBuilds(projectA.id);
       expect(builds).toEqual([buildB, buildA]);
     });
 
     it('should list builds filtered by branch', async () => {
-      const builds = await fetchJSON(`/v1/projects/${projectA.id}/builds?branch=master`);
+      const builds = await client.getBuilds(projectA.id, {branch: 'master'});
       expect(builds).toEqual([buildA]);
     });
 
-    it('should list builds filtered by branch', async () => {
-      const builds = await fetchJSON(`/v1/projects/${projectA.id}/builds?hash=${buildB.hash}`);
+    it('should list builds filtered by hash', async () => {
+      const builds = await client.getBuilds(projectA.id, {hash: buildB.hash});
       expect(builds).toEqual([buildB]);
     });
 
     it('should list builds for another project', async () => {
-      const builds = await fetchJSON(`/v1/projects/${projectB.id}/builds`);
+      const builds = await client.getBuilds(projectB.id);
       expect(builds).toEqual([buildC]);
     });
 
     it('should find a specific build', async () => {
-      const build = await fetchJSON(`/v1/projects/${projectA.id}/builds/${buildA.id}`);
+      const build = await client.findBuildById(buildA.projectId, buildA.id);
       expect(build).toEqual(buildA);
     });
   });
 
   describe('/:projectId/branches', () => {
     it('should list branches', async () => {
-      const branches = await fetchJSON(`/v1/projects/${projectA.id}/branches`);
+      const branches = await client.getBranches(projectA.id);
       expect(branches).toEqual([{branch: 'test_branch'}, {branch: 'master'}]);
     });
   });
@@ -222,9 +211,14 @@ describe('Lighthouse CI Server', () => {
     });
 
     it('should create a run', async () => {
-      const payload = {url: 'https://example.com', lhr: JSON.stringify(lhr)};
+      const payload = {
+        projectId: projectA.id,
+        buildId: buildA.id,
+        url: 'https://example.com',
+        lhr: JSON.stringify(lhr),
+      };
 
-      runA = await fetchJSON(`/v1/projects/${projectA.id}/builds/${buildA.id}/runs`, payload);
+      runA = await client.createRun(payload);
       expect(runA).toHaveProperty('id');
       expect(runA.projectId).toEqual(projectA.id);
       expect(runA.buildId).toEqual(buildA.id);
@@ -233,6 +227,8 @@ describe('Lighthouse CI Server', () => {
 
     it('should create a 2nd run', async () => {
       const payload = {
+        projectId: projectA.id,
+        buildId: buildA.id,
         url: 'https://example.com',
         lhr: JSON.stringify({
           ...lhr,
@@ -242,7 +238,7 @@ describe('Lighthouse CI Server', () => {
         }),
       };
 
-      runB = await fetchJSON(`/v1/projects/${projectA.id}/builds/${buildA.id}/runs`, payload);
+      runB = await client.createRun(payload);
       expect(runB).toHaveProperty('id');
       expect(runB.projectId).toEqual(projectA.id);
       expect(runB.buildId).toEqual(buildA.id);
@@ -251,6 +247,8 @@ describe('Lighthouse CI Server', () => {
 
     it('should create a 3rd run', async () => {
       const payload = {
+        projectId: projectA.id,
+        buildId: buildA.id,
         url: 'https://example.com',
         lhr: JSON.stringify({
           ...lhr,
@@ -260,7 +258,7 @@ describe('Lighthouse CI Server', () => {
         }),
       };
 
-      runC = await fetchJSON(`/v1/projects/${projectA.id}/builds/${buildA.id}/runs`, payload);
+      runC = await client.createRun(payload);
       expect(runC).toHaveProperty('id');
       expect(runC.projectId).toEqual(projectA.id);
       expect(runC.buildId).toEqual(buildA.id);
@@ -269,6 +267,8 @@ describe('Lighthouse CI Server', () => {
 
     it('should create a 4th run of a different url', async () => {
       const payload = {
+        projectId: projectA.id,
+        buildId: buildA.id,
         url: 'https://example.com/blog',
         lhr: JSON.stringify({
           finalUrl: 'https://example.com/blog',
@@ -286,7 +286,7 @@ describe('Lighthouse CI Server', () => {
         }),
       };
 
-      runD = await fetchJSON(`/v1/projects/${projectA.id}/builds/${buildA.id}/runs`, payload);
+      runD = await client.createRun(payload);
       expect(runD).toHaveProperty('id');
       expect(runD.projectId).toEqual(projectA.id);
       expect(runD.buildId).toEqual(buildA.id);
@@ -294,14 +294,12 @@ describe('Lighthouse CI Server', () => {
     });
 
     it('should list runs', async () => {
-      const runs = await fetchJSON(`/v1/projects/${projectA.id}/builds/${buildA.id}/runs`);
+      const runs = await client.getRuns(projectA.id, buildA.id);
       expect(runs).toEqual([runD, runC, runB, runA]);
     });
 
     it('should list runs by url', async () => {
-      const runs = await fetchJSON(
-        `/v1/projects/${projectA.id}/builds/${buildA.id}/runs?url=${encodeURIComponent(runD.url)}`
-      );
+      const runs = await client.getRuns(projectA.id, buildA.id, {url: runD.url});
       expect(runs).toEqual([runD]);
     });
   });
@@ -314,66 +312,43 @@ describe('Lighthouse CI Server', () => {
     });
 
     it('should get empty data for unsealed build', async () => {
-      const statistics = await fetchJSON(
-        `/v1/projects/${projectA.id}/builds/${buildA.id}/statistics`
-      );
+      const statistics = await client.getStatistics(projectA.id, buildA.id);
 
       expect(statistics).toEqual([]);
     });
 
     it('should seal the build', async () => {
-      const response = await fetch(
-        `${rootURL}/v1/projects/${projectA.id}/builds/${buildA.id}/lifecycle`,
-        {
-          method: 'PUT',
-          headers: {'content-type': 'application/json'},
-          body: JSON.stringify('sealed'),
-        }
-      );
-
-      // Assert on these together for a nicer debugging experience
-      expect({
-        status: response.status,
-        body: await response.text(),
-      }).toEqual({
-        status: 204,
-        body: '',
-      });
+      await client.sealBuild(projectA.id, buildA.id);
 
       // Build should now be sealed
-      expect(await fetchJSON(`/v1/projects/${projectA.id}/builds/${buildA.id}`)).toHaveProperty(
+      expect(await client.findBuildById(projectA.id, buildA.id)).toHaveProperty(
         'lifecycle',
         'sealed'
       );
 
       // Runs should have been marked representative
-      expect(await fetchJSON(`/v1/projects/${projectA.id}/builds/${buildA.id}/runs`)).toMatchObject(
-        [
-          {id: runD.id, representative: true},
-          {id: runC.id, representative: false},
-          {id: runB.id, representative: true},
-          {id: runA.id, representative: false},
-        ]
-      );
+      expect(await client.getRuns(projectA.id, buildA.id)).toMatchObject([
+        {id: runD.id, representative: true},
+        {id: runC.id, representative: false},
+        {id: runB.id, representative: true},
+        {id: runA.id, representative: false},
+      ]);
     });
 
     it('should get representative runs', async () => {
-      const runsUrl = `/v1/projects/${projectA.id}/builds/${buildA.id}/runs`;
-      expect(await fetchJSON(`${runsUrl}?representative=true`)).toMatchObject([
+      expect(await client.getRuns(projectA.id, buildA.id, {representative: true})).toMatchObject([
         {id: runD.id, representative: true},
         {id: runB.id, representative: true},
       ]);
 
-      expect(await fetchJSON(`${runsUrl}?representative=false`)).toMatchObject([
+      expect(await client.getRuns(projectA.id, buildA.id, {representative: false})).toMatchObject([
         {id: runC.id, representative: false},
         {id: runA.id, representative: false},
       ]);
     });
 
     it('should get the statistics', async () => {
-      const statistics = await fetchJSON(
-        `/v1/projects/${projectA.id}/builds/${buildA.id}/statistics`
-      );
+      const statistics = await client.getStatistics(projectA.id, buildA.id);
       statistics.sort((a, b) => a.url.localeCompare(b.url) || a.name.localeCompare(b.name));
 
       expect(statistics).toMatchObject([
@@ -463,51 +438,49 @@ describe('Lighthouse CI Server', () => {
 
   describe('/:projectId/urls', () => {
     it('should list urls', async () => {
-      const urls = await fetchJSON(`/v1/projects/${projectA.id}/urls`);
+      const urls = await client.getUrls(projectA.id);
       expect(urls).toEqual([{url: 'https://example.com/blog'}, {url: 'https://example.com'}]);
     });
   });
 
   describe('/:projectId/builds/:buildId/urls', () => {
     it('should list urls', async () => {
-      const urls = await fetchJSON(`/v1/projects/${projectA.id}/builds/${buildA.id}/urls`);
+      const urls = await client.getUrls(projectA.id, buildA.id);
       expect(urls).toEqual([{url: 'https://example.com/blog'}, {url: 'https://example.com'}]);
     });
   });
 
   describe('error handling', () => {
     it('should return 404 in the case of missing data', async () => {
-      const response = await fetch(`${rootURL}/v1/projects/non-sense`);
+      const response = await fetch(`${rootURL}/v1/projects/missing`);
       expect(response.status).toEqual(404);
+    });
+
+    it('should return undefined to the client', async () => {
+      expect(await client.findProjectById('missing')).toBeUndefined();
+      expect(await client.findProjectByToken('missing')).toBeUndefined();
+      expect(await client.findBuildById('missing', 'missing')).toBeUndefined();
     });
 
     it('should fail to create a sealed build', async () => {
       const payload = {...buildA, lifecycle: 'sealed', id: undefined};
-      expect(await fetchJSON(`/v1/projects/${projectB.id}/builds`, payload)).toEqual({
+      await expect(client.createBuild(payload)).rejects.toMatchObject({
         status: 422,
         body: '{"message":"Invalid lifecycle value"}',
       });
     });
 
     it('should reject new runs after sealing', async () => {
-      const response = await fetchJSON(
-        `/v1/projects/${projectA.id}/builds/${buildA.id}/runs`,
-        runA
-      );
-
-      expect(response).toEqual({
+      await expect(client.createRun(runA)).rejects.toMatchObject({
         status: 422,
         body: '{"message":"Invalid build"}',
       });
     });
 
     it('should reject runs with representative flag', async () => {
-      const response = await fetchJSON(`/v1/projects/${projectA.id}/builds/${buildB.id}/runs`, {
-        ...runA,
-        representative: true,
-      });
-
-      expect(response).toEqual({
+      await expect(
+        client.createRun({...runA, buildId: buildB.id, representative: true})
+      ).rejects.toMatchObject({
         status: 422,
         body: '{"message":"Invalid representative value"}',
       });

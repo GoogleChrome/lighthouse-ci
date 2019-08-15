@@ -297,6 +297,13 @@ describe('Lighthouse CI Server', () => {
       const runs = await fetchJSON(`/v1/projects/${projectA.id}/builds/${buildA.id}/runs`);
       expect(runs).toEqual([runD, runC, runB, runA]);
     });
+
+    it('should list runs by url', async () => {
+      const runs = await fetchJSON(
+        `/v1/projects/${projectA.id}/builds/${buildA.id}/runs?url=${encodeURIComponent(runD.url)}`
+      );
+      expect(runs).toEqual([runD]);
+    });
   });
 
   describe('/:projectId/builds/:buildId/statistics', () => {
@@ -348,6 +355,19 @@ describe('Lighthouse CI Server', () => {
           {id: runA.id, representative: false},
         ]
       );
+    });
+
+    it('should get representative runs', async () => {
+      const runsUrl = `/v1/projects/${projectA.id}/builds/${buildA.id}/runs`;
+      expect(await fetchJSON(`${runsUrl}?representative=true`)).toMatchObject([
+        {id: runD.id, representative: true},
+        {id: runB.id, representative: true},
+      ]);
+
+      expect(await fetchJSON(`${runsUrl}?representative=false`)).toMatchObject([
+        {id: runC.id, representative: false},
+        {id: runA.id, representative: false},
+      ]);
     });
 
     it('should get the statistics', async () => {

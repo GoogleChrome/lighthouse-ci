@@ -121,7 +121,15 @@ function createRouter(context) {
   router.get(
     '/:projectId/builds/:buildId/runs',
     handleAsyncError(async (req, res) => {
-      const runs = await context.storageMethod.getRuns(req.params.projectId, req.params.buildId);
+      if (typeof req.query.representative === 'string') {
+        req.query.representative = req.query.representative === 'true';
+      }
+
+      const runs = await context.storageMethod.getRuns(
+        req.params.projectId,
+        req.params.buildId,
+        req.query
+      );
       res.json(runs);
     })
   );

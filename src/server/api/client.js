@@ -54,7 +54,7 @@ class ApiClient {
   /**
    * @template {string} T
    * @param {string} rawUrl
-   * @param {Partial<Record<T, string|number|undefined>>} [query]
+   * @param {Partial<Record<T, string|number|boolean|undefined>>} [query]
    * @return {Promise<any>}
    */
   async _get(rawUrl, query) {
@@ -183,10 +183,11 @@ class ApiClient {
   /**
    * @param {string} projectId
    * @param {string} buildId
+   * @param {LHCI.ServerCommand.GetRunsOptions} [options]
    * @return {Promise<LHCI.ServerCommand.Run[]>}
    */
-  async getRuns(projectId, buildId) {
-    return this._get(`/v1/projects/${projectId}/builds/${buildId}/runs`);
+  async getRuns(projectId, buildId, options = {}) {
+    return this._get(`/v1/projects/${projectId}/builds/${buildId}/runs`, options);
   }
 
   /**

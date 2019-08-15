@@ -76,6 +76,11 @@ declare global {
         hash?: string;
       }
 
+      export interface GetRunsOptions {
+        representative?: boolean;
+        url?: string;
+      }
+
       export type StorageMethod = StorageMethod_;
 
       export interface StorageOptions {

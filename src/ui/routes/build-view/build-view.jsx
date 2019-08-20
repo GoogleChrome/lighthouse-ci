@@ -6,25 +6,46 @@
 
 import {h} from 'preact';
 import {AsyncLoader, combineLoadingStates, combineAsyncData} from '../../components/async-loader';
-import {useProject, useBuild, useOptionalAncestorBuild} from '../../hooks/use-api-data';
+import {
+  useProject,
+  useBuild,
+  useOptionalAncestorBuild,
+  useBuildURLs,
+} from '../../hooks/use-api-data';
 
-/** @param {{project: LHCI.ServerCommand.Project, build: LHCI.ServerCommand.Build, ancestorBuild: LHCI.ServerCommand.Build | null}} props */
-const BuildView_ = ({project, build, ancestorBuild}) => {
-  return <pre>{JSON.stringify({project, build, ancestorBuild}, null, 2)}</pre>;
+/** @param {{project: LHCI.ServerCommand.Project, build: LHCI.ServerCommand.Build, ancestorBuild: LHCI.ServerCommand.Build | null, buildUrls: Array<{url: string}>}} props */
+const BuildView_ = ({project, build, ancestorBuild, buildUrls}) => {
+  return <pre>{JSON.stringify({project, build, ancestorBuild, buildUrls}, null, 2)}</pre>;
 };
 
 /** @param {{projectId: string, buildId: string}} props */
 export const BuildView = props => {
   const projectLoadingData = useProject(props.projectId);
   const buildLoadingData = useBuild(props.projectId, props.buildId);
+  const buildUrlsData = useBuildURLs(props.projectId, props.buildId);
   const ancestorBuildData = useOptionalAncestorBuild(props.projectId, buildLoadingData[1]);
 
   return (
     <AsyncLoader
-      loadingState={combineLoadingStates(projectLoadingData, buildLoadingData, ancestorBuildData)}
-      asyncData={combineAsyncData(projectLoadingData, buildLoadingData, ancestorBuildData)}
-      render={([project, build, ancestorBuild]) => (
-        <BuildView_ project={project} build={build} ancestorBuild={ancestorBuild} />
+      loadingState={combineLoadingStates(
+        projectLoadingData,
+        buildLoadingData,
+        ancestorBuildData,
+        buildUrlsData
+      )}
+      asyncData={combineAsyncData(
+        projectLoadingData,
+        buildLoadingData,
+        ancestorBuildData,
+        buildUrlsData
+      )}
+      render={([project, build, ancestorBuild, buildUrls]) => (
+        <BuildView_
+          project={project}
+          build={build}
+          ancestorBuild={ancestorBuild}
+          buildUrls={buildUrls}
+        />
       )}
     />
   );

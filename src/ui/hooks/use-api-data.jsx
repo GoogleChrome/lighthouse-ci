@@ -95,6 +95,15 @@ export function useBuild(projectId, buildId) {
 
 /**
  * @param {string|undefined} projectId
+ * @param {string|undefined} buildId
+ * @return {[LoadingState, Array<{url: string}> | undefined]}
+ */
+export function useBuildURLs(projectId, buildId) {
+  return useApiData('getUrls', projectId && buildId ? [projectId, buildId] : undefined);
+}
+
+/**
+ * @param {string|undefined} projectId
  * @param {LHCI.ServerCommand.Build | undefined} build
  * @return {[LoadingState, LHCI.ServerCommand.Build | null | undefined]}
  */

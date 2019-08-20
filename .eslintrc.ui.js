@@ -36,6 +36,7 @@ module.exports = {
     react: {
       version: '16.0', // we're not really using react, but this version is pretty close
       pragma: 'h', // Preact's pragma is `h`
+      pragmaFrag: '"span"', // Preact doesn't support fragments so use span
     },
   },
 };

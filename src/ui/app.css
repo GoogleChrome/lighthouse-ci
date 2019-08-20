@@ -43,7 +43,7 @@
 
   /** Element-specific constants */
   --page-header-height: 56px;
-  --page-header-padding: 12px;
+  --page-header-padding: var(--base-spacing);
   --page-header-content-height: calc(var(--page-header-height) - 2 * var(--page-header-padding));
   --paper-min-width: 200px;
   --dashboard-graph-min-height: 300px;
@@ -63,8 +63,19 @@ body {
   margin: 0;
 }
 
+.lhci {
+  position: relative;
+}
+
 .page-body {
   padding: var(--base-spacing);
+}
+
+.page-body__header-portal {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
 }
 
 h1,

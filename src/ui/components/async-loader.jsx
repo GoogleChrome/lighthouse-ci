@@ -40,14 +40,16 @@ export function combineLoadingStates(...states) {
  * @template T2
  * @template T3
  * @template T4
+ * @template T5
  * @param {[LoadingState, T1 | undefined]} l1
  * @param {[LoadingState, T2 | undefined]} l2
  * @param {[LoadingState, T3 | undefined]} [l3]
  * @param {[LoadingState, T4 | undefined]} [l4]
- * @return {[T1, T2, T3, T4] | undefined}
+ * @param {[LoadingState, T5 | undefined]} [l5]
+ * @return {[T1, T2, T3, T4, T5] | undefined}
  */
-export function combineAsyncData(l1, l2, l3, l4) {
-  const tuples = [l1, l2, l3, l4].filter(tuple => tuple !== undefined);
+export function combineAsyncData(l1, l2, l3, l4, l5) {
+  const tuples = [l1, l2, l3, l4, l5].filter(tuple => tuple !== undefined);
   const values = tuples.map(tuple => tuple && tuple[1]);
 
   if (values.every(value => value !== undefined)) {

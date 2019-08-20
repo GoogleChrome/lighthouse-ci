@@ -4,6 +4,24 @@
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
  */
 
+/**
+ * @fileoverview
+ *
+ * Contains all of the hooks for consuming API data throughout the app.
+ * The shape of the return object for all hooks is the below tuple:
+ *
+ *    `[loadingState, data]: [LoadingState, TData | undefined]`
+ *
+ * Conventions:
+ *
+ *    1. `loadingState === 'loaded'` if and only if `data !== undefined`.
+ *       Hooks that violate this convention automatically redirect to the project selector via
+ *       logic in `async-loader.jsx`.
+ *    2. A request is sent if and only if all of a hook's parameters are defined
+ *       (i.e. `arguments.every(arg => arg !== undefined)`).
+ *    3. A request is reissued whenever the parameters have changed.
+ */
+
 import {useState, useEffect, useMemo} from 'preact/hooks';
 import ApiClient from '../../server/api/client.js';
 
@@ -104,7 +122,23 @@ export function useBuildURLs(projectId, buildId) {
 
 /**
  * @param {string|undefined} projectId
- * @param {LHCI.ServerCommand.Build | undefined} build
+ * @param {string|undefined} buildId
+ * @param {string|null|undefined} url
+ * @return {[LoadingState, Array<LHCI.ServerCommand.Run> | undefined]}
+ */
+export function useOptionalBuildRepresentativeRuns(projectId, buildId, url) {
+  const isUrlDefined = url !== undefined;
+  // Construct this options object in a `useMemo` to prevent infinitely re-requesting.
+  const getRunsOptions = useMemo(() => (url ? {representative: true, url} : undefined), [url]);
+  return useApiData(
+    'getRuns',
+    projectId && buildId && isUrlDefined ? [projectId, buildId, getRunsOptions] : undefined
+  );
+}
+
+/**
+ * @param {string|undefined} projectId
+ * @param {{ancestorHash?: string} | undefined} build
  * @return {[LoadingState, LHCI.ServerCommand.Build | null | undefined]}
  */
 export function useOptionalAncestorBuild(projectId, build) {
@@ -125,7 +159,7 @@ export function useOptionalAncestorBuild(projectId, build) {
     loadingState = 'loaded';
   }
   // If there were matching builds,
-  // Then it's "loaded" and the result is the first matched build.
+  // Then it's "loaded" and the result is the first matched build (which would be the most recent in default API sorting)
   if (builds && builds.length) {
     ancestorBuild = builds[0];
     loadingState = 'loaded';

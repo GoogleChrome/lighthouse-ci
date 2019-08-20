@@ -29,13 +29,22 @@ describe('BuildView', () => {
     fetchMock.mockResponseOnce(JSON.stringify({commitMessage: 'test: write some tests'}));
     fetchMock.mockResponseOnce(JSON.stringify([]));
     fetchMock.mockResponseOnce(JSON.stringify([]));
+    fetchMock.mockResponseOnce(JSON.stringify([]));
 
     const {container, getAllByText} = render(<BuildView projectId="1" buildId="2" />);
     await wait(() => getAllByText(/write some tests/));
     expect(snapshotDOM(container)).toMatchInlineSnapshot(`
       "<div>
-        <pre>
-          {
+        <span>
+          <div
+            class=\\"page-body__header-portal\\"
+          >
+            <h1>
+              test: write some tests
+            </h1>
+          </div>
+          <pre>
+            {
         \\"project\\": {
           \\"name\\": \\"My Project\\"
         },
@@ -43,9 +52,11 @@ describe('BuildView', () => {
           \\"commitMessage\\": \\"test: write some tests\\"
         },
         \\"ancestorBuild\\": null,
-        \\"buildUrls\\": []
+        \\"buildUrls\\": [],
+        \\"runs\\": []
       }
-        </pre>
+          </pre>
+        </span>
       </div>"
     `);
   });
@@ -57,13 +68,22 @@ describe('BuildView', () => {
     );
     fetchMock.mockResponseOnce(JSON.stringify([]));
     fetchMock.mockResponseOnce(JSON.stringify([{hash: '1234', commitMessage: 'fix: master'}]));
+    fetchMock.mockResponseOnce(JSON.stringify([]));
 
     const {container, getAllByText} = render(<BuildView projectId="1" buildId="2" />);
     await wait(() => getAllByText(/write some tests/));
     expect(snapshotDOM(container)).toMatchInlineSnapshot(`
       "<div>
-        <pre>
-          {
+        <span>
+          <div
+            class=\\"page-body__header-portal\\"
+          >
+            <h1>
+              test: write some tests
+            </h1>
+          </div>
+          <pre>
+            {
         \\"project\\": {
           \\"name\\": \\"My Project\\"
         },
@@ -75,9 +95,11 @@ describe('BuildView', () => {
           \\"hash\\": \\"1234\\",
           \\"commitMessage\\": \\"fix: master\\"
         },
-        \\"buildUrls\\": []
+        \\"buildUrls\\": [],
+        \\"runs\\": []
       }
-        </pre>
+          </pre>
+        </span>
       </div>"
     `);
   });

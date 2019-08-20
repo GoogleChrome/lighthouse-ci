@@ -11,19 +11,38 @@ import {
   useBuild,
   useOptionalAncestorBuild,
   useBuildURLs,
+  useOptionalBuildRepresentativeRuns,
 } from '../../hooks/use-api-data';
+import {PageHeaderPortal} from '../../layout/page-header';
 
-/** @param {{project: LHCI.ServerCommand.Project, build: LHCI.ServerCommand.Build, ancestorBuild: LHCI.ServerCommand.Build | null, buildUrls: Array<{url: string}>}} props */
-const BuildView_ = ({project, build, ancestorBuild, buildUrls}) => {
-  return <pre>{JSON.stringify({project, build, ancestorBuild, buildUrls}, null, 2)}</pre>;
+/** @param {{project: LHCI.ServerCommand.Project, build: LHCI.ServerCommand.Build, ancestorBuild: LHCI.ServerCommand.Build | null, buildUrls: Array<{url: string}>, runs: Array<LHCI.ServerCommand.Run>}} props */
+const BuildView_ = props => {
+  return (
+    <>
+      <PageHeaderPortal>
+        <h1>{props.build.commitMessage}</h1>
+      </PageHeaderPortal>
+      <pre>{JSON.stringify(props, null, 2)}</pre>
+    </>
+  );
 };
 
-/** @param {{projectId: string, buildId: string}} props */
+/** @param {{projectId: string, buildId: string, baseHash?: string}} props */
 export const BuildView = props => {
   const projectLoadingData = useProject(props.projectId);
   const buildLoadingData = useBuild(props.projectId, props.buildId);
   const buildUrlsData = useBuildURLs(props.projectId, props.buildId);
-  const ancestorBuildData = useOptionalAncestorBuild(props.projectId, buildLoadingData[1]);
+
+  const ancestorHashOptions = props.baseHash ? {ancestorHash: props.baseHash} : buildLoadingData[1];
+  const selectedBuildUrl =
+    buildUrlsData[1] && (buildUrlsData[1].length ? buildUrlsData[1][0].url : null);
+
+  const ancestorBuildData = useOptionalAncestorBuild(props.projectId, ancestorHashOptions);
+  const runData = useOptionalBuildRepresentativeRuns(
+    props.projectId,
+    props.buildId,
+    selectedBuildUrl
+  );
 
   return (
     <AsyncLoader
@@ -31,20 +50,23 @@ export const BuildView = props => {
         projectLoadingData,
         buildLoadingData,
         ancestorBuildData,
-        buildUrlsData
+        buildUrlsData,
+        runData
       )}
       asyncData={combineAsyncData(
         projectLoadingData,
         buildLoadingData,
         ancestorBuildData,
-        buildUrlsData
+        buildUrlsData,
+        runData
       )}
-      render={([project, build, ancestorBuild, buildUrls]) => (
+      render={([project, build, ancestorBuild, buildUrls, runs]) => (
         <BuildView_
           project={project}
           build={build}
           ancestorBuild={ancestorBuild}
           buildUrls={buildUrls}
+          runs={runs}
         />
       )}
     />

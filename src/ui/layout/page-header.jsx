@@ -101,3 +101,8 @@ export const PageHeader = props => {
     </div>
   );
 };
+
+/** @param {{children: import('preact').VNode}} props */
+export const PageHeaderPortal = props => {
+  return <div className="page-body__header-portal">{props.children}</div>;
+};

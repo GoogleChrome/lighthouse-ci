@@ -28,6 +28,7 @@ describe('BuildView', () => {
     fetchMock.mockResponseOnce(JSON.stringify({name: 'My Project'}));
     fetchMock.mockResponseOnce(JSON.stringify({commitMessage: 'test: write some tests'}));
     fetchMock.mockResponseOnce(JSON.stringify([]));
+    fetchMock.mockResponseOnce(JSON.stringify([]));
 
     const {container, getAllByText} = render(<BuildView projectId="1" buildId="2" />);
     await wait(() => getAllByText(/write some tests/));
@@ -41,7 +42,8 @@ describe('BuildView', () => {
         \\"build\\": {
           \\"commitMessage\\": \\"test: write some tests\\"
         },
-        \\"ancestorBuild\\": null
+        \\"ancestorBuild\\": null,
+        \\"buildUrls\\": []
       }
         </pre>
       </div>"
@@ -53,6 +55,7 @@ describe('BuildView', () => {
     fetchMock.mockResponseOnce(
       JSON.stringify({commitMessage: 'test: write some tests', ancestorHash: '1234'})
     );
+    fetchMock.mockResponseOnce(JSON.stringify([]));
     fetchMock.mockResponseOnce(JSON.stringify([{hash: '1234', commitMessage: 'fix: master'}]));
 
     const {container, getAllByText} = render(<BuildView projectId="1" buildId="2" />);
@@ -71,7 +74,8 @@ describe('BuildView', () => {
         \\"ancestorBuild\\": {
           \\"hash\\": \\"1234\\",
           \\"commitMessage\\": \\"fix: master\\"
-        }
+        },
+        \\"buildUrls\\": []
       }
         </pre>
       </div>"

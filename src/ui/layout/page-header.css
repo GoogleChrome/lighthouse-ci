@@ -7,7 +7,7 @@
 .page-header {
   height: var(--page-header-height);
   width: 100%;
-  padding: var(--page-header-padding);
+  padding: var(--page-header-vertical-padding) var(--page-header-horizontal-padding);
 
   background: var(--highlighted-background-color);
   border-bottom: 1px solid var(--base-border-color);
@@ -21,48 +21,9 @@
   margin-right: var(--base-spacing);
 }
 
-.page-header__logo {
-  width: var(--page-header-content-height);
-  height: var(--page-header-content-height);
-  background-image: url('../logo.svg');
-}
-
-.page-header-picker {
-  height: var(--page-header-content-height);
-  border-radius: calc(var(--page-header-content-height) / 8);
-  padding: var(--base-spacing);
-
-  background: var(--secondary-background-color);
-  font-weight: var(--medium-font-weight);
-
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-}
-
-.page-header-picker__label {
-  color: var(--secondary-text-color);
-  margin-right: var(--base-spacing);
-}
-
-.page-header-picker__select {
-  --arrow-size: calc(3 * var(--base-font-size) / 4);
-
-  background-color: transparent;
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' fill='%23666666'><polygon points='0,0 100,0 50,50'/></svg>");
-  background-repeat: no-repeat;
-  background-size: var(--arrow-size);
-  background-position: calc(100% - var(--arrow-size) / 2) calc(var(--arrow-size) / 2);
-
-  border: none;
-
-  -moz-appearance: none;
-  -webkit-appearance: none;
-  appearance: none;
-
-  color: var(--base-text-color);
-  font-size: var(--base-font-size);
-  font-family: var(--base-font-family);
-  font-weight: var(--medium-font-weight);
-  padding-right: calc(2 * var(--base-spacing));
+.page-header__sidebar-button {
+  cursor: pointer;
+  /* Material Icons aren't actually vertically centered for their line-height, so adjust it */
+  position: relative;
+  top: 1px;
 }

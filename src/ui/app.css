@@ -23,12 +23,15 @@
   --base-text-color: var(--color-gray-900);
   --secondary-text-color: var(--color-gray-600);
   --inverted-text-color: var(--color-gray-50);
+  --inverted-secondary-text-color: var(--color-gray-500);
 
   --base-background-color: var(--color-gray-50);
   --secondary-background-color: var(--color-gray-200);
   --highlighted-background-color: var(--color-gray-0);
+  --inverted-background-color: var(--color-gray-900);
 
   --base-border-color: var(--color-gray-200);
+  --inverted-border-color: var(--color-gray-800);
 
   --base-font-family: 'Roboto', sans-serif;
   --base-font-weight: 400;
@@ -43,8 +46,15 @@
 
   /** Element-specific constants */
   --page-header-height: 56px;
-  --page-header-padding: var(--base-spacing);
-  --page-header-content-height: calc(var(--page-header-height) - 2 * var(--page-header-padding));
+  --page-header-vertical-padding: var(--base-spacing);
+  --page-header-horizontal-padding: calc(var(--base-spacing) * 2);
+  --page-header-content-height: calc(
+    var(--page-header-height) - 2 * var(--page-header-vertical-padding)
+  );
+
+  --page-sidebar-width: 350px;
+  --page-sidebar-nav-item-height: 24px;
+
   --paper-min-width: 200px;
   --dashboard-graph-min-height: 300px;
 }

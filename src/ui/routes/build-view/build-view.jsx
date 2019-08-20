@@ -4,7 +4,7 @@
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
  */
 
-import {h} from 'preact';
+import {h, Fragment} from 'preact';
 import {AsyncLoader, combineLoadingStates, combineAsyncData} from '../../components/async-loader';
 import {
   useProject,
@@ -18,12 +18,12 @@ import {PageHeaderPortal} from '../../layout/page-header';
 /** @param {{project: LHCI.ServerCommand.Project, build: LHCI.ServerCommand.Build, ancestorBuild: LHCI.ServerCommand.Build | null, buildUrls: Array<{url: string}>, runs: Array<LHCI.ServerCommand.Run>}} props */
 const BuildView_ = props => {
   return (
-    <>
+    <Fragment>
       <PageHeaderPortal>
         <h1>{props.build.commitMessage}</h1>
       </PageHeaderPortal>
       <pre>{JSON.stringify(props, null, 2)}</pre>
-    </>
+    </Fragment>
   );
 };
 

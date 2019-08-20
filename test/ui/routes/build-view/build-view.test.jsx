@@ -35,16 +35,15 @@ describe('BuildView', () => {
     await wait(() => getAllByText(/write some tests/));
     expect(snapshotDOM(container)).toMatchInlineSnapshot(`
       "<div>
-        <span>
-          <div
-            class=\\"page-body__header-portal\\"
-          >
-            <h1>
-              test: write some tests
-            </h1>
-          </div>
-          <pre>
-            {
+        <div
+          class=\\"page-body__header-portal\\"
+        >
+          <h1>
+            test: write some tests
+          </h1>
+        </div>
+        <pre>
+          {
         \\"project\\": {
           \\"name\\": \\"My Project\\"
         },
@@ -55,8 +54,7 @@ describe('BuildView', () => {
         \\"buildUrls\\": [],
         \\"runs\\": []
       }
-          </pre>
-        </span>
+        </pre>
       </div>"
     `);
   });
@@ -74,16 +72,15 @@ describe('BuildView', () => {
     await wait(() => getAllByText(/write some tests/));
     expect(snapshotDOM(container)).toMatchInlineSnapshot(`
       "<div>
-        <span>
-          <div
-            class=\\"page-body__header-portal\\"
-          >
-            <h1>
-              test: write some tests
-            </h1>
-          </div>
-          <pre>
-            {
+        <div
+          class=\\"page-body__header-portal\\"
+        >
+          <h1>
+            test: write some tests
+          </h1>
+        </div>
+        <pre>
+          {
         \\"project\\": {
           \\"name\\": \\"My Project\\"
         },
@@ -98,8 +95,7 @@ describe('BuildView', () => {
         \\"buildUrls\\": [],
         \\"runs\\": []
       }
-          </pre>
-        </span>
+        </pre>
       </div>"
     `);
   });

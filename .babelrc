@@ -1,4 +1,4 @@
 {
   "presets": ["@babel/preset-env"],
-  "plugins": [["@babel/plugin-transform-react-jsx", {"pragma": "h", "pragmaFrag": "\"span\""}]]
+  "plugins": [["@babel/plugin-transform-react-jsx", {"pragma": "h"}]]
 }

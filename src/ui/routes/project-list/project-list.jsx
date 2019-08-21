@@ -8,6 +8,7 @@ import {h} from 'preact';
 import {useProjectList} from '../../hooks/use-api-data';
 import {AsyncLoader} from '../../components/async-loader';
 import {Link} from 'preact-router';
+import {Page} from '../../layout/page';
 
 /** @param {{projects: Array<LHCI.ServerCommand.Project>}} props */
 const ProjectList_ = ({projects}) => {
@@ -32,10 +33,12 @@ export const ProjectList = () => {
   const [loadingState, projects] = useProjectList();
 
   return (
-    <AsyncLoader
-      loadingState={loadingState}
-      asyncData={projects}
-      render={projects => <ProjectList_ projects={projects} />}
-    />
+    <Page>
+      <AsyncLoader
+        loadingState={loadingState}
+        asyncData={projects}
+        render={projects => <ProjectList_ projects={projects} />}
+      />
+    </Page>
   );
 };

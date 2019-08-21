@@ -14,6 +14,7 @@ import {Paper} from '../../components/paper.jsx';
 import {Plot} from '../../components/plot.jsx';
 import {ProjectGettingStarted} from './getting-started.jsx';
 import './project-dashboard.css';
+import {Page} from '../../layout/page.jsx';
 
 /** @typedef {LHCI.ServerCommand.Statistic & {build: LHCI.ServerCommand.Build}} StatisticWithBuild */
 
@@ -258,16 +259,18 @@ export const ProjectDashboard = props => {
   const projectBuildData = useProjectBuilds(props.projectId);
 
   return (
-    <AsyncLoader
-      loadingState={combineLoadingStates(projectApiData, projectBuildData)}
-      asyncData={combineAsyncData(projectApiData, projectBuildData)}
-      render={([project, builds]) =>
-        builds.length ? (
-          <ProjectDashboard_ project={project} builds={builds} {...props} />
-        ) : (
-          <ProjectGettingStarted project={project} />
-        )
-      }
-    />
+    <Page>
+      <AsyncLoader
+        loadingState={combineLoadingStates(projectApiData, projectBuildData)}
+        asyncData={combineAsyncData(projectApiData, projectBuildData)}
+        render={([project, builds]) =>
+          builds.length ? (
+            <ProjectDashboard_ project={project} builds={builds} {...props} />
+          ) : (
+            <ProjectGettingStarted project={project} />
+          )
+        }
+      />
+    </Page>
   );
 };

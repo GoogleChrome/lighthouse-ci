@@ -9,6 +9,8 @@ import {api} from '../../../../src/ui/hooks/use-api-data.jsx';
 import {ProjectDashboard} from '../../../../src/ui/routes/project-dashboard/project-dashboard.jsx';
 import {render, cleanup, wait, snapshotDOM} from '../../../test-utils.js';
 
+jest.mock('../../../../src/ui/layout/page');
+
 afterEach(cleanup);
 
 describe('ProjectDashboard', () => {
@@ -28,7 +30,7 @@ describe('ProjectDashboard', () => {
     fetchMock.mockResponseOnce(JSON.stringify({name: 'My Project'}));
     fetchMock.mockResponseOnce(JSON.stringify([]));
 
-    const {container, getAllByText} = render(<ProjectDashboard />);
+    const {container, getAllByText} = render(<ProjectDashboard projectId={'abcd'} />);
     await wait(() => getAllByText(/No build/));
     expect(snapshotDOM(container)).toMatchInlineSnapshot(`
             "<div>
@@ -62,7 +64,7 @@ describe('ProjectDashboard', () => {
       ])
     );
 
-    const {getAllByText} = render(<ProjectDashboard />);
+    const {getAllByText} = render(<ProjectDashboard projectId={'abcd'} />);
     await wait(() => getAllByText(/Project/));
   });
 });

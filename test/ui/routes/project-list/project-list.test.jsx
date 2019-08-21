@@ -9,6 +9,8 @@ import {api} from '../../../../src/ui/hooks/use-api-data.jsx';
 import {ProjectList} from '../../../../src/ui/routes/project-list/project-list.jsx';
 import {render, cleanup, wait, snapshotDOM} from '../../../test-utils.js';
 
+jest.mock('../../../../src/ui/layout/page');
+
 afterEach(cleanup);
 
 describe('ProjectList', () => {

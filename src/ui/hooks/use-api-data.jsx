@@ -71,11 +71,11 @@ export function useProjectList() {
 }
 
 /**
- * @param {string} projectId
+ * @param {string|undefined} projectId
  * @return {[LoadingState, LHCI.ServerCommand.Project | undefined]}
  */
 export function useProject(projectId) {
-  return useApiData('findProjectById', [projectId]);
+  return useApiData('findProjectById', projectId ? [projectId] : undefined);
 }
 
 /**

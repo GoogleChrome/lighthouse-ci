@@ -19,7 +19,7 @@ module.exports = {
         vars: 'all',
         args: 'after-used',
         argsIgnorePattern: '(^reject$|^_$)',
-        varsIgnorePattern: '(^_$|^h$)',
+        varsIgnorePattern: '(^_$|^h$|^VNode$)',
       },
     ],
   },

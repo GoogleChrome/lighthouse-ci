@@ -13,11 +13,10 @@ import './build-selector-pill.css';
  */
 const Selection = props => {
   const {hash, commitMessage = 'unknown commit'} = props.build;
-  const message = commitMessage.length > 24 ? `${commitMessage.slice(0, 21)}...` : commitMessage;
   return (
     <Fragment>
       <span className="build-selector-pill__hash">{hash.slice(0, 8)}</span>
-      <span>{message}</span>
+      <span className="build-selector-pill__message">{commitMessage}</span>
     </Fragment>
   );
 };
@@ -29,9 +28,7 @@ export const BuildSelectorPill = props => {
   return (
     <div className={`build-selector-pill build-selector-pill--${props.variant}`}>
       <div className="build-selector-pill__variant-label">{props.variant}</div>
-      <div className="build-selector-pill__selection">
-        {props.build ? <Selection build={props.build} /> : 'Unknown'}
-      </div>
+      {props.build ? <Selection build={props.build} /> : <span>None</span>}
     </div>
   );
 };

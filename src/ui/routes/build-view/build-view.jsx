@@ -13,19 +13,22 @@ import {
   useBuildURLs,
   useOptionalBuildRepresentativeRuns,
 } from '../../hooks/use-api-data';
-import {PageHeaderPortal} from '../../layout/page-header';
 import {BuildSelectorPill} from './build-selector-pill';
+import {Page} from '../../layout/page';
 
 /** @param {{project: LHCI.ServerCommand.Project, build: LHCI.ServerCommand.Build, ancestorBuild: LHCI.ServerCommand.Build | null, buildUrls: Array<{url: string}>, runs: Array<LHCI.ServerCommand.Run>}} props */
 const BuildView_ = props => {
   return (
-    <Fragment>
-      <PageHeaderPortal>
-        <BuildSelectorPill build={props.ancestorBuild} variant="base" />
-        <BuildSelectorPill build={props.build} variant="compare" />
-      </PageHeaderPortal>
+    <Page
+      header={
+        <Fragment>
+          <BuildSelectorPill build={props.ancestorBuild} variant="base" />
+          <BuildSelectorPill build={props.build} variant="compare" />
+        </Fragment>
+      }
+    >
       <pre>{JSON.stringify(props, null, 2)}</pre>
-    </Fragment>
+    </Page>
   );
 };
 
@@ -61,6 +64,11 @@ export const BuildView = props => {
         ancestorBuildData,
         buildUrlsData,
         runData
+      )}
+      renderLoading={() => (
+        <Page>
+          <h1>Loading...</h1>
+        </Page>
       )}
       render={([project, build, ancestorBuild, buildUrls, runs]) => (
         <BuildView_

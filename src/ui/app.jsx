@@ -8,46 +8,48 @@ import {h} from 'preact';
 import Router from 'preact-router';
 import LazyRoute from 'preact-async-route';
 import {Redirect} from './components/redirect.jsx';
-import {PageHeader} from './layout/page-header.jsx';
 import './app.css';
+import {Page} from './layout/page.jsx';
 
 const Loader = () => <h1>Loading route...</h1>;
-
-/** @type {any} Router types do not work properly, so fallback to any. */
-const PageHeaderNoTypes = PageHeader;
 
 export const App = () => {
   return (
     <div className="lhci">
       <Router>
-        <PageHeaderNoTypes path="/app/:slug?/:projectId?/:slugLevel2?/:idLevel2?" />
+        <LazyRoute
+          path="/app/projects"
+          loading={() => (
+            <Page>
+              <Loader />
+            </Page>
+          )}
+          getComponent={() =>
+            import('./routes/project-list/project-list.jsx').then(m => m.ProjectList)
+          }
+        />
+        <LazyRoute
+          path="/app/projects/:projectId"
+          loading={() => (
+            <Page>
+              <Loader />
+            </Page>
+          )}
+          getComponent={() =>
+            import('./routes/project-dashboard/project-dashboard.jsx').then(m => m.ProjectDashboard)
+          }
+        />
+        <LazyRoute
+          path="/app/projects/:projectId/builds/:buildId"
+          loading={() => (
+            <Page>
+              <Loader />
+            </Page>
+          )}
+          getComponent={() => import('./routes/build-view/build-view.jsx').then(m => m.BuildView)}
+        />
+        <Redirect default to="/app/projects" />
       </Router>
-      <div className="page-body">
-        <Router>
-          <LazyRoute
-            path="/app/projects"
-            loading={() => <Loader />}
-            getComponent={() =>
-              import('./routes/project-list/project-list.jsx').then(m => m.ProjectList)
-            }
-          />
-          <LazyRoute
-            path="/app/projects/:projectId"
-            loading={() => <Loader />}
-            getComponent={() =>
-              import('./routes/project-dashboard/project-dashboard.jsx').then(
-                m => m.ProjectDashboard
-              )
-            }
-          />
-          <LazyRoute
-            path="/app/projects/:projectId/builds/:buildId"
-            loading={() => <Loader />}
-            getComponent={() => import('./routes/build-view/build-view.jsx').then(m => m.BuildView)}
-          />
-          <Redirect default to="/app/projects" />
-        </Router>
-      </div>
     </div>
   );
 };

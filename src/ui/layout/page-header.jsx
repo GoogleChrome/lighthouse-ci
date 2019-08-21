@@ -4,62 +4,48 @@
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
  */
 
-import {h, Fragment} from 'preact';
-import {useState, useEffect} from 'preact/hooks';
+import {h, Fragment, VNode} from 'preact';
 import clsx from 'clsx';
 import './page-header.css';
-import {useProjectList} from '../hooks/use-api-data';
-import {PageSidebar} from './page-sidebar';
+import {useProject} from '../hooks/use-api-data';
+import {Router} from 'preact-router';
 
-/** @param {{matches: {projectId?: string, runUrl?: string, branch?: string}}} props */
-export const PageHeader = props => {
-  const [isOpen, setIsOpen] = useState(false);
-  const projectsApiData = useProjectList();
-  const selectedProject =
-    props.matches.projectId && projectsApiData[1]
-      ? projectsApiData[1].find(project => project.id === props.matches.projectId)
-      : undefined;
-
-  useEffect(() => {
-    /** @param {MouseEvent} evt */
-    const listener = evt => {
-      if (
-        !(evt.target instanceof HTMLElement) ||
-        evt.target.closest('.page-sidebar') ||
-        evt.target.closest('.page-header__sidebar-button')
-      )
-        return;
-      setIsOpen(false);
-    };
-
-    document.addEventListener('click', listener);
-    return () => document.removeEventListener('click', listener);
-  }, [setIsOpen]);
+/** @param {{children?: Array<VNode> | VNode, setIsSidebarOpen: (isOpen: boolean) => void, matches: {projectId?: string}}} props */
+const PageHeader_ = props => {
+  const [_, selectedProject] = useProject(props.matches.projectId);
 
   return (
     <Fragment>
-      <div
-        className={clsx('page-header', {
-          'page-header--with-sidebar': isOpen,
-        })}
-      >
+      <div className={clsx('page-header')}>
         <div
           className="page-header__sidebar-button"
           role="button"
-          onClick={() => setIsOpen(!isOpen)}
+          onClick={() => props.setIsSidebarOpen(true)}
         >
           <i className="material-icons">menu</i>
         </div>
         <div className="page-header__current-project">
           {(selectedProject && selectedProject.name) || 'Lighthouse CI'}
         </div>
+        {props.children}
       </div>
-      {<PageSidebar isOpen={isOpen} setIsOpen={setIsOpen} projectId={props.matches.projectId} />}
     </Fragment>
   );
 };
 
-/** @param {{children: import('preact').VNode | Array<import('preact').VNode>}} props */
-export const PageHeaderPortal = props => {
-  return <div className="page-body__header-portal">{props.children}</div>;
+/** @type {any} Router types do not work properly, so fallback to any. */
+const PageHeaderNoTypes = PageHeader_;
+
+/** @param {Omit<Parameters<typeof PageHeader_>[0], 'matches'>} props */
+export const PageHeader = props => {
+  return (
+    <Router>
+      <PageHeaderNoTypes
+        path="/app/:slug?/:projectId?/:slugLevel2?/:idLevel2?"
+        setIsSidebarOpen={props.setIsSidebarOpen}
+      >
+        {props.children}
+      </PageHeaderNoTypes>
+    </Router>
+  );
 };

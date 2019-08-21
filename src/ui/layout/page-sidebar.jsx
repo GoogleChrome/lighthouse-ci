@@ -5,14 +5,14 @@
  */
 
 import {h} from 'preact';
-import {Link} from 'preact-router';
+import Router, {Link} from 'preact-router';
 import './page-sidebar.css';
 import {AsyncLoader} from '../components/async-loader';
 import {useProjectList} from '../hooks/use-api-data';
 import clsx from 'clsx';
 
-/** @param {{projectId?: string, isOpen: boolean, setIsOpen: (value: boolean) => void}} props */
-export const PageSidebar = props => {
+/** @param {{isOpen: boolean, setIsOpen: (value: boolean) => void, matches: {projectId?: string}}} props */
+const PageSidebar_ = props => {
   const [loadingState, projects] = useProjectList();
 
   return (
@@ -36,7 +36,7 @@ export const PageSidebar = props => {
                   <li key={project.id}>
                     <Link
                       className={clsx({
-                        active: project.id === props.projectId,
+                        active: project.id === props.matches.projectId,
                       })}
                       href={`/app/projects/${project.id}`}
                     >
@@ -50,5 +50,21 @@ export const PageSidebar = props => {
         />
       </div>
     </div>
+  );
+};
+
+/** @type {any} Router types do not work properly, so fallback to any. */
+const PageSidebarNoTypes = PageSidebar_;
+
+/** @param {Omit<Parameters<typeof PageSidebar_>[0], 'matches'>} props */
+export const PageSidebar = props => {
+  return (
+    <Router>
+      <PageSidebarNoTypes
+        path="/app/:slug?/:projectId?/:slugLevel2?/:idLevel2?"
+        isOpen={props.isOpen}
+        setIsOpen={props.setIsOpen}
+      />
+    </Router>
   );
 };

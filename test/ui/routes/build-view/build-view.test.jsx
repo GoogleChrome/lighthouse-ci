@@ -9,6 +9,8 @@ import {api} from '../../../../src/ui/hooks/use-api-data.jsx';
 import {BuildView} from '../../../../src/ui/routes/build-view/build-view.jsx';
 import {render, cleanup, wait} from '../../../test-utils.js';
 
+jest.mock('../../../../src/ui/layout/page');
+
 afterEach(cleanup);
 
 describe('BuildView', () => {

@@ -16,13 +16,12 @@
   color: var(--inverted-text-color);
   background: var(--inverted-background-color);
 
-  box-shadow: 0 0 0 black;
-
   transition: left 0.5s;
 }
 
 .page-sidebar--open {
   left: 0;
+  box-shadow: 0 0 10px var(--inverted-background-color);
 }
 
 .page-sidebar__header {

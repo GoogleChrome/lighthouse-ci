@@ -14,13 +14,15 @@ import {
   useOptionalBuildRepresentativeRuns,
 } from '../../hooks/use-api-data';
 import {PageHeaderPortal} from '../../layout/page-header';
+import {BuildSelectorPill} from './build-selector-pill';
 
 /** @param {{project: LHCI.ServerCommand.Project, build: LHCI.ServerCommand.Build, ancestorBuild: LHCI.ServerCommand.Build | null, buildUrls: Array<{url: string}>, runs: Array<LHCI.ServerCommand.Run>}} props */
 const BuildView_ = props => {
   return (
     <Fragment>
       <PageHeaderPortal>
-        <h1>{props.build.commitMessage}</h1>
+        <BuildSelectorPill build={props.ancestorBuild} variant="base" />
+        <BuildSelectorPill build={props.build} variant="compare" />
       </PageHeaderPortal>
       <pre>{JSON.stringify(props, null, 2)}</pre>
     </Fragment>

@@ -7,7 +7,7 @@
 import {h} from 'preact';
 import {api} from '../../../../src/ui/hooks/use-api-data.jsx';
 import {BuildView} from '../../../../src/ui/routes/build-view/build-view.jsx';
-import {render, cleanup, wait, snapshotDOM} from '../../../test-utils.js';
+import {render, cleanup, wait} from '../../../test-utils.js';
 
 afterEach(cleanup);
 
@@ -26,77 +26,27 @@ describe('BuildView', () => {
 
   it('should render the build and missing comparison build', async () => {
     fetchMock.mockResponseOnce(JSON.stringify({name: 'My Project'}));
-    fetchMock.mockResponseOnce(JSON.stringify({commitMessage: 'test: write some tests'}));
+    fetchMock.mockResponseOnce(
+      JSON.stringify({hash: 'abcd', commitMessage: 'test: write some tests'})
+    );
     fetchMock.mockResponseOnce(JSON.stringify([]));
     fetchMock.mockResponseOnce(JSON.stringify([]));
     fetchMock.mockResponseOnce(JSON.stringify([]));
 
-    const {container, getAllByText} = render(<BuildView projectId="1" buildId="2" />);
+    const {getAllByText} = render(<BuildView projectId="1" buildId="2" />);
     await wait(() => getAllByText(/write some tests/));
-    expect(snapshotDOM(container)).toMatchInlineSnapshot(`
-      "<div>
-        <div
-          class=\\"page-body__header-portal\\"
-        >
-          <h1>
-            test: write some tests
-          </h1>
-        </div>
-        <pre>
-          {
-        \\"project\\": {
-          \\"name\\": \\"My Project\\"
-        },
-        \\"build\\": {
-          \\"commitMessage\\": \\"test: write some tests\\"
-        },
-        \\"ancestorBuild\\": null,
-        \\"buildUrls\\": [],
-        \\"runs\\": []
-      }
-        </pre>
-      </div>"
-    `);
   });
 
   it('should render the build and the comparison build', async () => {
     fetchMock.mockResponseOnce(JSON.stringify({name: 'My Project'}));
     fetchMock.mockResponseOnce(
-      JSON.stringify({commitMessage: 'test: write some tests', ancestorHash: '1234'})
+      JSON.stringify({hash: 'abcd', commitMessage: 'test: write some tests', ancestorHash: '1234'})
     );
     fetchMock.mockResponseOnce(JSON.stringify([]));
     fetchMock.mockResponseOnce(JSON.stringify([{hash: '1234', commitMessage: 'fix: master'}]));
     fetchMock.mockResponseOnce(JSON.stringify([]));
 
-    const {container, getAllByText} = render(<BuildView projectId="1" buildId="2" />);
+    const {getAllByText} = render(<BuildView projectId="1" buildId="2" />);
     await wait(() => getAllByText(/write some tests/));
-    expect(snapshotDOM(container)).toMatchInlineSnapshot(`
-      "<div>
-        <div
-          class=\\"page-body__header-portal\\"
-        >
-          <h1>
-            test: write some tests
-          </h1>
-        </div>
-        <pre>
-          {
-        \\"project\\": {
-          \\"name\\": \\"My Project\\"
-        },
-        \\"build\\": {
-          \\"commitMessage\\": \\"test: write some tests\\",
-          \\"ancestorHash\\": \\"1234\\"
-        },
-        \\"ancestorBuild\\": {
-          \\"hash\\": \\"1234\\",
-          \\"commitMessage\\": \\"fix: master\\"
-        },
-        \\"buildUrls\\": [],
-        \\"runs\\": []
-      }
-        </pre>
-      </div>"
-    `);
   });
 });

@@ -1,0 +1,45 @@
+/**
+ * @license Copyright 2019 Google Inc. All Rights Reserved.
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
+ */
+
+.build-selector-pill {
+  --build-selector-pill-content-height: calc(var(--build-selector-pill-height) - 2px);
+  --build-selector-pill-spacing: calc(var(--base-spacing) / 2);
+
+  height: var(--build-selector-pill-height);
+  border-radius: 15px;
+  border: 1px solid var(--base-text-color);
+  margin: 0 var(--build-selector-pill-spacing);
+}
+
+.build-selector-pill--compare {
+  color: var(--color-blue-500);
+  border-color: var(--color-blue-500);
+}
+
+.build-selector-pill--compare .build-selector-pill__variant-label {
+  border-color: var(--color-blue-500);
+}
+
+.build-selector-pill > * {
+  display: inline-block;
+  height: var(--build-selector-pill-content-height);
+  line-height: var(--build-selector-pill-content-height);
+}
+
+.build-selector-pill__variant-label {
+  border-right: 1px solid var(--base-text-color);
+  padding-left: calc(2 * var(--build-selector-pill-spacing));
+  padding-right: var(--build-selector-pill-spacing);
+}
+
+.build-selector-pill__selection {
+  padding: 0 var(--build-selector-pill-spacing);
+}
+
+.build-selector-pill__hash {
+  font-weight: bold;
+  margin-right: var(--build-selector-pill-spacing);
+}

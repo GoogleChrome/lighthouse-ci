@@ -20,11 +20,11 @@
 }
 
 .build-score-comparison-item__score {
-  width: 82px;
-  height: 82px;
-  border-radius: 41px;
-  line-height: 82px;
-  font-size: 36px;
+  width: var(--build-score-gauge-size);
+  height: var(--build-score-gauge-size);
+  border-radius: calc(var(--build-score-gauge-size) / 2);
+  line-height: var(--build-score-gauge-size);
+  font-size: calc(var(--build-score-gauge-size) / 2);
 
   border: 1px solid var(--base-border-color);
 
@@ -39,9 +39,9 @@
 .build-score-comparison-item__delta {
   margin-top: var(--base-spacing);
   padding: 0 var(--base-spacing);
-  height: 24px;
-  border-radius: 12px;
-  line-height: 24px;
+  height: var(--build-score-delta-badge-height);
+  border-radius: calc(var(--build-score-delta-badge-height) / 2);
+  line-height: var(--build-score-delta-badge-height);
 
   background: var(--neutral-color);
   color: var(--inverted-text-color);

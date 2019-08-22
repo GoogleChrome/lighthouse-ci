@@ -129,7 +129,11 @@ export function useBuildURLs(projectId, buildId) {
 export function useOptionalBuildRepresentativeRuns(projectId, buildId, url) {
   const isUrlDefined = url !== undefined;
   // Construct this options object in a `useMemo` to prevent infinitely re-requesting.
-  const getRunsOptions = useMemo(() => (url ? {representative: true, url} : undefined), [url]);
+  const getRunsOptions = useMemo(
+    () => (url ? {representative: true, url} : {representative: true}),
+    [url]
+  );
+
   return useApiData(
     'getRuns',
     projectId && buildId && isUrlDefined ? [projectId, buildId, getRunsOptions] : undefined

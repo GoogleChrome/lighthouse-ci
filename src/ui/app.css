@@ -64,6 +64,8 @@
   --page-sidebar-width: 350px;
   --page-sidebar-nav-item-height: 24px;
 
+  --build-score-gauge-size: 82px;
+  --build-score-delta-badge-height: 24px;
   --build-selector-pill-height: 30px;
   --paper-min-width: 200px;
   --dashboard-graph-min-height: 300px;

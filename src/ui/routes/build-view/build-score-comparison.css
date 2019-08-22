@@ -1,0 +1,59 @@
+/**
+ * @license Copyright 2019 Google Inc. All Rights Reserved.
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
+ */
+
+.build-score-comparison {
+  display: flex;
+}
+
+.build-score-comparison-item {
+  /* properties that affect how it's rendered within its parent */
+  flex-basis: 0;
+  flex-grow: 1;
+
+  /* properties that affect how its children are rendered */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.build-score-comparison-item__score {
+  width: 82px;
+  height: 82px;
+  border-radius: 41px;
+  line-height: 82px;
+  font-size: 36px;
+
+  border: 1px solid var(--base-border-color);
+
+  font-family: var(--monospace-font-family);
+  text-align: center;
+}
+
+.build-score-comparison-item__label {
+  margin-top: var(--base-spacing);
+}
+
+.build-score-comparison-item__delta {
+  margin-top: var(--base-spacing);
+  padding: 0 var(--base-spacing);
+  height: 24px;
+  border-radius: 12px;
+  line-height: 24px;
+
+  background: var(--neutral-color);
+  color: var(--inverted-text-color);
+
+  font-family: var(--monospace-font-family);
+  text-align: center;
+}
+
+.build-score-comparison-item--improvement .build-score-comparison-item__delta {
+  background-color: var(--improvement-color);
+}
+
+.build-score-comparison-item--regression .build-score-comparison-item__delta {
+  background-color: var(--regression-color);
+}

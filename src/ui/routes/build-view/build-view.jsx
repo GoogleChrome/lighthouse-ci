@@ -15,9 +15,58 @@ import {
 } from '../../hooks/use-api-data';
 import {BuildSelectorPill} from './build-selector-pill';
 import {Page} from '../../layout/page';
+import {BuildScoreComparison} from './build-score-comparison';
+import {useState, useMemo} from 'preact/hooks';
+import './build-view.css';
+
+/** @param {{selectedUrl: string, setUrl(url: string): void, build: LHCI.ServerCommand.Build | null, lhr?: LH.Result, baseLhr?: LH.Result}} props */
+const BuildViewScoreAndUrl = props => {
+  return (
+    <div className="build-view__scores-and-url">
+      <div className="container">
+        <BuildScoreComparison {...props} />
+      </div>
+    </div>
+  );
+};
 
 /** @param {{project: LHCI.ServerCommand.Project, build: LHCI.ServerCommand.Build, ancestorBuild: LHCI.ServerCommand.Build | null, buildUrls: Array<{url: string}>, runs: Array<LHCI.ServerCommand.Run>}} props */
 const BuildView_ = props => {
+  const [selectedUrlState, setUrl] = useState('');
+  const selectedUrl = selectedUrlState || (props.runs[0] && props.runs[0].url);
+
+  const ancestorBuildId = props.ancestorBuild && props.ancestorBuild.id;
+  const run = props.runs.find(run => run.buildId === props.build.id);
+  const baseRun = props.runs.find(run => run.buildId === ancestorBuildId);
+
+  /** @type {LH.Result|undefined} */
+  let lhr;
+  /** @type {LH.Result|undefined} */
+  let baseLhr;
+  /** @type {Error|undefined} */
+  let lhrError;
+
+  try {
+    lhr = useMemo(() => run && JSON.parse(run.lhr), [run]);
+  } catch (err) {
+    lhrError = err;
+  }
+
+  try {
+    baseLhr = useMemo(() => baseRun && JSON.parse(baseRun.lhr), [baseRun]);
+  } catch (err) {
+    lhrError = err;
+  }
+
+  if (!run) {
+    return (
+      <Fragment>
+        <h1>No runs for build</h1>
+        <pre>{JSON.stringify(props, null, 2)}</pre>
+      </Fragment>
+    );
+  }
+
   return (
     <Page
       header={
@@ -27,6 +76,14 @@ const BuildView_ = props => {
         </Fragment>
       }
     >
+      <BuildViewScoreAndUrl
+        build={props.build}
+        lhr={lhr}
+        baseLhr={baseLhr}
+        selectedUrl={selectedUrl}
+        setUrl={setUrl}
+      />
+      <span>{lhrError && <h1>Error parsing LHR ({lhrError.stack})</h1>}</span>
       <pre>{JSON.stringify(props, null, 2)}</pre>
     </Page>
   );
@@ -39,14 +96,15 @@ export const BuildView = props => {
   const buildUrlsData = useBuildURLs(props.projectId, props.buildId);
 
   const ancestorHashOptions = props.baseHash ? {ancestorHash: props.baseHash} : buildLoadingData[1];
-  const selectedBuildUrl =
-    buildUrlsData[1] && (buildUrlsData[1].length ? buildUrlsData[1][0].url : null);
-
   const ancestorBuildData = useOptionalAncestorBuild(props.projectId, ancestorHashOptions);
-  const runData = useOptionalBuildRepresentativeRuns(
+  const ancestorBuildId = ancestorBuildData[1] && ancestorBuildData[1].id;
+
+  const runData = useOptionalBuildRepresentativeRuns(props.projectId, props.buildId, null);
+
+  const baseRunData = useOptionalBuildRepresentativeRuns(
     props.projectId,
-    props.buildId,
-    selectedBuildUrl
+    ancestorBuildId === null ? 'EMPTY_QUERY' : ancestorBuildId,
+    null
   );
 
   return (
@@ -56,27 +114,29 @@ export const BuildView = props => {
         buildLoadingData,
         ancestorBuildData,
         buildUrlsData,
-        runData
+        runData,
+        baseRunData
       )}
       asyncData={combineAsyncData(
         projectLoadingData,
         buildLoadingData,
         ancestorBuildData,
         buildUrlsData,
-        runData
+        runData,
+        baseRunData
       )}
       renderLoading={() => (
         <Page>
           <h1>Loading...</h1>
         </Page>
       )}
-      render={([project, build, ancestorBuild, buildUrls, runs]) => (
+      render={([project, build, ancestorBuild, buildUrls, runs, baseRuns]) => (
         <BuildView_
           project={project}
           build={build}
           ancestorBuild={ancestorBuild}
           buildUrls={buildUrls}
-          runs={runs}
+          runs={runs.concat(baseRuns)}
         />
       )}
     />

@@ -19,6 +19,8 @@
   --color-red-a200: #ff5252;
   --color-green-a700: #00c853;
   --color-blue-400: #42a5f5;
+  --color-cyan-500: #00bcd4;
+  --color-pink-a200: #ff4081;
 
   /** Themematic constants */
   --base-text-color: var(--color-gray-900);
@@ -34,9 +36,15 @@
   --base-border-color: var(--color-gray-200);
   --inverted-border-color: var(--color-gray-800);
 
+  --improvement-color: var(--color-cyan-500);
+  --neutral-color: var(--color-gray-800);
+  --regression-color: var(--color-pink-a200);
+
   --base-font-family: 'Roboto', sans-serif;
   --base-font-weight: 400;
   --medium-font-weight: 500;
+  --monospace-font-family: 'Roboto Mono', 'Menlo', 'dejavu sans mono', 'Consolas', 'Lucida Console',
+    monospace;
 
   --base-font-size: 16px;
   --header-font-size: 20px;
@@ -92,6 +100,11 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.container {
+  width: 762px;
+  margin: 0 auto;
 }
 
 h1,

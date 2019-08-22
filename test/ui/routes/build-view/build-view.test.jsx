@@ -34,6 +34,7 @@ describe('BuildView', () => {
     fetchMock.mockResponseOnce(JSON.stringify([]));
     fetchMock.mockResponseOnce(JSON.stringify([]));
     fetchMock.mockResponseOnce(JSON.stringify([]));
+    fetchMock.mockResponseOnce(JSON.stringify([]));
 
     const {getAllByText} = render(<BuildView projectId="1" buildId="2" />);
     await wait(() => getAllByText(/write some tests/));
@@ -46,6 +47,7 @@ describe('BuildView', () => {
     );
     fetchMock.mockResponseOnce(JSON.stringify([]));
     fetchMock.mockResponseOnce(JSON.stringify([{hash: '1234', commitMessage: 'fix: master'}]));
+    fetchMock.mockResponseOnce(JSON.stringify([]));
     fetchMock.mockResponseOnce(JSON.stringify([]));
 
     const {getAllByText} = render(<BuildView projectId="1" buildId="2" />);

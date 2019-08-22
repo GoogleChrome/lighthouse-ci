@@ -1,0 +1,43 @@
+/**
+ * @license Copyright 2019 Google Inc. All Rights Reserved.
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
+ */
+
+.build-view__legend {
+  display: flex;
+  flex-direction: row;
+
+  margin: 0 auto;
+  width: fit-content;
+  padding: var(--base-spacing) calc(var(--base-spacing) * 2);
+
+  background: var(--highlighted-background-color);
+  border: 1px solid var(--base-border-color);
+  border-radius: 9999px; /* force fully rounded corners */
+}
+
+.build-view-legend__label {
+  font-family: var(--monospace-font-family);
+  margin-left: var(--base-spacing);
+  margin-right: calc(var(--base-spacing) * 2);
+}
+
+.build-view-legend__label:last-child {
+  margin-right: 0;
+}
+
+.build-view-legend__chip {
+  display: 'block';
+  width: var(--base-icon-size);
+  height: var(--base-icon-size);
+  border-radius: 2px;
+}
+
+.build-view-legend__chip--regression {
+  background: var(--regression-color);
+}
+
+.build-view-legend__chip--improvement {
+  background: var(--improvement-color);
+}

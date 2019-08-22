@@ -23,6 +23,5 @@
 
 .build-view__url-dropdown {
   height: calc(var(--header-base-size) + var(--base-spacing));
-
   margin-bottom: var(--base-spacing);
 }

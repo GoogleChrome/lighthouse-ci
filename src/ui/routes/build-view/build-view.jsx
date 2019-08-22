@@ -20,6 +20,7 @@ import {Page} from '../../layout/page';
 import {BuildScoreComparison} from './build-score-comparison';
 
 import './build-view.css';
+import {BuildViewLegend} from './build-view-legend';
 
 /** @param {{selectedUrl: string, setUrl(url: string): void, build: LHCI.ServerCommand.Build | null, lhr?: LH.Result, baseLhr?: LH.Result, urls: Array<{url: string}>}} props */
 const BuildViewScoreAndUrl = props => {
@@ -84,6 +85,7 @@ const BuildView_ = props => {
         </Fragment>
       }
     >
+      <span>{lhrError && <h1>Error parsing LHR ({lhrError.stack})</h1>}</span>
       <BuildViewScoreAndUrl
         build={props.build}
         lhr={lhr}
@@ -92,8 +94,10 @@ const BuildView_ = props => {
         setUrl={setUrl}
         urls={props.buildUrls}
       />
-      <span>{lhrError && <h1>Error parsing LHR ({lhrError.stack})</h1>}</span>
-      <pre>{JSON.stringify(props, null, 2)}</pre>
+      <div className="container">
+        <BuildViewLegend />
+        <pre>{JSON.stringify(props, null, 2)}</pre>
+      </div>
     </Page>
   );
 };

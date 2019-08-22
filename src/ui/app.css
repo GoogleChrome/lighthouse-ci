@@ -4,6 +4,8 @@
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
  */
 
+@import './icons.css';
+
 :root {
   /** Material colors https://www.materialui.co/colors */
   --color-gray-0: #ffffff;
@@ -21,6 +23,7 @@
   --color-blue-400: #42a5f5;
   --color-cyan-500: #00bcd4;
   --color-pink-a200: #ff4081;
+  --color-orange-500: #ff9800;
 
   /** Themematic constants */
   --base-text-color: var(--color-gray-900);
@@ -37,6 +40,10 @@
   --strong-border-color: var(--color-gray-900);
   --inverted-border-color: var(--color-gray-800);
 
+  --pass-color: var(--color-green-a700);
+  --average-color: var(--color-orange-500);
+  --fail-color: var(--color-red-a200);
+
   --improvement-color: var(--color-cyan-500);
   --neutral-color: var(--color-gray-800);
   --regression-color: var(--color-pink-a200);
@@ -50,6 +57,8 @@
   --base-font-size: 16px;
   --header-font-size: 20px;
   --title-font-size: 24px;
+
+  --base-icon-size: 16px;
 
   --base-spacing: 12px;
   --large-spacing: 20px;

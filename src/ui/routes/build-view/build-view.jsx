@@ -5,7 +5,9 @@
  */
 
 import {h, Fragment} from 'preact';
+import {useState, useMemo} from 'preact/hooks';
 import {AsyncLoader, combineLoadingStates, combineAsyncData} from '../../components/async-loader';
+import {Dropdown} from '../../components/dropdown';
 import {
   useProject,
   useBuild,
@@ -16,14 +18,20 @@ import {
 import {BuildSelectorPill} from './build-selector-pill';
 import {Page} from '../../layout/page';
 import {BuildScoreComparison} from './build-score-comparison';
-import {useState, useMemo} from 'preact/hooks';
+
 import './build-view.css';
 
-/** @param {{selectedUrl: string, setUrl(url: string): void, build: LHCI.ServerCommand.Build | null, lhr?: LH.Result, baseLhr?: LH.Result}} props */
+/** @param {{selectedUrl: string, setUrl(url: string): void, build: LHCI.ServerCommand.Build | null, lhr?: LH.Result, baseLhr?: LH.Result, urls: Array<{url: string}>}} props */
 const BuildViewScoreAndUrl = props => {
   return (
     <div className="build-view__scores-and-url">
       <div className="container">
+        <Dropdown
+          className="build-view__url-dropdown"
+          value={props.selectedUrl}
+          setValue={props.setUrl}
+          options={props.urls.map(({url}) => ({value: url, label: url}))}
+        />
         <BuildScoreComparison {...props} />
       </div>
     </div>
@@ -82,6 +90,7 @@ const BuildView_ = props => {
         baseLhr={baseLhr}
         selectedUrl={selectedUrl}
         setUrl={setUrl}
+        urls={props.buildUrls}
       />
       <span>{lhrError && <h1>Error parsing LHR ({lhrError.stack})</h1>}</span>
       <pre>{JSON.stringify(props, null, 2)}</pre>

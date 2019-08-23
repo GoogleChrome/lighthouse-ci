@@ -2,7 +2,7 @@
 
 ## Overview
 
-Lighthouse CI is a set of commands that make running, asserting, saving, and retrieving [Lighthouse]() results as easy as possible.
+Lighthouse CI is a set of commands that make running, asserting, saving, and retrieving [Lighthouse](https://github.com/GoogleChrome/lighthouse) results as easy as possible.
 
 ## Commands
 

@@ -13,6 +13,7 @@ declare global {
 
   namespace LH {
     export interface AuditResult {
+      id?: string;
       title?: string;
       description?: string;
       score: number | null;
@@ -31,7 +32,7 @@ declare global {
       id: string;
       score: number;
       title: string;
-      auditRefs: Array<{id: string; weight: number}>;
+      auditRefs: Array<{id: string; weight: number; group?: string}>;
     }
 
     export interface Result {

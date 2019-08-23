@@ -5,6 +5,7 @@
  */
 
 import {h, Fragment} from 'preact';
+import _ from '../../../shared/lodash';
 import {useState, useMemo} from 'preact/hooks';
 import {AsyncLoader, combineLoadingStates, combineAsyncData} from '../../components/async-loader';
 import {Dropdown} from '../../components/dropdown';
@@ -18,6 +19,7 @@ import {
 import {BuildSelectorPill} from './build-selector-pill';
 import {Page} from '../../layout/page';
 import {BuildScoreComparison} from './build-score-comparison';
+import {AuditGroup} from './audit-group';
 
 import './build-view.css';
 import {BuildViewLegend} from './build-view-legend';
@@ -35,6 +37,42 @@ const BuildViewScoreAndUrl = props => {
         />
         <BuildScoreComparison {...props} />
       </div>
+    </div>
+  );
+};
+
+/** @param {{lhr: LH.Result, baseLhr?: LH.Result}} props */
+const AuditGroups = props => {
+  const auditGroups = Object.values(props.lhr.categories)
+    .map(category => {
+      const auditRefsGroupedByGroup = _.groupBy(category.auditRefs, ref => ref.group);
+      return auditRefsGroupedByGroup.map(auditRefGroup => {
+        const groupId = auditRefGroup[0].group || '';
+        const group = props.lhr.categoryGroups && props.lhr.categoryGroups[groupId];
+        if (!group) return;
+
+        const audits = auditRefGroup
+          .map(ref => ({...props.lhr.audits[ref.id], id: ref.id}))
+          .sort((a, b) => (a.score || 0) - (b.score || 0));
+        return {id: groupId, group, audits};
+      });
+    })
+    .reduce((a, b) => a.concat(b));
+
+  return (
+    <div className="build-view__audit-groups">
+      {auditGroups.map(auditGroup => {
+        if (!auditGroup) return undefined;
+        return (
+          <AuditGroup
+            key={auditGroup.id}
+            audits={auditGroup.audits}
+            group={auditGroup.group}
+            variant={auditGroup.id === 'metrics' ? 'numeric' : 'standard'}
+            baseLhr={props.baseLhr}
+          />
+        );
+      })}
     </div>
   );
 };
@@ -67,11 +105,14 @@ const BuildView_ = props => {
     lhrError = err;
   }
 
-  if (!run) {
+  if (!run || !lhr) {
     return (
       <Fragment>
         <h1>No runs for build</h1>
-        <pre>{JSON.stringify(props, null, 2)}</pre>
+        <pre>
+          {lhrError}
+          {JSON.stringify(props, null, 2)}
+        </pre>
       </Fragment>
     );
   }
@@ -96,7 +137,7 @@ const BuildView_ = props => {
       />
       <div className="container">
         <BuildViewLegend />
-        <pre>{JSON.stringify(props, null, 2)}</pre>
+        <AuditGroups lhr={lhr} baseLhr={baseLhr} />
       </div>
     </Page>
   );

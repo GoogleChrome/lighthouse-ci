@@ -5,14 +5,13 @@
  */
 
 i.lh-score-fail {
-  --icon-size: calc(var(--base-icon-size) * 0.9);
-
   position: relative;
-  top: calc(var(--icon-size) / -5);
   display: block;
-  border-left: calc(var(--icon-size) / 2) solid transparent;
-  border-right: calc(var(--icon-size) / 2) solid transparent;
-  border-bottom: var(--icon-size) solid var(--fail-color);
+  width: 0;
+  height: 0;
+  border-left: calc(var(--base-icon-size) / 2) solid transparent;
+  border-right: calc(var(--base-icon-size) / 2) solid transparent;
+  border-bottom: var(--base-icon-size) solid var(--fail-color);
 }
 
 i.lh-score-average {

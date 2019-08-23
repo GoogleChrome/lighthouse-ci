@@ -17,17 +17,22 @@ const PageHeader_ = props => {
   return (
     <Fragment>
       <div className={clsx('page-header')}>
-        <div
-          className="page-header__sidebar-button"
-          role="button"
-          onClick={() => props.setIsSidebarOpen(true)}
-        >
-          <i className="material-icons">menu</i>
+        <div className="page-header__left">
+          <div
+            className="page-header__sidebar-button"
+            role="button"
+            onClick={() => props.setIsSidebarOpen(true)}
+          >
+            <i className="material-icons">menu</i>
+          </div>
+          <div className="page-header__current-project">
+            {(selectedProject && selectedProject.name) || 'Lighthouse CI'}
+          </div>
         </div>
-        <div className="page-header__current-project">
-          {(selectedProject && selectedProject.name) || 'Lighthouse CI'}
+        <div className="page-header__center">{props.children}</div>
+        <div className="page-header__right">
+          <span />
         </div>
-        {props.children}
       </div>
     </Fragment>
   );

@@ -17,7 +17,31 @@
   align-items: center;
 }
 
-.page-header > * {
+.page-header > div {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.page-header__left {
+  justify-content: flex-start;
+  flex-shrink: 1;
+  flex-basis: 200px;
+  min-width: 100px;
+}
+
+.page-header__center {
+  justify-content: center;
+  flex-grow: 1;
+}
+
+.page-header__right {
+  justify-content: flex-end;
+  flex-shrink: 1;
+  flex-basis: 200px;
+}
+
+.page-header > div > * {
   margin-right: var(--base-spacing);
 }
 
@@ -26,4 +50,11 @@
   /* Material Icons aren't actually vertically centered for their line-height, so adjust it */
   position: relative;
   top: 1px;
+}
+
+.page-header__current-project {
+  flex-shrink: 1;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }

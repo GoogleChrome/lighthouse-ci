@@ -106,17 +106,6 @@ body {
   padding: var(--base-spacing);
 }
 
-.page-body__header-portal {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: var(--page-header-height);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
 .container {
   width: 762px;
   margin: 0 auto;

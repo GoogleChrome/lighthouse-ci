@@ -17,12 +17,14 @@ import {
   useOptionalBuildRepresentativeRuns,
 } from '../../hooks/use-api-data';
 import {BuildSelectorPill} from './build-selector-pill';
+import {AuditDetailPane} from './audit-detail-pane';
 import {Page} from '../../layout/page';
 import {BuildScoreComparison} from './build-score-comparison';
 import {AuditGroup} from './audit-group';
 
 import './build-view.css';
 import {BuildViewLegend} from './build-view-legend';
+import clsx from 'clsx';
 
 /** @param {{selectedUrl: string, setUrl(url: string): void, build: LHCI.ServerCommand.Build | null, lhr?: LH.Result, baseLhr?: LH.Result, urls: Array<{url: string}>}} props */
 const BuildViewScoreAndUrl = props => {
@@ -41,7 +43,7 @@ const BuildViewScoreAndUrl = props => {
   );
 };
 
-/** @param {{lhr: LH.Result, baseLhr?: LH.Result}} props */
+/** @param {{lhr: LH.Result, baseLhr?: LH.Result, selectedAuditId: string|null, setSelectedAuditId: (id: string|null) => void}} props */
 const AuditGroups = props => {
   const auditGroups = Object.values(props.lhr.categories)
     .map(category => {
@@ -70,6 +72,8 @@ const AuditGroups = props => {
             group={auditGroup.group}
             variant={auditGroup.id === 'metrics' ? 'numeric' : 'standard'}
             baseLhr={props.baseLhr}
+            selectedAuditId={props.selectedAuditId}
+            setSelectedAuditId={props.setSelectedAuditId}
           />
         );
       })}
@@ -80,6 +84,7 @@ const AuditGroups = props => {
 /** @param {{project: LHCI.ServerCommand.Project, build: LHCI.ServerCommand.Build, ancestorBuild: LHCI.ServerCommand.Build | null, buildUrls: Array<{url: string}>, runs: Array<LHCI.ServerCommand.Run>}} props */
 const BuildView_ = props => {
   const [selectedUrlState, setUrl] = useState('');
+  const [selectedAuditId, setAuditId] = useState(/** @type {string|null} */ (null));
   const selectedUrl = selectedUrlState || (props.runs[0] && props.runs[0].url);
 
   const ancestorBuildId = props.ancestorBuild && props.ancestorBuild.id;
@@ -126,18 +131,37 @@ const BuildView_ = props => {
         </Fragment>
       }
     >
-      <span>{lhrError && <h1>Error parsing LHR ({lhrError.stack})</h1>}</span>
-      <BuildViewScoreAndUrl
-        build={props.build}
-        lhr={lhr}
-        baseLhr={baseLhr}
-        selectedUrl={selectedUrl}
-        setUrl={setUrl}
-        urls={props.buildUrls}
-      />
-      <div className="container">
-        <BuildViewLegend />
-        <AuditGroups lhr={lhr} baseLhr={baseLhr} />
+      {(selectedAuditId && (
+        <AuditDetailPane
+          selectedAuditId={selectedAuditId}
+          setSelectedAuditId={setAuditId}
+          lhr={lhr}
+          baseLhr={baseLhr}
+        />
+      )) || <Fragment />}
+      {(lhrError && <h1>Error parsing LHR ({lhrError.stack})</h1>) || <Fragment />}
+      <div
+        className={clsx('build-view', {
+          'build-view--with-audit-selection': !!selectedAuditId,
+        })}
+      >
+        <BuildViewScoreAndUrl
+          build={props.build}
+          lhr={lhr}
+          baseLhr={baseLhr}
+          selectedUrl={selectedUrl}
+          setUrl={setUrl}
+          urls={props.buildUrls}
+        />
+        <div className="container">
+          <BuildViewLegend />
+          <AuditGroups
+            lhr={lhr}
+            baseLhr={baseLhr}
+            selectedAuditId={selectedAuditId}
+            setSelectedAuditId={setAuditId}
+          />
+        </div>
       </div>
     </Page>
   );

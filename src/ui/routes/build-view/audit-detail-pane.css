@@ -4,28 +4,29 @@
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
  */
 
-.build-view--with-audit-selection {
-  width: 50%;
-}
+.audit-detail-pane {
+  position: fixed;
+  top: var(--page-header-height);
+  right: 0;
+  left: 50%;
+  bottom: 0;
 
-.build-view__scores-and-url {
-  height: 260px;
-  width: calc(100% + 2 * var(--base-spacing));
-  padding: var(--base-spacing);
-  margin: calc(-1 * var(--base-spacing));
-  margin-bottom: var(--base-spacing);
+  overflow: auto;
 
   background: var(--highlighted-background-color);
-  border-bottom: 1px solid var(--base-border-color);
+  border-left: 1px solid var(--base-border-color);
 }
 
-.build-view__scores-and-url .container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
+.audit-detail-pane__close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  height: 20px;
+  width: 20px;
+  border-radius: 20px;
+  line-height: 20px;
+  text-align: center;
 
-.build-view__url-dropdown {
-  height: calc(var(--header-font-size) + var(--base-spacing));
-  margin-bottom: var(--base-spacing);
+  background: var(--secondary-background-color);
+  cursor: pointer;
 }

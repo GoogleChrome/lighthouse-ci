@@ -7,6 +7,7 @@
 import {h, Fragment} from 'preact';
 import './audit-group.css';
 import {Paper} from '../../components/paper';
+import clsx from 'clsx';
 
 /** @param {{audit: LH.AuditResult, baseAudit?: LH.AuditResult}} props */
 const StandardDiff = props => {
@@ -30,7 +31,7 @@ const ScoreIcon = props => {
 };
 
 /**
- * @param {{key?: string, group: {title: string}, audits: Array<LH.AuditResult>, baseLhr?: LH.Result, variant?: 'standard'|'numeric'}} props
+ * @param {{key?: string, group: {title: string}, selectedAuditId: string|null, setSelectedAuditId: (id: string|null) => void, audits: Array<LH.AuditResult>, baseLhr?: LH.Result, variant?: 'standard'|'numeric'}} props
  */
 export const AuditGroup = props => {
   const {group, audits, baseLhr} = props;
@@ -43,7 +44,13 @@ export const AuditGroup = props => {
           const baseAudit = baseLhr && baseLhr.audits[audit.id || ''];
 
           return (
-            <div key={audit.id} className="audit-group__audit">
+            <div
+              key={audit.id}
+              className={clsx('audit-group__audit', {
+                'audit-group__audit--selected': audit.id === props.selectedAuditId,
+              })}
+              onClick={() => props.setSelectedAuditId(audit.id || null)}
+            >
               <div className="audit-group__audit-score">
                 <ScoreIcon audit={audit} />
               </div>

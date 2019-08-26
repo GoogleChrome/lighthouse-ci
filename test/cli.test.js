@@ -149,7 +149,7 @@ describe('Lighthouse CI CLI', () => {
     });
 
     it('should have sealed the build', async () => {
-      const [projectId, buildId, runAId, runBId] = uuids;
+      const [projectId, buildId] = uuids;
       const response = await fetch(
         `http://localhost:${serverPort}/v1/projects/${projectId}/builds/${buildId}`
       );

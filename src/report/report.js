@@ -148,6 +148,7 @@ async function runCommand(options) {
     process.stdout.write(`Saved LHR to ${options.serverBaseUrl} (${run.id})\n`);
   }
 
+  await api.sealBuild(build.projectId, build.id);
   process.stdout.write(`Done saving build results to Lighthouse CI\n`);
 }
 

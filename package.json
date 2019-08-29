@@ -11,6 +11,7 @@
     "build:watch": "parcel watch ./src/ui/index.html  --public-url=/app",
     "build:source-map-explorer": "npm run clean && npm run build && ./scripts/source-map-explorer.sh",
     "start": "./src/cli.js",
+    "start:seed-data-in-viewer": "node ./scripts/open-seed-report-in-viewer.js",
     "start:seed-database": "node ./scripts/seed-database.js ./test/fixtures/lighthouserc.json",
     "start:server": "./src/cli.js server --rc-file=./test/fixtures/lighthouserc.json",
     "update:fixture-seed-data": "node ./scripts/update-seed-fixtures.js",

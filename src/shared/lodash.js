@@ -41,8 +41,17 @@ function merge(v1, v2) {
   }
 }
 
+/**
+ * Converts a string from camelCase to kebab-case.
+ * @param {string} s
+ */
+function kebabCase(s) {
+  return s.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
+}
+
 module.exports = {
   merge,
+  kebabCase,
   /**
    * Generates an array of numbers from `from` (inclusive) to `to` (exclusive)
    * @param {number} from
@@ -59,11 +68,14 @@ module.exports = {
     return numbers;
   },
   /**
-   * Converts a string from camelCase to kebab-case.
+   * Converts a string from kebab-case or camelCase to Start Case.
    * @param {string} s
    */
-  kebabCase(s) {
-    return s.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
+  startCase(s) {
+    return kebabCase(s)
+      .split('-')
+      .map(word => `${word.slice(0, 1).toUpperCase()}${word.slice(1)}`)
+      .join(' ');
   },
   /**
    * Deep clones an object via JSON.parse/JSON.stringify.

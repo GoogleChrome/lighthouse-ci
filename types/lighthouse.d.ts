@@ -18,7 +18,7 @@ declare global {
       description?: string;
       score: number | null;
       numericValue?: number;
-      details?: {type: string; items?: any[]; overallSavingsMs?: number};
+      details?: {type: string; items?: any[]; overallSavingsMs?: number; headings?: any};
       scoreDisplayMode?:
         | 'notApplicable'
         | 'informative'

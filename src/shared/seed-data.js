@@ -7,6 +7,10 @@
 
 const _ = require('./lodash.js');
 
+const LOREM_IPSUM =
+  // eslint-disable-next-line max-len
+  'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin urna nunc, molestie sed hendrerit et, vulputate vitae mauris. Sed tempor vitae risus vel hendrerit. Nulla vestibulum malesuada erat vitae laoreet. Phasellus sodales vehicula dolor, dictum ullamcorper metus aliquam id. Nullam porttitor posuere purus id rhoncus. Sed et mi ligula. Donec imperdiet nulla sit amet justo cursus, id tempus ex accumsan. Maecenas ultricies elit eget lectus posuere vestibulum. Cras vestibulum neque nec justo congue feugiat non id dui. Pellentesque dapibus ac orci sed malesuada. Sed rhoncus vitae lorem eget facilisis. Donec auctor tortor a tortor egestas, vel condimentum lacus auctor.';
+
 /** @typedef {import('../server/api/client.js')} ApiClient */
 
 /** @type {Array<LHCI.ServerCommand.Project>} */
@@ -101,7 +105,8 @@ const BUILDS = [
   },
 ];
 
-/** @typedef {{auditId: string, passRate?: number, averageNumericValue?: number, averageWastedMs?: number}} AuditGenDef */
+/** @typedef {{url?: string, inclusionRate?: number, averageWastedMs?: number, averageTotalBytes?: number, averageWastedBytes?: number}} ItemGenDef */
+/** @typedef {{auditId: string, passRate?: number, averageNumericValue?: number, averageWastedMs?: number, items?: ItemGenDef[]}} AuditGenDef */
 
 /** @param {string} auditId */
 function getCategoryForAuditId(auditId) {
@@ -118,8 +123,12 @@ function getGroupForAuditId(auditId) {
   if (auditId === 'first-meaningful-paint') return 'metrics';
   if (auditId === 'speed-index') return 'metrics';
   if (auditId === 'interactive') return 'metrics';
-  if (auditId === 'uses-responsive-images') return 'load-opportunities';
-  if (auditId === 'bootup-time') return 'diagnostics';
+  if (auditId.startsWith('diagnostic-')) return 'diagnostics';
+  if (auditId.startsWith('uses-')) return 'load-opportunities';
+  if (auditId.startsWith('a11y')) return 'accessibility';
+  if (auditId.startsWith('seo')) return 'seo';
+  if (auditId.startsWith('best-practices')) return 'best-practices';
+  if (auditId.startsWith('pwa')) return 'pwa';
 }
 
 /** @param {number} average */
@@ -132,14 +141,15 @@ function generateNumericValue(average) {
 
 /**
  *
- * @param {string} url
+ * @param {string} pageUrl
  * @param {Array<AuditGenDef>} auditDefs
  * @return {LH.Result}
  */
-function createLHR(url, auditDefs) {
+function createLHR(pageUrl, auditDefs) {
   /** @type {LH.Result['audits']} */
   const audits = {};
 
+  const loremIpsumTokens = LOREM_IPSUM.split(' ');
   for (const auditDef of auditDefs) {
     const {auditId, averageNumericValue, averageWastedMs} = auditDef;
     if (typeof averageNumericValue === 'number') {
@@ -163,8 +173,52 @@ function createLHR(url, auditDefs) {
       audits[auditId] = {score: Math.random() <= passRate ? 1 : 0, scoreDisplayMode: 'binary'};
     }
 
-    audits[auditId].title = auditId.toUpperCase();
-    audits[auditId].description = 'Help text for ' + auditId.toUpperCase();
+    /** @type {Record<string, any>} */
+    const headersAsObject = {};
+    if (auditDef.items) {
+      const items = [];
+      for (const {url, inclusionRate = 1, ...rest} of auditDef.items) {
+        if (Math.random() > inclusionRate) continue;
+        /** @type {any} */
+        const item = {};
+        if (url) {
+          if (url.includes('lorempixel')) {
+            headersAsObject.thumbnail = {key: 'url', valueType: 'thumbnail'};
+          }
+
+          headersAsObject.url = {key: 'url', valueType: 'url', label: 'URL'};
+          item.url = new URL(url, pageUrl);
+        }
+
+        for (const key of Object.keys(rest)) {
+          const dataKey = key.replace('average', '').replace(/^\w/, v => v.toLowerCase());
+          const valueType = key.endsWith('Ms') ? 'timespanMs' : 'bytes';
+          headersAsObject[dataKey] = {key: dataKey, valueType, label: _.startCase(dataKey)};
+          // @ts-ignore - tsc can't understand Object.keys
+          item[dataKey] = generateNumericValue(rest[key]);
+        }
+
+        items.push(item);
+      }
+
+      const opportunityDetails = audits[auditId].details;
+      const opportunityMs = opportunityDetails && opportunityDetails.overallSavingsMs;
+      audits[auditId].details = {
+        type: opportunityMs ? 'opportunity' : 'table',
+        overallSavingsMs: opportunityMs,
+        headings: Object.values(headersAsObject).map(header => {
+          // Do the inverse of _getCanonicalizedTableHeadings
+          if (opportunityMs) return header;
+          return {...header, itemType: header.valueType, text: header.label};
+        }),
+        items,
+      };
+    }
+
+    audits[auditId].title = _.startCase(auditId);
+    audits[auditId].description = `Help text for ${_.startCase(auditId)}. ${loremIpsumTokens
+      .slice(0, Math.round(auditId.length * 1.5))
+      .join(' ')}.`;
   }
 
   /** @type {LH.Result['categories']} */
@@ -185,8 +239,8 @@ function createLHR(url, auditDefs) {
   }
 
   return {
-    requestedUrl: url,
-    finalUrl: url,
+    requestedUrl: pageUrl,
+    finalUrl: pageUrl,
     categories,
     audits,
 
@@ -197,6 +251,10 @@ function createLHR(url, auditDefs) {
       metrics: {title: 'Metrics'},
       'load-opportunities': {title: 'Opportunities'},
       diagnostics: {title: 'Diagnostics'},
+      accessibility: {title: 'Accessibility'},
+      seo: {title: 'SEO'},
+      'best-practices': {title: 'Best Practices'},
+      pwa: {title: 'PWA'},
     },
     runWarnings: [],
     userAgent: 'Chrome!',
@@ -230,6 +288,69 @@ function createRuns(run, audits, numberOfRuns = 5) {
   return runs;
 }
 
+const fiftyFiftyImages = [
+  {
+    inclusionRate: 0.5,
+    url: 'http://lorempixel.com/200/200/sports/2',
+    averageTotalBytes: 100 * 1024,
+    averageWastedBytes: 50 * 1024,
+  },
+  {
+    inclusionRate: 0.5,
+    url: 'http://lorempixel.com/200/200/sports/3',
+    averageTotalBytes: 80 * 1024,
+    averageWastedBytes: 20 * 1024,
+  },
+  {
+    inclusionRate: 0.5,
+    url: 'http://lorempixel.com/200/200/sports/4',
+    averageTotalBytes: 200 * 1024,
+    averageWastedBytes: 10 * 1024,
+  },
+  {
+    inclusionRate: 0.5,
+    url: 'http://lorempixel.com/200/200/sports/5',
+    averageTotalBytes: 150 * 1024,
+    averageWastedBytes: 20 * 1024,
+  },
+  {
+    inclusionRate: 0.5,
+    url: 'http://lorempixel.com/200/200/sports/6',
+    averageTotalBytes: 75 * 1024,
+    averageWastedBytes: 10 * 1024,
+  },
+  {
+    inclusionRate: 0.5,
+    url: 'http://lorempixel.com/200/200/sports/7',
+    averageTotalBytes: 500 * 1024,
+    averageWastedBytes: 200 * 1024,
+  },
+  {
+    inclusionRate: 0.5,
+    url: 'http://lorempixel.com/200/200/sports/8',
+    averageTotalBytes: 25 * 1024,
+    averageWastedBytes: 5 * 1024,
+  },
+];
+
+const permanentScripts = [
+  {
+    url: '/js/app.js',
+    averageWastedMs: 3000,
+    averageTotalBytes: 1000 * 1024,
+  },
+  {
+    url: '/js/vendor.js',
+    averageWastedMs: 500,
+    averageTotalBytes: 5000 * 1024,
+  },
+  {
+    url: 'https://www.google-analytics.com/ga.js',
+    averageWastedMs: 200,
+    averageTotalBytes: 50 * 1024,
+  },
+];
+
 const auditsToFake = {
   'first-contentful-paint': {averageNumericValue: 1000},
   'first-meaningful-paint': {averageNumericValue: 1000},
@@ -238,8 +359,12 @@ const auditsToFake = {
   interactive: {averageNumericValue: 5000},
   'max-potential-fid': {averageNumericValue: 250},
 
-  'uses-responsive-images': {averageWastedMs: 400},
-  'bootup-time': {passRate: 0.5},
+  'uses-responsive-images': {averageWastedMs: 400, items: fiftyFiftyImages},
+  'uses-minified-files': {averageWastedMs: 800, items: fiftyFiftyImages},
+  'uses-optimized-images': {averageWastedMs: 1400, items: fiftyFiftyImages},
+  'diagnostic-bootup-time': {passRate: 0.5, items: permanentScripts},
+  'diagnostic-main-thread-time': {averageNumericValue: 5000, items: permanentScripts},
+  'diagnostic-cache-headers': {passRate: 0.5, items: permanentScripts},
 
   'a11y-color-contrast': {passRate: 0.5},
   'a11y-labels': {passRate: 0.5},
@@ -292,12 +417,32 @@ const RUNS = [
     {...auditsToFake, interactive: {averageNumericValue: 4000}}
   ),
   ...createRuns(
+    // this build is a branch that regresses metrics
     {projectId: '0', buildId: '4', url: 'http://localhost:1234/viewer/#home'},
-    {...auditsToFake, interactive: {averageNumericValue: 7000}}
+    {
+      ...auditsToFake,
+      interactive: {averageNumericValue: 7000},
+      'diagnostic-main-thread-time': {
+        averageNumericValue: 6000,
+        items: permanentScripts.map(item =>
+          item.url.includes('app') ? {...item, averageWastedMs: item.averageWastedMs + 1000} : item
+        ),
+      },
+    }
   ),
   ...createRuns(
+    // this build is a branch that improves metrics
     {projectId: '0', buildId: '5', url: 'http://localhost:1234/viewer/#home'},
-    {...auditsToFake, interactive: {averageNumericValue: 6000}}
+    {
+      ...auditsToFake,
+      interactive: {averageNumericValue: 3000},
+      'diagnostic-main-thread-time': {
+        averageNumericValue: 2000,
+        items: permanentScripts.map(item =>
+          item.url.includes('app') ? {...item, averageWastedMs: item.averageWastedMs - 1000} : item
+        ),
+      },
+    }
   ),
 ];
 

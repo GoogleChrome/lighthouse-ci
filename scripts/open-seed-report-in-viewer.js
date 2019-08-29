@@ -6,6 +6,7 @@
  */
 'use strict';
 
+const fs = require('fs');
 const puppeteer = require('puppeteer');
 const {RUNS} = require('../src/shared/seed-data.js');
 
@@ -23,7 +24,9 @@ async function run() {
     document.dispatchEvent(event);
   }, RUNS[0].lhr);
 
-  console.log(JSON.stringify(JSON.parse(RUNS[0].lhr), null, 2));
+  const lhrAsString = JSON.stringify(JSON.parse(RUNS[0].lhr), null, 2);
+  console.log(lhrAsString);
+  fs.writeFileSync('lhr.tmp.json', lhrAsString);
 }
 
 run();

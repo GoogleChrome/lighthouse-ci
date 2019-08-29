@@ -18,8 +18,8 @@
 }
 
 .audit-detail-pane__close {
-  position: absolute;
-  top: 10px;
+  position: fixed;
+  top: calc(var(--page-header-height) + 10px);
   right: 10px;
   height: 20px;
   width: 20px;
@@ -29,4 +29,22 @@
 
   background: var(--secondary-background-color);
   cursor: pointer;
+}
+
+.audit-detail-pane__audit {
+  padding: calc(2 * var(--base-spacing));
+
+  border-bottom: 1px solid var(--base-border-color);
+}
+
+.audit-detail-pane__audit--selected {
+  background: var(--secondary-background-color);
+}
+
+.audit-detail-pane__audit-title {
+  font-size: var(--header-font-size);
+}
+
+.audit-detail-pane__audit-description {
+  color: var(--secondary-text-color);
 }

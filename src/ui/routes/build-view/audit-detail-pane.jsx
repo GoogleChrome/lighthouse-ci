@@ -6,6 +6,22 @@
 
 import {h} from 'preact';
 import './audit-detail-pane.css';
+import clsx from 'clsx';
+
+/** @param {{audit: LH.AuditResult, selectedAuditId: string|null, key?: string}} props */
+const Audit = props => {
+  return (
+    <div
+      className={clsx('audit-detail-pane__audit', {
+        'audit-detail-pane__audit--selected': props.selectedAuditId === props.audit.id,
+      })}
+    >
+      <div className="audit-detail-pane__audit-title">{props.audit.title}</div>
+      <div className="audit-detail-pane__audit-description">{props.audit.description}</div>
+      <div className="audit-detail-pane__audit-details">{JSON.stringify(props.audit.details)}</div>
+    </div>
+  );
+};
 
 /**
  * @param {{selectedAuditId: string, setSelectedAuditId: (id: string|null) => void, lhr: LH.Result, baseLhr?: LH.Result}} props
@@ -13,10 +29,12 @@ import './audit-detail-pane.css';
 export const AuditDetailPane = props => {
   return (
     <div className="audit-detail-pane">
-      Audits! <pre>{JSON.stringify(props.lhr, null, 2)}</pre>
       <div className="audit-detail-pane__close" onClick={() => props.setSelectedAuditId(null)}>
         x
       </div>
+      {Object.values(props.lhr.audits).map(audit => {
+        return <Audit key={audit.id} audit={audit} selectedAuditId={props.selectedAuditId} />;
+      })}
     </div>
   );
 };

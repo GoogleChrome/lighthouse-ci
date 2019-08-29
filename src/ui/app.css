@@ -104,6 +104,7 @@ body {
 
 .page-body {
   padding: var(--base-spacing);
+  padding-top: calc(var(--base-spacing) + var(--page-header-height));
 }
 
 .container {

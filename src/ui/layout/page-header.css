@@ -5,6 +5,7 @@
  */
 
 .page-header {
+  position: fixed;
   height: var(--page-header-height);
   width: 100%;
   padding: var(--page-header-vertical-padding) var(--page-header-horizontal-padding);
@@ -15,6 +16,7 @@
   display: flex;
   flex-direction: row;
   align-items: center;
+  z-index: 10;
 }
 
 .page-header > div {

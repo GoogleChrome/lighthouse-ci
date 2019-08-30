@@ -6,7 +6,8 @@
 'use strict';
 
 const _ = require('../lodash.js');
-const PRandom = require('./prandom.js');
+
+/** @typedef {import('./prandom.js')} PRandom */
 
 const LOREM_IPSUM =
   // eslint-disable-next-line max-len
@@ -143,7 +144,7 @@ function createLHR(pageUrl, auditDefs, prandom) {
       id: category,
       title: category.toUpperCase(),
       score: sum / audits.length,
-      auditRefs: audits.map(([id]) => ({id, weight: 0, group: getGroupForAuditId(id)})),
+      auditRefs: audits.map(([id]) => ({id, weight: 1, group: getGroupForAuditId(id)})),
     };
   }
 

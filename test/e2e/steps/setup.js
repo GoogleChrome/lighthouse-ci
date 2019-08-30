@@ -13,7 +13,7 @@ const puppeteer = require('puppeteer');
 const {configureToMatchImageSnapshot} = require('jest-image-snapshot');
 const {startServer} = require('../../test-utils');
 const ApiClient = require('../../../src/server/api/client');
-const {writeSeedDataToApi} = require('../../../src/shared/seed-data');
+const {writeSeedDataToApi} = require('../../../src/shared/seed-data/seed-data.js');
 
 const SEED_DATA_PATH = path.join(__dirname, '../../fixtures/seed-data.json');
 

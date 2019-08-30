@@ -8,9 +8,10 @@
 const VARIANT_MULTIPLIER = 9653;
 
 class PRandom {
-  /** @param {number?} variant */
+  /** @param {number} variant */
   constructor(variant = 0) {
     this.variant = variant;
+    /** @type {number} */
     this.seed = 0;
     this.reset();
   }

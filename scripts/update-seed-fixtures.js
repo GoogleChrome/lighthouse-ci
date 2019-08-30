@@ -8,19 +8,12 @@
 
 const fs = require('fs');
 const path = require('path');
-const seedData = require('../src/shared/seed-data.js');
+const {createDataset} = require('../src/shared/seed-data/seed-data.js');
 
 const FIXTURE_PATH = path.join(__dirname, '../test/fixtures/seed-data.json');
 
 function run() {
-  fs.writeFileSync(
-    FIXTURE_PATH,
-    JSON.stringify(
-      {projects: seedData.PROJECTS, builds: seedData.BUILDS, runs: seedData.RUNS},
-      null,
-      2
-    )
-  );
+  fs.writeFileSync(FIXTURE_PATH, JSON.stringify(createDataset(), null, 2));
 }
 
 run();

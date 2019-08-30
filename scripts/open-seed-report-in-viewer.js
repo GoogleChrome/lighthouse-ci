@@ -8,9 +8,10 @@
 
 const fs = require('fs');
 const puppeteer = require('puppeteer');
-const {RUNS} = require('../src/shared/seed-data.js');
+const {createDataset} = require('../src/shared/seed-data/seed-data.js');
 
 async function run() {
+  const lhr = JSON.stringify(JSON.parse(createDataset().runs[0].lhr), null, 2);
   const browser = await puppeteer.launch({headless: false, devtools: true});
   const page = await browser.newPage();
   await page.goto('https://googlechrome.github.io/lighthouse/viewer/');
@@ -22,11 +23,10 @@ async function run() {
     dataTransfer.setData('text', lhr);
     const event = new ClipboardEvent('paste', {clipboardData: dataTransfer});
     document.dispatchEvent(event);
-  }, RUNS[0].lhr);
+  }, lhr);
 
-  const lhrAsString = JSON.stringify(JSON.parse(RUNS[0].lhr), null, 2);
-  console.log(lhrAsString);
-  fs.writeFileSync('lhr.tmp.json', lhrAsString);
+  console.log(lhr);
+  fs.writeFileSync('lhr.tmp.json', lhr);
 }
 
 run();

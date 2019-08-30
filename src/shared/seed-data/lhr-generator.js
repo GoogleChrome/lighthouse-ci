@@ -6,6 +6,7 @@
 'use strict';
 
 const _ = require('../lodash.js');
+const PRandom = require('./prandom.js');
 
 const LOREM_IPSUM =
   // eslint-disable-next-line max-len
@@ -37,11 +38,11 @@ function getGroupForAuditId(auditId) {
   if (auditId.startsWith('pwa')) return 'pwa';
 }
 
-/** @param {number} average */
-function generateNumericValue(average) {
+/** @param {number} average @param {PRandom} prandom */
+function generateNumericValue(average, prandom) {
   const maxDeltaAsPercent = 0.1;
   const maxDelta = average * maxDeltaAsPercent;
-  const percentile = Math.random();
+  const percentile = prandom.next();
   return (percentile - 0.5) * 2 * maxDelta + average;
 }
 
@@ -49,9 +50,10 @@ function generateNumericValue(average) {
  *
  * @param {string} pageUrl
  * @param {Array<AuditGenDef>} auditDefs
+ * @param {PRandom} prandom
  * @return {LH.Result}
  */
-function createLHR(pageUrl, auditDefs) {
+function createLHR(pageUrl, auditDefs, prandom) {
   /** @type {LH.Result['audits']} */
   const audits = {};
 
@@ -59,13 +61,13 @@ function createLHR(pageUrl, auditDefs) {
   for (const auditDef of auditDefs) {
     const {auditId, averageNumericValue, averageWastedMs} = auditDef;
     if (typeof averageNumericValue === 'number') {
-      const numericValue = generateNumericValue(averageNumericValue);
+      const numericValue = generateNumericValue(averageNumericValue, prandom);
       // score of 100 = <1000
       // score of 0 = >10000
       const score = 1 - Math.min(1, Math.max((numericValue - 1000) / 9000, 0));
       audits[auditId] = {score, numericValue, scoreDisplayMode: 'numeric'};
     } else if (typeof averageWastedMs === 'number') {
-      const wastedMs = generateNumericValue(averageWastedMs);
+      const wastedMs = generateNumericValue(averageWastedMs, prandom);
       // score of 100 = <100
       // score of 0 = >1000
       const score = 1 - Math.min(1, Math.max((wastedMs - 100) / 900, 0));
@@ -76,7 +78,7 @@ function createLHR(pageUrl, auditDefs) {
       };
     } else {
       const {passRate = 1} = auditDef;
-      audits[auditId] = {score: Math.random() <= passRate ? 1 : 0, scoreDisplayMode: 'binary'};
+      audits[auditId] = {score: prandom.next() <= passRate ? 1 : 0, scoreDisplayMode: 'binary'};
     }
 
     /** @type {Record<string, any>} */
@@ -84,7 +86,7 @@ function createLHR(pageUrl, auditDefs) {
     if (auditDef.items) {
       const items = [];
       for (const {url, inclusionRate = 1, ...rest} of auditDef.items) {
-        if (Math.random() > inclusionRate) continue;
+        if (prandom.next() > inclusionRate) continue;
         /** @type {any} */
         const item = {};
         if (url) {
@@ -101,7 +103,8 @@ function createLHR(pageUrl, auditDefs) {
           const valueType = key.endsWith('Ms') ? 'timespanMs' : 'bytes';
           headersAsObject[dataKey] = {key: dataKey, valueType, label: _.startCase(dataKey)};
           // @ts-ignore - tsc can't understand Object.keys
-          item[dataKey] = generateNumericValue(rest[key]);
+          const averageValue = rest[key];
+          item[dataKey] = generateNumericValue(averageValue, prandom);
         }
 
         items.push(item);

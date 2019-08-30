@@ -6,6 +6,7 @@
 'use strict';
 
 const _ = require('../lodash.js');
+const PRandom = require('./prandom.js');
 const {createLHR} = require('./lhr-generator.js');
 
 /** @typedef {import('./lhr-generator').AuditGenDef} AuditGenDef */
@@ -13,11 +14,13 @@ const {createLHR} = require('./lhr-generator.js');
 /**
  * @param {Pick<LHCI.ServerCommand.Run, 'projectId'|'buildId'|'url'>} run
  * @param {Record<string, StrictOmit<AuditGenDef, 'auditId'>>} audits
+ * @param {number} prandomVariant
  * @param {number} [numberOfRuns]
  * @return {Array<LHCI.ServerCommand.Run>}
  */
-function createRuns(run, audits, numberOfRuns = 5) {
+function createRuns(run, audits, prandomVariant, numberOfRuns = 5) {
   const auditDefs = Object.keys(audits).map(auditId => ({auditId, ...audits[auditId]}));
+  const prandom = new PRandom(prandomVariant);
 
   /** @type {Array<LHCI.ServerCommand.Run>} */
   const runs = [];
@@ -27,7 +30,7 @@ function createRuns(run, audits, numberOfRuns = 5) {
       ...run,
       representative: false,
       id: '',
-      lhr: JSON.stringify(createLHR(run.url, auditDefs)),
+      lhr: JSON.stringify(createLHR(run.url, auditDefs, prandom)),
     });
   }
 
@@ -232,31 +235,38 @@ function createDataset() {
     runs: [
       ...createRuns(
         {projectId: '0', buildId: '0', url: 'http://localhost:1234/viewer/#home'},
-        auditsToFake
+        auditsToFake,
+        0
       ),
       ...createRuns(
         {projectId: '0', buildId: '1', url: 'http://localhost:1234/viewer/#home'},
-        auditsToFake
+        auditsToFake,
+        1
       ),
       ...createRuns(
         {projectId: '0', buildId: '2', url: 'http://localhost:1234/viewer/#home'},
-        auditsToFake
+        auditsToFake,
+        2
       ),
       ...createRuns(
         {projectId: '0', buildId: '0', url: 'http://localhost:1234/viewer/#checkout'},
-        auditsToFake
+        auditsToFake,
+        3
       ),
       ...createRuns(
         {projectId: '0', buildId: '1', url: 'http://localhost:1234/viewer/#checkout'},
-        auditsToFake
+        auditsToFake,
+        4
       ),
       ...createRuns(
         {projectId: '0', buildId: '2', url: 'http://localhost:1234/viewer/#checkout'},
-        auditsToFake
+        auditsToFake,
+        5
       ),
       ...createRuns(
         {projectId: '0', buildId: '3', url: 'http://localhost:1234/viewer/#home'},
-        {...auditsToFake, interactive: {averageNumericValue: 4000}}
+        {...auditsToFake, interactive: {averageNumericValue: 4000}},
+        6
       ),
       ...createRuns(
         // this build is a branch that regresses metrics
@@ -272,7 +282,8 @@ function createDataset() {
                 : item
             ),
           },
-        }
+        },
+        7
       ),
       ...createRuns(
         // this build is a branch that improves metrics
@@ -288,7 +299,8 @@ function createDataset() {
                 : item
             ),
           },
-        }
+        },
+        8
       ),
     ],
   };

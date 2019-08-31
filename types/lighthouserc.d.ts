@@ -11,7 +11,7 @@ declare global {
         extends?: string;
         assert?: Partial<AssertCommand.Options>;
         collect?: Partial<CollectCommand.Options>;
-        report?: Partial<ReportCommand.Options>;
+        upload?: Partial<UploadCommand.Options>;
         server?: Partial<ServerCommand.Options>;
       };
     }

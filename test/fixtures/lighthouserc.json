@@ -13,7 +13,7 @@
         "budgets": [{"resourceSizes": [{"resourceType": "script", "budget": 1}]}]
       }
     },
-    "report": {
+    "upload": {
       "serverBaseUrl": "http://localhost:9009"
     },
     "server": {

@@ -8,7 +8,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const {createDataset} = require('../src/shared/seed-data/seed-data.js');
+const {createDataset} = require('../packages/utils/src/seed-data/seed-data.js');
 
 const FIXTURE_PATH = path.join(__dirname, '../test/fixtures/seed-data.json');
 

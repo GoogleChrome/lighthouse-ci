@@ -6,9 +6,9 @@
  */
 'use strict';
 
-const {loadAndParseRcFile} = require('../src/shared/lighthouserc.js');
-const ApiClient = require('../src/server/api/client.js');
-const {writeSeedDataToApi} = require('../src/shared/seed-data/seed-data.js');
+const {loadAndParseRcFile} = require('../packages/utils/src/lighthouserc.js');
+const ApiClient = require('../packages/cli/src/server/api/client.js');
+const {writeSeedDataToApi} = require('../packages/utils/src/seed-data/seed-data.js');
 
 if (process.argv.length !== 3) {
   process.stderr.write(`Usage ./scripts/seed-database.js <path to rc file>`);

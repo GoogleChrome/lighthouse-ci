@@ -8,7 +8,7 @@
 
 const fs = require('fs');
 const puppeteer = require('puppeteer');
-const {createDataset} = require('../src/shared/seed-data/seed-data.js');
+const {createDataset} = require('../packages/utils/src/seed-data/seed-data.js');
 
 async function run() {
   const lhr = JSON.stringify(JSON.parse(createDataset().runs[0].lhr), null, 2);

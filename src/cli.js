@@ -10,7 +10,7 @@ const yargs = require('yargs');
 const loadAndParseRcFile = require('./shared/lighthouserc.js').loadAndParseRcFile;
 const getVersion = require('./shared/version.js').getVersion;
 const assertCmd = require('./assert/assert.js');
-const reportCmd = require('./report/report.js');
+const uploadCmd = require('./upload/upload.js');
 const collectCmd = require('./collect/collect.js');
 const serverCmd = require('./server/server.js');
 const wizardCmd = require('./wizard/wizard.js');
@@ -27,8 +27,8 @@ async function run() {
     .command('collect', 'Run Lighthouse and save the results to a local folder', commandYargs =>
       collectCmd.buildCommand(commandYargs)
     )
-    .command('report', 'Save the results to the server', commandYargs =>
-      reportCmd.buildCommand(commandYargs)
+    .command('upload', 'Save the results to the server', commandYargs =>
+      uploadCmd.buildCommand(commandYargs)
     )
     .command('assert', 'Assert that the latest results meet expectations', commandYargs =>
       assertCmd.buildCommand(commandYargs)
@@ -44,8 +44,8 @@ async function run() {
     case 'assert':
       await assertCmd.runCommand(argv);
       break;
-    case 'report':
-      await reportCmd.runCommand(argv);
+    case 'upload':
+      await uploadCmd.runCommand(argv);
       break;
     case 'server': {
       const {port} = await serverCmd.runCommand(argv);

@@ -106,7 +106,7 @@ function getAncestorHash() {
 }
 
 /**
- * @param {LHCI.ReportCommand.Options} options
+ * @param {LHCI.UploadCommand.Options} options
  * @return {Promise<void>}
  */
 async function runCommand(options) {

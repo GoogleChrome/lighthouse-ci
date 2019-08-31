@@ -9,7 +9,7 @@ const fs = require('fs');
 const path = require('path');
 const _ = require('./lodash.js');
 
-/** @typedef {Partial<LHCI.AssertCommand.Options & LHCI.CollectCommand.Options & LHCI.ReportCommand.Options & LHCI.ServerCommand.Options & {extends?: string | undefined}>} YargsOptions */
+/** @typedef {Partial<LHCI.AssertCommand.Options & LHCI.CollectCommand.Options & LHCI.UploadCommand.Options & LHCI.ServerCommand.Options & {extends?: string | undefined}>} YargsOptions */
 
 /**
  * @param {string} pathToRcFile
@@ -31,7 +31,7 @@ function loadAndParseRcFile(pathToRcFile) {
 function convertRcFileToYargsOptions(rcFile, pathToRcFile) {
   const {ci = {}} = rcFile;
   /** @type {YargsOptions} */
-  let merged = {...ci.assert, ...ci.collect, ...ci.report, ...ci.server};
+  let merged = {...ci.assert, ...ci.collect, ...ci.upload, ...ci.server};
   if (ci.extends) {
     const extendedRcFilePath = path.resolve(path.dirname(pathToRcFile), ci.extends);
     const extensionBase = loadAndParseRcFile(extendedRcFilePath);

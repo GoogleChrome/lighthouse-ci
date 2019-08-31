@@ -104,12 +104,12 @@ describe('Lighthouse CI CLI', () => {
     }, 60000);
   });
 
-  describe('report', () => {
+  describe('upload', () => {
     let uuids;
     it('should read LHRs from folders', () => {
       let {stdout = '', stderr = '', status = -1} = spawnSync(
         CLI_PATH,
-        ['report', `--serverBaseUrl=http://localhost:${serverPort}`],
+        ['upload', `--serverBaseUrl=http://localhost:${serverPort}`],
         {env: {...process.env, LHCI_TOKEN: projectToken}}
       );
 

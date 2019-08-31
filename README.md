@@ -22,10 +22,10 @@ lighthouse-ci collect --numberOfRuns=5 --url=https://example.com
 
 Runs Lighthouse `N` times and stores the LHRs in a local `.lighthouseci/` folder, similar to the way test coverage tools operate.
 
-### `report`
+### `upload`
 
 ```bash
-lighthouse-ci report
+lighthouse-ci upload
 ```
 
 Saves all the runs in the `.lighthouseci/` folder to the server as a single build, similar to a Coveralls/CodeCov upload step. In the future, I imagine this can also return the results of the server's assertions against the parent hash.
@@ -73,7 +73,7 @@ lighthouse-ci --rc-file=path/to/different/rc/file <command>
     "collect": {
       "numberOfRuns": 2
     },
-    "report": {
+    "upload": {
       "serverBaseUrl": "http://localhost:9009"
     },
     "server": {

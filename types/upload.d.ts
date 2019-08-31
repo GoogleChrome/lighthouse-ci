@@ -6,7 +6,7 @@
 
 declare global {
   namespace LHCI {
-    namespace ReportCommand {
+    namespace UploadCommand {
       export interface Options {
         token: string;
         serverBaseUrl: string;

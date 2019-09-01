@@ -13,5 +13,5 @@
     "esModuleInterop": true,
     "diagnostics": true
   },
-  "include": ["src/**/*.js", "types/**/*.ts", "src/**/*.jsx", "scripts/*.js"]
+  "include": ["packages/*/src/**/*.js", "types/**/*.ts", "packages/*/src/**/*.jsx", "scripts/*.js"]
 }

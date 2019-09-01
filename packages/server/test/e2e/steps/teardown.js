@@ -7,7 +7,7 @@
 
 /* eslint-env jest */
 
-const {cleanup} = require('../../test-utils');
+const {cleanup} = require('../../test-utils.js');
 
 module.exports = state => {
   describe('teardown', () => {

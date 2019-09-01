@@ -7,33 +7,37 @@
 
 /* eslint-env jest */
 
+const fs = require('fs');
 const path = require('path');
 const {spawn, spawnSync} = require('child_process');
 const fetch = require('isomorphic-fetch');
 const log = require('lighthouse-logger');
 const puppeteer = require('puppeteer');
-const {startServer, cleanup, waitForCondition, CLI_PATH} = require('./test-utils.js');
+const {startServer, waitForCondition, CLI_PATH} = require('./test-utils.js');
 
 describe('Lighthouse CI CLI', () => {
-  const sqlFile = 'cli-test.tmp.sql';
   const rcFile = path.join(__dirname, 'fixtures/lighthouserc.json');
   const rcExtendedFile = path.join(__dirname, 'fixtures/lighthouserc-extended.json');
 
-  let serverPort;
+  let server;
   let projectToken;
   let urlToCollect;
 
-  afterAll(cleanup);
+  afterAll(() => {
+    if (server) {
+      server.process.kill();
+      if (fs.existsSync(server.sqlFile)) fs.unlinkSync(server.sqlFile);
+    }
+  });
 
   describe('server', () => {
     it('should bring up the server and accept requests', async () => {
-      const server = await startServer(sqlFile);
-      serverPort = server.port;
-      urlToCollect = `http://localhost:${serverPort}/app/`;
+      server = await startServer();
+      urlToCollect = `http://localhost:${server.port}/app/`;
     });
 
     it('should accept requests', async () => {
-      const response = await fetch(`http://localhost:${serverPort}/v1/projects`);
+      const response = await fetch(`http://localhost:${server.port}/v1/projects`);
       const projects = await response.json();
       expect(projects).toEqual([]);
     });
@@ -65,7 +69,7 @@ describe('Lighthouse CI CLI', () => {
       await waitForCondition(() => wizardProcess.stdoutMemory.includes('Which wizard'));
       await writeAllInputs(wizardProcess, [
         '', // Just ENTER key to select "new-project"
-        `http://localhost:${serverPort}`, // The base URL to talk to
+        `http://localhost:${server.port}`, // The base URL to talk to
         'AwesomeCIProjectName', // Project name
         'https://example.com', // External build URL
       ]);
@@ -109,7 +113,7 @@ describe('Lighthouse CI CLI', () => {
     it('should read LHRs from folders', () => {
       let {stdout = '', stderr = '', status = -1} = spawnSync(
         CLI_PATH,
-        ['upload', `--serverBaseUrl=http://localhost:${serverPort}`],
+        ['upload', `--serverBaseUrl=http://localhost:${server.port}`],
         {env: {...process.env, LHCI_TOKEN: projectToken}}
       );
 
@@ -136,7 +140,7 @@ describe('Lighthouse CI CLI', () => {
     it('should have saved lhrs to the API', async () => {
       const [projectId, buildId, runAId, runBId] = uuids;
       const response = await fetch(
-        `http://localhost:${serverPort}/v1/projects/${projectId}/builds/${buildId}/runs`
+        `http://localhost:${server.port}/v1/projects/${projectId}/builds/${buildId}/runs`
       );
 
       const runs = await response.json();
@@ -151,7 +155,7 @@ describe('Lighthouse CI CLI', () => {
     it('should have sealed the build', async () => {
       const [projectId, buildId] = uuids;
       const response = await fetch(
-        `http://localhost:${serverPort}/v1/projects/${projectId}/builds/${buildId}`
+        `http://localhost:${server.port}/v1/projects/${projectId}/builds/${buildId}`
       );
 
       const build = await response.json();
@@ -266,7 +270,7 @@ describe('Lighthouse CI CLI', () => {
 
     it('should load the page', async () => {
       page = await browser.newPage();
-      await page.goto(`http://localhost:${serverPort}/app`, {waitUntil: 'networkidle0'});
+      await page.goto(`http://localhost:${server.port}/app`, {waitUntil: 'networkidle0'});
     });
 
     it('should list the projects', async () => {

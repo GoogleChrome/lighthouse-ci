@@ -5,16 +5,7 @@
  */
 'use strict';
 
-const path = require('path');
-const createServer = require('http').createServer;
-const express = require('express');
-const morgan = require('morgan');
-const bodyParser = require('body-parser');
-const createProjectsRouter = require('./api/routes/projects');
-const StorageMethod = require('./api/storage/storage-method.js');
-const {errorMiddleware} = require('./api/express-utils.js');
-
-const DIST_FOLDER = path.join(__dirname, '../../../../dist');
+const {createServer} = require('@lhci/server');
 
 /**
  * @param {import('yargs').Argv} yargs
@@ -58,32 +49,7 @@ function buildCommand(yargs) {
  * @return {Promise<{port: number, close: () => void}>}
  */
 async function runCommand(options) {
-  const {port, storage} = options;
-
-  const storageMethod = StorageMethod.from(storage);
-  await storageMethod.initialize(storage);
-
-  const app = express();
-  if (options.logLevel !== 'silent') app.use(morgan('short'));
-
-  // 1. Support large payloads because LHRs are big.
-  // 2. Support JSON primitives because `PUT /builds/<id>/lifecycle "sealed"`
-  app.use(bodyParser.json({limit: '10mb', strict: false}));
-
-  app.use('/v1/projects', createProjectsRouter({storageMethod}));
-  app.use('/app', express.static(DIST_FOLDER));
-  app.get('/app/*', (_, res) => res.sendFile(path.join(DIST_FOLDER, 'index.html')));
-  app.use(errorMiddleware);
-
-  return new Promise(resolve => {
-    const server = createServer(app);
-    server.listen(port, () => {
-      const serverAddress = server.address();
-      const listenPort =
-        typeof serverAddress === 'string' || !serverAddress ? port : serverAddress.port;
-      resolve({port: listenPort, close: () => server.close()});
-    });
-  });
+  return createServer(options);
 }
 
 module.exports = {buildCommand, runCommand};

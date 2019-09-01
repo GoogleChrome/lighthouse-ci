@@ -9,8 +9,8 @@
 
 const fs = require('fs');
 const path = require('path');
-const ApiClient = require('../../src/server/api/client.js');
-const runServer = require('../../src/server/server.js').runCommand;
+const ApiClient = require('../src/api/client.js');
+const runServer = require('../src/server.js').createServer;
 const fetch = require('isomorphic-fetch');
 
 describe('Lighthouse CI Server', () => {

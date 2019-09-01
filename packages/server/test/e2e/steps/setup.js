@@ -11,8 +11,8 @@ const fs = require('fs');
 const path = require('path');
 const puppeteer = require('puppeteer');
 const {configureToMatchImageSnapshot} = require('jest-image-snapshot');
-const {startServer} = require('../../test-utils');
-const ApiClient = require('../../../src/server/api/client');
+const {createTestServer} = require('../../test-utils.js');
+const ApiClient = require('../../../src/api/client');
 const {writeSeedDataToApi} = require('@lhci/utils/src/seed-data/seed-data.js');
 
 const SEED_DATA_PATH = path.join(__dirname, '../../fixtures/seed-data.json');
@@ -30,7 +30,7 @@ module.exports = state => {
 
   describe('initialize', () => {
     it('should initialize a server', async () => {
-      state.server = await startServer();
+      state.server = await createTestServer();
       state.rootURL = `http://localhost:${state.server.port}`;
       state.client = new ApiClient({rootURL: state.rootURL});
     });

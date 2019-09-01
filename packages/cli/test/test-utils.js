@@ -5,18 +5,11 @@
  */
 'use strict';
 
-/* eslint-env jest, browser */
-
-const fs = require('fs');
 const path = require('path');
 const {spawn} = require('child_process');
-const preactRender = require('preact').render;
 const testingLibrary = require('@testing-library/dom');
 
 const CLI_PATH = path.join(__dirname, '../src/cli.js');
-
-const servers = [];
-const renderedComponents = new Set();
 
 async function startServer(sqlFile) {
   if (!sqlFile) {
@@ -30,9 +23,7 @@ async function startServer(sqlFile) {
   await waitForCondition(() => stdout.includes('listening'));
 
   const port = stdout.match(/port (\d+)/)[1];
-  const server = {port, process: serverProcess, sqlFile};
-  servers.push(server);
-  return server;
+  return {port, process: serverProcess, sqlFile};
 }
 
 function waitForCondition(fn, label) {
@@ -41,58 +32,8 @@ function waitForCondition(fn, label) {
   });
 }
 
-function render(preactNodeToRender, {container} = {}) {
-  if (!container) {
-    container = document.body.appendChild(document.createElement('div'));
-  }
-
-  renderedComponents.add(container);
-  preactRender(preactNodeToRender, container);
-
-  return {
-    container,
-    ...testingLibrary.getQueriesForElement(container),
-  };
-}
-
-function cleanup() {
-  for (const container of renderedComponents) {
-    preactRender('', document.body, container);
-  }
-
-  if (servers.length > 1) throw new Error('Cannot have multiple servers in same jest context');
-
-  for (const server of servers) {
-    if (fs.existsSync(server.sqlFile)) fs.unlinkSync(server.sqlFile);
-    server.process.kill();
-  }
-}
-
-/** @type {typeof import('@testing-library/dom').fireEvent} */
-const dispatchEvent = (...args) => testingLibrary.fireEvent(...args);
-
-Object.keys(testingLibrary.fireEvent).forEach(key => {
-  dispatchEvent[key] = (...args) => {
-    testingLibrary.fireEvent(...args);
-    return new Promise(resolve => process.nextTick(resolve));
-  };
-});
-
-const wait = testingLibrary.wait;
-
-const prettyDOM = testingLibrary.prettyDOM;
-
-/** PrettyDOM but without the color control characters. */
-const snapshotDOM = (el, maxLength) => prettyDOM(el, maxLength).replace(/\[\d{1,2}m/g, '');
-
 module.exports = {
   CLI_PATH,
   startServer,
   waitForCondition,
-  render,
-  cleanup,
-  wait,
-  dispatchEvent,
-  prettyDOM,
-  snapshotDOM,
 };

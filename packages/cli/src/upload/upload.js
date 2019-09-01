@@ -6,7 +6,7 @@
 'use strict';
 
 const childProcess = require('child_process');
-const ApiClient = require('../server/api/client.js');
+const ApiClient = require('@lhci/server').ApiClient;
 const {getSavedLHRs} = require('@lhci/utils/src/saved-reports.js');
 
 /**

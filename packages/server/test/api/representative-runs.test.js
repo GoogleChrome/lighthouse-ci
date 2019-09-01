@@ -7,7 +7,7 @@
 
 /* eslint-env jest */
 
-const {computeRepresentativeRuns} = require('../../../src/server/api/representative-runs.js');
+const {computeRepresentativeRuns} = require('../../src/api/representative-runs.js');
 
 describe('Representative Runs', () => {
   function lhr(auditNumericValues) {

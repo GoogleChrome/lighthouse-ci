@@ -7,7 +7,7 @@
 'use strict';
 
 const {loadAndParseRcFile} = require('../packages/utils/src/lighthouserc.js');
-const ApiClient = require('../packages/cli/src/server/api/client.js');
+const ApiClient = require('../packages/server').ApiClient;
 const {writeSeedDataToApi} = require('../packages/utils/src/seed-data/seed-data.js');
 
 if (process.argv.length !== 3) {

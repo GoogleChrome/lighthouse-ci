@@ -19,5 +19,8 @@
     "preact": "^10.0.0-beta.2",
     "preact-async-route": "^2.2.1",
     "preact-router": "^3.0.0"
+  },
+  "alias": {
+    "isomorphic-fetch": "clsx"
   }
 }

@@ -15,7 +15,7 @@ const createProjectsRouter = require('./api/routes/projects.js');
 const StorageMethod = require('./api/storage/storage-method.js');
 const {errorMiddleware} = require('./api/express-utils.js');
 
-const DIST_FOLDER = path.join(__dirname, '../../../dist');
+const DIST_FOLDER = path.join(__dirname, '../dist');
 
 /**
  * @param {LHCI.ServerCommand.Options} options

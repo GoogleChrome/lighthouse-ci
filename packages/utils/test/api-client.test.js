@@ -7,7 +7,7 @@
 
 /* eslint-env jest */
 
-const ApiClient = require('../../src/api/client.js');
+const ApiClient = require('../src/api-client.js');
 
 describe('Lighthouse CI API Client', () => {
   const fetchMockImpl = () => ({json: () => ({})});

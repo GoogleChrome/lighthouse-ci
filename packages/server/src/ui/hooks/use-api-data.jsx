@@ -23,7 +23,7 @@
  */
 
 import {useState, useEffect, useMemo} from 'preact/hooks';
-import ApiClient from '../../api/client.js';
+import ApiClient from '@lhci/utils/src/api-client.js';
 
 export const api = new ApiClient({
   rootURL: window.location.origin,

@@ -8,7 +8,7 @@
 const {createLHR} = require('./lhr-generator.js');
 const {createDataset} = require('./dataset-generator.js');
 
-/** @typedef {import('../../../server/src/api/client.js')} ApiClient */
+/** @typedef {import('../api-client.js')} ApiClient */
 
 /**
  * @param {ApiClient} client

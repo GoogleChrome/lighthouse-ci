@@ -9,7 +9,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const ApiClient = require('../src/api/client.js');
+const ApiClient = require('@lhci/utils/src/api-client.js');
 const runServer = require('../src/server.js').createServer;
 const fetch = require('isomorphic-fetch');
 

@@ -19,7 +19,7 @@ const DIST_FOLDER = path.join(__dirname, '../dist');
 
 /**
  * @param {LHCI.ServerCommand.Options} options
- * @return {Promise<Parameters<typeof createHttpServer>[0]>}
+ * @return {Promise<Parameters<typeof createHttpServer>[1]>}
  */
 async function createApp(options) {
   const {storage} = options;

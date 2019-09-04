@@ -148,13 +148,17 @@ function createLHR(pageUrl, auditDefs, prandom) {
     };
   }
 
+  const fetchTimeBase = new Date('2019-08-01T12:00:00').getTime();
+  const fetchTimeOffset = Math.round(prandom.next() * 1000 * 60 * 60 * 24 * 7);
+  const fetchTime = new Date(fetchTimeBase + fetchTimeOffset).toISOString();
+
   return {
     requestedUrl: pageUrl,
     finalUrl: pageUrl,
     categories,
     audits,
 
-    fetchTime: new Date().toISOString(),
+    fetchTime,
     lighthouseVersion: '5.2.0',
     configSettings: {channel: 'cli'},
     categoryGroups: {

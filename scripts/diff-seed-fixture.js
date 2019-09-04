@@ -6,21 +6,23 @@
  */
 'use strict';
 
-const {loadAndParseRcFile} = require('../packages/utils/src/lighthouserc.js');
-const ApiClient = require('../packages/utils/src/api-client.js');
-const {writeSeedDataToApi} = require('../packages/utils/src/seed-data/seed-data.js');
+const fs = require('fs');
+const path = require('path');
+const {createDataset} = require('../packages/utils/src/seed-data/seed-data.js');
 
-if (process.argv.length !== 3) {
-  process.stderr.write(`Usage ./scripts/seed-database.js <path to rc file>`);
-  process.exit(1);
-}
+const FIXTURE_PATH = path.join(__dirname, '../packages/server/test/fixtures/seed-data.json');
 
-async function run() {
-  const {serverBaseUrl} = loadAndParseRcFile(process.argv[2]);
-  if (!serverBaseUrl) throw new Error('RC file did not set the serverBaseUrl');
+function run() {
+  const existingContents = JSON.parse(fs.readFileSync(FIXTURE_PATH, 'utf8'));
+  const newContents = createDataset();
 
-  const api = new ApiClient({rootURL: serverBaseUrl});
-  await writeSeedDataToApi(api);
+  newContents.runs.forEach((newRun, i) => {
+    const oldRun = existingContents.runs[i];
+
+    it('should match the lhr', () => {
+      expect(JSON.parse(newRun.lhr)).toEqual(JSON.parse(oldRun.lhr));
+    });
+  });
 }
 
 run();

@@ -10,7 +10,7 @@ const fs = require('fs');
 const path = require('path');
 const {createDataset} = require('../packages/utils/src/seed-data/seed-data.js');
 
-const FIXTURE_PATH = path.join(__dirname, '../test/fixtures/seed-data.json');
+const FIXTURE_PATH = path.join(__dirname, '../packages/server/test/fixtures/seed-data.json');
 
 function run() {
   fs.writeFileSync(FIXTURE_PATH, JSON.stringify(createDataset(), null, 2));

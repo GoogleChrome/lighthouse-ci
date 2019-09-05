@@ -16,7 +16,20 @@ describe('#findAuditDiffs', () => {
     expect(findAuditDiffs(baseAudit, compareAudit)).toEqual([]);
   });
 
-  it('should find a score diff', () => {
+  it('should find error diffs', () => {
+    const baseAudit = {id: 'audit', score: null};
+    const compareAudit = {id: 'audit', score: 0.5};
+    expect(findAuditDiffs(baseAudit, compareAudit)).toEqual([
+      {
+        auditId: 'audit',
+        type: 'error',
+        baseValue: NaN,
+        compareValue: 0.5,
+      },
+    ]);
+  });
+
+  it('should find score diffs', () => {
     const baseAudit = {id: 'audit', score: 0.8};
     const compareAudit = {id: 'audit', score: 0.4};
     expect(findAuditDiffs(baseAudit, compareAudit)).toEqual([
@@ -24,6 +37,15 @@ describe('#findAuditDiffs', () => {
         auditId: 'audit',
         type: 'score',
         baseValue: 0.8,
+        compareValue: 0.4,
+      },
+    ]);
+
+    expect(findAuditDiffs({...baseAudit, score: 0.95}, compareAudit)).toEqual([
+      {
+        auditId: 'audit',
+        type: 'score',
+        baseValue: 0.95,
         compareValue: 0.4,
       },
     ]);

@@ -9,6 +9,14 @@ const _ = require('./lodash.js');
 
 /** @typedef {{item: Record<string, any>, kind: string, index: number}} DetailItemEntry */
 
+/** @param {number|null|undefined} score */
+function getScoreLevel(score) {
+  if (typeof score !== 'number') return 'error';
+  if (score >= 0.9) return 'pass';
+  if (score >= 0.5) return 'average';
+  return 'fail';
+}
+
 /**
  * @param {LHCI.NumericAuditDiff | LHCI.NumericItemAuditDiff} diff
  */
@@ -161,7 +169,7 @@ function findAuditDetailItemsDiffs(auditId, baseItems, compareItems) {
 /**
  * @param {LH.AuditResult} baseAudit
  * @param {LH.AuditResult} compareAudit
- * @param {{percentAbsoluteDeltaThreshold?: number}} options
+ * @param {{forceAllScoreDiffs?: boolean, percentAbsoluteDeltaThreshold?: number}} options
  * @return {Array<LHCI.AuditDiff>}
  */
 function findAuditDiffs(baseAudit, compareAudit, options = {}) {
@@ -209,13 +217,19 @@ function findAuditDiffs(baseAudit, compareAudit, options = {}) {
     diffs.push(...findAuditDetailItemsDiffs(auditId, baseItems, compareItems));
   }
 
-  return diffs.filter(
-    diff =>
-      diff.type === 'error' ||
-      diff.type === 'itemAddition' ||
-      diff.type === 'itemRemoval' ||
-      getDeltaStats(diff).percentAbsoluteDelta > percentAbsoluteDeltaThreshold
-  );
+  return diffs.filter(diff => {
+    // Errors are always surfaced.
+    if (diff.type === 'error') return true;
+    // Additions and removals are always surfaced.
+    if (diff.type === 'itemAddition' || diff.type === 'itemRemoval') return true;
+    // If it's a score and we're not forcing all score diffs, only flag level changes.
+    if (diff.type === 'score' && !options.forceAllScoreDiffs) {
+      return getScoreLevel(diff.baseValue) !== getScoreLevel(diff.compareValue);
+    }
+
+    // Default to just ensuring the percent delta is above our threshold.
+    return getDeltaStats(diff).percentAbsoluteDelta > percentAbsoluteDeltaThreshold;
+  });
 }
 
 module.exports = {findAuditDiffs, findAuditDetailItemsDiffs};

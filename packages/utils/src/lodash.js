@@ -49,6 +49,27 @@ function kebabCase(s) {
   return s.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
 }
 
+/**
+ * @template TKey
+ * @template TValue
+ * @param {Array<TValue>} items
+ * @param {(item: TValue) => TKey} keyFn
+ * @return {Map<TKey, Array<TValue>>}
+ */
+function groupIntoMap(items, keyFn) {
+  /** @type {Map<TKey, Array<TValue>>} */
+  const groups = new Map();
+
+  for (const item of items) {
+    const key = keyFn(item);
+    const group = groups.get(key) || [];
+    group.push(item);
+    groups.set(key, group);
+  }
+
+  return groups;
+}
+
 module.exports = {
   merge,
   kebabCase,
@@ -93,18 +114,9 @@ module.exports = {
    * @return {Array<Array<T>>}
    */
   groupBy(items, keyFn) {
-    /** @type {Map<any, Array<T>>} */
-    const groups = new Map();
-
-    for (const item of items) {
-      const key = keyFn(item);
-      const group = groups.get(key) || [];
-      group.push(item);
-      groups.set(key, group);
-    }
-
-    return [...groups.values()];
+    return [...groupIntoMap(items, keyFn).values()];
   },
+  groupIntoMap,
   /**
    * @template T
    * @param {T} object

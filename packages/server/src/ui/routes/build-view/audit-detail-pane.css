@@ -10,6 +10,7 @@
   right: 0;
   left: 50%;
   bottom: 0;
+  z-index: 5;
 
   overflow: auto;
 

@@ -7,7 +7,7 @@
 
 /* eslint-env jest */
 
-const {findAuditDiffs} = require('@lhci/utils/src/audit-diff-finder.js');
+const {findAuditDiffs, getDiffSeverity} = require('@lhci/utils/src/audit-diff-finder.js');
 
 describe('#findAuditDiffs', () => {
   it('should return empty array for identical audits', () => {
@@ -185,6 +185,100 @@ describe('#findAuditDiffs', () => {
         auditId: 'audit',
         type: 'itemAddition',
         compareItemIndex: 0,
+      },
+    ]);
+  });
+});
+
+describe('#getDiffSeverity', () => {
+  it('should sort the diffs in order of severity', () => {
+    const baseAudit = {
+      id: 'audit',
+      score: 0.9,
+      numericValue: 1000,
+      details: {items: [{url: 'urlA', wastedMs: 2000}, {url: 'urlB', wastedKb: 2000e3}]},
+    };
+
+    const compareAuditA = {
+      id: 'audit',
+      score: 0.7,
+      numericValue: 1100,
+      details: {items: [{url: 'urlA', wastedMs: 2500}, {url: 'urlD', wastedKb: 70e3}]},
+    };
+
+    const compareAuditB = {
+      id: 'audit',
+      score: 0.2,
+      numericValue: 400,
+      details: {items: [{url: 'urlA', wastedMs: 1200}, {url: 'urlB', wastedKb: 1800e3}]},
+    };
+
+    const diffs = [
+      ...findAuditDiffs(baseAudit, compareAuditA),
+      ...findAuditDiffs(baseAudit, compareAuditB),
+    ].sort((a, b) => getDiffSeverity(b) - getDiffSeverity(a));
+
+    expect(diffs).toMatchInlineSnapshot([
+      {
+        auditId: 'audit',
+        baseValue: 0.9,
+        compareValue: 0.2,
+        type: 'score',
+      },
+      {
+        auditId: 'audit',
+        baseValue: 0.9,
+        compareValue: 0.7,
+        type: 'score',
+      },
+      {
+        auditId: 'audit',
+        baseValue: 1000,
+        compareValue: 1100,
+        type: 'numericValue',
+      },
+      {
+        auditId: 'audit',
+        baseValue: 1000,
+        compareValue: 400,
+        type: 'numericValue',
+      },
+      {
+        auditId: 'audit',
+        baseItemIndex: 1,
+        type: 'itemRemoval',
+      },
+      {
+        auditId: 'audit',
+        compareItemIndex: 1,
+        type: 'itemAddition',
+      },
+      {
+        auditId: 'audit',
+        baseItemIndex: 1,
+        baseValue: 2000000,
+        compareItemIndex: 1,
+        compareValue: 1800000,
+        itemKey: 'wastedKb',
+        type: 'itemDelta',
+      },
+      {
+        auditId: 'audit',
+        baseItemIndex: 0,
+        baseValue: 2000,
+        compareItemIndex: 0,
+        compareValue: 1200,
+        itemKey: 'wastedMs',
+        type: 'itemDelta',
+      },
+      {
+        auditId: 'audit',
+        baseItemIndex: 0,
+        baseValue: 2000,
+        compareItemIndex: 0,
+        compareValue: 2500,
+        itemKey: 'wastedMs',
+        type: 'itemDelta',
       },
     ]);
   });

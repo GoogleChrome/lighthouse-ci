@@ -9,12 +9,32 @@ const _ = require('./lodash.js');
 
 /** @typedef {{item: Record<string, any>, kind: string, index: number}} DetailItemEntry */
 
+/**
+ * @param {LHCI.AuditDiff} diff
+ * @return {diff is LHCI.NumericAuditDiff|LHCI.NumericItemAuditDiff} */
+function isNumericAuditDiff(diff) {
+  return ['score', 'numericValue', 'itemCount', 'itemDelta'].includes(diff.type);
+}
+
 /** @param {number|null|undefined} score */
 function getScoreLevel(score) {
   if (typeof score !== 'number') return 'error';
   if (score >= 0.9) return 'pass';
   if (score >= 0.5) return 'average';
   return 'fail';
+}
+
+/** @param {LHCI.AuditDiff} diff */
+function getDiffSeverity(diff) {
+  const delta = isNumericAuditDiff(diff) ? Math.abs(diff.baseValue - diff.compareValue) : 0;
+  if (diff.type === 'error') return 1e12;
+  if (diff.type === 'score') return 1e10 * delta;
+  if (diff.type === 'numericValue') return 1e8 * Math.max(delta / 1000, 1);
+  if (diff.type === 'itemCount') return 1e6 * delta;
+  if (diff.type === 'itemAddition') return 1e5;
+  if (diff.type === 'itemRemoval') return 1e5;
+  if (diff.type === 'itemDelta') return Math.min(Math.max(delta / 100, 1), 1e5 - 1);
+  return 0;
 }
 
 /**
@@ -232,4 +252,4 @@ function findAuditDiffs(baseAudit, compareAudit, options = {}) {
   });
 }
 
-module.exports = {findAuditDiffs, findAuditDetailItemsDiffs};
+module.exports = {findAuditDiffs, getDiffSeverity};

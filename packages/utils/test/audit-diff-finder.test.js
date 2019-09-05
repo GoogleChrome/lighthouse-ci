@@ -16,7 +16,7 @@ describe('#findAuditDiffs', () => {
     expect(findAuditDiffs(baseAudit, compareAudit)).toEqual([]);
   });
 
-  it('should return find a score diff', () => {
+  it('should find a score diff', () => {
     const baseAudit = {id: 'audit', score: 0.8};
     const compareAudit = {id: 'audit', score: 0.4};
     expect(findAuditDiffs(baseAudit, compareAudit)).toEqual([
@@ -29,20 +29,23 @@ describe('#findAuditDiffs', () => {
     ]);
   });
 
-  it('should return find a score diff', () => {
-    const baseAudit = {id: 'audit', score: 0.8};
-    const compareAudit = {id: 'audit', score: 0.4};
+  it('should ignore diffs below a certain threshold', () => {
+    const baseAudit = {id: 'audit', score: 0.8, numericValue: 100};
+    const compareAudit = {id: 'audit', score: 0.8, numericValue: 101};
     expect(findAuditDiffs(baseAudit, compareAudit)).toEqual([
       {
         auditId: 'audit',
-        type: 'score',
-        baseValue: 0.8,
-        compareValue: 0.4,
+        type: 'numericValue',
+        baseValue: 100,
+        compareValue: 101,
       },
     ]);
+
+    const options = {percentAbsoluteDeltaThreshold: 0.05};
+    expect(findAuditDiffs(baseAudit, compareAudit, options)).toEqual([]);
   });
 
-  it('should return find a numericValue diff', () => {
+  it('should find a numericValue diff', () => {
     const baseAudit = {id: 'audit', score: 0.4, numericValue: 3200};
     const compareAudit = {id: 'audit', score: 0.7, numericValue: 1600};
     expect(findAuditDiffs(baseAudit, compareAudit)).toEqual([
@@ -61,7 +64,7 @@ describe('#findAuditDiffs', () => {
     ]);
   });
 
-  it('should return find a details item addition diff', () => {
+  it('should find a details item addition diff', () => {
     const detailsItem = {url: 'http://example.com/foo.js'};
     const baseAudit = {id: 'audit', score: 0.5, details: {items: []}};
     const compareAudit = {id: 'audit', score: 0.5, details: {items: [detailsItem]}};
@@ -81,7 +84,7 @@ describe('#findAuditDiffs', () => {
     ]);
   });
 
-  it('should return find a details item removal diff', () => {
+  it('should find a details item removal diff', () => {
     const detailsItem = {url: 'http://example.com/foo.js'};
     const baseAudit = {id: 'audit', score: 0.5, details: {items: [detailsItem]}};
     const compareAudit = {id: 'audit', score: 0.5, details: {items: []}};
@@ -101,7 +104,7 @@ describe('#findAuditDiffs', () => {
     ]);
   });
 
-  it('should return find a details item property diff', () => {
+  it('should find a details item property diff', () => {
     const detailsItem = {url: 'http://example.com/foo.js'};
     const baseAudit = {
       id: 'audit',
@@ -133,6 +136,33 @@ describe('#findAuditDiffs', () => {
         compareItemIndex: 0,
         baseValue: 50,
         compareValue: 51,
+      },
+    ]);
+  });
+
+  it('should find a details item addition/removal diff', () => {
+    const baseAudit = {
+      id: 'audit',
+      score: 0.5,
+      details: {items: [{url: 'http://example.com/foo.js'}]},
+    };
+
+    const compareAudit = {
+      id: 'audit',
+      score: 0.5,
+      details: {items: [{url: 'http://example.com/foo2.js'}]},
+    };
+
+    expect(findAuditDiffs(baseAudit, compareAudit)).toEqual([
+      {
+        auditId: 'audit',
+        type: 'itemRemoval',
+        baseItemIndex: 0,
+      },
+      {
+        auditId: 'audit',
+        type: 'itemAddition',
+        compareItemIndex: 0,
       },
     ]);
   });

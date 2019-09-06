@@ -10,14 +10,12 @@ import clsx from 'clsx';
 import {usePreviousValue} from '../../hooks/use-previous-value';
 import {useEffect, useRef} from 'preact/hooks';
 
-/** @param {{audit: LH.AuditResult, selectedAuditId: string|null, key?: string}} props */
+/** @param {{audit: LH.AuditResult, baseAudit?: LH.AuditResult, key?: string}} props */
 const Audit = props => {
   return (
     <div
       id={`audit-detail-pane-audit--${props.audit.id}`}
-      className={clsx('audit-detail-pane__audit', {
-        'audit-detail-pane__audit--selected': props.selectedAuditId === props.audit.id,
-      })}
+      className={clsx('audit-detail-pane__audit')}
     >
       <div className="audit-detail-pane__audit-title">{props.audit.title}</div>
       <div className="audit-detail-pane__audit-description">{props.audit.description}</div>
@@ -27,7 +25,7 @@ const Audit = props => {
 };
 
 /**
- * @param {{selectedAuditId: string, setSelectedAuditId: (id: string|null) => void, lhr: LH.Result, baseLhr?: LH.Result}} props
+ * @param {{selectedAuditId: string, setSelectedAuditId: (id: string|null) => void, audits: Array<LH.AuditResult>, baseLhr?: LH.Result}} props
  */
 export const AuditDetailPane = props => {
   /** @type {import('preact').Ref<HTMLElement|undefined>} */
@@ -51,8 +49,12 @@ export const AuditDetailPane = props => {
       <div className="audit-detail-pane__close" onClick={() => props.setSelectedAuditId(null)}>
         x
       </div>
-      {Object.entries(props.lhr.audits).map(([id, audit]) => {
-        return <Audit key={id} audit={{...audit, id}} selectedAuditId={props.selectedAuditId} />;
+      {props.audits.map(audit => {
+        const id = audit.id;
+        const baseAudit = props.baseLhr ? props.baseLhr.audits[id] : undefined;
+        return (
+          <Audit key={id} audit={{...audit, id}} baseAudit={baseAudit && {...baseAudit, id}} />
+        );
       })}
     </div>
   );

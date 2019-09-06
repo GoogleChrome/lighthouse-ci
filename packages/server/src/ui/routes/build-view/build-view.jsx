@@ -25,6 +25,57 @@ import {AuditGroup} from './audit-group';
 import './build-view.css';
 import {BuildViewLegend} from './build-view-legend';
 import clsx from 'clsx';
+import {findAuditDiffs, getDiffSeverity} from '@lhci/utils/src/audit-diff-finder';
+
+/**
+ * @param {LH.Result} lhr
+ * @param {LH.Result|undefined} baseLhr
+ * @return {Array<AuditGroupDef>}
+ */
+function computeAuditGroups(lhr, baseLhr) {
+  /** @type {Array<AuditGroupDef|undefined>} */
+  const rawAuditGroups = Object.values(lhr.categories)
+    .map(category => {
+      const auditRefsGroupedByGroup = _.groupBy(category.auditRefs, ref => ref.group);
+      return auditRefsGroupedByGroup.map(auditRefGroup => {
+        const groupId = auditRefGroup[0].group || '';
+        const group = lhr.categoryGroups && lhr.categoryGroups[groupId];
+        if (!group) return;
+
+        const audits = auditRefGroup
+          .map(ref => ({...lhr.audits[ref.id], id: ref.id}))
+          .sort((a, b) => (a.score || 0) - (b.score || 0));
+        return {id: groupId, group, audits};
+      });
+    })
+    .reduce((a, b) => a.concat(b));
+
+  /** @type {Array<AuditGroupDef>} */
+  const auditGroups = [];
+
+  for (const auditGroup of rawAuditGroups) {
+    if (!auditGroup) continue;
+
+    const auditPairs = auditGroup.audits
+      .map(audit => {
+        const baseAudit = baseLhr && baseLhr.audits[audit.id || ''];
+        const diffs = baseAudit ? findAuditDiffs(baseAudit, audit) : [];
+        const maxSeverity = Math.max(...diffs.map(getDiffSeverity), 0);
+        return {audit, baseAudit, diffs, maxSeverity};
+      })
+      .filter(pair => !pair.baseAudit || pair.diffs.length);
+
+    auditGroup.audits = auditPairs
+      .sort((a, b) => b.maxSeverity - a.maxSeverity)
+      .map(pair => pair.audit);
+
+    if (auditGroup.audits.length) auditGroups.push(auditGroup);
+  }
+
+  return auditGroups;
+}
+
+/** @typedef {{id: string, audits: Array<LH.AuditResult>, group: {title: string}}} AuditGroupDef */
 
 /** @param {{selectedUrl: string, setUrl(url: string): void, build: LHCI.ServerCommand.Build | null, lhr?: LH.Result, baseLhr?: LH.Result, urls: Array<{url: string}>}} props */
 const BuildViewScoreAndUrl = props => {
@@ -43,27 +94,11 @@ const BuildViewScoreAndUrl = props => {
   );
 };
 
-/** @param {{lhr: LH.Result, baseLhr?: LH.Result, selectedAuditId: string|null, setSelectedAuditId: (id: string|null) => void}} props */
+/** @param {{auditGroups: Array<AuditGroupDef|undefined>, baseLhr?: LH.Result, selectedAuditId: string|null, setSelectedAuditId: (id: string|null) => void}} props */
 const AuditGroups = props => {
-  const auditGroups = Object.values(props.lhr.categories)
-    .map(category => {
-      const auditRefsGroupedByGroup = _.groupBy(category.auditRefs, ref => ref.group);
-      return auditRefsGroupedByGroup.map(auditRefGroup => {
-        const groupId = auditRefGroup[0].group || '';
-        const group = props.lhr.categoryGroups && props.lhr.categoryGroups[groupId];
-        if (!group) return;
-
-        const audits = auditRefGroup
-          .map(ref => ({...props.lhr.audits[ref.id], id: ref.id}))
-          .sort((a, b) => (a.score || 0) - (b.score || 0));
-        return {id: groupId, group, audits};
-      });
-    })
-    .reduce((a, b) => a.concat(b));
-
   return (
     <div className="build-view__audit-groups">
-      {auditGroups.map(auditGroup => {
+      {props.auditGroups.map(auditGroup => {
         if (!auditGroup) return undefined;
         return (
           <AuditGroup
@@ -122,6 +157,8 @@ const BuildView_ = props => {
     );
   }
 
+  const auditGroups = computeAuditGroups(lhr, baseLhr);
+
   return (
     <Page
       header={
@@ -135,7 +172,7 @@ const BuildView_ = props => {
         <AuditDetailPane
           selectedAuditId={selectedAuditId}
           setSelectedAuditId={setAuditId}
-          lhr={lhr}
+          audits={auditGroups.map(group => group.audits).reduce((a, b) => a.concat(b))}
           baseLhr={baseLhr}
         />
       )) || <Fragment />}
@@ -156,7 +193,7 @@ const BuildView_ = props => {
         <div className="container">
           <BuildViewLegend />
           <AuditGroups
-            lhr={lhr}
+            auditGroups={auditGroups}
             baseLhr={baseLhr}
             selectedAuditId={selectedAuditId}
             setSelectedAuditId={setAuditId}

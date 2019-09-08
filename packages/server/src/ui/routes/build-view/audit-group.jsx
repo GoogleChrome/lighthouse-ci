@@ -9,6 +9,31 @@ import './audit-group.css';
 import {Paper} from '../../components/paper';
 import clsx from 'clsx';
 
+/** @param {number} x @param {'up'|'down'} direction */
+const toNearestRoundNumber = (x, direction) => {
+  const fn = direction === 'up' ? Math.ceil : Math.floor;
+  if (x < 10) return fn(x);
+  if (x < 100) return fn(x / 10) * 10;
+  if (x < 1000) return fn(x / 100) * 100;
+  if (x < 10000) return fn(x / 1000) * 1000;
+  return fn(x / 2500) * 2500;
+};
+
+/** @param {number} x */
+const toDisplay = x => {
+  let value = x;
+  let fractionDigits = 1;
+  if (Math.abs(x) >= 100) {
+    fractionDigits = 0;
+    value = Math.round(value * 10) / 10;
+  }
+
+  return value.toLocaleString(undefined, {
+    minimumFractionDigits: fractionDigits,
+    maximumFractionDigits: fractionDigits,
+  });
+};
+
 /** @param {{audit: LH.AuditResult, baseAudit?: LH.AuditResult}} props */
 const StandardDiff = props => {
   if (!props.baseAudit) return <span>No diff available</span>;
@@ -18,6 +43,59 @@ const StandardDiff = props => {
       <ScoreIcon audit={props.baseAudit} />
       <span className="audit-group__diff-arrow">→</span>
       <ScoreIcon audit={props.audit} />
+    </Fragment>
+  );
+};
+
+/** @param {{audit: LH.AuditResult, baseAudit?: LH.AuditResult}} props */
+const NumericDiff = props => {
+  const {audit, baseAudit} = props;
+  if (
+    !baseAudit ||
+    typeof baseAudit.numericValue !== 'number' ||
+    typeof audit.numericValue !== 'number'
+  ) {
+    return <span>No diff available</span>;
+  }
+
+  const delta = audit.numericValue - baseAudit.numericValue;
+  const minValue = Math.min(audit.numericValue, baseAudit.numericValue);
+  const maxValue = Math.max(audit.numericValue, baseAudit.numericValue);
+  const lowerLimit = toNearestRoundNumber(minValue * 0.8, 'down');
+  const upperLimit = toNearestRoundNumber(maxValue * 1.2, 'up');
+  const range = upperLimit - lowerLimit;
+
+  const boxLeft = (100 * (minValue - lowerLimit)) / range;
+  const boxRight = 100 - (100 * (maxValue - lowerLimit)) / range;
+  const deltaType = delta < 0 ? 'regression' : 'improvement';
+
+  return (
+    <Fragment>
+      <div className="audit-numeric-diff">
+        <div className="audit-numeric-diff__left-label">{toDisplay(lowerLimit)}</div>
+        <div className="audit-numeric-diff__bar">
+          <div
+            className={clsx('audit-numeric-diff__box', {
+              'audit-numeric-diff__box--improvement': deltaType === 'improvement',
+              'audit-numeric-diff__box--regression': deltaType === 'regression',
+            })}
+            style={{left: `${boxLeft}%`, right: `${boxRight}%`}}
+            title={`${toDisplay(baseAudit.numericValue)} -> ${toDisplay(audit.numericValue)}`}
+          >
+            <div
+              className="audit-numeric-diff__now"
+              style={{left: deltaType === 'improvement' ? '100%' : '0%'}}
+            />
+            <div
+              className="audit-numeric-diff__delta-label"
+              style={{[deltaType === 'improvement' ? 'left' : 'right']: '100%'}}
+            >
+              {toDisplay(delta)}
+            </div>
+          </div>
+        </div>
+        <div className="audit-numeric-diff__right-label">{toDisplay(upperLimit)}</div>
+      </div>
     </Fragment>
   );
 };
@@ -34,7 +112,7 @@ const ScoreIcon = props => {
  * @param {{key?: string, group: {title: string}, selectedAuditId: string|null, setSelectedAuditId: (id: string|null) => void, audits: Array<LH.AuditResult>, baseLhr?: LH.Result, variant?: 'standard'|'numeric'}} props
  */
 export const AuditGroup = props => {
-  const {group, audits, baseLhr} = props;
+  const {group, audits, baseLhr, variant} = props;
 
   return (
     <Paper className="audit-group">
@@ -56,7 +134,11 @@ export const AuditGroup = props => {
               </div>
               <div className="audit-group__audit-title">{audit.title}</div>
               <div className="audit-group__audit-diff">
-                <StandardDiff audit={audit} baseAudit={baseAudit} />
+                {variant === 'numeric' ? (
+                  <NumericDiff audit={audit} baseAudit={baseAudit} />
+                ) : (
+                  <StandardDiff audit={audit} baseAudit={baseAudit} />
+                )}
               </div>
             </div>
           );

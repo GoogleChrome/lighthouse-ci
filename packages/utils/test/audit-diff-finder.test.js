@@ -218,7 +218,7 @@ describe('#getDiffSeverity', () => {
       ...findAuditDiffs(baseAudit, compareAuditB),
     ].sort((a, b) => getDiffSeverity(b) - getDiffSeverity(a));
 
-    expect(diffs).toMatchInlineSnapshot([
+    expect(diffs).toEqual([
       {
         auditId: 'audit',
         baseValue: 0.9,

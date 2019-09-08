@@ -50,3 +50,73 @@
   margin: 0 var(--base-spacing);
   font-weight: var(--medium-font-weight);
 }
+
+.audit-numeric-diff {
+  display: flex;
+  flex-direction: row;
+  font-family: var(--monospace-font-family);
+}
+
+.audit-numeric-diff__bar {
+  position: relative;
+  width: 200px;
+  background: var(--secondary-background-color);
+  margin: 0 var(--base-spacing);
+}
+
+.audit-numeric-diff__box {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+}
+
+.audit-numeric-diff__box--improvement {
+  color: var(--improvement-color);
+  background: repeating-linear-gradient(
+    60deg,
+    var(--improvement-color),
+    var(--improvement-color) 2px,
+    var(--secondary-background-color) 2px,
+    var(--secondary-background-color) 4px
+  );
+}
+.audit-numeric-diff__box--regression {
+  color: var(--regression-color);
+  background: repeating-linear-gradient(
+    60deg,
+    var(--regression-color),
+    var(--regression-color) 2px,
+    var(--secondary-background-color) 2px,
+    var(--secondary-background-color) 4px
+  );
+}
+
+.audit-numeric-diff__now {
+  position: absolute;
+  top: -2px;
+  bottom: -2px;
+  width: 2px;
+}
+
+.audit-numeric-diff__delta-label {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  padding: 0 calc(var(--base-spacing) / 2);
+  font-size: calc(var(--base-font-size) * 3 / 4);
+  line-height: calc(var(--base-font-size) * 3 / 4);
+
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.audit-numeric-diff__box--improvement .audit-numeric-diff__now {
+  background: var(--improvement-color);
+}
+.audit-numeric-diff__box--regression .audit-numeric-diff__now {
+  background: var(--regression-color);
+}
+
+.audit-numeric-diff__left-label {
+}

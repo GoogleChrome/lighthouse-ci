@@ -50,6 +50,7 @@ export const AuditDetailPane = props => {
         x
       </div>
       {props.audits.map(audit => {
+        if (!audit.id) return undefined;
         const id = audit.id;
         const baseAudit = props.baseLhr ? props.baseLhr.audits[id] : undefined;
         return (

@@ -105,7 +105,6 @@ const AuditGroups = props => {
             key={auditGroup.id}
             audits={auditGroup.audits}
             group={auditGroup.group}
-            variant={auditGroup.id === 'metrics' ? 'numeric' : 'standard'}
             baseLhr={props.baseLhr}
             selectedAuditId={props.selectedAuditId}
             setSelectedAuditId={props.setSelectedAuditId}

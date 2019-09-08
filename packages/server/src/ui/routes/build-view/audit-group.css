@@ -68,6 +68,7 @@
   position: absolute;
   top: 0;
   bottom: 0;
+  background: var(--highlighted-background-color);
 }
 
 .audit-numeric-diff__box--improvement {
@@ -116,7 +117,4 @@
 }
 .audit-numeric-diff__box--regression .audit-numeric-diff__now {
   background: var(--regression-color);
-}
-
-.audit-numeric-diff__left-label {
 }

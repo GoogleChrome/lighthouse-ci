@@ -8,6 +8,7 @@ import {h, Fragment} from 'preact';
 import './audit-group.css';
 import {Paper} from '../../components/paper';
 import clsx from 'clsx';
+import {getDeltaLabel} from '@lhci/utils/src/audit-diff-finder';
 
 /** @param {number} x @param {'up'|'down'} direction */
 const toNearestRoundNumber = (x, direction) => {
@@ -34,6 +35,14 @@ const toDisplay = x => {
   });
 };
 
+/** @param {LH.AuditResult} audit @return {number|undefined} */
+const getNumericValueForDiff = audit => {
+  const {details, numericValue} = audit;
+  if (typeof numericValue === 'number') return numericValue;
+  if (details && typeof details.overallSavingsMs === 'number') return details.overallSavingsMs;
+  return undefined;
+};
+
 /** @param {{audit: LH.AuditResult, baseAudit?: LH.AuditResult}} props */
 const StandardDiff = props => {
   if (!props.baseAudit) return <span>No diff available</span>;
@@ -50,24 +59,24 @@ const StandardDiff = props => {
 /** @param {{audit: LH.AuditResult, baseAudit?: LH.AuditResult}} props */
 const NumericDiff = props => {
   const {audit, baseAudit} = props;
-  if (
-    !baseAudit ||
-    typeof baseAudit.numericValue !== 'number' ||
-    typeof audit.numericValue !== 'number'
-  ) {
+  const currentNumericValue = getNumericValueForDiff(audit);
+  const baseNumericValue = baseAudit && getNumericValueForDiff(baseAudit);
+
+  if (typeof baseNumericValue !== 'number' || typeof currentNumericValue !== 'number') {
     return <span>No diff available</span>;
   }
 
-  const delta = audit.numericValue - baseAudit.numericValue;
-  const minValue = Math.min(audit.numericValue, baseAudit.numericValue);
-  const maxValue = Math.max(audit.numericValue, baseAudit.numericValue);
+  const delta = currentNumericValue - baseNumericValue;
+  const minValue = Math.min(currentNumericValue, baseNumericValue);
+  const maxValue = Math.max(currentNumericValue, baseNumericValue);
   const lowerLimit = toNearestRoundNumber(minValue * 0.8, 'down');
   const upperLimit = toNearestRoundNumber(maxValue * 1.2, 'up');
   const range = upperLimit - lowerLimit;
 
   const boxLeft = (100 * (minValue - lowerLimit)) / range;
   const boxRight = 100 - (100 * (maxValue - lowerLimit)) / range;
-  const deltaType = delta < 0 ? 'regression' : 'improvement';
+  const deltaType = getDeltaLabel(delta, 'audit');
+  const minValueIsCurrentValue = minValue === currentNumericValue;
 
   return (
     <Fragment>
@@ -80,15 +89,15 @@ const NumericDiff = props => {
               'audit-numeric-diff__box--regression': deltaType === 'regression',
             })}
             style={{left: `${boxLeft}%`, right: `${boxRight}%`}}
-            title={`${toDisplay(baseAudit.numericValue)} -> ${toDisplay(audit.numericValue)}`}
+            title={`${toDisplay(baseNumericValue)} -> ${toDisplay(currentNumericValue)}`}
           >
             <div
               className="audit-numeric-diff__now"
-              style={{left: deltaType === 'improvement' ? '100%' : '0%'}}
+              style={{left: minValueIsCurrentValue ? '0%' : '100%'}}
             />
             <div
               className="audit-numeric-diff__delta-label"
-              style={{[deltaType === 'improvement' ? 'left' : 'right']: '100%'}}
+              style={{[minValueIsCurrentValue ? 'right' : 'left']: '100%'}}
             >
               {toDisplay(delta)}
             </div>
@@ -134,7 +143,7 @@ export const AuditGroup = props => {
               </div>
               <div className="audit-group__audit-title">{audit.title}</div>
               <div className="audit-group__audit-diff">
-                {variant === 'numeric' ? (
+                {typeof getNumericValueForDiff(audit) === 'number' ? (
                   <NumericDiff audit={audit} baseAudit={baseAudit} />
                 ) : (
                   <StandardDiff audit={audit} baseAudit={baseAudit} />

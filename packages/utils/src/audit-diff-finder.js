@@ -10,6 +10,18 @@ const _ = require('./lodash.js');
 /** @typedef {{item: Record<string, any>, kind: string, index: number}} DetailItemEntry */
 
 /**
+ * @param {number} delta
+ * @param {'audit'|'score'} deltaType
+ * @return {'improvement'|'neutral'|'regression'}
+ */
+function getDeltaLabel(delta, deltaType = 'audit') {
+  if (delta === 0) return 'neutral';
+  let isImprovement = delta < 0;
+  if (deltaType === 'score') isImprovement = delta > 0;
+  return isImprovement ? 'improvement' : 'regression';
+}
+
+/**
  * @param {LHCI.AuditDiff} diff
  * @return {diff is LHCI.NumericAuditDiff|LHCI.NumericItemAuditDiff} */
 function isNumericAuditDiff(diff) {
@@ -252,4 +264,4 @@ function findAuditDiffs(baseAudit, compareAudit, options = {}) {
   });
 }
 
-module.exports = {findAuditDiffs, getDiffSeverity};
+module.exports = {findAuditDiffs, getDiffSeverity, getDeltaLabel};

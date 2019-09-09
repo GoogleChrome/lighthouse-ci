@@ -6,6 +6,9 @@
     "type": "git",
     "url": "https://github.com/GoogleChrome/lighthouse-ci.git"
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "dependencies": {
     "isomorphic-fetch": "^2.2.1"
   }

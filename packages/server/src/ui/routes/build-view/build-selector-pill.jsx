@@ -6,6 +6,7 @@
 
 import {h, Fragment} from 'preact';
 import './build-selector-pill.css';
+import clsx from 'clsx';
 
 /**
  *
@@ -22,11 +23,16 @@ const Selection = props => {
 };
 
 /**
- * @param {{build: LHCI.ServerCommand.Build | null, variant: 'base'|'compare'}} props
+ * @param {{build: LHCI.ServerCommand.Build | null, variant: 'base'|'compare', isOpen?: boolean, onClick?: () => void}} props
  */
 export const BuildSelectorPill = props => {
   return (
-    <div className={`build-selector-pill build-selector-pill--${props.variant}`}>
+    <div
+      className={clsx(`build-selector-pill build-selector-pill--${props.variant}`, {
+        'build-selector-pill--open': props.isOpen,
+      })}
+      onClick={props.onClick}
+    >
       <div className="build-selector-pill__variant-label">{props.variant}</div>
       {props.build ? <Selection build={props.build} /> : <span>None</span>}
     </div>

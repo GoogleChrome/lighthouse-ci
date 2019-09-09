@@ -121,6 +121,17 @@ export function useBuildURLs(projectId, buildId) {
 }
 
 /**
+ * @param {string} projectId
+ * @param {string} branch
+ * @return {[LoadingState, Array<LHCI.ServerCommand.Build> | undefined]}
+ */
+export function useBranchBuilds(projectId, branch) {
+  // Construct this options object in a `useMemo` to prevent infinitely re-requesting.
+  const getBuildsOptions = useMemo(() => ({branch}), [branch]);
+  return useApiData('getBuilds', [projectId, getBuildsOptions]);
+}
+
+/**
  * @param {string|undefined} projectId
  * @param {string|undefined} buildId
  * @param {string|null|undefined} url

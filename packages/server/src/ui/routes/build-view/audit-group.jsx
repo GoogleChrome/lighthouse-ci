@@ -121,7 +121,7 @@ const ScoreIcon = props => {
  * @param {{key?: string, group: {title: string}, selectedAuditId: string|null, setSelectedAuditId: (id: string|null) => void, audits: Array<LH.AuditResult>, baseLhr?: LH.Result, variant?: 'standard'|'numeric'}} props
  */
 export const AuditGroup = props => {
-  const {group, audits, baseLhr, variant} = props;
+  const {group, audits, baseLhr} = props;
 
   return (
     <Paper className="audit-group">

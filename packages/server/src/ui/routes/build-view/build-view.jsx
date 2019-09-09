@@ -16,6 +16,7 @@ import {
   useBuildURLs,
   useOptionalBuildRepresentativeRuns,
 } from '../../hooks/use-api-data';
+import {BuildHashSelector} from './build-hash-selector';
 import {BuildSelectorPill} from './build-selector-pill';
 import {AuditDetailPane} from './audit-detail-pane';
 import {Page} from '../../layout/page';
@@ -117,6 +118,7 @@ const AuditGroups = props => {
 
 /** @param {{project: LHCI.ServerCommand.Project, build: LHCI.ServerCommand.Build, ancestorBuild: LHCI.ServerCommand.Build | null, buildUrls: Array<{url: string}>, runs: Array<LHCI.ServerCommand.Run>}} props */
 const BuildView_ = props => {
+  const [openBuildHash, setOpenBuild] = useState(/** @type {null|'base'|'compare'} */ (null));
   const [selectedUrlState, setUrl] = useState('');
   const [selectedAuditId, setAuditId] = useState(/** @type {string|null} */ (null));
   const selectedUrl = selectedUrlState || (props.runs[0] && props.runs[0].url);
@@ -162,11 +164,28 @@ const BuildView_ = props => {
     <Page
       header={
         <Fragment>
-          <BuildSelectorPill build={props.ancestorBuild} variant="base" />
-          <BuildSelectorPill build={props.build} variant="compare" />
+          <BuildSelectorPill
+            build={props.ancestorBuild}
+            variant="base"
+            isOpen={openBuildHash === 'base'}
+            onClick={() => setOpenBuild(openBuildHash === 'base' ? null : 'base')}
+          />
+          <BuildSelectorPill
+            build={props.build}
+            variant="compare"
+            isOpen={openBuildHash === 'compare'}
+            onClick={() => setOpenBuild(openBuildHash === 'compare' ? null : 'compare')}
+          />
         </Fragment>
       }
     >
+      {(openBuildHash && (
+        <BuildHashSelector
+          build={props.build}
+          ancestorBuild={props.ancestorBuild}
+          selector={openBuildHash}
+        />
+      )) || <Fragment />}
       {(selectedAuditId && (
         <AuditDetailPane
           selectedAuditId={selectedAuditId}

@@ -19,6 +19,11 @@ class StorageMethod {
     throw new Error('Unimplemented');
   }
 
+  /** @return {Promise<void>} */
+  async close() {
+    throw new Error('Unimplemented');
+  }
+
   /**
    * @return {Promise<Array<LHCI.ServerCommand.Project>>}
    */

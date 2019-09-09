@@ -19,7 +19,7 @@ const DIST_FOLDER = path.join(__dirname, '../dist');
 
 /**
  * @param {LHCI.ServerCommand.Options} options
- * @return {Promise<Parameters<typeof createHttpServer>[1]>}
+ * @return {Promise<{app: Parameters<typeof createHttpServer>[1], storageMethod: StorageMethod}>}
  */
 async function createApp(options) {
   const {storage} = options;
@@ -39,7 +39,7 @@ async function createApp(options) {
   app.get('/app/*', (_, res) => res.sendFile(path.join(DIST_FOLDER, 'index.html')));
   app.use(errorMiddleware);
 
-  return app;
+  return {app, storageMethod};
 }
 
 /**
@@ -47,7 +47,7 @@ async function createApp(options) {
  * @return {Promise<{port: number, close: () => void}>}
  */
 async function createServer(options) {
-  const app = await createApp(options);
+  const {app, storageMethod} = await createApp(options);
 
   return new Promise(resolve => {
     const server = createHttpServer(app);
@@ -55,7 +55,14 @@ async function createServer(options) {
       const serverAddress = server.address();
       const listenPort =
         typeof serverAddress === 'string' || !serverAddress ? options.port : serverAddress.port;
-      resolve({port: listenPort, close: () => server.close()});
+
+      resolve({
+        port: listenPort,
+        close: () => {
+          server.close();
+          storageMethod.close();
+        },
+      });
     });
   });
 }

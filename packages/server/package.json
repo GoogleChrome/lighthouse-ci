@@ -3,6 +3,10 @@
   "main": "./src/server.js",
   "version": "0.1.0",
   "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/GoogleChrome/lighthouse-ci.git"
+  },
   "scripts": {
     "clean": "rm -rf ./dist",
     "build": "parcel build ./src/ui/index.html --public-url=/app",

@@ -27,6 +27,33 @@ function clone(o) {
   return JSON.parse(JSON.stringify(o));
 }
 
+/**
+ * @param {LHCI.ServerCommand.StorageOptions} options
+ */
+function createSequelize(options) {
+  const dialect = options.sqlDialect;
+  const sequelizeOptions = {
+    operatorsAliases: false,
+    logging: () => {},
+  };
+
+  if (dialect === 'sqlite') {
+    if (!options.sqlDatabasePath) throw new Error('Cannot use sqlite without a database path');
+    return new Sequelize({
+      ...sequelizeOptions,
+      dialect: 'sqlite',
+      storage: options.sqlDatabasePath,
+    });
+  }
+
+  if (!options.sqlConnectionUrl) throw new Error(`Cannot use ${dialect} without a database URL`);
+
+  return new Sequelize(options.sqlConnectionUrl, {
+    ...sequelizeOptions,
+    ssl: !!options.sqlConnectionSsl,
+  });
+}
+
 /** @typedef {LHCI.ServerCommand.TableAttributes<LHCI.ServerCommand.Project>} ProjectAttrs */
 /** @typedef {LHCI.ServerCommand.TableAttributes<LHCI.ServerCommand.Build>} BuildAttrs */
 /** @typedef {LHCI.ServerCommand.TableAttributes<LHCI.ServerCommand.Run>} RunAttrs */
@@ -64,17 +91,11 @@ class SqlStorageMethod {
    * @return {Promise<void>}
    */
   async initialize(options) {
-    if (!options.sqlDatabasePath) throw new Error('Cannot use sqlite without a database path');
     if (!buildModelDefn.attributes.projectId.references) throw new Error('Invalid buildModel');
     if (!runModelDefn.attributes.projectId.references) throw new Error('Invalid runModel');
     if (!runModelDefn.attributes.buildId.references) throw new Error('Invalid runModel');
 
-    const sequelize = new Sequelize({
-      dialect: options.sqlDialect,
-      storage: options.sqlDatabasePath,
-      operatorsAliases: false,
-      logging: () => {},
-    });
+    const sequelize = createSequelize(options);
 
     const projectModel = sequelize.define(projectModelDefn.tableName, projectModelDefn.attributes);
 
@@ -170,7 +191,7 @@ class SqlStorageMethod {
     const builds = await buildModel.findAll({
       where: {projectId},
       order,
-      group: 'branch',
+      group: ['branch'],
       attributes: ['branch'],
     });
 
@@ -258,7 +279,7 @@ class SqlStorageMethod {
     const runs = await runModel.findAll({
       where: buildId ? {projectId, buildId} : {projectId},
       order,
-      group: 'url',
+      group: ['url'],
       attributes: ['url'],
     });
 

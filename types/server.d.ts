@@ -10,7 +10,7 @@ declare global {
   namespace LHCI {
     namespace ServerCommand {
       export type TableDefinition<T, TAllKeys extends keyof T = keyof T> = {
-        [K in TAllKeys]: import('sequelize').DefineAttributeColumnOptions
+        [K in TAllKeys]: import('sequelize').DefineAttributeColumnOptions;
       };
 
       export type TableAttributes<T, TAllKeys extends keyof T = keyof T> = {[K in TAllKeys]: {}};
@@ -84,9 +84,11 @@ declare global {
       export type StorageMethod = StorageMethod_;
 
       export interface StorageOptions {
-        storageMethod: 'sql' | 'bigquery';
-        sqlDialect: 'sqlite' | 'mysql';
+        storageMethod: 'sql' | 'spanner';
+        sqlDialect: 'sqlite' | 'mysql' | 'postgres';
         sqlDatabasePath?: string;
+        sqlConnectionSsl?: string;
+        sqlConnectionUrl?: string;
         sqlDangerouslyForceMigration?: boolean;
       }
 

@@ -16,11 +16,15 @@ before_script:
   - export DISPLAY=:99.0
   - export CHROME_PATH="$(which google-chrome-stable)"
   - sh -e /etc/init.d/xvfb start
+  - export POSTGRES_DB_URL="postgres://postgres@localhost/lighthouse_ci_test"
+  - psql -c 'create database lighthouse_ci_test;' -U postgres
 script:
   - yarn build
   - yarn test
 before_cache:
   # nyc, jest and other projects store files in here. They mess up the travis build cache.
   - rm -rf ./node_modules/.cache/
+services:
+  - postgresql
 addons:
   chrome: stable

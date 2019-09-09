@@ -34,7 +34,7 @@ describe('ProjectList', () => {
     expect(snapshotDOM(container)).toMatchInlineSnapshot(`
       "<div>
         <span>
-          No projects yet, create one by running \`lighthouse-ci wizard\`
+          No projects yet, create one by running \`lhci wizard\`
         </span>
       </div>"
     `);

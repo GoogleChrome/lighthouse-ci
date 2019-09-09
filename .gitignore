@@ -1,0 +1,4 @@
+.cache/
+.lighthouseci/
+node_modules/
+yarn.lock

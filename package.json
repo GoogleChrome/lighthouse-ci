@@ -1,0 +1,15 @@
+{
+  "name": "lhci-canary",
+  "version": "1.0.0",
+  "description": "Example of deploying lhci/server to heroku",
+  "main": "server.js",
+  "dependencies": {
+    "@lhci/server": "0.1.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Patrick Hulce <patrick.hulce@gmail.com>",
+  "license": "MIT"
+}

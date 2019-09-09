@@ -6,12 +6,13 @@
     "lhci": "./src/cli.js"
   },
   "dependencies": {
-    "@lhci/server": "0.1.0",
     "@lhci/utils": "0.1.0",
     "inquirer": "^6.3.1",
-    "isomorphic-fetch": "^2.2.1",
     "lighthouse": "GoogleChrome/lighthouse#master",
     "yargs": "^12.0.5"
+  },
+  "peerDependencies": {
+    "@lhci/server": "0.1.0"
   },
   "devDependencies": {
     "@babel/core": "^7.5.5",

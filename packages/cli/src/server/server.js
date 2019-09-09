@@ -5,8 +5,6 @@
  */
 'use strict';
 
-const {createServer} = require('@lhci/server');
-
 /**
  * @param {import('yargs').Argv} yargs
  */
@@ -49,6 +47,7 @@ function buildCommand(yargs) {
  * @return {Promise<{port: number, close: () => void}>}
  */
 async function runCommand(options) {
+  const {createServer} = require('@lhci/server');
   return createServer(options);
 }
 

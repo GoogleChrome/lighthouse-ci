@@ -1,5 +1,8 @@
 {
   "name": "@lhci/utils",
   "version": "0.1.0",
-  "license": "Apache-2.0"
+  "license": "Apache-2.0",
+  "dependencies": {
+    "isomorphic-fetch": "^2.2.1"
+  }
 }

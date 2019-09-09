@@ -158,7 +158,9 @@ export function useOptionalBuildRepresentativeRuns(projectId, buildId, url) {
  */
 export function useOptionalAncestorBuild(projectId, build) {
   // Construct this options object in a `useMemo` to prevent infinitely re-requesting.
-  const getBuildsOptions = useMemo(() => build && {hash: build.ancestorHash}, [build]);
+  const getBuildsOptions = useMemo(() => build && {hash: build.ancestorHash}, [
+    build && build.ancestorHash,
+  ]);
   const [apiLoadingState, builds] = useApiData(
     'getBuilds',
     projectId && build && build.ancestorHash ? [projectId, getBuildsOptions] : undefined

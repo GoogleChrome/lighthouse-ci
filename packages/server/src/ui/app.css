@@ -24,6 +24,8 @@
   --color-cyan-500: #00bcd4;
   --color-pink-a200: #ff4081;
   --color-orange-500: #ff9800;
+  --color-deep-orange-a200: #ff6e40;
+  --color-deep-purple-400: #7e57c2;
 
   /** Themematic constants */
   --base-text-color: var(--color-gray-900);
@@ -47,6 +49,10 @@
   --improvement-color: var(--color-cyan-500);
   --neutral-color: var(--color-gray-800);
   --regression-color: var(--color-pink-a200);
+
+  --compare-color: var(--color-blue-400);
+  --dev-branch-color: var(--color-deep-orange-a200);
+  --master-branch-color: var(--color-deep-purple-400);
 
   --base-font-family: 'Roboto', sans-serif;
   --base-font-weight: 400;
@@ -76,7 +82,9 @@
 
   --build-score-gauge-size: 82px;
   --build-score-delta-badge-height: 24px;
-  --build-selector-pill-height: 30px;
+  --pill-height: 30px;
+  --pill-content-height: calc(var(--pill-height) - 2px);
+  --pill-spacing: calc(var(--base-spacing) / 2);
 
   --audit-group-audit-height: 32px;
 

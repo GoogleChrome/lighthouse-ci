@@ -8,6 +8,71 @@ import {h} from 'preact';
 import './build-hash-selector.css';
 import {useBranchBuilds} from '../../hooks/use-api-data';
 import {AsyncLoader, combineLoadingStates, combineAsyncData} from '../../components/async-loader';
+import {Pill} from '../../components/pill';
+
+/**
+ * @param {{build: LHCI.ServerCommand.Build, ancestorBuild?: LHCI.ServerCommand.Build | null, selector: 'base'|'compare', branchBuilds: Array<LHCI.ServerCommand.Build>, baseBuilds: Array<LHCI.ServerCommand.Build>}} props
+ */
+const BuildHashSelector_ = props => {
+  const {branchBuilds, baseBuilds, ancestorBuild} = props;
+  const builds = branchBuilds
+    .concat(baseBuilds)
+    .sort((a, b) => new Date(b.runAt).getTime() - new Date(a.runAt).getTime());
+
+  return (
+    <div className="container">
+      <ul className="build-hash-selector__list">
+        {builds.map(build => {
+          const isCompareBranch = build.id === props.build.id;
+          const isBaseBranch = build.id === (ancestorBuild && ancestorBuild.id);
+          const variant = build.branch === props.build.branch ? 'dev-branch' : 'master-branch';
+
+          return (
+            <li key={build.id}>
+              <span className="build-hash-selector__selection">
+                {isCompareBranch && (
+                  <Pill variant="compare" solid>
+                    compare
+                  </Pill>
+                )}
+                {isBaseBranch && (
+                  <Pill variant="base" solid>
+                    base
+                  </Pill>
+                )}
+              </span>
+              <Pill
+                variant={variant}
+                onClick={() => {
+                  if (isCompareBranch || isBaseBranch) return;
+                  const url = new URL(window.location.href);
+
+                  if (props.selector === 'base') {
+                    url.searchParams.set('baseHash', build.hash);
+                  } else {
+                    url.searchParams.delete('baseHash');
+                    if (ancestorBuild) url.searchParams.set('baseHash', ancestorBuild.hash);
+                    url.pathname = url.pathname.replace(props.build.id, build.id);
+                  }
+
+                  window.location.href = url.href;
+                }}
+              >
+                <span className="build-hash-selector__hash">{build.hash.slice(0, 8)}</span>
+              </Pill>{' '}
+              <img className="build-hash-selector__avatar" src={build.avatarUrl} />
+              <span className="build-hash-selector__commit">{build.commitMessage}</span>
+              <span className="build-hash-selector__links">
+                <a href={build.externalBuildUrl}>Travis</a>
+                <a href={build.externalBuildUrl}>GH</a>
+              </span>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+  );
+};
 
 /**
  * @param {{build: LHCI.ServerCommand.Build, ancestorBuild?: LHCI.ServerCommand.Build | null, selector: 'base'|'compare'}} props
@@ -21,7 +86,7 @@ export const BuildHashSelector = props => {
         loadingState={combineLoadingStates(branchLoadingData, baseLoadingData)}
         asyncData={combineAsyncData(branchLoadingData, baseLoadingData)}
         render={([branchBuilds, baseBuilds]) => (
-          <pre>{JSON.stringify({branchBuilds, baseBuilds}, null, 2)}</pre>
+          <BuildHashSelector_ {...props} branchBuilds={branchBuilds} baseBuilds={baseBuilds} />
         )}
       />
     </div>

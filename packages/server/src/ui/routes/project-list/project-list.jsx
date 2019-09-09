@@ -13,7 +13,7 @@ import {Page} from '../../layout/page';
 /** @param {{projects: Array<LHCI.ServerCommand.Project>}} props */
 const ProjectList_ = ({projects}) => {
   if (!projects.length) {
-    return <span>No projects yet, create one by running `lighthouse-ci wizard`</span>;
+    return <span>No projects yet, create one by running `lhci wizard`</span>;
   }
 
   return (

@@ -20,7 +20,7 @@ async function run() {
   const argv = yargs
     .help('help')
     .version(getVersion())
-    .usage('lighthouse-ci <command> <options>')
+    .usage('lhci <command> <options>')
     .env('LHCI')
     .config('rc-file', loadAndParseRcFile)
     .demand(1)

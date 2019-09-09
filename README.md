@@ -1,3 +1,9 @@
+### This project is in **early alpha**. It is available for **testing only**.
+
+### **Do not rely on this for production workloads.**
+
+---
+
 # Lighthouse CI
 
 ## Overview
@@ -9,7 +15,7 @@ Lighthouse CI is a set of commands that make running, asserting, saving, and ret
 ### `server`
 
 ```bash
-lighthouse-ci server
+lhci server
 ```
 
 Starts a local server that exposes an API to save projects/builds/runs to a database. Currently, data is saved with SQLite to a local database path, but conceptually it's easy to write to bigtable or some other store and free to write to any other SQL store.
@@ -17,7 +23,7 @@ Starts a local server that exposes an API to save projects/builds/runs to a data
 ### `collect`
 
 ```bash
-lighthouse-ci collect --numberOfRuns=5 --url=https://example.com
+lhci collect --numberOfRuns=5 --url=https://example.com
 ```
 
 Runs Lighthouse `N` times and stores the LHRs in a local `.lighthouseci/` folder, similar to the way test coverage tools operate.
@@ -25,7 +31,7 @@ Runs Lighthouse `N` times and stores the LHRs in a local `.lighthouseci/` folder
 ### `upload`
 
 ```bash
-lighthouse-ci upload
+lhci upload
 ```
 
 Saves all the runs in the `.lighthouseci/` folder to the server as a single build, similar to a Coveralls/CodeCov upload step. In the future, I imagine this can also return the results of the server's assertions against the parent hash.
@@ -33,7 +39,7 @@ Saves all the runs in the `.lighthouseci/` folder to the server as a single buil
 ### `assert`
 
 ```bash
-lighthouse-ci assert --preset=lighthouse:recommended --assertions.speed-index=off
+lhci assert --preset=lighthouse:recommended --assertions.speed-index=off
 ```
 
 Asserts the conditions in the Lighthouse CI config and preset. Currently, assert supports the following features:
@@ -55,7 +61,7 @@ export LHCI_RC_FILE=path/to/rc/file
 lighthouse-ci <command>
 
 # Specify an rc file via command-line flag
-lighthouse-ci --rc-file=path/to/different/rc/file <command>
+lhci --rc-file=path/to/different/rc/file <command>
 ```
 
 **Example RC File**

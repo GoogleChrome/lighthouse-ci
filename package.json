@@ -53,6 +53,8 @@
     "jest-image-snapshot": "^2.9.0",
     "lerna": "^3.16.4",
     "parcel-bundler": "^1.12.3",
+    "pg": "^7.12.1",
+    "pg-hstore": "^2.3.3",
     "prettier": "^1.16.4",
     "puppeteer": "^1.18.1",
     "sqlite3": "^4.0.6",

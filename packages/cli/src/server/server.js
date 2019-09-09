@@ -22,15 +22,23 @@ function buildCommand(yargs) {
     },
     'storage.storageMethod': {
       type: 'string',
-      choices: ['sql', 'bigquery'],
+      choices: ['sql', 'spanner'],
       default: 'sql',
     },
     'storage.sqlDialect': {
       type: 'string',
-      choices: ['sqlite', 'mysql'],
+      choices: ['sqlite', 'mysql', 'postgres'],
       default: 'sqlite',
     },
     'storage.sqlDatabasePath': {
+      description: 'The path to a SQLite database on disk.',
+    },
+    'storage.sqlConnectionUrl': {
+      description: 'The connection url to a postgres or mysql database.',
+    },
+    'storage.sqlConnectionSsl': {
+      type: 'boolean',
+      default: false,
       description: 'The path to a SQLite database on disk.',
     },
     'storage.sqlDangerouslyForceMigration': {

@@ -7,13 +7,10 @@
 
 /* eslint-env jest */
 
-const fs = require('fs');
-const path = require('path');
 const ApiClient = require('@lhci/utils/src/api-client.js');
-const runServer = require('../src/server.js').createServer;
 const fetch = require('isomorphic-fetch');
 
-describe('Lighthouse CI Server', () => {
+function runTests(state) {
   let rootURL = '';
   let client;
   let projectA;
@@ -25,31 +22,10 @@ describe('Lighthouse CI Server', () => {
   let runB;
   let runC;
   let runD;
-  let closeServer;
 
-  const dbPath = path.join(__dirname, 'server-test.tmp.sql');
-
-  beforeAll(async () => {
-    if (fs.existsSync(dbPath)) fs.unlinkSync(dbPath);
-
-    const {port, close} = await runServer({
-      logLevel: 'silent',
-      port: 0,
-      storage: {
-        storageMethod: 'sql',
-        sqlDialect: 'sqlite',
-        sqlDatabasePath: dbPath,
-      },
-    });
-
-    rootURL = `http://localhost:${port}`;
+  beforeAll(() => {
+    rootURL = `http://localhost:${state.port}`;
     client = new ApiClient({rootURL});
-    closeServer = close;
-  });
-
-  afterAll(() => {
-    fs.unlinkSync(dbPath);
-    closeServer();
   });
 
   describe('/v1/projects', () => {
@@ -486,4 +462,6 @@ describe('Lighthouse CI Server', () => {
       });
     });
   });
-});
+}
+
+module.exports = {runTests};

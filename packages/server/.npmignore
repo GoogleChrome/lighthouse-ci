@@ -1,0 +1,5 @@
+*.tmp.sql
+*.tmp.json
+.lighthouseci/
+.cache/
+test/

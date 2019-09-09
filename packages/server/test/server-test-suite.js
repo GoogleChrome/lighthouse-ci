@@ -326,6 +326,7 @@ function runTests(state) {
     it('should get the statistics', async () => {
       const statistics = await client.getStatistics(projectA.id, buildA.id);
       statistics.sort((a, b) => a.url.localeCompare(b.url) || a.name.localeCompare(b.name));
+      statistics.forEach(stat => (stat.value = Math.round(stat.value * 1000) / 1000));
 
       expect(statistics).toMatchObject([
         {
@@ -361,7 +362,7 @@ function runTests(state) {
         {
           url: 'https://example.com/',
           name: 'category_pwa_average',
-          value: 0.10000000000000002,
+          value: 0.1,
         },
         {
           url: 'https://example.com/',

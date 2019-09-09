@@ -87,6 +87,26 @@ class SqlStorageMethod {
   }
 
   /**
+   * @template T1
+   * @template T2
+   * @param {import('sequelize').Model<T1, T2>} model
+   * @param {string} pk
+   */
+  async _findByPk(model, pk) {
+    try {
+      return await model.findByPk(pk);
+    } catch (err) {
+      // postgres throws if the PK isn't a valid UUID when the column is UUID,
+      // but we want that to be the same as missing.
+      if (err.name === 'SequelizeDatabaseError' && err.message.includes('invalid input')) {
+        return undefined;
+      }
+
+      throw err;
+    }
+  }
+
+  /**
    * @param {LHCI.ServerCommand.StorageOptions} options
    * @return {Promise<void>}
    */
@@ -120,6 +140,11 @@ class SqlStorageMethod {
     this._sequelize = {sequelize, projectModel, buildModel, runModel, statisticModel};
   }
 
+  /** @return {Promise<void>} */
+  async close() {
+    return this._sql().sequelize.close();
+  }
+
   /**
    * @return {Promise<Array<LHCI.ServerCommand.Project>>}
    */
@@ -143,7 +168,7 @@ class SqlStorageMethod {
    */
   async findProjectByToken(token) {
     const {projectModel} = this._sql();
-    const project = await projectModel.findOne({where: {id: token}});
+    const project = await this._findByPk(projectModel, token);
     return clone(project || undefined);
   }
 
@@ -153,7 +178,7 @@ class SqlStorageMethod {
    */
   async findProjectById(projectId) {
     const {projectModel} = this._sql();
-    const project = await projectModel.findByPk(projectId);
+    const project = await this._findByPk(projectModel, projectId);
     return clone(project || undefined);
   }
 
@@ -190,7 +215,7 @@ class SqlStorageMethod {
     const {buildModel} = this._sql();
     const builds = await buildModel.findAll({
       where: {projectId},
-      order,
+      order: [['branch', 'desc']],
       group: ['branch'],
       attributes: ['branch'],
     });
@@ -217,7 +242,7 @@ class SqlStorageMethod {
   // eslint-disable-next-line no-unused-vars
   async sealBuild(projectId, buildId) {
     const {sequelize, buildModel, runModel} = this._sql();
-    let build = await buildModel.findByPk(buildId);
+    let build = await this._findByPk(buildModel, buildId);
     if (!build) throw new E422('Invalid build');
     if (build.projectId !== projectId) throw new E422('Invalid project');
     build = {...clone(build), lifecycle: 'sealed'};
@@ -252,7 +277,7 @@ class SqlStorageMethod {
    */
   async findBuildById(projectId, buildId) {
     const {buildModel} = this._sql();
-    const build = await buildModel.findByPk(buildId);
+    const build = await this._findByPk(buildModel, buildId);
     if (build && build.projectId !== projectId) return undefined;
     return clone(build || undefined);
   }
@@ -278,7 +303,7 @@ class SqlStorageMethod {
     const {runModel} = this._sql();
     const runs = await runModel.findAll({
       where: buildId ? {projectId, buildId} : {projectId},
-      order,
+      order: [['url', 'desc']],
       group: ['url'],
       attributes: ['url'],
     });
@@ -331,7 +356,7 @@ class SqlStorageMethod {
     let statistic;
     if (existing) {
       await statisticModel.update({...unsavedStatistic}, {where: {id: existing.id}, transaction});
-      const updated = await statisticModel.findByPk(existing.id);
+      const updated = await this._findByPk(statisticModel, existing.id);
       if (!updated) throw new Error('Failed to update statistic');
       statistic = updated;
     } else {

@@ -30,6 +30,7 @@ describe('postgres server', () => {
         sqlDialect: 'postgres',
         sqlConnectionUrl: process.env.POSTGRES_DB_URL,
         sqlConnectionSsl: !!process.env.POSTGRES_DB_SSL,
+        sqlDangerouslyForceMigration: true,
       },
     });
 

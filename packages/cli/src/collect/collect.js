@@ -39,12 +39,17 @@ async function runCommand(options) {
 
   for (let i = 0; i < options.numberOfRuns; i++) {
     process.stdout.write(`Run #${i + 1}...`);
-    const lhr = await runner.run(options.url, {
-      headful: options.headful,
-      settings: options.settings,
-    });
-    saveLHR(lhr);
-    process.stdout.write('done.\n');
+    try {
+      const lhr = await runner.run(options.url, {
+        headful: options.headful,
+        settings: options.settings,
+      });
+      saveLHR(lhr);
+      process.stdout.write('done.\n');
+    } catch (err) {
+      process.stdout.write('failed!\n');
+      throw err;
+    }
   }
 
   process.stdout.write(`Done running Lighthouse!\n`);

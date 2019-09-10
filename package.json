@@ -4,7 +4,9 @@
   "description": "Example of deploying lhci/server to heroku",
   "main": "server.js",
   "dependencies": {
-    "@lhci/server": "0.1.0"
+    "@lhci/server": "^0.1.1-alpha.0",
+    "pg": "^7.12.1",
+    "pg-hstore": "^2.3.3"
   },
   "devDependencies": {},
   "scripts": {

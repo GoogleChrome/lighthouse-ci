@@ -2,3 +2,6 @@
 .lighthouseci/
 node_modules/
 yarn.lock
+
+*.tmp.sql
+packages/

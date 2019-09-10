@@ -5,6 +5,7 @@
   ],
   "scripts": {
     "clean": "lerna exec --parallel 'rm -rf ./dist'",
+    "ci:dogfood": "./scripts/ci-dogfood.sh",
     "build": "lerna run --scope @lhci/server build",
     "build:watch": "lerna run --scope @lhci/server build:watch --stream",
     "build:source-map-explorer": "lerna run --scope @lhci/server build:source-map-explorer",

@@ -21,6 +21,7 @@ before_script:
 script:
   - yarn build
   - yarn test
+  - yarn ci:dogfood
 before_cache:
   # nyc, jest and other projects store files in here. They mess up the travis build cache.
   - rm -rf ./node_modules/.cache/

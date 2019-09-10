@@ -5,6 +5,7 @@
  */
 'use strict';
 
+const crypto = require('crypto');
 const childProcess = require('child_process');
 const ApiClient = require('@lhci/utils/src/api-client.js');
 const {getSavedLHRs} = require('@lhci/utils/src/saved-reports.js');
@@ -38,6 +39,8 @@ function getCurrentHash() {
  * @return {string}
  */
 function getCurrentBranch() {
+  if (process.env.TRAVIS_BRANCH) return process.env.TRAVIS_BRANCH;
+
   const result = childProcess.spawnSync('git', ['rev-parse', '--abbrev-ref', 'HEAD'], {
     encoding: 'utf8',
   });
@@ -52,7 +55,7 @@ function getCurrentBranch() {
  * @return {string}
  */
 function getExternalBuildUrl() {
-  return '';
+  return process.env.TRAVIS_BUILD_WEB_URL || '';
 }
 
 /**
@@ -77,7 +80,7 @@ function getAuthor() {
     encoding: 'utf8',
   });
   if (result.status !== 0) {
-    throw new Error('Unable to determine commit message with `git log --format=%aN <%aE> -n 1`');
+    throw new Error('Unable to determine commit author with `git log --format=%aN <%aE> -n 1`');
   }
 
   return result.stdout.trim();
@@ -87,7 +90,17 @@ function getAuthor() {
  * @return {string}
  */
 function getAvatarUrl() {
-  return '';
+  const result = childProcess.spawnSync('git', ['log', '--format=%aE', '-n', '1'], {
+    encoding: 'utf8',
+  });
+  if (result.status !== 0) {
+    throw new Error('Unable to determine commit email with `git log --format=%aE -n 1`');
+  }
+
+  // Use default gravatar image, see https://en.gravatar.com/site/implement/images/.
+  const hash = crypto.createHash('md5');
+  hash.update(result.stdout.trim().toLowerCase());
+  return `https://www.gravatar.com/avatar/${hash.digest('hex')}.jpg?d=identicon`;
 }
 
 /**

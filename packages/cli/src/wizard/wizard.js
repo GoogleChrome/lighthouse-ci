@@ -50,9 +50,8 @@ async function runNewProjectWizard(options) {
   });
 
   const token = await api.getProjectToken(project);
-  process.stdout.write(require('util').inspect(token));
   process.stdout.write(`Created project ${project.name} (${project.id})!\n`);
-  process.stdout.write(`Use token ${log.bold}${token}${log.reset} to connect.`);
+  process.stdout.write(`Use token ${log.bold}${token}${log.reset} to connect.\n`);
 }
 
 /**

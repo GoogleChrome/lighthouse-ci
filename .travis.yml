@@ -12,11 +12,15 @@ cache:
   yarn: true
   directories:
     - node_modules
+before_install:
+  - sudo apt-get update
+  - sudo apt-get install dpkg
+  - sudo apt-get install --only-upgrade google-chrome-stable
+  - google-chrome-stable --version
 before_script:
   - export DISPLAY=:99.0
   - export CHROME_PATH="$(which google-chrome-stable)"
   - sh -e /etc/init.d/xvfb start
-  - google-chrome-stable --version
   - export POSTGRES_DB_URL="postgres://postgres@localhost/lighthouse_ci_test"
   - psql -c 'create database lighthouse_ci_test;' -U postgres
 script:

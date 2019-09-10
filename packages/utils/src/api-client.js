@@ -261,6 +261,8 @@ class ApiClient {
   async _getStatistics(projectId, buildId) {
     throw new Error('Unimplemented');
   }
+
+  async close() {}
 }
 
 module.exports = ApiClient;

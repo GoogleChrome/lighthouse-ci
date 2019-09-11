@@ -27,6 +27,7 @@ import './build-view.css';
 import {BuildViewLegend} from './build-view-legend';
 import clsx from 'clsx';
 import {findAuditDiffs, getDiffSeverity} from '@lhci/utils/src/audit-diff-finder';
+import {BuildViewEmpty} from './build-view-empty';
 
 /**
  * @param {LH.Result} lhr
@@ -212,12 +213,16 @@ const BuildView_ = props => {
         />
         <div className="container">
           <BuildViewLegend />
-          <AuditGroups
-            auditGroups={auditGroups}
-            baseLhr={baseLhr}
-            selectedAuditId={selectedAuditId}
-            setSelectedAuditId={setAuditId}
-          />
+          {auditGroups.length ? (
+            <AuditGroups
+              auditGroups={auditGroups}
+              baseLhr={baseLhr}
+              selectedAuditId={selectedAuditId}
+              setSelectedAuditId={setAuditId}
+            />
+          ) : (
+            <BuildViewEmpty lhr={lhr} />
+          )}
         </div>
       </div>
     </Page>

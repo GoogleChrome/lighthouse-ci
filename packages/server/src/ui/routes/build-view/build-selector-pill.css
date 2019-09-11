@@ -46,12 +46,12 @@
 
 .build-selector-pill__hash {
   font-weight: bold;
-  margin: 0 var(--pill-spacing);
+  margin-left: var(--pill-spacing);
 }
 
 .build-selector-pill__message {
   max-width: 150px;
-  margin-right: var(--pill-spacing);
+  margin: 0 var(--pill-spacing);
 
   white-space: nowrap;
   overflow: hidden;

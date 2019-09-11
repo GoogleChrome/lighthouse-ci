@@ -34,7 +34,11 @@ export const BuildSelectorPill = props => {
       onClick={props.onClick}
     >
       <div className="build-selector-pill__variant-label">{props.variant}</div>
-      {props.build ? <Selection build={props.build} /> : <span>None</span>}
+      {props.build ? (
+        <Selection build={props.build} />
+      ) : (
+        <span className="build-selector-pill__message">None</span>
+      )}
     </div>
   );
 };

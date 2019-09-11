@@ -8,7 +8,7 @@ import {h, Fragment, VNode} from 'preact';
 import clsx from 'clsx';
 import './page-header.css';
 import {useProject} from '../hooks/use-api-data';
-import {Router} from 'preact-router';
+import {Router, Link} from 'preact-router';
 
 /** @param {{children?: Array<VNode> | VNode, setIsSidebarOpen: (isOpen: boolean) => void, matches: {projectId?: string}}} props */
 const PageHeader_ = props => {
@@ -26,7 +26,9 @@ const PageHeader_ = props => {
             <i className="material-icons">menu</i>
           </div>
           <div className="page-header__current-project">
-            {(selectedProject && selectedProject.name) || 'Lighthouse CI'}
+            <Link href={selectedProject ? `/app/projects/${selectedProject.id}` : '#'}>
+              {(selectedProject && selectedProject.name) || 'Lighthouse CI'}
+            </Link>
           </div>
         </div>
         <div className="page-header__center">{props.children}</div>

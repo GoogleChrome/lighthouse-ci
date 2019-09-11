@@ -60,3 +60,8 @@
   text-overflow: ellipsis;
   overflow: hidden;
 }
+
+.page-header__current-project a {
+  color: var(--base-text-color);
+  text-decoration: none;
+}

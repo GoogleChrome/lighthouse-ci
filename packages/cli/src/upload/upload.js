@@ -110,7 +110,19 @@ function getAvatarUrl() {
 /**
  * @return {string}
  */
-function getAncestorHash() {
+function getAncestorHashForMaster() {
+  const result = childProcess.spawnSync('git', ['rev-parse', 'HEAD^'], {encoding: 'utf8'});
+  if (result.status !== 0) {
+    throw new Error('Unable to determine previous hash with `git rev-parse HEAD^`');
+  }
+
+  return result.stdout.trim();
+}
+
+/**
+ * @return {string}
+ */
+function getAncestorHashForBranch() {
   const result = childProcess.spawnSync('git', ['merge-base', 'HEAD', 'master'], {
     encoding: 'utf8',
   });
@@ -134,15 +146,17 @@ async function runCommand(options) {
     throw new Error('Could not find active project with provided token');
   }
 
+  const branch = getCurrentBranch();
+
   const build = await api.createBuild({
     projectId: project.id,
     lifecycle: 'unsealed',
     hash: getCurrentHash(),
-    branch: getCurrentBranch(),
+    branch,
     commitMessage: getCommitMessage(),
     author: getAuthor(),
     avatarUrl: getAvatarUrl(),
-    ancestorHash: getAncestorHash(),
+    ancestorHash: branch === 'master' ? getAncestorHashForMaster() : getAncestorHashForBranch(),
     externalBuildUrl: getExternalBuildUrl(),
     runAt: new Date().toISOString(),
   });

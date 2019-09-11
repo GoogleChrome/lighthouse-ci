@@ -48,7 +48,7 @@ function getCurrentBranch() {
     throw new Error('Unable to determine current branch with `git rev-parse --abbrev-ref HEAD`');
   }
 
-  return result.stdout.trim();
+  return result.stdout.trim().slice(0, 40);
 }
 
 /**
@@ -69,7 +69,7 @@ function getCommitMessage() {
     throw new Error('Unable to determine commit message with `git log --format=%s -n 1`');
   }
 
-  return result.stdout.trim();
+  return result.stdout.trim().slice(0, 80);
 }
 
 /**
@@ -83,7 +83,7 @@ function getAuthor() {
     throw new Error('Unable to determine commit author with `git log --format=%aN <%aE> -n 1`');
   }
 
-  return result.stdout.trim();
+  return result.stdout.trim().slice(0, 256);
 }
 
 /**

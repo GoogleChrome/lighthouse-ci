@@ -17,7 +17,13 @@ module.exports = {
     return (req, res, next) => {
       Promise.resolve()
         .then(() => handler(req, res, next))
-        .catch(next);
+        .catch(err => {
+          if (err.name === 'SequelizeDatabaseError' && err.message.includes('value too long')) {
+            next(new E422(err.message));
+          } else {
+            next(err);
+          }
+        });
     };
   },
   /**

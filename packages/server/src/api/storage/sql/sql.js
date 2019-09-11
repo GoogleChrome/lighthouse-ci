@@ -28,6 +28,17 @@ function clone(o) {
 }
 
 /**
+ * @param {string|undefined} id
+ */
+function validateUuidOrEmpty(id) {
+  if (typeof id === 'undefined') return undefined;
+  if (id.match(/^\w{8}-\w{4}-\w{4}-\w{4}-\w{12}$/)) return id;
+  // Valid v4 UUID's always have the third segment start with 4, so this will never match, but passes
+  // as a UUID to postgres.
+  return `11111111-1111-1111-1111-111111111111`;
+}
+
+/**
  * @param {LHCI.ServerCommand.StorageOptions} options
  */
 function createSequelize(options) {
@@ -93,17 +104,27 @@ class SqlStorageMethod {
    * @param {string} pk
    */
   async _findByPk(model, pk) {
-    try {
-      return await model.findByPk(pk);
-    } catch (err) {
-      // postgres throws if the PK isn't a valid UUID when the column is UUID,
-      // but we want that to be the same as missing.
-      if (err.name === 'SequelizeDatabaseError' && err.message.includes('invalid input')) {
-        return undefined;
-      }
+    return model.findByPk(validateUuidOrEmpty(pk));
+  }
 
-      throw err;
+  /**
+   * @template T1
+   * @template T2
+   * @param {import('sequelize').Model<T1, T2>} model
+   * @param {import('sequelize').FindOptions<T1 & T2>} options
+   */
+  async _findAll(model, options) {
+    if (options.where) {
+      options.where = {...options.where};
+
+      for (const key of Object.keys(options.where)) {
+        if (!key.endsWith('Id')) continue;
+        // @ts-ignore - `options.where` is not indexable in tsc's eyes
+        options.where[key] = validateUuidOrEmpty(options.where[key]);
+      }
     }
+
+    return model.findAll(options);
   }
 
   /**
@@ -150,7 +171,7 @@ class SqlStorageMethod {
    */
   async getProjects() {
     const {projectModel} = this._sql();
-    const projects = await projectModel.findAll({order});
+    const projects = await this._findAll(projectModel, {order});
     return projects.map(clone);
   }
 
@@ -199,7 +220,7 @@ class SqlStorageMethod {
    */
   async getBuilds(projectId, options = {}) {
     const {buildModel} = this._sql();
-    const builds = await buildModel.findAll({
+    const builds = await this._findAll(buildModel, {
       where: {projectId, ...omit(options, [], {dropUndefined: true})},
       order,
     });
@@ -213,7 +234,7 @@ class SqlStorageMethod {
   // eslint-disable-next-line no-unused-vars
   async getBranches(projectId) {
     const {buildModel} = this._sql();
-    const builds = await buildModel.findAll({
+    const builds = await this._findAll(buildModel, {
       where: {projectId},
       order: [['branch', 'desc']],
       group: ['branch'],
@@ -290,7 +311,7 @@ class SqlStorageMethod {
    */
   async getRuns(projectId, buildId, options) {
     const {runModel} = this._sql();
-    const runs = await runModel.findAll({where: {...options, projectId, buildId}, order});
+    const runs = await this._findAll(runModel, {where: {...options, projectId, buildId}, order});
     return clone(runs);
   }
 
@@ -301,7 +322,7 @@ class SqlStorageMethod {
    */
   async getUrls(projectId, buildId) {
     const {runModel} = this._sql();
-    const runs = await runModel.findAll({
+    const runs = await this._findAll(runModel, {
       where: buildId ? {projectId, buildId} : {projectId},
       order: [['url', 'desc']],
       group: ['url'],
@@ -373,7 +394,7 @@ class SqlStorageMethod {
    */
   async _getStatistics(projectId, buildId) {
     const {statisticModel} = this._sql();
-    const statistics = await statisticModel.findAll({where: {projectId, buildId}, order});
+    const statistics = await this._findAll(statisticModel, {where: {projectId, buildId}, order});
     return clone(statistics);
   }
 }

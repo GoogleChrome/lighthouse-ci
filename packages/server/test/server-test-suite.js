@@ -153,9 +153,19 @@ function runTests(state) {
       expect(builds).toEqual([buildC]);
     });
 
+    it('should list builds for missing project', async () => {
+      const builds = await client.getBuilds('MISSING');
+      expect(builds).toEqual([]);
+    });
+
     it('should find a specific build', async () => {
       const build = await client.findBuildById(buildA.projectId, buildA.id);
       expect(build).toEqual(buildA);
+    });
+
+    it('should not find a missing build', async () => {
+      const build = await client.findBuildById('MISSING', 'MISSING');
+      expect(build).toEqual(undefined);
     });
   });
 
@@ -163,6 +173,11 @@ function runTests(state) {
     it('should list branches', async () => {
       const branches = await client.getBranches(projectA.id);
       expect(branches).toEqual([{branch: 'test_branch'}, {branch: 'master'}]);
+    });
+
+    it('should handle missing ids', async () => {
+      const branches = await client.getBranches('MISSING');
+      expect(branches).toEqual([]);
     });
   });
 
@@ -277,6 +292,11 @@ function runTests(state) {
     it('should list runs by url', async () => {
       const runs = await client.getRuns(projectA.id, buildA.id, {url: runD.url});
       expect(runs).toEqual([runD]);
+    });
+
+    it('should handle listing nonexistent builds', async () => {
+      const runs = await client.getRuns('MISSING', 'MISSING');
+      expect(runs).toEqual([]);
     });
   });
 

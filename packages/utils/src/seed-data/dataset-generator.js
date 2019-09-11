@@ -154,7 +154,7 @@ function createDataset() {
     ],
     builds: [
       {
-        id: '',
+        id: '0',
         projectId: '0',
         lifecycle: 'unsealed',
         branch: 'master',
@@ -167,7 +167,7 @@ function createDataset() {
         runAt: '2019-08-05T20:25:28.904Z',
       },
       {
-        id: '',
+        id: '1',
         projectId: '0',
         lifecycle: 'unsealed',
         branch: 'master',
@@ -180,7 +180,7 @@ function createDataset() {
         runAt: '2019-08-05T22:45:28.904Z',
       },
       {
-        id: '',
+        id: '2',
         projectId: '0',
         lifecycle: 'unsealed',
         branch: 'master',
@@ -193,7 +193,7 @@ function createDataset() {
         runAt: '2019-08-06T22:13:28.904Z',
       },
       {
-        id: '',
+        id: '3',
         projectId: '0',
         lifecycle: 'unsealed',
         branch: 'master',
@@ -206,7 +206,7 @@ function createDataset() {
         runAt: '2019-08-07T20:51:28.904Z',
       },
       {
-        id: '',
+        id: '4',
         projectId: '0',
         lifecycle: 'unsealed',
         branch: 'test_0',
@@ -219,7 +219,7 @@ function createDataset() {
         runAt: '2019-08-09T20:15:28.904Z',
       },
       {
-        id: '',
+        id: '5',
         projectId: '0',
         lifecycle: 'unsealed',
         branch: 'test_1',
@@ -230,6 +230,32 @@ function createDataset() {
         avatarUrl: 'https://avatars1.githubusercontent.com/u/2301202?s=460&v=4',
         ancestorHash: '30cf658d9d72669af568d37ea60d945bfb3b0fc3',
         runAt: '2019-08-09T23:15:28.904Z',
+      },
+      {
+        id: '6',
+        projectId: '0',
+        lifecycle: 'unsealed',
+        branch: 'master',
+        hash: '5b0ad9f682c1ea447b8c3c9ba4d2ac839abb9aa3',
+        externalBuildUrl: 'http://travis-ci.org/org/repo/1025',
+        commitMessage: 'test(matched-ancestor): a really really really really really long message',
+        author: 'Patrick Hulce <patrick@example.com>',
+        avatarUrl: 'https://avatars1.githubusercontent.com/u/2301202?s=460&v=4',
+        ancestorHash: '5b0ad9f682c1ea447b8c3c9ba4d2ac839abb9aa3',
+        runAt: '2019-08-09T23:55:18.904Z',
+      },
+      {
+        id: '7',
+        projectId: '0',
+        lifecycle: 'unsealed',
+        branch: 'missing_ancestor',
+        hash: 'ba5b0ad9f6824c1ea447b8c3c9d2ac839abb9aa3',
+        externalBuildUrl: 'http://travis-ci.org/org/repo/1025',
+        commitMessage: 'test(unmatched-ancestor): a really really really really long message',
+        author: 'Paul Irish <paul@example.com>',
+        avatarUrl: 'https://avatars1.githubusercontent.com/u/39191?s=460&v=4',
+        ancestorHash: '3c9ba5c17b8ea44cb24d2ac839abb0ad9f689aa3', // this doesn't match anything
+        runAt: '2019-08-10T01:13:28.904Z',
       },
     ],
     runs: [
@@ -301,6 +327,16 @@ function createDataset() {
           },
         },
         8
+      ),
+      ...createRuns(
+        {projectId: '0', buildId: '6', url: 'http://localhost:1234/viewer/#home'},
+        {...auditsToFake, interactive: {averageNumericValue: 12000}},
+        9
+      ),
+      ...createRuns(
+        {projectId: '0', buildId: '7', url: 'http://localhost:1234/viewer/#home'},
+        auditsToFake,
+        10
       ),
     ],
   };

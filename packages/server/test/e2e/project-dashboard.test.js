@@ -24,9 +24,9 @@ describe('Project dashboard', () => {
 
       expect(commits).toMatchInlineSnapshot(`
         Array [
+          "missing_ancestor (ba5b0ad9) 8:13:28 PM",
+          "master (5b0ad9f6) 6:55:18 PM",
           "test_1 (c1ea447b) 6:15:28 PM",
-          "test_0 (aaa5b0a3) 3:15:28 PM",
-          "master (bb9aa3c1) 3:51:28 PM",
         ]
       `);
     });

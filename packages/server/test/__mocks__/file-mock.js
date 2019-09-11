@@ -5,12 +5,4 @@
  */
 'use strict';
 
-module.exports = {
-  transform: {
-    '.*jsx$': 'babel-jest',
-  },
-  moduleNameMapper: {
-    '\\.css$': 'identity-obj-proxy',
-    '\\.(svg|png|jpg|jpeg)$': '<rootDir>/packages/server/test/__mocks__/file-mock.js',
-  },
-};
+module.exports = 'file-mock';

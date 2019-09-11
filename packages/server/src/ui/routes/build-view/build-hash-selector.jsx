@@ -48,7 +48,9 @@ const BuildHashSelector_ = props => {
               <Pill
                 variant={variant}
                 onClick={() => {
-                  if (isCompareBranch || isBaseBranch) return;
+                  if (isCompareBranch && props.selector === 'compare') return;
+                  if (isBaseBranch && props.selector === 'base') return;
+
                   const url = new URL(window.location.href);
 
                   if (props.selector === 'base') {

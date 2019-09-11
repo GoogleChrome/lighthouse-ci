@@ -7,11 +7,13 @@
 import {h} from 'preact';
 import './audit-detail-pane.css';
 import clsx from 'clsx';
-import {usePreviousValue} from '../../hooks/use-previous-value';
+import {usePreviousValue} from '../../hooks/use-previous-value.jsx';
 import {useEffect, useRef} from 'preact/hooks';
+import {findAuditDiffs} from '@lhci/utils/src/audit-diff-finder.js';
 
 /** @param {{audit: LH.AuditResult, baseAudit?: LH.AuditResult, key?: string}} props */
 const Audit = props => {
+  const diff = props.baseAudit ? findAuditDiffs(props.audit, props.baseAudit) : [];
   return (
     <div
       id={`audit-detail-pane-audit--${props.audit.id}`}
@@ -19,7 +21,9 @@ const Audit = props => {
     >
       <div className="audit-detail-pane__audit-title">{props.audit.title}</div>
       <div className="audit-detail-pane__audit-description">{props.audit.description}</div>
-      <div className="audit-detail-pane__audit-details">{JSON.stringify(props.audit.details)}</div>
+      <div className="audit-detail-pane__audit-details">
+        <pre>{JSON.stringify(diff, null, 2)}</pre>
+      </div>
     </div>
   );
 };

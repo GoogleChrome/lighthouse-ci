@@ -28,10 +28,6 @@
   background: var(--secondary-background-color);
 }
 
-.audit-group__audit--selected {
-  background: var(--secondary-background-color);
-}
-
 .audit-group__audit-title {
   margin-left: var(--base-spacing);
   font-weight: var(--medium-font-weight);
@@ -110,6 +106,15 @@
   display: flex;
   flex-direction: row;
   align-items: center;
+}
+
+.audit-numeric-diff__left-label,
+.audit-numeric-diff__right-label {
+  width: 60px;
+}
+
+.audit-numeric-diff__left-label {
+  text-align: right;
 }
 
 .audit-numeric-diff__box--improvement .audit-numeric-diff__now {

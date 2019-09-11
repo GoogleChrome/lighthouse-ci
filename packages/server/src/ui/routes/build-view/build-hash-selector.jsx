@@ -5,6 +5,7 @@
  */
 
 import {h} from 'preact';
+import * as _ from '@lhci/utils/src/lodash.js';
 import './build-hash-selector.css';
 import {useBranchBuilds} from '../../hooks/use-api-data';
 import {AsyncLoader, combineLoadingStates, combineAsyncData} from '../../components/async-loader';
@@ -15,9 +16,12 @@ import {Pill} from '../../components/pill';
  */
 const BuildHashSelector_ = props => {
   const {branchBuilds, baseBuilds, ancestorBuild} = props;
-  const builds = branchBuilds
-    .concat(baseBuilds)
-    .sort((a, b) => new Date(b.runAt).getTime() - new Date(a.runAt).getTime());
+  const builds = _.uniqBy(
+    branchBuilds
+      .concat(baseBuilds)
+      .sort((a, b) => new Date(b.runAt).getTime() - new Date(a.runAt).getTime()),
+    build => build.id
+  );
 
   return (
     <div className="container">

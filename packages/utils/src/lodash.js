@@ -108,6 +108,28 @@ module.exports = {
     return JSON.parse(JSON.stringify(o));
   },
   /**
+   * @template TArr
+   * @template TKey
+   * @param {Array<TArr>} items
+   * @param {(item: TArr) => TKey} keyFn
+   * @return {Array<TArr>}
+   */
+  uniqBy(items, keyFn) {
+    /** @type {Set<TKey>} */
+    const seen = new Set();
+    /** @type {Array<TArr>} */
+    const out = [];
+
+    for (const item of items) {
+      const key = keyFn(item);
+      if (seen.has(key)) continue;
+      seen.add(key);
+      out.push(item);
+    }
+
+    return out;
+  },
+  /**
    * @template T
    * @param {Array<T>} items
    * @param {(item: T) => any} keyFn

@@ -10,9 +10,10 @@ import './build-hash-selector.css';
 import {useBranchBuilds} from '../../hooks/use-api-data';
 import {AsyncLoader, combineLoadingStates, combineAsyncData} from '../../components/async-loader';
 import {Pill} from '../../components/pill';
+import {LhrViewerLink} from '../../components/lhr-viewer-link';
 
 /**
- * @param {{build: LHCI.ServerCommand.Build, ancestorBuild?: LHCI.ServerCommand.Build | null, selector: 'base'|'compare', branchBuilds: Array<LHCI.ServerCommand.Build>, baseBuilds: Array<LHCI.ServerCommand.Build>}} props
+ * @param {{build: LHCI.ServerCommand.Build, ancestorBuild?: LHCI.ServerCommand.Build | null, selector: 'base'|'compare', branchBuilds: Array<LHCI.ServerCommand.Build>, baseBuilds: Array<LHCI.ServerCommand.Build>, lhr: LH.Result, baseLhr?: LH.Result}} props
  */
 const BuildHashSelector_ = props => {
   const {branchBuilds, baseBuilds, ancestorBuild} = props;
@@ -69,6 +70,16 @@ const BuildHashSelector_ = props => {
               <img className="build-hash-selector__avatar" src={build.avatarUrl} />
               <span className="build-hash-selector__commit">{build.commitMessage}</span>
               <span className="build-hash-selector__links">
+                {isCompareBranch && (
+                  <a href="#">
+                    <LhrViewerLink lhr={props.lhr}>Report</LhrViewerLink>
+                  </a>
+                )}
+                {!isCompareBranch && isBaseBranch && props.baseLhr && (
+                  <a href="#">
+                    <LhrViewerLink lhr={props.baseLhr}>Report</LhrViewerLink>
+                  </a>
+                )}
                 <a href={build.externalBuildUrl}>Travis</a>
                 <a href={build.externalBuildUrl}>GH</a>
               </span>
@@ -81,7 +92,7 @@ const BuildHashSelector_ = props => {
 };
 
 /**
- * @param {{build: LHCI.ServerCommand.Build, ancestorBuild?: LHCI.ServerCommand.Build | null, selector: 'base'|'compare'}} props
+ * @param {{build: LHCI.ServerCommand.Build, ancestorBuild?: LHCI.ServerCommand.Build | null, selector: 'base'|'compare', lhr: LH.Result, baseLhr?: LH.Result}} props
  */
 export const BuildHashSelector = props => {
   const branchLoadingData = useBranchBuilds(props.build.projectId, props.build.branch);

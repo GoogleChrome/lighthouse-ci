@@ -184,6 +184,8 @@ const BuildView_ = props => {
           build={props.build}
           ancestorBuild={props.ancestorBuild}
           selector={openBuildHash}
+          lhr={lhr}
+          baseLhr={baseLhr}
         />
       )) || <Fragment />}
       {(selectedAuditId && (

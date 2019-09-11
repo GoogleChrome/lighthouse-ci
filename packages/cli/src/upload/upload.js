@@ -27,6 +27,8 @@ function buildCommand(yargs) {
  * @return {string}
  */
 function getCurrentHash() {
+  if (process.env.TRAVIS_COMMIT) return process.env.TRAVIS_COMMIT;
+
   const result = childProcess.spawnSync('git', ['rev-parse', 'HEAD'], {encoding: 'utf8'});
   if (result.status !== 0) {
     throw new Error('Unable to determine current hash with `git rev-parse HEAD`');
@@ -39,7 +41,7 @@ function getCurrentHash() {
  * @return {string}
  */
 function getCurrentBranch() {
-  if (process.env.TRAVIS_BRANCH) return process.env.TRAVIS_BRANCH;
+  if (process.env.TRAVIS_BRANCH) return process.env.TRAVIS_BRANCH.slice(0, 40);
 
   const result = childProcess.spawnSync('git', ['rev-parse', '--abbrev-ref', 'HEAD'], {
     encoding: 'utf8',
@@ -62,6 +64,8 @@ function getExternalBuildUrl() {
  * @return {string}
  */
 function getCommitMessage() {
+  if (process.env.TRAVIS_COMMIT_MESSAGE) return process.env.TRAVIS_COMMIT_MESSAGE.slice(0, 80);
+
   const result = childProcess.spawnSync('git', ['log', '--format=%s', '-n', '1'], {
     encoding: 'utf8',
   });

@@ -26,7 +26,6 @@ before_cache:
   - rm -rf ./node_modules/.cache/
 services:
   - postgresql
+  - xvfb
 addons:
   chrome: stable
-services:
-  - xvfb

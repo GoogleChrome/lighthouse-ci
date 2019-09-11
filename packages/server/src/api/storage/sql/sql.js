@@ -230,7 +230,12 @@ class SqlStorageMethod {
   async createBuild(unsavedBuild) {
     const {buildModel} = this._sql();
     if (unsavedBuild.lifecycle !== 'unsealed') throw new E422('Invalid lifecycle value');
-    const build = await buildModel.create({...unsavedBuild, id: uuid.v4()});
+    const build = await buildModel.create({
+      ...unsavedBuild,
+      commitMessage: unsavedBuild.commitMessage && unsavedBuild.commitMessage.slice(0, 80),
+      author: unsavedBuild.author && unsavedBuild.author.slice(0, 256),
+      id: uuid.v4(),
+    });
     return clone(build);
   }
 

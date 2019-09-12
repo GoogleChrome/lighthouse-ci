@@ -13,7 +13,7 @@ import {findAuditDiffs} from '@lhci/utils/src/audit-diff-finder.js';
 
 /** @param {{audit: LH.AuditResult, baseAudit?: LH.AuditResult, key?: string}} props */
 const Audit = props => {
-  const diff = props.baseAudit ? findAuditDiffs(props.audit, props.baseAudit) : [];
+  const diff = props.baseAudit ? findAuditDiffs(props.baseAudit, props.audit) : [];
   return (
     <div
       id={`audit-detail-pane-audit--${props.audit.id}`}

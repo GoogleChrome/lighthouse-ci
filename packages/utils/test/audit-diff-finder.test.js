@@ -29,6 +29,12 @@ describe('#findAuditDiffs', () => {
     ]);
   });
 
+  it('should return empty array for identical 0-based audits', () => {
+    const baseAudit = {id: 'audit', score: 0.5, numericValue: 0, details: {items: []}};
+    const compareAudit = {id: 'audit', score: 0.5, numericValue: 0, details: {items: []}};
+    expect(findAuditDiffs(baseAudit, compareAudit)).toEqual([]);
+  });
+
   it('should find score diffs', () => {
     const baseAudit = {id: 'audit', score: 0.8};
     const compareAudit = {id: 'audit', score: 0.4};

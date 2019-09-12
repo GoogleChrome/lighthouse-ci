@@ -55,9 +55,12 @@ function getDiffSeverity(diff) {
 function getDeltaStats(diff) {
   const {baseValue, compareValue} = diff;
   const delta = compareValue - baseValue;
-  const absoluteDelta = Math.abs(compareValue - baseValue);
+  const absoluteDelta = Math.abs(delta);
+  // Handle the 0 case to avoid messy NaN handling.
+  if (delta === 0) return {delta, absoluteDelta, percentDelta: 0, percentAbsoluteDelta: 0};
+
   // Percent delta is `delta / baseValue` unless `baseValue == 0`.
-  // Then `percentDelta` is 100% by arbitrary convention.
+  // Then `percentDelta` is 100% by arbitrary convention (instead of Infinity/NaN).
   const percentDelta = baseValue ? delta / baseValue : 1;
   const percentAbsoluteDelta = Math.abs(percentDelta);
 

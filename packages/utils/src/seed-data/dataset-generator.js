@@ -9,6 +9,11 @@ const _ = require('../lodash.js');
 const PRandom = require('./prandom.js');
 const {createLHR} = require('./lhr-generator.js');
 
+// To include in next LHR update...
+//    - Not applicable audits
+//    - Informative audits
+//    - 0-value numericValue
+
 /** @typedef {import('./lhr-generator').AuditGenDef} AuditGenDef */
 
 /**

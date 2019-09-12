@@ -98,6 +98,7 @@ function createAuditDiff(diff) {
     return {
       auditId,
       type: 'error',
+      attemptedType: type,
       baseValue: baseValue || NaN,
       compareValue: compareValue || NaN,
     };
@@ -202,6 +203,41 @@ function findAuditDetailItemsDiffs(auditId, baseItems, compareItems) {
 }
 
 /**
+ * @param {LH.AuditResult} audit
+ */
+function normalizeScore(audit) {
+  if (audit.scoreDisplayMode === 'notApplicable') {
+    // notApplicable should be treated as passing.
+    return 1;
+  }
+
+  if (audit.scoreDisplayMode === 'informative') {
+    // informative should be treated as failing.
+    return 0;
+  }
+
+  return audit.score;
+}
+
+/**
+ * @param {LH.AuditResult} audit
+ */
+function normalizeNumericValue(audit) {
+  if (audit.scoreDisplayMode === 'notApplicable') {
+    return 0;
+  }
+
+  return audit.numericValue;
+}
+
+/**
+ * @param {LH.AuditResult} audit
+ */
+function normalizeDetailsItems(audit) {
+  return (audit.details && audit.details.items) || [];
+}
+
+/**
  * @param {LH.AuditResult} baseAudit
  * @param {LH.AuditResult} compareAudit
  * @param {{forceAllScoreDiffs?: boolean, percentAbsoluteDeltaThreshold?: number}} options
@@ -211,34 +247,36 @@ function findAuditDiffs(baseAudit, compareAudit, options = {}) {
   const auditId = baseAudit.id || '';
   const {percentAbsoluteDeltaThreshold = 0} = options;
   /** @type {Array<LHCI.AuditDiff>} */
-  const diffs = [
-    createAuditDiff({
-      auditId,
-      type: 'score',
-      baseValue: baseAudit.score,
-      compareValue: compareAudit.score,
-    }),
-  ];
+  const diffs = [];
 
-  if (typeof baseAudit.numericValue === 'number') {
+  if (typeof baseAudit.score === 'number' || typeof compareAudit.score === 'number') {
+    diffs.push(
+      createAuditDiff({
+        auditId,
+        type: 'score',
+        baseValue: normalizeScore(baseAudit),
+        compareValue: normalizeScore(compareAudit),
+      })
+    );
+  }
+
+  if (typeof baseAudit.numericValue === 'number' || typeof compareAudit.numericValue === 'number') {
     diffs.push(
       createAuditDiff({
         auditId,
         type: 'numericValue',
-        baseValue: baseAudit.numericValue,
-        compareValue: compareAudit.numericValue,
+        baseValue: normalizeNumericValue(baseAudit),
+        compareValue: normalizeNumericValue(compareAudit),
       })
     );
   }
 
   if (
-    baseAudit.details &&
-    baseAudit.details.items &&
-    compareAudit.details &&
-    compareAudit.details.items
+    (baseAudit.details && baseAudit.details.items) ||
+    (compareAudit.details && compareAudit.details.items)
   ) {
-    const baseItems = baseAudit.details.items;
-    const compareItems = compareAudit.details.items;
+    const baseItems = normalizeDetailsItems(baseAudit);
+    const compareItems = normalizeDetailsItems(compareAudit);
 
     diffs.push(
       createAuditDiff({

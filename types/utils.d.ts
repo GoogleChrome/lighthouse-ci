@@ -47,6 +47,7 @@ declare global {
 
     export interface ErrorAuditDiff extends BaseAuditDiff {
       type: 'error';
+      attemptedType: AuditDiffType;
       baseValue?: number;
       compareValue?: number;
     }

@@ -16,15 +16,30 @@ describe('#findAuditDiffs', () => {
     expect(findAuditDiffs(baseAudit, compareAudit)).toEqual([]);
   });
 
-  it('should find error diffs', () => {
-    const baseAudit = {id: 'audit', score: null};
+  it('should find error diffs for score', () => {
+    const baseAudit = {id: 'audit', score: null, scoreDisplayMode: 'error'};
     const compareAudit = {id: 'audit', score: 0.5};
     expect(findAuditDiffs(baseAudit, compareAudit)).toEqual([
       {
         auditId: 'audit',
         type: 'error',
+        attemptedType: 'score',
         baseValue: NaN,
         compareValue: 0.5,
+      },
+    ]);
+  });
+
+  it('should find error diffs for score', () => {
+    const baseAudit = {id: 'audit', score: 0.5};
+    const compareAudit = {id: 'audit', score: 0.5, numericValue: 105};
+    expect(findAuditDiffs(baseAudit, compareAudit)).toEqual([
+      {
+        auditId: 'audit',
+        type: 'error',
+        attemptedType: 'numericValue',
+        baseValue: NaN,
+        compareValue: 105,
       },
     ]);
   });
@@ -53,6 +68,32 @@ describe('#findAuditDiffs', () => {
         type: 'score',
         baseValue: 0.95,
         compareValue: 0.4,
+      },
+    ]);
+  });
+
+  it('should find score diffs for notApplicable audits', () => {
+    const baseAudit = {id: 'audit', scoreDisplayMode: 'notApplicable', score: null};
+    const compareAudit = {id: 'audit', score: 0};
+    expect(findAuditDiffs(baseAudit, compareAudit)).toEqual([
+      {
+        auditId: 'audit',
+        type: 'score',
+        baseValue: 1,
+        compareValue: 0,
+      },
+    ]);
+  });
+
+  it('should find score diffs for informative audits', () => {
+    const baseAudit = {id: 'audit', scoreDisplayMode: 'informative', score: null};
+    const compareAudit = {id: 'audit', score: 1};
+    expect(findAuditDiffs(baseAudit, compareAudit)).toEqual([
+      {
+        auditId: 'audit',
+        type: 'score',
+        baseValue: 0,
+        compareValue: 1,
       },
     ]);
   });
@@ -88,6 +129,51 @@ describe('#findAuditDiffs', () => {
         type: 'numericValue',
         baseValue: 3200,
         compareValue: 1600,
+      },
+    ]);
+  });
+
+  it('should find a numericValue diff for not applicable', () => {
+    const baseAudit = {id: 'audit', score: null, scoreDisplayMode: 'notApplicable'};
+    const compareAudit = {id: 'audit', score: 0.7, numericValue: 1600};
+    expect(findAuditDiffs(baseAudit, compareAudit)).toEqual([
+      {
+        auditId: 'audit',
+        type: 'score',
+        baseValue: 1,
+        compareValue: 0.7,
+      },
+      {
+        auditId: 'audit',
+        type: 'numericValue',
+        baseValue: 0,
+        compareValue: 1600,
+      },
+    ]);
+  });
+
+  it('should find a details item addition diff for not applicable', () => {
+    const detailsItem = {url: 'http://example.com/foo.js'};
+    const baseAudit = {id: 'audit', score: null, scoreDisplayMode: 'notApplicable'};
+    const compareAudit = {id: 'audit', score: 0.5, details: {items: [detailsItem]}};
+
+    expect(findAuditDiffs(baseAudit, compareAudit)).toEqual([
+      {
+        auditId: 'audit',
+        type: 'score',
+        baseValue: 1,
+        compareValue: 0.5,
+      },
+      {
+        auditId: 'audit',
+        type: 'itemCount',
+        baseValue: 0,
+        compareValue: 1,
+      },
+      {
+        auditId: 'audit',
+        type: 'itemAddition',
+        compareItemIndex: 0,
       },
     ]);
   });

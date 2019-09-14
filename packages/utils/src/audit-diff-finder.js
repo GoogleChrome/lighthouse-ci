@@ -222,12 +222,27 @@ function normalizeScore(audit) {
 /**
  * @param {LH.AuditResult} audit
  */
+function getNumericValue(audit) {
+  if (
+    typeof audit.numericValue !== 'number' &&
+    audit.details &&
+    typeof audit.details.overallSavingsMs === 'number'
+  ) {
+    return audit.details.overallSavingsMs;
+  }
+
+  return audit.numericValue;
+}
+
+/**
+ * @param {LH.AuditResult} audit
+ */
 function normalizeNumericValue(audit) {
   if (audit.scoreDisplayMode === 'notApplicable') {
     return 0;
   }
 
-  return audit.numericValue;
+  return getNumericValue(audit);
 }
 
 /**
@@ -260,7 +275,10 @@ function findAuditDiffs(baseAudit, compareAudit, options = {}) {
     );
   }
 
-  if (typeof baseAudit.numericValue === 'number' || typeof compareAudit.numericValue === 'number') {
+  if (
+    typeof getNumericValue(baseAudit) === 'number' ||
+    typeof getNumericValue(compareAudit) === 'number'
+  ) {
     diffs.push(
       createAuditDiff({
         auditId,

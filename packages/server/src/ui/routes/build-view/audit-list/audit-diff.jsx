@@ -6,7 +6,7 @@
 
 import {h, Fragment} from 'preact';
 import {ScoreIcon} from '../../../components/score-icon';
-import {NumericDiff, getNumericValueForDiff} from './numeric-diff';
+import {NumericDiff} from './numeric-diff';
 
 /** @param {{audit: LH.AuditResult, baseAudit: LH.AuditResult}} props */
 const StandardDiff = props => {
@@ -21,15 +21,13 @@ const StandardDiff = props => {
 
 /** @param {{pair: LHCI.AuditPair}} props */
 export const AuditDiff = props => {
-  const {audit, baseAudit} = props.pair;
+  const {audit, baseAudit, diffs} = props.pair;
 
   if (!baseAudit) return <span>No diff available</span>;
 
-  if (
-    typeof getNumericValueForDiff(audit) === 'number' ||
-    typeof getNumericValueForDiff(baseAudit) === 'number'
-  ) {
-    return <NumericDiff audit={audit} baseAudit={baseAudit} />;
+  const numericDiff = diffs.find(diff => diff.type === 'numericValue');
+  if (numericDiff && numericDiff.type === 'numericValue') {
+    return <NumericDiff diff={numericDiff} />;
   }
 
   return <StandardDiff audit={audit} baseAudit={baseAudit} />;

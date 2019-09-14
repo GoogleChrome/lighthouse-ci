@@ -8,14 +8,6 @@ import {h, Fragment} from 'preact';
 import {getDeltaLabel} from '@lhci/utils/src/audit-diff-finder';
 import clsx from 'clsx';
 
-/** @param {LH.AuditResult} audit @return {number|undefined} */
-export const getNumericValueForDiff = audit => {
-  const {details, numericValue} = audit;
-  if (typeof numericValue === 'number') return numericValue;
-  if (details && typeof details.overallSavingsMs === 'number') return details.overallSavingsMs;
-  return undefined;
-};
-
 /** @param {number} x @param {'up'|'down'} direction */
 const toNearestRoundNumber = (x, direction) => {
   const fn = direction === 'up' ? Math.ceil : Math.floor;
@@ -41,11 +33,11 @@ const toDisplay = x => {
   });
 };
 
-/** @param {{audit: LH.AuditResult, baseAudit: LH.AuditResult}} props */
+/** @param {{diff: LHCI.NumericAuditDiff}} props */
 export const NumericDiff = props => {
-  const {audit, baseAudit} = props;
-  const currentNumericValue = getNumericValueForDiff(audit);
-  const baseNumericValue = getNumericValueForDiff(baseAudit);
+  const {diff} = props;
+  const currentNumericValue = diff.compareValue;
+  const baseNumericValue = diff.baseValue;
 
   if (typeof baseNumericValue !== 'number' || typeof currentNumericValue !== 'number') {
     return <span>No diff available</span>;

@@ -30,7 +30,7 @@ describe('#findAuditDiffs', () => {
     ]);
   });
 
-  it('should find error diffs for score', () => {
+  it('should find error diffs for numericValue', () => {
     const baseAudit = {id: 'audit', score: 0.5};
     const compareAudit = {id: 'audit', score: 0.5, numericValue: 105};
     expect(findAuditDiffs(baseAudit, compareAudit)).toEqual([
@@ -124,6 +124,19 @@ describe('#findAuditDiffs', () => {
         baseValue: 0.4,
         compareValue: 0.7,
       },
+      {
+        auditId: 'audit',
+        type: 'numericValue',
+        baseValue: 3200,
+        compareValue: 1600,
+      },
+    ]);
+  });
+
+  it('should find a numericValue diff for overallSavingsMs', () => {
+    const baseAudit = {id: 'audit', score: 0.4, details: {overallSavingsMs: 3200}};
+    const compareAudit = {id: 'audit', score: 0.4, details: {overallSavingsMs: 1600}};
+    expect(findAuditDiffs(baseAudit, compareAudit)).toEqual([
       {
         auditId: 'audit',
         type: 'numericValue',

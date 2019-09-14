@@ -213,7 +213,7 @@ const BuildView_ = props => {
         />
         <div className="container">
           <BuildViewLegend />
-          {auditGroups.length ? (
+          {auditGroups.length && baseLhr ? (
             <AuditGroups
               auditGroups={auditGroups}
               baseLhr={baseLhr}

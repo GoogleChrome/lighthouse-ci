@@ -7,6 +7,7 @@
 import {h, Fragment} from 'preact';
 import {getDeltaLabel} from '@lhci/utils/src/audit-diff-finder';
 import clsx from 'clsx';
+import './numeric-diff.css';
 
 /** @param {number} x @param {'up'|'down'} direction */
 const toNearestRoundNumber = (x, direction) => {

@@ -6,17 +6,27 @@
 
 import {h} from 'preact';
 import clsx from 'clsx';
+import {TableDetails} from './table-details';
+
+/** @param {{pair: LHCI.AuditPair, key?: string}} props */
+const Details = props => {
+  const {details} = props.pair.audit;
+  const type = details && details.type;
+  if (type === 'table' || type === 'opportunity') return <TableDetails pair={props.pair} />;
+
+  return <pre>{JSON.stringify(props.pair, null, 2)}</pre>;
+};
 
 /** @param {{pair: LHCI.AuditPair, key?: string}} props */
 export const AuditDetail = props => {
-  const {audit, diffs} = props.pair;
+  const {audit} = props.pair;
 
   return (
     <div id={`audit-detail-pane-audit--${audit.id}`} className={clsx('audit-detail-pane__audit')}>
       <div className="audit-detail-pane__audit-title">{audit.title}</div>
       <div className="audit-detail-pane__audit-description">{audit.description}</div>
       <div className="audit-detail-pane__audit-details">
-        <pre>{JSON.stringify(diffs, null, 2)}</pre>
+        <Details pair={props.pair} />
       </div>
     </div>
   );

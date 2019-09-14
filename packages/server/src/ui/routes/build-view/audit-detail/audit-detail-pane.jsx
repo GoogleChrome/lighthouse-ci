@@ -9,21 +9,7 @@ import './audit-detail-pane.css';
 import clsx from 'clsx';
 import {usePreviousValue} from '../../../hooks/use-previous-value.jsx';
 import {useEffect, useRef} from 'preact/hooks';
-
-/** @param {{pair: LHCI.AuditPair, key?: string}} props */
-const AuditDetail = props => {
-  const {audit, diffs} = props.pair;
-
-  return (
-    <div id={`audit-detail-pane-audit--${audit.id}`} className={clsx('audit-detail-pane__audit')}>
-      <div className="audit-detail-pane__audit-title">{audit.title}</div>
-      <div className="audit-detail-pane__audit-description">{audit.description}</div>
-      <div className="audit-detail-pane__audit-details">
-        <pre>{JSON.stringify(diffs, null, 2)}</pre>
-      </div>
-    </div>
-  );
-};
+import {AuditDetail} from './audit-detail';
 
 /**
  * @param {{selectedAuditId: string, setSelectedAuditId: (id: string|null) => void, pairs: Array<LHCI.AuditPair>, baseLhr?: LH.Result}} props

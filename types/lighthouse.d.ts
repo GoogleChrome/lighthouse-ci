@@ -18,7 +18,12 @@ declare global {
       description?: string;
       score: number | null;
       numericValue?: number;
-      details?: {type: string; items?: any[]; overallSavingsMs?: number; headings?: any};
+      details?: {
+        type: string;
+        items?: Array<Record<string, any>>;
+        overallSavingsMs?: number;
+        headings?: Array<{key: string; valueType: string; label?: string}>;
+      };
       scoreDisplayMode?:
         | 'notApplicable'
         | 'informative'

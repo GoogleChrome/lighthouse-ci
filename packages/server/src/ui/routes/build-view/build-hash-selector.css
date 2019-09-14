@@ -5,7 +5,7 @@
  */
 
 .build-hash-selector {
-  position: absolute;
+  position: fixed;
   z-index: 10;
 
   top: var(--page-header-height);

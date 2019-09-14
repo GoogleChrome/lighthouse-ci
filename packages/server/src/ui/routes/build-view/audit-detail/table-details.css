@@ -4,5 +4,64 @@
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
  */
 
-.table-details {
+.table-details table {
+  border-collapse: collapse;
+  width: calc(100% - var(--base-spacing));
+}
+
+.table-details thead th {
+  font-weight: normal;
+  color: var(--color-gray-600);
+  word-break: normal;
+}
+
+.table-details tbody tr:nth-child(odd) {
+  background-color: var(--color-gray-100);
+}
+
+.table-details th,
+.table-details td {
+  padding: 8px 6px;
+}
+.table-details th:first-child {
+  padding-left: 0;
+}
+.table-details th:last-child {
+  padding-right: 0;
+}
+
+.table-column--text,
+.table-column--url,
+/* .table-column--thumbnail, */
+/* .table-column--empty,*/
+.table-column--code,
+.table-column--node {
+  text-align: left;
+}
+
+.table-column--bytes,
+.table-column--timespanMs,
+.table-column--ms,
+.table-column--numeric {
+  text-align: right;
+  word-break: normal;
+}
+
+.table-details .table-column--thumbnail {
+  width: var(--image-preview-size);
+  padding: 0;
+}
+
+.table-column--url {
+  min-width: 250px;
+}
+
+/* Keep columns narrow if they follow the URL column */
+/* 12% was determined to be a decent narrow width, but wide enough for column headings */
+.table-column--url + th.table-column--bytes,
+.table-column--url + .table-column--bytes + th.table-column--bytes,
+.table-column--url + .table-column--ms,
+.table-column--url + .table-column--ms + th.table-column--bytes,
+.table-column--url + .table-column--bytes + th.table-column--timespanMs {
+  width: 12%;
 }

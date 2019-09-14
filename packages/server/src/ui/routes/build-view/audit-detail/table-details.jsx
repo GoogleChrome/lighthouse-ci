@@ -5,7 +5,6 @@
  */
 
 import {h, Fragment} from 'preact';
-import clsx from 'clsx';
 import './table-details.css';
 
 /** @typedef {'better'|'worse'|'added'|'removed'|'none'} RowState */
@@ -46,27 +45,42 @@ export const TableDetails = props => {
   const {headings, items: compareItems} = audit.details;
   if (!headings || !compareItems) return <Fragment />;
 
-  const items = compareItems;
+  const items = compareItems
+    .map((item, idx) => ({item, compareItemIndex: idx}))
+    .sort(
+      (a, b) =>
+        ROW_STATE_SORT_ORDER.indexOf(determineRowState(diffs, a.compareItemIndex, undefined)) -
+        ROW_STATE_SORT_ORDER.indexOf(determineRowState(diffs, b.compareItemIndex, undefined))
+    );
 
   return (
     <div className="table-details">
       <table>
         <thead>
           <tr>
+            <th />
             {headings.map((heading, i) => {
-              return <th key={i}>{heading.label}</th>;
+              return (
+                <th className={`table-column--${heading.valueType}`} key={i}>
+                  {heading.label}
+                </th>
+              );
             })}
           </tr>
         </thead>
         <tbody>
-          {items.map((item, i) => {
-            const state = determineRowState(diffs, i, undefined);
+          {items.map(({item, compareItemIndex}) => {
+            const state = determineRowState(diffs, compareItemIndex, undefined);
 
             return (
-              <tr key={i}>
+              <tr key={compareItemIndex}>
                 <td>{state}</td>
                 {headings.map((heading, j) => {
-                  return <td key={j}>{item[heading.key]}</td>;
+                  return (
+                    <td key={j} className={`table-column--${heading.valueType}`}>
+                      {item[heading.key]}
+                    </td>
+                  );
                 })}
               </tr>
             );

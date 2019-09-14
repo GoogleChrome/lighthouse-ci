@@ -7,7 +7,7 @@
 import {h} from 'preact';
 import './audit-detail-pane.css';
 import clsx from 'clsx';
-import {usePreviousValue} from '../../hooks/use-previous-value.jsx';
+import {usePreviousValue} from '../../../hooks/use-previous-value.jsx';
 import {useEffect, useRef} from 'preact/hooks';
 
 /** @param {{pair: LHCI.AuditPair, key?: string}} props */

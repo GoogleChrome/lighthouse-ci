@@ -38,10 +38,6 @@
   border-bottom: 1px solid var(--base-border-color);
 }
 
-.audit-detail-pane__audit--selected {
-  background: var(--secondary-background-color);
-}
-
 .audit-detail-pane__audit-title {
   font-size: var(--header-font-size);
 }

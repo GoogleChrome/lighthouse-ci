@@ -18,7 +18,7 @@ import {
 } from '../../hooks/use-api-data';
 import {BuildHashSelector} from './build-hash-selector';
 import {BuildSelectorPill} from './build-selector-pill';
-import {AuditDetailPane} from './audit-detail-pane';
+import {AuditDetailPane} from './audit-detail/audit-detail-pane';
 import {Page} from '../../layout/page';
 import {BuildScoreComparison} from './build-score-comparison';
 import {AuditGroup} from './audit-list/audit-group';

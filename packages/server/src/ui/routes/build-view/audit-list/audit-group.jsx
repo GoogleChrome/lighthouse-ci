@@ -27,9 +27,7 @@ export const AuditGroup = props => {
           return (
             <div
               key={audit.id}
-              className={clsx('audit-group__audit', {
-                'audit-group__audit--selected': audit.id === props.selectedAuditId,
-              })}
+              className={clsx('audit-group__audit')}
               onClick={() => props.setSelectedAuditId(audit.id || null)}
             >
               <div className="audit-group__audit-score">

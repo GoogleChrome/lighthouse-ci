@@ -5,6 +5,7 @@
  */
 'use strict';
 
+const URL = require('url').URL;
 const crypto = require('crypto');
 const childProcess = require('child_process');
 const ApiClient = require('@lhci/utils/src/api-client.js');
@@ -179,8 +180,14 @@ async function runCommand(options) {
     process.stdout.write(`Saved LHR to ${options.serverBaseUrl} (${run.id})\n`);
   }
 
+  const buildViewUrl = new URL(
+    `/app/projects/${build.projectId}/builds/${build.id}`,
+    options.serverBaseUrl
+  );
+
   await api.sealBuild(build.projectId, build.id);
   process.stdout.write(`Done saving build results to Lighthouse CI\n`);
+  process.stdout.write(`View build diff at ${buildViewUrl.href}\n`);
 }
 
 module.exports = {buildCommand, runCommand};

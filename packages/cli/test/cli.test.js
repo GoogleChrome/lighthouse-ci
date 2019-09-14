@@ -130,11 +130,12 @@ describe('Lighthouse CI CLI', () => {
         Saved LHR to http://localhost<PORT> (<UUID>)
         Saved LHR to http://localhost<PORT> (<UUID>)
         Done saving build results to Lighthouse CI
+        View build diff at http://localhost<PORT>/app/projects/<UUID>/builds/<UUID>
         "
       `);
       expect(stderr).toMatchInlineSnapshot(`""`);
       expect(status).toEqual(0);
-      expect(uuids).toHaveLength(4);
+      expect(uuids).toHaveLength(6);
     });
 
     it('should have saved lhrs to the API', async () => {

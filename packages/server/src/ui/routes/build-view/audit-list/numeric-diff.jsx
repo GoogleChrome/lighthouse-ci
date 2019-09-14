@@ -5,10 +5,16 @@
  */
 
 import {h, Fragment} from 'preact';
-import './audit-group.css';
-import {Paper} from '../../components/paper';
-import clsx from 'clsx';
 import {getDeltaLabel} from '@lhci/utils/src/audit-diff-finder';
+import clsx from 'clsx';
+
+/** @param {LH.AuditResult} audit @return {number|undefined} */
+export const getNumericValueForDiff = audit => {
+  const {details, numericValue} = audit;
+  if (typeof numericValue === 'number') return numericValue;
+  if (details && typeof details.overallSavingsMs === 'number') return details.overallSavingsMs;
+  return undefined;
+};
 
 /** @param {number} x @param {'up'|'down'} direction */
 const toNearestRoundNumber = (x, direction) => {
@@ -35,32 +41,11 @@ const toDisplay = x => {
   });
 };
 
-/** @param {LH.AuditResult} audit @return {number|undefined} */
-const getNumericValueForDiff = audit => {
-  const {details, numericValue} = audit;
-  if (typeof numericValue === 'number') return numericValue;
-  if (details && typeof details.overallSavingsMs === 'number') return details.overallSavingsMs;
-  return undefined;
-};
-
-/** @param {{audit: LH.AuditResult, baseAudit?: LH.AuditResult}} props */
-const StandardDiff = props => {
-  if (!props.baseAudit) return <span>No diff available</span>;
-
-  return (
-    <Fragment>
-      <ScoreIcon audit={props.baseAudit} />
-      <span className="audit-group__diff-arrow">→</span>
-      <ScoreIcon audit={props.audit} />
-    </Fragment>
-  );
-};
-
-/** @param {{audit: LH.AuditResult, baseAudit?: LH.AuditResult}} props */
-const NumericDiff = props => {
+/** @param {{audit: LH.AuditResult, baseAudit: LH.AuditResult}} props */
+export const NumericDiff = props => {
   const {audit, baseAudit} = props;
   const currentNumericValue = getNumericValueForDiff(audit);
-  const baseNumericValue = baseAudit && getNumericValueForDiff(baseAudit);
+  const baseNumericValue = getNumericValueForDiff(baseAudit);
 
   if (typeof baseNumericValue !== 'number' || typeof currentNumericValue !== 'number') {
     return <span>No diff available</span>;
@@ -106,53 +91,5 @@ const NumericDiff = props => {
         <div className="audit-numeric-diff__right-label">{toDisplay(upperLimit)}</div>
       </div>
     </Fragment>
-  );
-};
-
-/** @param {{audit: LH.AuditResult}} props */
-const ScoreIcon = props => {
-  const score = props.audit.score || 0;
-  if (score >= 0.9) return <i className="lh-score-pass" />;
-  if (score >= 0.5) return <i className="lh-score-average" />;
-  return <i className="lh-score-fail" />;
-};
-
-/**
- * @param {{key?: string, group: {title: string}, selectedAuditId: string|null, setSelectedAuditId: (id: string|null) => void, audits: Array<LH.AuditResult>, baseLhr?: LH.Result, variant?: 'standard'|'numeric'}} props
- */
-export const AuditGroup = props => {
-  const {group, audits, baseLhr} = props;
-
-  return (
-    <Paper className="audit-group">
-      <div className="audit-group__title">{group.title}</div>
-      <div className="audit-group__audits">
-        {audits.map(audit => {
-          const baseAudit = baseLhr && baseLhr.audits[audit.id || ''];
-
-          return (
-            <div
-              key={audit.id}
-              className={clsx('audit-group__audit', {
-                'audit-group__audit--selected': audit.id === props.selectedAuditId,
-              })}
-              onClick={() => props.setSelectedAuditId(audit.id || null)}
-            >
-              <div className="audit-group__audit-score">
-                <ScoreIcon audit={audit} />
-              </div>
-              <div className="audit-group__audit-title">{audit.title}</div>
-              <div className="audit-group__audit-diff">
-                {typeof getNumericValueForDiff(audit) === 'number' ? (
-                  <NumericDiff audit={audit} baseAudit={baseAudit} />
-                ) : (
-                  <StandardDiff audit={audit} baseAudit={baseAudit} />
-                )}
-              </div>
-            </div>
-          );
-        })}
-      </div>
-    </Paper>
   );
 };

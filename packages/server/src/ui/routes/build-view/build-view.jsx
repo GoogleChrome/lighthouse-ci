@@ -21,7 +21,7 @@ import {BuildSelectorPill} from './build-selector-pill';
 import {AuditDetailPane} from './audit-detail-pane';
 import {Page} from '../../layout/page';
 import {BuildScoreComparison} from './build-score-comparison';
-import {AuditGroup} from './audit-group';
+import {AuditGroup} from './audit-list/audit-group';
 
 import './build-view.css';
 import {BuildViewLegend} from './build-view-legend';

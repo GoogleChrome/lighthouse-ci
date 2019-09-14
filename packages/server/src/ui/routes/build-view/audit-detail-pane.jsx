@@ -9,27 +9,24 @@ import './audit-detail-pane.css';
 import clsx from 'clsx';
 import {usePreviousValue} from '../../hooks/use-previous-value.jsx';
 import {useEffect, useRef} from 'preact/hooks';
-import {findAuditDiffs} from '@lhci/utils/src/audit-diff-finder.js';
 
-/** @param {{audit: LH.AuditResult, baseAudit?: LH.AuditResult, key?: string}} props */
-const Audit = props => {
-  const diff = props.baseAudit ? findAuditDiffs(props.baseAudit, props.audit) : [];
+/** @param {{pair: LHCI.AuditPair, key?: string}} props */
+const AuditDetail = props => {
+  const {audit, diffs} = props.pair;
+
   return (
-    <div
-      id={`audit-detail-pane-audit--${props.audit.id}`}
-      className={clsx('audit-detail-pane__audit')}
-    >
-      <div className="audit-detail-pane__audit-title">{props.audit.title}</div>
-      <div className="audit-detail-pane__audit-description">{props.audit.description}</div>
+    <div id={`audit-detail-pane-audit--${audit.id}`} className={clsx('audit-detail-pane__audit')}>
+      <div className="audit-detail-pane__audit-title">{audit.title}</div>
+      <div className="audit-detail-pane__audit-description">{audit.description}</div>
       <div className="audit-detail-pane__audit-details">
-        <pre>{JSON.stringify(diff, null, 2)}</pre>
+        <pre>{JSON.stringify(diffs, null, 2)}</pre>
       </div>
     </div>
   );
 };
 
 /**
- * @param {{selectedAuditId: string, setSelectedAuditId: (id: string|null) => void, audits: Array<LH.AuditResult>, baseLhr?: LH.Result}} props
+ * @param {{selectedAuditId: string, setSelectedAuditId: (id: string|null) => void, pairs: Array<LHCI.AuditPair>, baseLhr?: LH.Result}} props
  */
 export const AuditDetailPane = props => {
   /** @type {import('preact').Ref<HTMLElement|undefined>} */
@@ -53,13 +50,10 @@ export const AuditDetailPane = props => {
       <div className="audit-detail-pane__close" onClick={() => props.setSelectedAuditId(null)}>
         x
       </div>
-      {props.audits.map(audit => {
+      {props.pairs.map(pair => {
+        const {audit} = pair;
         if (!audit.id) return undefined;
-        const id = audit.id;
-        const baseAudit = props.baseLhr ? props.baseLhr.audits[id] : undefined;
-        return (
-          <Audit key={id} audit={{...audit, id}} baseAudit={baseAudit && {...baseAudit, id}} />
-        );
+        return <AuditDetail key={audit.id} pair={pair} />;
       })}
     </div>
   );

@@ -4,7 +4,7 @@
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
  */
 
-import {h, Fragment} from 'preact';
+import {h} from 'preact';
 import './audit-group.css';
 import {Paper} from '../../../components/paper';
 import {ScoreIcon} from '../../../components/score-icon';
@@ -12,17 +12,17 @@ import clsx from 'clsx';
 import {AuditDiff} from './audit-diff';
 
 /**
- * @param {{key?: string, group: {title: string}, selectedAuditId: string|null, setSelectedAuditId: (id: string|null) => void, audits: Array<LH.AuditResult>, baseLhr?: LH.Result, variant?: 'standard'|'numeric'}} props
+ * @param {{key?: string, group: {title: string}, selectedAuditId: string|null, setSelectedAuditId: (id: string|null) => void, pairs: Array<LHCI.AuditPair>, baseLhr?: LH.Result, variant?: 'standard'|'numeric'}} props
  */
 export const AuditGroup = props => {
-  const {group, audits, baseLhr} = props;
+  const {group, pairs} = props;
 
   return (
     <Paper className="audit-group">
       <div className="audit-group__title">{group.title}</div>
       <div className="audit-group__audits">
-        {audits.map(audit => {
-          const baseAudit = baseLhr && baseLhr.audits[audit.id || ''];
+        {pairs.map(pair => {
+          const {audit} = pair;
 
           return (
             <div
@@ -37,7 +37,7 @@ export const AuditGroup = props => {
               </div>
               <div className="audit-group__audit-title">{audit.title}</div>
               <div className="audit-group__audit-diff">
-                <AuditDiff audit={audit} baseAudit={baseAudit} />
+                <AuditDiff pair={pair} />
               </div>
             </div>
           );

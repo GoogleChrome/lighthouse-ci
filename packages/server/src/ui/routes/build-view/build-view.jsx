@@ -35,7 +35,7 @@ import {BuildViewEmpty} from './build-view-empty';
  * @return {Array<AuditGroupDef>}
  */
 function computeAuditGroups(lhr, baseLhr) {
-  /** @type {Array<AuditGroupDef|undefined>} */
+  /** @type {Array<IntermediateAuditGroupDef|undefined>} */
   const rawAuditGroups = Object.values(lhr.categories)
     .map(category => {
       const auditRefsGroupedByGroup = _.groupBy(category.auditRefs, ref => ref.group);
@@ -55,10 +55,10 @@ function computeAuditGroups(lhr, baseLhr) {
   /** @type {Array<AuditGroupDef>} */
   const auditGroups = [];
 
-  for (const auditGroup of rawAuditGroups) {
-    if (!auditGroup) continue;
+  for (const intermediateGroup of rawAuditGroups) {
+    if (!intermediateGroup) continue;
 
-    const auditPairs = auditGroup.audits
+    const auditPairs = intermediateGroup.audits
       .map(audit => {
         const baseAudit = baseLhr && baseLhr.audits[audit.id || ''];
         const diffs = baseAudit ? findAuditDiffs(baseAudit, audit) : [];
@@ -67,17 +67,20 @@ function computeAuditGroups(lhr, baseLhr) {
       })
       .filter(pair => !pair.baseAudit || pair.diffs.length);
 
-    auditGroup.audits = auditPairs
-      .sort((a, b) => b.maxSeverity - a.maxSeverity)
-      .map(pair => pair.audit);
+    const auditGroup = {
+      id: intermediateGroup.id,
+      group: intermediateGroup.group,
+      pairs: auditPairs.sort((a, b) => b.maxSeverity - a.maxSeverity),
+    };
 
-    if (auditGroup.audits.length) auditGroups.push(auditGroup);
+    if (auditGroup.pairs.length) auditGroups.push(auditGroup);
   }
 
   return auditGroups;
 }
 
-/** @typedef {{id: string, audits: Array<LH.AuditResult>, group: {title: string}}} AuditGroupDef */
+/** @typedef {{id: string, audits: Array<LH.AuditResult>, group: {title: string}}} IntermediateAuditGroupDef */
+/** @typedef {{id: string, pairs: Array<LHCI.AuditPair>, group: {title: string}}} AuditGroupDef */
 
 /** @param {{selectedUrl: string, setUrl(url: string): void, build: LHCI.ServerCommand.Build | null, lhr?: LH.Result, baseLhr?: LH.Result, urls: Array<{url: string}>}} props */
 const BuildViewScoreAndUrl = props => {
@@ -105,7 +108,7 @@ const AuditGroups = props => {
         return (
           <AuditGroup
             key={auditGroup.id}
-            audits={auditGroup.audits}
+            pairs={auditGroup.pairs}
             group={auditGroup.group}
             baseLhr={props.baseLhr}
             selectedAuditId={props.selectedAuditId}
@@ -193,7 +196,7 @@ const BuildView_ = props => {
         <AuditDetailPane
           selectedAuditId={selectedAuditId}
           setSelectedAuditId={setAuditId}
-          audits={auditGroups.map(group => group.audits).reduce((a, b) => a.concat(b))}
+          pairs={auditGroups.map(group => group.pairs).reduce((a, b) => a.concat(b))}
           baseLhr={baseLhr}
         />
       )) || <Fragment />}

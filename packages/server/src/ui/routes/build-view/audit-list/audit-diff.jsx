@@ -19,9 +19,9 @@ const StandardDiff = props => {
   );
 };
 
-/** @param {{audit: LH.AuditResult, baseAudit?: LH.AuditResult}} props */
+/** @param {{pair: LHCI.AuditPair}} props */
 export const AuditDiff = props => {
-  const {audit, baseAudit} = props;
+  const {audit, baseAudit} = props.pair;
 
   if (!baseAudit) return <span>No diff available</span>;
 

@@ -58,6 +58,13 @@ declare global {
       | ItemRemovalAuditDiff
       | NumericItemAuditDiff
       | ErrorAuditDiff;
+
+    export interface AuditPair {
+      audit: LH.AuditResult;
+      baseAudit?: LH.AuditResult;
+      diffs: Array<AuditDiff>;
+      maxSeverity: number;
+    }
   }
 }
 

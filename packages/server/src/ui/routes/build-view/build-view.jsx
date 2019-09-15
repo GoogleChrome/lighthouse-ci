@@ -61,7 +61,9 @@ function computeAuditGroups(lhr, baseLhr) {
     const auditPairs = intermediateGroup.audits
       .map(audit => {
         const baseAudit = baseLhr && baseLhr.audits[audit.id || ''];
-        const diffs = baseAudit ? findAuditDiffs(baseAudit, audit) : [];
+        const diffs = baseAudit
+          ? findAuditDiffs(baseAudit, audit, {percentAbsoluteDeltaThreshold: 0.05})
+          : [];
         const maxSeverity = Math.max(...diffs.map(getDiffSeverity), 0);
         return {audit, baseAudit, diffs, maxSeverity};
       })

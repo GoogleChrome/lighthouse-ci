@@ -32,7 +32,7 @@ declare global {
         type: string;
         items?: Array<Record<string, any>>;
         overallSavingsMs?: number;
-        headings?: Array<{key: string; valueType: string; label?: string}>;
+        headings?: Array<{key: string; valueType: DetailsType; label?: string}>;
       };
       scoreDisplayMode?:
         | 'notApplicable'

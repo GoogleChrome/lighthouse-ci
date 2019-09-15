@@ -6,6 +6,7 @@
 
 import {h, Fragment} from 'preact';
 import './table-details.css';
+import {SimpleDetails} from './simple-details';
 
 /** @typedef {'better'|'worse'|'added'|'removed'|'none'} RowState */
 
@@ -78,7 +79,7 @@ export const TableDetails = props => {
                 {headings.map((heading, j) => {
                   return (
                     <td key={j} className={`table-column--${heading.valueType}`}>
-                      {item[heading.key]}
+                      <SimpleDetails type={heading.valueType} value={item[heading.key]} />
                     </td>
                   );
                 })}

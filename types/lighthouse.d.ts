@@ -12,6 +12,16 @@ declare global {
   type UnPromisify<T> = T extends Promise<infer U> ? U : T;
 
   namespace LH {
+    export type DetailsType =
+      | 'code'
+      | 'bytes'
+      | 'ms'
+      | 'timespanMs'
+      | 'text'
+      | 'numeric'
+      | 'url'
+      | 'thumbnail';
+
     export interface AuditResult {
       id?: string;
       title?: string;

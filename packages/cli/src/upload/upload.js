@@ -11,6 +11,8 @@ const childProcess = require('child_process');
 const ApiClient = require('@lhci/utils/src/api-client.js');
 const {getSavedLHRs} = require('@lhci/utils/src/saved-reports.js');
 
+const envVars = process.env;
+
 /**
  * @param {import('yargs').Argv} yargs
  */
@@ -28,9 +30,12 @@ function buildCommand(yargs) {
  * @return {string}
  */
 function getCurrentHash() {
-  if (process.env.TRAVIS_COMMIT) return process.env.TRAVIS_COMMIT;
+  if (envVars.TRAVIS_PULL_REQUEST_SHA) return envVars.TRAVIS_PULL_REQUEST_SHA;
+  if (envVars.TRAVIS_COMMIT) return envVars.TRAVIS_COMMIT;
 
-  const result = childProcess.spawnSync('git', ['rev-parse', 'HEAD'], {encoding: 'utf8'});
+  const result = childProcess.spawnSync('git', ['rev-list', '--no-merges', '-n', '1', 'HEAD'], {
+    encoding: 'utf8',
+  });
   if (result.status !== 0) {
     throw new Error('Unable to determine current hash with `git rev-parse HEAD`');
   }
@@ -42,7 +47,8 @@ function getCurrentHash() {
  * @return {string}
  */
 function getCurrentBranch() {
-  if (process.env.TRAVIS_BRANCH) return process.env.TRAVIS_BRANCH.slice(0, 40);
+  if (envVars.TRAVIS_PULL_REQUEST_BRANCH) return envVars.TRAVIS_PULL_REQUEST_BRANCH.slice(0, 40);
+  if (envVars.TRAVIS_BRANCH) return envVars.TRAVIS_BRANCH.slice(0, 40);
 
   const result = childProcess.spawnSync('git', ['rev-parse', '--abbrev-ref', 'HEAD'], {
     encoding: 'utf8',
@@ -58,16 +64,15 @@ function getCurrentBranch() {
  * @return {string}
  */
 function getExternalBuildUrl() {
-  return process.env.TRAVIS_BUILD_WEB_URL || '';
+  return envVars.TRAVIS_BUILD_WEB_URL || '';
 }
 
 /**
+ * @param {string} hash
  * @return {string}
  */
-function getCommitMessage() {
-  if (process.env.TRAVIS_COMMIT_MESSAGE) return process.env.TRAVIS_COMMIT_MESSAGE.slice(0, 80);
-
-  const result = childProcess.spawnSync('git', ['log', '--format=%s', '-n', '1'], {
+function getCommitMessage(hash = 'HEAD') {
+  const result = childProcess.spawnSync('git', ['log', '--format=%s', '-n', '1', hash], {
     encoding: 'utf8',
   });
   if (result.status !== 0) {
@@ -78,10 +83,11 @@ function getCommitMessage() {
 }
 
 /**
+ * @param {string} hash
  * @return {string}
  */
-function getAuthor() {
-  const result = childProcess.spawnSync('git', ['log', '--format=%aN <%aE>', '-n', '1'], {
+function getAuthor(hash = 'HEAD') {
+  const result = childProcess.spawnSync('git', ['log', '--format=%aN <%aE>', '-n', '1', hash], {
     encoding: 'utf8',
   });
   if (result.status !== 0) {
@@ -92,10 +98,11 @@ function getAuthor() {
 }
 
 /**
+ * @param {string} hash
  * @return {string}
  */
-function getAvatarUrl() {
-  const result = childProcess.spawnSync('git', ['log', '--format=%aE', '-n', '1'], {
+function getAvatarUrl(hash = 'HEAD') {
+  const result = childProcess.spawnSync('git', ['log', '--format=%aE', '-n', '1', hash], {
     encoding: 'utf8',
   });
   if (result.status !== 0) {
@@ -103,9 +110,9 @@ function getAvatarUrl() {
   }
 
   // Use default gravatar image, see https://en.gravatar.com/site/implement/images/.
-  const hash = crypto.createHash('md5');
-  hash.update(result.stdout.trim().toLowerCase());
-  return `https://www.gravatar.com/avatar/${hash.digest('hex')}.jpg?d=identicon`;
+  const md5 = crypto.createHash('md5');
+  md5.update(result.stdout.trim().toLowerCase());
+  return `https://www.gravatar.com/avatar/${md5.digest('hex')}.jpg?d=identicon`;
 }
 
 /**
@@ -147,16 +154,17 @@ async function runCommand(options) {
     throw new Error('Could not find active project with provided token');
   }
 
+  const hash = getCurrentHash();
   const branch = getCurrentBranch();
 
   const build = await api.createBuild({
     projectId: project.id,
     lifecycle: 'unsealed',
-    hash: getCurrentHash(),
+    hash,
     branch,
-    commitMessage: getCommitMessage(),
-    author: getAuthor(),
-    avatarUrl: getAvatarUrl(),
+    commitMessage: getCommitMessage(hash),
+    author: getAuthor(hash),
+    avatarUrl: getAvatarUrl(hash),
     ancestorHash: branch === 'master' ? getAncestorHashForMaster() : getAncestorHashForBranch(),
     externalBuildUrl: getExternalBuildUrl(),
     runAt: new Date().toISOString(),

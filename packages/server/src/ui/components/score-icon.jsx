@@ -13,3 +13,10 @@ export const ScoreIcon = props => {
   if (score >= 0.5) return <i className="lh-score-average" />;
   return <i className="lh-score-fail" />;
 };
+
+/** @param {{audit: LH.AuditResult}} props */
+export const ScoreWord = props => {
+  const score = props.audit.score || 0;
+  if (score >= 0.9) return <span className="lh-score-word">Pass</span>;
+  return <span className="lh-score-word">Fail</span>;
+};

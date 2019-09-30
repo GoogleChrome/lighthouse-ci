@@ -63,8 +63,10 @@
   --base-font-size: 16px;
   --header-font-size: 20px;
   --title-font-size: 24px;
+  --subtext-font-size: 12px;
 
   --base-icon-size: 16px;
+  --large-icon-size: 24px;
 
   --base-spacing: 12px;
   --large-spacing: 20px;

@@ -5,27 +5,80 @@
  */
 
 import {h, Fragment} from 'preact';
-import {ScoreIcon} from '../../../components/score-icon';
+import {ScoreWord} from '../../../components/score-icon';
 import {NumericDiff} from './numeric-diff';
+import {getDiffLabel} from '@lhci/utils/src/audit-diff-finder';
 
-/** @param {{audit: LH.AuditResult, baseAudit: LH.AuditResult}} props */
+/** @param {{diff: LHCI.AuditDiff, audit: LH.AuditResult, baseAudit: LH.AuditResult}} props */
 const StandardDiff = props => {
   return (
     <Fragment>
-      <ScoreIcon audit={props.baseAudit} />
-      <span className="audit-group__diff-arrow">→</span>
-      <ScoreIcon audit={props.audit} />
+      <ScoreWord audit={props.baseAudit} />
+      <i
+        class={`material-icons audit-group__diff-arrow audit-group__diff-arrow--${getDiffLabel(
+          props.diff
+        )}`}
+      >
+        arrow_forward
+      </i>
+      <ScoreWord audit={props.audit} />
     </Fragment>
   );
 };
 
-/** @param {{diff: LHCI.NumericAuditDiff}} props */
-const ItemCountDiff = props => {
+/** @param {{diffs: Array<LHCI.AuditDiff>, audit: LH.AuditResult, baseAudit: LH.AuditResult}} props */
+const ItemDiff = props => {
+  const {diffs, baseAudit} = props;
+  if (!baseAudit.details || !baseAudit.details.items) return null;
+
+  const seen = new Set();
+  const diffsPerItem = diffs.filter(diff => {
+    if (diff.type !== 'itemDelta') return true;
+    const key = `${diff.baseItemIndex}-${diff.compareItemIndex}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+
+  const regressionDiffs = diffsPerItem.filter(diff => getDiffLabel(diff) === 'regression');
+  const improvementDiffs = diffsPerItem.filter(diff => getDiffLabel(diff) === 'improvement');
+
+  const itemDiffTypes = new Set(['itemRemoval', 'itemAddition', 'itemDelta']);
+  const regressionCount = regressionDiffs.filter(diff => itemDiffTypes.has(diff.type)).length;
+  const improvementCount = improvementDiffs.filter(diff => itemDiffTypes.has(diff.type)).length;
+
   return (
     <Fragment>
-      {props.diff.baseValue} item(s)
-      <span className="audit-group__diff-arrow">→</span>
-      {props.diff.compareValue} item(s)
+      <div class="audit-group__diff-badge-group">
+        <i class="material-icons">list</i>
+        <div class="audit-group__diff-badges">
+          <span class="audit-group__diff-badge">{baseAudit.details.items.length}</span>
+        </div>
+      </div>
+      <i
+        class={`material-icons audit-group__diff-arrow audit-group__diff-arrow--${
+          improvementCount > regressionCount ? 'improvement' : 'regression'
+        }`}
+      >
+        arrow_forward
+      </i>
+      <div class="audit-group__diff-badge-group">
+        <i class="material-icons">list</i>
+        <div class="audit-group__diff-badges">
+          {regressionCount ? (
+            <span class="audit-group__diff-badge audit-group__diff-badge--regression">
+              {regressionCount}
+            </span>
+          ) : null}
+          {improvementCount ? (
+            <span class="audit-group__diff-badge audit-group__diff-badge--improvement">
+              {improvementCount}
+            </span>
+          ) : null}
+        </div>
+      </div>
+      {/* Apply a bit of a spacer to prevent the overflow from leaking outside the boundaries of the box. */}
+      <div style={{width: 10}} />
     </Fragment>
   );
 };
@@ -33,18 +86,23 @@ const ItemCountDiff = props => {
 /** @param {{pair: LHCI.AuditPair}} props */
 export const AuditDiff = props => {
   const {audit, baseAudit, diffs} = props.pair;
+  const noDiffAvailable = <span>No diff available</span>;
 
-  if (!baseAudit) return <span>No diff available</span>;
+  if (!baseAudit) return noDiffAvailable;
 
   const numericDiff = diffs.find(diff => diff.type === 'numericValue');
   if (numericDiff && numericDiff.type === 'numericValue') {
     return <NumericDiff diff={numericDiff} />;
   }
 
-  const itemCountDiff = diffs.find(diff => diff.type === 'itemCount');
-  if (itemCountDiff && itemCountDiff.type === 'itemCount' && itemCountDiff.baseValue !== 0) {
-    return <ItemCountDiff diff={itemCountDiff} />;
+  const hasItemDiff = diffs.some(
+    diff => diff.type === 'itemAddition' || diff.type === 'itemRemoval' || diff.type === 'itemDelta'
+  );
+  if (hasItemDiff) {
+    return <ItemDiff diffs={diffs} audit={audit} baseAudit={baseAudit} />;
   }
 
-  return <StandardDiff audit={audit} baseAudit={baseAudit} />;
+  const scoreDiff = diffs.find(diff => diff.type === 'score');
+  if (!scoreDiff) return noDiffAvailable;
+  return <StandardDiff diff={scoreDiff} audit={audit} baseAudit={baseAudit} />;
 };

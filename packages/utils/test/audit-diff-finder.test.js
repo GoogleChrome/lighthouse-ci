@@ -235,6 +235,24 @@ describe('#findAuditDiffs', () => {
     ]);
   });
 
+  it('should find a details item diff without url', () => {
+    const baseAudit = {id: 'audit', score: 0.5, details: {items: [{node: 'a'}, {node: 'b'}]}};
+    const compareAudit = {id: 'audit', score: 0.5, details: {items: [{node: 'c'}, {node: 'a'}]}};
+
+    expect(findAuditDiffs(baseAudit, compareAudit)).toEqual([
+      {
+        auditId: 'audit',
+        type: 'itemRemoval',
+        baseItemIndex: 1,
+      },
+      {
+        auditId: 'audit',
+        type: 'itemAddition',
+        compareItemIndex: 0,
+      },
+    ]);
+  });
+
   it('should find a details item property diff', () => {
     const detailsItem = {url: 'http://example.com/foo.js'};
     const baseAudit = {

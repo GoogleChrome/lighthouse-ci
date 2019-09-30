@@ -8,7 +8,7 @@
 const _ = require('./lodash.js');
 
 /** @typedef {'improvement'|'neutral'|'regression'} DiffLabel */
-/** @typedef {{item: Record<string, any>, kind: string, index: number}} DetailItemEntry */
+/** @typedef {{item: Record<string, any>, kind?: string, index: number}} DetailItemEntry */
 
 /**
  * @param {number} delta
@@ -191,40 +191,61 @@ function findAuditDetailItemKeyDiffs(auditId, baseEntry, compareEntry) {
 
   return diffs;
 }
-
 /**
  * TODO: consider doing more than URL-based comparisons.
  *
+ * @param {Array<Record<string, any>>} baseItems
+ * @param {Array<Record<string, any>>} compareItems
+ * @return {Array<{base?: DetailItemEntry, compare?: DetailItemEntry}>}
+ */
+function zipBaseAndCompareItems(baseItems, compareItems) {
+  const groupedByKey = _.groupIntoMap(
+    [
+      ...baseItems.map((item, i) => ({item, kind: 'base', index: i})),
+      ...compareItems.map((item, i) => ({item, kind: 'compare', index: i})),
+    ],
+    entry => (entry.item.url === undefined ? JSON.stringify(entry.item) : entry.item.url)
+  );
+
+  /** @type {Array<{base?: DetailItemEntry, compare?: DetailItemEntry}>} */
+  const zipped = [];
+
+  for (const entries of groupedByKey.values()) {
+    const baseItems = entries.filter(entry => entry.kind === 'base');
+    const compareItems = entries.filter(entry => entry.kind === 'compare');
+
+    if (baseItems.length > 1 || compareItems.length > 1) {
+      // The key is not actually unique, just treat all as added/removed.
+      for (const entry of entries) {
+        zipped.push({[entry.kind]: entry});
+      }
+
+      continue;
+    }
+
+    zipped.push({base: baseItems[0], compare: compareItems[0]});
+  }
+
+  return zipped;
+}
+
+/**
  * @param {string} auditId
  * @param {Array<Record<string, any>>} baseItems
  * @param {Array<Record<string, any>>} compareItems
  * @return {Array<LHCI.AuditDiff>}
  */
 function findAuditDetailItemsDiffs(auditId, baseItems, compareItems) {
-  const groupedByUrl = _.groupIntoMap(
-    [
-      ...baseItems.map((item, i) => ({item, kind: 'base', index: i})),
-      ...compareItems.map((item, i) => ({item, kind: 'compare', index: i})),
-    ],
-    entry => entry.item.url
-  );
-
   /** @type {Array<LHCI.AuditDiff>} */
   const diffs = [];
 
-  for (const [url, entries] of groupedByUrl.entries()) {
-    if (typeof url !== 'string') continue;
-    if (entries.length > 2) continue;
-
-    const baseEntry = entries.find(entry => entry.kind === 'base');
-    const compareEntry = entries.find(entry => entry.kind === 'compare');
-
-    if (baseEntry && compareEntry) {
-      diffs.push(...findAuditDetailItemKeyDiffs(auditId, baseEntry, compareEntry));
-    } else if (compareEntry) {
-      diffs.push({type: 'itemAddition', auditId, compareItemIndex: compareEntry.index});
-    } else if (baseEntry) {
-      diffs.push({type: 'itemRemoval', auditId, baseItemIndex: baseEntry.index});
+  for (const {base, compare} of zipBaseAndCompareItems(baseItems, compareItems)) {
+    if (base && compare) {
+      diffs.push(...findAuditDetailItemKeyDiffs(auditId, base, compare));
+    } else if (compare) {
+      diffs.push({type: 'itemAddition', auditId, compareItemIndex: compare.index});
+    } else if (base) {
+      diffs.push({type: 'itemRemoval', auditId, baseItemIndex: base.index});
     } else {
       throw new Error('Impossible');
     }

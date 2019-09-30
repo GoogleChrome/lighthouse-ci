@@ -7,7 +7,11 @@
 
 /* eslint-env jest */
 
-const {findAuditDiffs, getDiffSeverity} = require('@lhci/utils/src/audit-diff-finder.js');
+const {
+  findAuditDiffs,
+  getDiffSeverity,
+  getDiffLabel,
+} = require('@lhci/utils/src/audit-diff-finder.js');
 
 describe('#findAuditDiffs', () => {
   it('should return empty array for identical audits', () => {
@@ -386,5 +390,39 @@ describe('#getDiffSeverity', () => {
         type: 'itemDelta',
       },
     ]);
+  });
+});
+
+describe('#getDiffLabel', () => {
+  it('should categorize errors', () => {
+    expect(getDiffLabel({type: 'error'})).toEqual('regression');
+  });
+
+  it('should categorize score increases', () => {
+    expect(getDiffLabel({type: 'score', baseValue: 0.7, compareValue: 0.9})).toEqual('improvement');
+  });
+
+  it('should categorize score decreases', () => {
+    expect(getDiffLabel({type: 'score', baseValue: 0.7, compareValue: 0.5})).toEqual('regression');
+  });
+
+  it('should categorize numericValue increases', () => {
+    expect(getDiffLabel({type: 'numericValue', baseValue: 500, compareValue: 1000})).toEqual(
+      'regression'
+    );
+  });
+
+  it('should categorize numericValue decreases', () => {
+    expect(getDiffLabel({type: 'numericValue', baseValue: 1000, compareValue: 500})).toEqual(
+      'improvement'
+    );
+  });
+
+  it('should categorize itemAddition', () => {
+    expect(getDiffLabel({type: 'itemAddition'})).toEqual('regression');
+  });
+
+  it('should categorize itemRemoval', () => {
+    expect(getDiffLabel({type: 'itemRemoval'})).toEqual('improvement');
   });
 });

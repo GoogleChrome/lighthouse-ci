@@ -7,18 +7,49 @@
 
 const _ = require('./lodash.js');
 
+/** @typedef {'improvement'|'neutral'|'regression'} DiffLabel */
 /** @typedef {{item: Record<string, any>, kind: string, index: number}} DetailItemEntry */
 
 /**
  * @param {number} delta
  * @param {'audit'|'score'} deltaType
- * @return {'improvement'|'neutral'|'regression'}
+ * @return {DiffLabel}
  */
 function getDeltaLabel(delta, deltaType = 'audit') {
   if (delta === 0) return 'neutral';
   let isImprovement = delta < 0;
   if (deltaType === 'score') isImprovement = delta > 0;
   return isImprovement ? 'improvement' : 'regression';
+}
+
+/**
+ * @param {LHCI.AuditDiff} diff
+ * @return {DiffLabel}
+ */
+function getDiffLabel(diff) {
+  switch (diff.type) {
+    case 'error':
+      return 'regression';
+    case 'score':
+      return getDeltaLabel(getDeltaStats(diff).delta, 'score');
+    case 'numericValue':
+    case 'itemCount':
+    case 'itemDelta':
+      return getDeltaLabel(getDeltaStats(diff).delta, 'audit');
+    case 'itemAddition':
+      return 'regression';
+    case 'itemRemoval':
+      return 'improvement';
+    default:
+      return 'neutral';
+  }
+}
+
+/** @param {Array<DiffLabel>} labels @return {DiffLabel} */
+function getMostSevereDiffLabel(labels) {
+  if (labels.some(l => l === 'regression')) return 'regression';
+  if (labels.some(l => l === 'neutral')) return 'neutral';
+  return 'improvement';
 }
 
 /**
@@ -38,7 +69,7 @@ function getScoreLevel(score) {
 
 /** @param {LHCI.AuditDiff} diff */
 function getDiffSeverity(diff) {
-  const delta = isNumericAuditDiff(diff) ? Math.abs(diff.baseValue - diff.compareValue) : 0;
+  const delta = isNumericAuditDiff(diff) ? getDeltaStats(diff).absoluteDelta : 0;
   if (diff.type === 'error') return 1e12;
   if (diff.type === 'score') return 1e10 * delta;
   if (diff.type === 'numericValue') return 1e8 * Math.max(delta / 1000, 1);
@@ -318,9 +349,15 @@ function findAuditDiffs(baseAudit, compareAudit, options = {}) {
       return getScoreLevel(diff.baseValue) !== getScoreLevel(diff.compareValue);
     }
 
-    // Default to just ensuring the percent delta is above our threshold.
+    // Ensure the percent delta is above our threshold (0 by default).
     return getDeltaStats(diff).percentAbsoluteDelta > percentAbsoluteDeltaThreshold;
   });
 }
 
-module.exports = {findAuditDiffs, getDiffSeverity, getDeltaLabel};
+module.exports = {
+  findAuditDiffs,
+  getDiffSeverity,
+  getDeltaLabel,
+  getDiffLabel,
+  getMostSevereDiffLabel,
+};

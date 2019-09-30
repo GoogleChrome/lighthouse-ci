@@ -7,6 +7,7 @@
 import {h, Fragment} from 'preact';
 import './table-details.css';
 import {SimpleDetails} from './simple-details';
+import {zipBaseAndCompareItems} from '@lhci/utils/src/audit-diff-finder';
 
 /** @typedef {'better'|'worse'|'added'|'removed'|'none'} RowState */
 
@@ -41,18 +42,22 @@ function determineRowState(diffs, compareItemIndex, baseItemIndex) {
 
 /** @param {{pair: LHCI.AuditPair}} props */
 export const TableDetails = props => {
-  const {audit, diffs} = props.pair;
+  const {audit, baseAudit, diffs} = props.pair;
   if (!audit.details) return <Fragment />;
   const {headings, items: compareItems} = audit.details;
   if (!headings || !compareItems) return <Fragment />;
 
-  const items = compareItems
-    .map((item, idx) => ({item, compareItemIndex: idx}))
-    .sort(
-      (a, b) =>
-        ROW_STATE_SORT_ORDER.indexOf(determineRowState(diffs, a.compareItemIndex, undefined)) -
-        ROW_STATE_SORT_ORDER.indexOf(determineRowState(diffs, b.compareItemIndex, undefined))
-    );
+  const baseItems = (baseAudit && baseAudit.details && baseAudit.details.items) || [];
+
+  const zippedItems = zipBaseAndCompareItems(baseItems, compareItems).sort(
+    (a, b) =>
+      ROW_STATE_SORT_ORDER.indexOf(
+        determineRowState(diffs, a.compare && a.compare.index, a.base && a.base.index)
+      ) -
+      ROW_STATE_SORT_ORDER.indexOf(
+        determineRowState(diffs, b.compare && b.compare.index, b.base && b.base.index)
+      )
+  );
 
   return (
     <div className="table-details">
@@ -70,11 +75,17 @@ export const TableDetails = props => {
           </tr>
         </thead>
         <tbody>
-          {items.map(({item, compareItemIndex}) => {
-            const state = determineRowState(diffs, compareItemIndex, undefined);
+          {zippedItems.map(({base, compare}) => {
+            const definedItem = compare || base;
+            // This should never be true, but make tsc happy
+            if (!definedItem) return null;
+
+            const item = definedItem.item;
+            const key = `${base && base.index}-${compare && compare.index}`;
+            const state = determineRowState(diffs, compare && compare.index, base && base.index);
 
             return (
-              <tr key={compareItemIndex}>
+              <tr key={key}>
                 <td>{state}</td>
                 {headings.map((heading, j) => {
                   return (

@@ -381,4 +381,5 @@ module.exports = {
   getDeltaLabel,
   getDiffLabel,
   getMostSevereDiffLabel,
+  zipBaseAndCompareItems,
 };

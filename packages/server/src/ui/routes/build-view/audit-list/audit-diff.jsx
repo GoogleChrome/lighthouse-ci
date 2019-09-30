@@ -15,7 +15,7 @@ const StandardDiff = props => {
     <Fragment>
       <ScoreWord audit={props.baseAudit} />
       <i
-        class={`material-icons audit-group__diff-arrow audit-group__diff-arrow--${getDiffLabel(
+        className={`material-icons audit-group__diff-arrow audit-group__diff-arrow--${getDiffLabel(
           props.diff
         )}`}
       >
@@ -49,29 +49,29 @@ const ItemDiff = props => {
 
   return (
     <Fragment>
-      <div class="audit-group__diff-badge-group">
-        <i class="material-icons">list</i>
-        <div class="audit-group__diff-badges">
-          <span class="audit-group__diff-badge">{baseAudit.details.items.length}</span>
+      <div className="audit-group__diff-badge-group">
+        <i className="material-icons">list</i>
+        <div className="audit-group__diff-badges">
+          <span className="audit-group__diff-badge">{baseAudit.details.items.length}</span>
         </div>
       </div>
       <i
-        class={`material-icons audit-group__diff-arrow audit-group__diff-arrow--${
+        className={`material-icons audit-group__diff-arrow audit-group__diff-arrow--${
           improvementCount > regressionCount ? 'improvement' : 'regression'
         }`}
       >
         arrow_forward
       </i>
-      <div class="audit-group__diff-badge-group">
-        <i class="material-icons">list</i>
-        <div class="audit-group__diff-badges">
+      <div className="audit-group__diff-badge-group">
+        <i className="material-icons">list</i>
+        <div className="audit-group__diff-badges">
           {regressionCount ? (
-            <span class="audit-group__diff-badge audit-group__diff-badge--regression">
+            <span className="audit-group__diff-badge audit-group__diff-badge--regression">
               {regressionCount}
             </span>
           ) : null}
           {improvementCount ? (
-            <span class="audit-group__diff-badge audit-group__diff-badge--improvement">
+            <span className="audit-group__diff-badge audit-group__diff-badge--improvement">
               {improvementCount}
             </span>
           ) : null}

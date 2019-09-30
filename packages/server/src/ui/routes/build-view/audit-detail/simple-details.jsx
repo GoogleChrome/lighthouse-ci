@@ -6,28 +6,57 @@
 
 import {h} from 'preact';
 
-/** @param {{type: LH.DetailsType, value: any}} props */
+/** @param {{type: LH.DetailsType, baseValue: any, compareValue: any}} props */
 export const SimpleDetails = props => {
-  if (typeof props.value === 'object' && props.value.type) {
-    return <SimpleDetails {...props.value} />;
+  const {type, compareValue, baseValue} = props;
+  const value = compareValue === undefined ? baseValue : compareValue;
+
+  if (typeof value === 'object' && value.type) {
+    return <SimpleDetails {...value} />;
   }
+
+  const numericBase = Number.isFinite(baseValue) ? baseValue : 0;
+  const numericCompare = Number.isFinite(compareValue) ? compareValue : 0;
+
+  let label = 'neutral';
+  if (numericCompare < numericBase) label = 'improvement';
+  if (numericCompare > numericBase) label = 'regression';
 
   switch (props.type) {
     case 'bytes':
-      return <span>{Math.round(props.value / 1024).toLocaleString()} KB</span>;
+      const kb = Math.round((numericCompare - numericBase) / 1024);
+      return (
+        <pre className={`simple-details--${label}`}>
+          {kb >= 0 ? '+' : ''}
+          {kb.toLocaleString()} KB
+        </pre>
+      );
     case 'ms':
     case 'timespanMs':
-      return <span>{Math.round(props.value).toLocaleString()} ms</span>;
+      const ms = Math.round(numericCompare - numericBase);
+      return (
+        <pre className={`simple-details--${label}`}>
+          {ms >= 0 ? '+' : ''}
+          {ms.toLocaleString()} ms
+        </pre>
+      );
     case 'thumbnail':
-      return <img style={{width: 48, height: 48, objectFit: 'cover'}} src={props.value} />;
+      return <img style={{width: 48, height: 48, objectFit: 'cover'}} src={value} />;
     case 'url':
-      return <span>{new URL(props.value).pathname}</span>;
+      return <span>{new URL(value).pathname}</span>;
     case 'code':
-      return <pre>{props.value}</pre>;
+      return <pre>{value}</pre>;
     case 'numeric':
-      return <span>{Number(props.value).toLocaleString()}</span>;
+      const delta = numericCompare - numericBase;
+      return (
+        <pre className={`simple-details--${label}`}>
+          {delta >= 0 ? '+' : ''}
+          {delta.toLocaleString()}
+        </pre>
+      );
+      return <span>{Number(value).toLocaleString()}</span>;
     case 'text':
-      return <span>{props.value}</span>;
+      return <span>{value}</span>;
     default:
       return <pre>{JSON.stringify(props).slice(0, 20)}</pre>;
   }

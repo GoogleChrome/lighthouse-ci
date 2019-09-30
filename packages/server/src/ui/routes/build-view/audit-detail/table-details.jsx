@@ -9,10 +9,10 @@ import './table-details.css';
 import {SimpleDetails} from './simple-details';
 import {zipBaseAndCompareItems} from '@lhci/utils/src/audit-diff-finder';
 
-/** @typedef {'better'|'worse'|'added'|'removed'|'none'} RowState */
+/** @typedef {'better'|'worse'|'added'|'removed'|'ambiguous'|'none'} RowState */
 
 /** @type {Array<RowState>} */
-const ROW_STATE_SORT_ORDER = ['added', 'worse', 'removed', 'better', 'none'];
+const ROW_STATE_SORT_ORDER = ['added', 'worse', 'ambiguous', 'removed', 'better', 'none'];
 
 /**
  * @param {Array<LHCI.AuditDiff>} diffs
@@ -31,11 +31,13 @@ function determineRowState(diffs, compareItemIndex, baseItemIndex) {
   const matchingDiffs = diffs.filter(
     diff => diff.type === 'itemDelta' && diff.compareItemIndex === compareItemIndex
   );
-  if (matchingDiffs.some(diff => diff.type === 'itemDelta' && diff.compareValue > diff.baseValue))
+  if (matchingDiffs.every(diff => diff.type === 'itemDelta' && diff.compareValue > diff.baseValue))
     return 'worse';
 
-  if (matchingDiffs.some(diff => diff.type === 'itemDelta' && diff.compareValue < diff.baseValue))
+  if (matchingDiffs.every(diff => diff.type === 'itemDelta' && diff.compareValue < diff.baseValue))
     return 'better';
+
+  if (matchingDiffs.length) return 'ambiguous';
 
   return 'none';
 }
@@ -80,7 +82,6 @@ export const TableDetails = props => {
             // This should never be true, but make tsc happy
             if (!definedItem) return null;
 
-            const item = definedItem.item;
             const key = `${base && base.index}-${compare && compare.index}`;
             const state = determineRowState(diffs, compare && compare.index, base && base.index);
 
@@ -90,7 +91,11 @@ export const TableDetails = props => {
                 {headings.map((heading, j) => {
                   return (
                     <td key={j} className={`table-column--${heading.valueType}`}>
-                      <SimpleDetails type={heading.valueType} value={item[heading.key]} />
+                      <SimpleDetails
+                        type={heading.valueType}
+                        compareValue={compare && compare.item[heading.key]}
+                        baseValue={base && base.item[heading.key]}
+                      />
                     </td>
                   );
                 })}

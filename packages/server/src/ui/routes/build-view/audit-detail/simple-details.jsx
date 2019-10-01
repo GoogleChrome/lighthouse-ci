@@ -5,10 +5,11 @@
  */
 
 import {h} from 'preact';
+import './simple-details.css';
 
 /** @param {{type: LH.DetailsType, baseValue: any, compareValue: any}} props */
 export const SimpleDetails = props => {
-  const {type, compareValue, baseValue} = props;
+  const {compareValue, baseValue} = props;
   const value = compareValue === undefined ? baseValue : compareValue;
 
   if (typeof value === 'object' && value.type) {
@@ -22,11 +23,15 @@ export const SimpleDetails = props => {
   if (numericCompare < numericBase) label = 'improvement';
   if (numericCompare > numericBase) label = 'regression';
 
+  const baseDisplay = `Base Value: ${Math.round(numericBase).toLocaleString()}`;
+  const compareDisplay = `Compare Value: ${Math.round(numericCompare).toLocaleString()}`;
+  const title = `${baseDisplay}, ${compareDisplay}`;
+
   switch (props.type) {
     case 'bytes':
       const kb = Math.round((numericCompare - numericBase) / 1024);
       return (
-        <pre className={`simple-details--${label}`}>
+        <pre className={`simple-details--${label}`} title={title}>
           {kb >= 0 ? '+' : ''}
           {kb.toLocaleString()} KB
         </pre>
@@ -35,7 +40,7 @@ export const SimpleDetails = props => {
     case 'timespanMs':
       const ms = Math.round(numericCompare - numericBase);
       return (
-        <pre className={`simple-details--${label}`}>
+        <pre className={`simple-details--${label}`} title={title}>
           {ms >= 0 ? '+' : ''}
           {ms.toLocaleString()} ms
         </pre>

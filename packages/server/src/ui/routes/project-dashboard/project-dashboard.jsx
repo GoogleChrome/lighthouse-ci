@@ -25,7 +25,7 @@ const ProjectDashboard_ = props => {
       <Paper className="dashboard__recent-activity">
         <h2>Recent Activity</h2>
         <table className="dashboard__build-list">
-          {builds.map(build => {
+          {builds.slice(0, 5).map(build => {
             return (
               <tr
                 key={build.id}

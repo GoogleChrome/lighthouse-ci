@@ -110,14 +110,14 @@ const augmentStatsWithBuilds = (stats, builds) => {
 
 /** @param {{project: LHCI.ServerCommand.Project, builds: Array<LHCI.ServerCommand.Build>, runUrl?: string, branch?: string}} props */
 export const ProjectGraphs = props => {
-  const {project, builds} = props;
+  const {project, builds, branch = 'master'} = props;
   const buildIds = useMemo(() => builds.map(build => build.id), builds);
   const [loadingState, stats] = useBuildStatistics(project.id, buildIds);
   const statsWithBuildsUnfiltered = augmentStatsWithBuilds(stats, builds);
   const statsWithBuilds =
     statsWithBuildsUnfiltered &&
     statsWithBuildsUnfiltered
-      .filter(stat => !props.branch || stat.build.branch === props.branch)
+      .filter(stat => stat.build.branch === branch)
       .filter(stat => !props.runUrl || stat.url === props.runUrl);
 
   return (

@@ -59,7 +59,7 @@ export const TableDetails = props => {
 
             return (
               <tr key={key}>
-                <td>{state}</td>
+                <td className="table-column--row-label">{state}</td>
                 {headings.map((heading, j) => {
                   return (
                     <td key={j} className={`table-column--${heading.valueType}`}>

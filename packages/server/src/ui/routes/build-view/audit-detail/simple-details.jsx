@@ -48,7 +48,7 @@ export const SimpleDetails = props => {
     case 'thumbnail':
       return <img style={{width: 48, height: 48, objectFit: 'cover'}} src={value} />;
     case 'url':
-      return <span>{new URL(value).pathname}</span>;
+      return <span title={value}>{new URL(value).pathname}</span>;
     case 'code':
       return <pre>{value}</pre>;
     case 'numeric':

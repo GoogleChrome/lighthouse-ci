@@ -46,3 +46,14 @@
 .audit-detail-pane__audit-description {
   color: var(--secondary-text-color);
 }
+
+.audit-detail-pane__audit-details {
+  margin-top: var(--base-spacing);
+}
+
+.audit-detail-pane__audit-details--binary {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  font-family: var(--monospace-font-family);
+}

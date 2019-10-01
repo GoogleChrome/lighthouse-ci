@@ -65,3 +65,7 @@
 .table-column--url + .table-column--bytes + th.table-column--timespanMs {
   width: 12%;
 }
+
+.table-column--row-label {
+  color: var(--secondary-text-color);
+}

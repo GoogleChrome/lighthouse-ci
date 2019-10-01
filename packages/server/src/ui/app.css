@@ -88,6 +88,7 @@
   --pill-height: 30px;
   --pill-content-height: calc(var(--pill-height) - 2px);
   --pill-spacing: calc(var(--base-spacing) / 2);
+  --avatar-image-size: 25px;
 
   --audit-group-audit-height: 32px;
 
@@ -133,4 +134,10 @@ h5,
 h6 {
   font-size: var(--header-font-size);
   font-weight: var(--base-font-weight);
+}
+
+.flex-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
 }

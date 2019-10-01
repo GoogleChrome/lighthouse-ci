@@ -5,7 +5,7 @@
  */
 
 import {h} from 'preact';
-import {Link} from 'preact-router';
+import {Link, route} from 'preact-router';
 import _ from '@lhci/utils/src/lodash.js';
 import {useProjectBuilds, useProject} from '../../hooks/use-api-data';
 import {AsyncLoader, combineLoadingStates, combineAsyncData} from '../../components/async-loader';
@@ -22,25 +22,35 @@ const ProjectDashboard_ = props => {
 
   return (
     <div className="dashboard">
-      <div className="dashboard__header">
-        <h2 className="dashboard__project-name">{project.name}</h2>
-        <Paper className="dashboard__build-list">
-          <table>
-            {builds.slice(0, 3).map(build => {
-              return (
-                <tr key={build.id}>
-                  <td>
-                    <Link href={`/app/projects/${project.id}/builds/${build.id}`}>
-                      {build.branch} ({build.hash.slice(0, 8)}){' '}
-                    </Link>
-                  </td>
-                  <td>{new Date(build.runAt).toLocaleTimeString()}</td>
-                </tr>
-              );
-            })}
-          </table>
-        </Paper>
-      </div>
+      <Paper className="dashboard__recent-activity">
+        <h2>Recent Activity</h2>
+        <table className="dashboard__build-list">
+          {builds.map(build => {
+            return (
+              <tr
+                key={build.id}
+                onClick={() => route(`/app/projects/${project.id}/builds/${build.id}`)}
+              >
+                <td className="build-list__avatar">
+                  <img src={build.avatarUrl} title={build.author} />
+                </td>
+                <td className="build-list__commit">{build.commitMessage}</td>
+                <td className="build-list__branch">
+                  <div className="flex-row">
+                    <i className="material-icons">call_split</i>
+                    {build.branch}
+                  </div>
+                </td>
+                <td className="build-list__hash">{build.hash.slice(0, 8)}</td>
+                <td className="build-list__date">
+                  {new Date(build.runAt).toDateString().replace(/\w+ (.*) \d{4}/, '$1')}{' '}
+                  {new Date(build.runAt).toLocaleTimeString().replace(/:\d{2} /, ' ')}
+                </td>
+              </tr>
+            );
+          })}
+        </table>
+      </Paper>
       <ProjectGraphs {...props} />
     </div>
   );

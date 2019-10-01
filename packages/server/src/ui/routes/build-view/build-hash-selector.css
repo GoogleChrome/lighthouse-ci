@@ -47,8 +47,8 @@
 }
 
 .build-hash-selector__avatar {
-  width: 25px;
-  height: 25px;
+  width: var(--avatar-image-size);
+  height: var(--avatar-image-size);
 
   border-radius: 100%;
   margin: 0 var(--base-spacing);

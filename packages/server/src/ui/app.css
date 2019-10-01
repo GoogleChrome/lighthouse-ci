@@ -60,12 +60,12 @@
   --monospace-font-family: 'Roboto Mono', 'Menlo', 'dejavu sans mono', 'Consolas', 'Lucida Console',
     monospace;
 
-  --base-font-size: 16px;
+  --base-font-size: 14px;
   --header-font-size: 20px;
   --title-font-size: 24px;
   --subtext-font-size: 12px;
 
-  --base-icon-size: 16px;
+  --base-icon-size: 14px;
   --large-icon-size: 24px;
 
   --base-spacing: 12px;

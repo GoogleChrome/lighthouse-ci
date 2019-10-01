@@ -51,7 +51,7 @@
   cursor: pointer;
   /* Material Icons aren't actually vertically centered for their line-height, so adjust it */
   position: relative;
-  top: 1px;
+  top: 2px;
 }
 
 .page-header__current-project {

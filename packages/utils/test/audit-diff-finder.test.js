@@ -11,6 +11,8 @@ const {
   findAuditDiffs,
   getDiffSeverity,
   getDiffLabel,
+  getRowLabel,
+  getRowLabelForIndex,
 } = require('@lhci/utils/src/audit-diff-finder.js');
 
 describe('#findAuditDiffs', () => {
@@ -442,5 +444,50 @@ describe('#getDiffLabel', () => {
 
   it('should categorize itemRemoval', () => {
     expect(getDiffLabel({type: 'itemRemoval'})).toEqual('improvement');
+  });
+});
+
+describe('#getRowLabel', () => {
+  it('should categorize added', () => {
+    expect(getRowLabel([{type: 'itemAddition'}])).toEqual('added');
+  });
+
+  it('should categorize removed', () => {
+    expect(getRowLabel([{type: 'itemRemoval'}])).toEqual('removed');
+  });
+
+  it('should categorize better', () => {
+    expect(getRowLabel([{type: 'itemDelta', compareValue: 5, baseValue: 10}])).toEqual('better');
+  });
+
+  it('should categorize worse', () => {
+    expect(getRowLabel([{type: 'itemDelta', compareValue: 10, baseValue: 5}])).toEqual('worse');
+  });
+
+  it('should categorize ambiguous', () => {
+    expect(
+      getRowLabel([
+        {type: 'itemDelta', compareValue: 10, baseValue: 5},
+        {type: 'itemDelta', compareValue: 5, baseValue: 10},
+      ])
+    ).toEqual('ambiguous');
+  });
+
+  it('should categorize no change', () => {
+    expect(getRowLabel([])).toEqual('no change');
+  });
+});
+
+describe('#getRowLabel', () => {
+  it('should categorize row label', () => {
+    const diffs = [
+      {type: 'itemAddition', compareItemIndex: 27},
+      {type: 'itemRemoval', baseItemIndex: 5},
+      {type: 'itemDelta', compareItemIndex: 2, baseItemIndex: 0, compareValue: 0, baseValue: 1},
+    ];
+
+    expect(getRowLabelForIndex(diffs, 27, undefined)).toEqual('added');
+    expect(getRowLabelForIndex(diffs, undefined, 5)).toEqual('removed');
+    expect(getRowLabelForIndex(diffs, 2, 0)).toEqual('better');
   });
 });

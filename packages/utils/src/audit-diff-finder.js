@@ -8,6 +8,7 @@
 const _ = require('./lodash.js');
 
 /** @typedef {'improvement'|'neutral'|'regression'} DiffLabel */
+/** @typedef {'better'|'worse'|'added'|'removed'|'ambiguous'|'no change'} RowLabel */
 /** @typedef {{item: Record<string, any>, kind?: string, index: number}} DetailItemEntry */
 
 /**
@@ -43,6 +44,52 @@ function getDiffLabel(diff) {
     default:
       return 'neutral';
   }
+}
+
+/**
+ * Given the array of diffs for a particular row, determine its label.
+ *
+ * @param {Array<LHCI.AuditDiff>} diffs
+ * @return {RowLabel}
+ */
+function getRowLabel(diffs) {
+  if (!diffs.length) return 'no change';
+
+  if (diffs.some(diff => diff.type === 'itemAddition')) return 'added';
+  if (diffs.some(diff => diff.type === 'itemRemoval')) return 'removed';
+
+  const itemDeltaDiffs = diffs.filter(
+    /** @return {diff is LHCI.NumericItemAuditDiff} */ diff => diff.type === 'itemDelta'
+  );
+
+  // All the diffs were worse, it's "worse".
+  if (itemDeltaDiffs.every(diff => diff.compareValue > diff.baseValue)) return 'worse';
+  // All the diffs were better, it's "better".
+  if (itemDeltaDiffs.every(diff => diff.compareValue < diff.baseValue)) return 'better';
+  // The item had diffs but some were better and some were worse, so we can't decide.
+  if (itemDeltaDiffs.length) return 'ambiguous';
+
+  return 'no change';
+}
+
+/**
+ * Given the array of all diffs for an audit, determine the label for a row with particular item index.
+ *
+ * @param {Array<LHCI.AuditDiff>} diffs
+ * @param {number|undefined} compareItemIndex
+ * @param {number|undefined} baseItemIndex
+ * @return {RowLabel}
+ */
+function getRowLabelForIndex(diffs, compareItemIndex, baseItemIndex) {
+  const matchingDiffs = diffs.filter(diff => {
+    const compareIndex = 'compareItemIndex' in diff ? diff.compareItemIndex : undefined;
+    const baseIndex = 'baseItemIndex' in diff ? diff.baseItemIndex : undefined;
+    if (typeof compareIndex === 'number') return compareIndex === compareItemIndex;
+    if (typeof baseIndex === 'number') return baseIndex === baseItemIndex;
+    return false;
+  });
+
+  return getRowLabel(matchingDiffs);
 }
 
 /** @param {Array<DiffLabel>} labels @return {DiffLabel} */
@@ -380,6 +427,8 @@ module.exports = {
   getDiffSeverity,
   getDeltaLabel,
   getDiffLabel,
+  getRowLabel,
+  getRowLabelForIndex,
   getMostSevereDiffLabel,
   zipBaseAndCompareItems,
 };

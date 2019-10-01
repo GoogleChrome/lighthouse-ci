@@ -7,40 +7,12 @@
 import {h, Fragment} from 'preact';
 import './table-details.css';
 import {SimpleDetails} from './simple-details';
-import {zipBaseAndCompareItems} from '@lhci/utils/src/audit-diff-finder';
+import {zipBaseAndCompareItems, getRowLabelForIndex} from '@lhci/utils/src/audit-diff-finder';
 
-/** @typedef {'better'|'worse'|'added'|'removed'|'ambiguous'|'none'} RowState */
+/** @typedef {import('@lhci/utils/src/audit-diff-finder').RowLabel} RowLabel */
 
-/** @type {Array<RowState>} */
+/** @type {Array<RowLabel>} */
 const ROW_STATE_SORT_ORDER = ['added', 'worse', 'ambiguous', 'removed', 'better', 'none'];
-
-/**
- * @param {Array<LHCI.AuditDiff>} diffs
- * @param {number|undefined} compareItemIndex
- * @param {number|undefined} baseItemIndex
- * @return {RowState}
- */
-function determineRowState(diffs, compareItemIndex, baseItemIndex) {
-  if (
-    diffs.some(diff => diff.type === 'itemAddition' && diff.compareItemIndex === compareItemIndex)
-  )
-    return 'added';
-  if (diffs.some(diff => diff.type === 'itemRemoval' && diff.baseItemIndex === baseItemIndex))
-    return 'removed';
-
-  const matchingDiffs = diffs.filter(
-    diff => diff.type === 'itemDelta' && diff.compareItemIndex === compareItemIndex
-  );
-  if (matchingDiffs.every(diff => diff.type === 'itemDelta' && diff.compareValue > diff.baseValue))
-    return 'worse';
-
-  if (matchingDiffs.every(diff => diff.type === 'itemDelta' && diff.compareValue < diff.baseValue))
-    return 'better';
-
-  if (matchingDiffs.length) return 'ambiguous';
-
-  return 'none';
-}
 
 /** @param {{pair: LHCI.AuditPair}} props */
 export const TableDetails = props => {
@@ -54,10 +26,10 @@ export const TableDetails = props => {
   const zippedItems = zipBaseAndCompareItems(baseItems, compareItems).sort(
     (a, b) =>
       ROW_STATE_SORT_ORDER.indexOf(
-        determineRowState(diffs, a.compare && a.compare.index, a.base && a.base.index)
+        getRowLabelForIndex(diffs, a.compare && a.compare.index, a.base && a.base.index)
       ) -
       ROW_STATE_SORT_ORDER.indexOf(
-        determineRowState(diffs, b.compare && b.compare.index, b.base && b.base.index)
+        getRowLabelForIndex(diffs, b.compare && b.compare.index, b.base && b.base.index)
       )
   );
 
@@ -83,7 +55,7 @@ export const TableDetails = props => {
             if (!definedItem) return null;
 
             const key = `${base && base.index}-${compare && compare.index}`;
-            const state = determineRowState(diffs, compare && compare.index, base && base.index);
+            const state = getRowLabelForIndex(diffs, compare && compare.index, base && base.index);
 
             return (
               <tr key={key}>

@@ -28,7 +28,7 @@ export const SimpleDetails = props => {
   const title = `${baseDisplay}, ${compareDisplay}`;
 
   switch (props.type) {
-    case 'bytes':
+    case 'bytes': {
       const kb = Math.round((numericCompare - numericBase) / 1024);
       return (
         <pre className={`simple-details--${label}`} title={title}>
@@ -36,8 +36,9 @@ export const SimpleDetails = props => {
           {kb.toLocaleString()} KB
         </pre>
       );
+    }
     case 'ms':
-    case 'timespanMs':
+    case 'timespanMs': {
       const ms = Math.round(numericCompare - numericBase);
       return (
         <pre className={`simple-details--${label}`} title={title}>
@@ -45,13 +46,14 @@ export const SimpleDetails = props => {
           {ms.toLocaleString()} ms
         </pre>
       );
+    }
     case 'thumbnail':
       return <img style={{width: 48, height: 48, objectFit: 'cover'}} src={value} />;
     case 'url':
       return <span title={value}>{new URL(value).pathname}</span>;
     case 'code':
       return <pre>{value}</pre>;
-    case 'numeric':
+    case 'numeric': {
       const delta = numericCompare - numericBase;
       return (
         <pre className={`simple-details--${label}`}>
@@ -59,7 +61,7 @@ export const SimpleDetails = props => {
           {delta.toLocaleString()}
         </pre>
       );
-      return <span>{Number(value).toLocaleString()}</span>;
+    }
     case 'text':
       return <span>{value}</span>;
     default:

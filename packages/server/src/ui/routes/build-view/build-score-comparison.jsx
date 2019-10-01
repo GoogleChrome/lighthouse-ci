@@ -8,6 +8,9 @@ import {h} from 'preact';
 import './build-score-comparison.css';
 import clsx from 'clsx';
 
+import {Gauge} from '../../components/gauge';
+import {getDiffLabel} from '@lhci/utils/src/audit-diff-finder';
+
 /** @param {number} score */
 const renderScore = score => Math.round(score * 100);
 
@@ -22,21 +25,26 @@ export const BuildScoreComparison = props => {
     <div className="build-score-comparison">
       {Object.keys(lhr.categories).map(id => {
         const category = lhr.categories[id];
-        let diff = null;
+        let deltaEl = null;
         let classes = '';
+        /** @type {LHCI.NumericAuditDiff|undefined} */
+        let diff = undefined;
 
         if (baseLhr) {
           const baseCategory = baseLhr.categories[id];
           if (baseCategory) {
+            diff = {
+              auditId: '',
+              type: 'score',
+              baseValue: baseCategory.score,
+              compareValue: category.score,
+            };
+
             const delta = renderScore(category.score - baseCategory.score);
 
-            classes = clsx({
-              'build-score-comparison-item--improvement': delta > 0,
-              'build-score-comparison-item--regression': delta < 0,
-              'build-score-comparison-item--neutral': delta === 0,
-            });
+            classes = `build-score-comparison-item--${getDiffLabel(diff)}`;
 
-            diff = (
+            deltaEl = (
               <div className={clsx('build-score-comparison-item__delta')}>
                 {delta < 0 ? delta : `+${delta}`}
               </div>
@@ -46,9 +54,9 @@ export const BuildScoreComparison = props => {
 
         return (
           <div key={id} className={clsx('build-score-comparison-item', classes)}>
-            <div className="build-score-comparison-item__score">{renderScore(category.score)}</div>
+            <Gauge score={category.score} diff={diff} />
             <div className="build-score-comparison-item__label">{category.title}</div>
-            {diff}
+            {deltaEl}
           </div>
         );
       })}

@@ -34,7 +34,7 @@
   --inverted-secondary-text-color: var(--color-gray-500);
 
   --base-background-color: var(--color-gray-50);
-  --secondary-background-color: var(--color-gray-200);
+  --secondary-background-color: var(--color-gray-100);
   --highlighted-background-color: var(--color-gray-0);
   --inverted-background-color: var(--color-gray-900);
 
@@ -82,7 +82,8 @@
   --page-sidebar-width: 350px;
   --page-sidebar-nav-item-height: 24px;
 
-  --build-score-gauge-size: 82px;
+  --gauge-size: 82px;
+  --gauge-stroke-width: 7px;
   --build-score-delta-badge-height: 24px;
   --pill-height: 30px;
   --pill-content-height: calc(var(--pill-height) - 2px);

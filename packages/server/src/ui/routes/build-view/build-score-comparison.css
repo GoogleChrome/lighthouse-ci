@@ -21,19 +21,6 @@
   align-items: center;
 }
 
-.build-score-comparison-item__score {
-  width: var(--build-score-gauge-size);
-  height: var(--build-score-gauge-size);
-  border-radius: calc(var(--build-score-gauge-size) / 2);
-  line-height: var(--build-score-gauge-size);
-  font-size: calc(var(--build-score-gauge-size) / 2);
-
-  border: 1px solid var(--base-border-color);
-
-  font-family: var(--monospace-font-family);
-  text-align: center;
-}
-
 .build-score-comparison-item__label {
   margin-top: var(--base-spacing);
 }

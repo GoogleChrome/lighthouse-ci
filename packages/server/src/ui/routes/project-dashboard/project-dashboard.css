@@ -58,20 +58,3 @@
 .dashboard-summary__badge--negative {
   background: var(--color-red-a200);
 }
-
-.dashboard_graphs-container {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-}
-
-.dashboard-graph {
-  width: calc(50% - 2 * var(--base-spacing));
-  /* Note this value must be set in JavaScript as well for the Plot height. */
-  min-height: var(--dashboard-graph-min-height);
-}
-
-.dashboard-graph__title {
-  margin-top: var(--base-spacing);
-  margin-left: var(--base-spacing);
-}

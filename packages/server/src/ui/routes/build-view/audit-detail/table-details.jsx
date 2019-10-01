@@ -12,7 +12,7 @@ import {zipBaseAndCompareItems, getRowLabelForIndex} from '@lhci/utils/src/audit
 /** @typedef {import('@lhci/utils/src/audit-diff-finder').RowLabel} RowLabel */
 
 /** @type {Array<RowLabel>} */
-const ROW_STATE_SORT_ORDER = ['added', 'worse', 'ambiguous', 'removed', 'better', 'none'];
+const ROW_STATE_SORT_ORDER = ['added', 'worse', 'ambiguous', 'removed', 'better', 'no change'];
 
 /** @param {{pair: LHCI.AuditPair}} props */
 export const TableDetails = props => {

@@ -4,10 +4,11 @@
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
  */
 
+import * as _ from '@lhci/utils/src/lodash';
 import {h, Fragment} from 'preact';
 import {ScoreWord} from '../../../components/score-icon';
 import {NumericDiff} from './numeric-diff';
-import {getDiffLabel} from '@lhci/utils/src/audit-diff-finder';
+import {getDiffLabel, getRowLabelForIndex} from '@lhci/utils/src/audit-diff-finder';
 
 /** @param {{diff: LHCI.AuditDiff, audit: LH.AuditResult, baseAudit: LH.AuditResult}} props */
 const StandardDiff = props => {
@@ -26,26 +27,46 @@ const StandardDiff = props => {
   );
 };
 
+/** @param {import('@lhci/utils/src/audit-diff-finder').RowLabel} rowLabel @return {'regression'|'improvement'|'neutral'} */
+function getDiffLabelForRowLabel(rowLabel) {
+  switch (rowLabel) {
+    case 'added':
+    case 'worse':
+    case 'ambiguous':
+      return 'regression';
+    case 'removed':
+    case 'better':
+      return 'improvement';
+    case 'no change':
+      return 'neutral';
+  }
+}
+
+/** @param {Array<LHCI.AuditDiff>} diffs */
+function getUniqueBaseCompareIndexPairs(diffs) {
+  return _.uniqBy(
+    diffs
+      .map(diff => ({
+        base: 'baseItemIndex' in diff ? diff.baseItemIndex : undefined,
+        compare: 'compareItemIndex' in diff ? diff.compareItemIndex : undefined,
+      }))
+      .filter(indexes => typeof indexes.base === 'number' || typeof indexes.compare === 'number'),
+    idx => `${idx.base}-${idx.compare}`
+  );
+}
+
 /** @param {{diffs: Array<LHCI.AuditDiff>, audit: LH.AuditResult, baseAudit: LH.AuditResult}} props */
 const ItemDiff = props => {
   const {diffs, baseAudit} = props;
   if (!baseAudit.details || !baseAudit.details.items) return null;
 
-  const seen = new Set();
-  const diffsPerItem = diffs.filter(diff => {
-    if (diff.type !== 'itemDelta') return true;
-    const key = `${diff.baseItemIndex}-${diff.compareItemIndex}`;
-    if (seen.has(key)) return false;
-    seen.add(key);
-    return true;
-  });
+  const rowIndexes = getUniqueBaseCompareIndexPairs(diffs);
+  const rowLabels = rowIndexes
+    .map(pair => getRowLabelForIndex(diffs, pair.compare, pair.base))
+    .map(getDiffLabelForRowLabel);
 
-  const regressionDiffs = diffsPerItem.filter(diff => getDiffLabel(diff) === 'regression');
-  const improvementDiffs = diffsPerItem.filter(diff => getDiffLabel(diff) === 'improvement');
-
-  const itemDiffTypes = new Set(['itemRemoval', 'itemAddition', 'itemDelta']);
-  const regressionCount = regressionDiffs.filter(diff => itemDiffTypes.has(diff.type)).length;
-  const improvementCount = improvementDiffs.filter(diff => itemDiffTypes.has(diff.type)).length;
+  const regressionCount = rowLabels.filter(label => label === 'regression').length;
+  const improvementCount = rowLabels.filter(label => label === 'improvement').length;
 
   return (
     <Fragment>

@@ -24,9 +24,11 @@ describe('Project dashboard', () => {
 
       expect(commits).toMatchInlineSnapshot(`
         Array [
-          "missing_ancestor (ba5b0ad9) 8:13:28 PM",
-          "master (5b0ad9f6) 6:55:18 PM",
-          "test_1 (c1ea447b) 6:15:28 PM",
+          "test(unmatched-ancestor): a really really really really long messagecall_splitmissing_ancestorba5b0ad9Aug 09 8:13 PM",
+          "test(matched-ancestor): a really really really really really long messagecall_splitmaster5b0ad9f6Aug 09 6:55 PM",
+          "feat: test out a different risky changecall_splittest_1c1ea447bAug 09 6:15 PM",
+          "feat: test out a risky changecall_splittest_0aaa5b0a3Aug 09 3:15 PM",
+          "perf: TTI improvementscall_splitmasterbb9aa3c1Aug 07 3:51 PM",
         ]
       `);
     });

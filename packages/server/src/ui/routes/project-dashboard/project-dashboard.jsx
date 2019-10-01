@@ -5,7 +5,7 @@
  */
 
 import {h} from 'preact';
-import {Link, route} from 'preact-router';
+import {route} from 'preact-router';
 import _ from '@lhci/utils/src/lodash.js';
 import {useProjectBuilds, useProject} from '../../hooks/use-api-data';
 import {AsyncLoader, combineLoadingStates, combineAsyncData} from '../../components/async-loader';

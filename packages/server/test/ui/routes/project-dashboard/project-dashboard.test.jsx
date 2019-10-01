@@ -65,6 +65,6 @@ describe('ProjectDashboard', () => {
     );
 
     const {getAllByText} = render(<ProjectDashboard projectId={'abcd'} />);
-    await wait(() => getAllByText(/Project/));
+    await wait(() => getAllByText(/feature_branch/));
   });
 });

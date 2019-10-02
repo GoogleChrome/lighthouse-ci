@@ -53,6 +53,7 @@ function clearSavedLHRs() {
 }
 
 function getSavedReportsDirectory() {
+  ensureDirectoryExists();
   return LHCI_DIR;
 }
 

@@ -27,6 +27,7 @@ declare global {
       title?: string;
       description?: string;
       score: number | null;
+      displayValue?: string;
       numericValue?: number;
       details?: {
         type: string;

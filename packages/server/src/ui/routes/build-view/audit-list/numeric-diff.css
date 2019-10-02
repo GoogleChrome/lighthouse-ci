@@ -57,8 +57,11 @@
   top: 0;
   bottom: 0;
   padding: 0 calc(var(--base-spacing) / 2);
+
   font-size: calc(var(--base-font-size) * 3 / 4);
   line-height: calc(var(--base-font-size) * 3 / 4);
+  white-space: nowrap;
+  font-weight: var(--medium-font-weight);
 
   display: flex;
   flex-direction: row;
@@ -68,6 +71,7 @@
 .audit-numeric-diff__left-label,
 .audit-numeric-diff__right-label {
   width: 60px;
+  color: var(--secondary-text-color);
 }
 
 .audit-numeric-diff__left-label {

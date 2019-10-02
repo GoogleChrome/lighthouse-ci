@@ -19,19 +19,24 @@ const toNearestRoundNumber = (x, direction) => {
   return fn(x / 2500) * 2500;
 };
 
-/** @param {number} x */
-const toDisplay = x => {
-  let value = x;
-  let fractionDigits = 1;
-  if (Math.abs(x) >= 100) {
-    fractionDigits = 0;
-    value = Math.round(value * 10) / 10;
+/** @param {number} x @param {{asDelta?: boolean, withSuffix?: boolean}} options*/
+const toDisplay = (x, options = {}) => {
+  let value = Math.round(x);
+  let fractionDigits = 0;
+  let suffix = ' ms';
+
+  if (Math.abs(value) >= 50) {
+    value /= 1000;
+    fractionDigits = 1;
+    suffix = ' s';
   }
 
-  return value.toLocaleString(undefined, {
+  const string = value.toLocaleString(undefined, {
     minimumFractionDigits: fractionDigits,
     maximumFractionDigits: fractionDigits,
   });
+
+  return `${options.asDelta && value >= 0 ? '+' : ''}${string}${options.withSuffix ? suffix : ''}`;
 };
 
 /** @param {{diff: LHCI.NumericAuditDiff}} props */
@@ -77,7 +82,7 @@ export const NumericDiff = props => {
               className="audit-numeric-diff__delta-label"
               style={{[minValueIsCurrentValue ? 'right' : 'left']: '100%'}}
             >
-              {toDisplay(delta)}
+              {toDisplay(delta, {asDelta: true, withSuffix: true})}
             </div>
           </div>
         </div>

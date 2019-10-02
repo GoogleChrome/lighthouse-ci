@@ -28,7 +28,7 @@ function buildCommand(yargs) {
       description: 'sed-like replacement patterns to mask non-deterministic URL substrings.',
       default: [
         's#:[0-9]{3,5}/#:PORT/#', // replace ports
-        's/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/UUID/i', // replace UUIDs
+        's/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/UUID/ig', // replace UUIDs
       ],
     },
   });

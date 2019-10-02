@@ -10,6 +10,7 @@ declare global {
       export interface Options {
         token: string;
         serverBaseUrl: string;
+        urlReplacementPatterns: string[];
       }
     }
   }

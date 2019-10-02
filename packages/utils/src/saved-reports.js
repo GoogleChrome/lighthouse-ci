@@ -56,4 +56,28 @@ function getSavedReportsDirectory() {
   return LHCI_DIR;
 }
 
-module.exports = {getSavedLHRs, saveLHR, clearSavedLHRs, getSavedReportsDirectory};
+/**
+ * @param {string} url
+ * @param {string[]} sedLikeReplacementPatterns
+ */
+function replaceUrlPatterns(url, sedLikeReplacementPatterns) {
+  let replaced = url;
+
+  for (const pattern of sedLikeReplacementPatterns) {
+    const match = pattern.match(/^s(.)(.*)\1(.*)\1([gim]*)$/);
+    if (!match) throw new Error(`Invalid URL replacement pattern "${pattern}"`);
+    const [needle, replacement, flags] = match.slice(2);
+    const regex = new RegExp(needle, flags);
+    replaced = replaced.replace(regex, replacement);
+  }
+
+  return replaced;
+}
+
+module.exports = {
+  getSavedLHRs,
+  saveLHR,
+  clearSavedLHRs,
+  getSavedReportsDirectory,
+  replaceUrlPatterns,
+};

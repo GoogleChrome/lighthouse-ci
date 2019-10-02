@@ -9,7 +9,7 @@ const URL = require('url').URL;
 const crypto = require('crypto');
 const childProcess = require('child_process');
 const ApiClient = require('@lhci/utils/src/api-client.js');
-const {getSavedLHRs} = require('@lhci/utils/src/saved-reports.js');
+const {getSavedLHRs, replaceUrlPatterns} = require('@lhci/utils/src/saved-reports.js');
 
 const envVars = process.env;
 
@@ -22,6 +22,14 @@ function buildCommand(yargs) {
     serverBaseUrl: {
       description: 'The base URL of the server where results will be saved.',
       default: 'http://localhost:9001/',
+    },
+    urlReplacementPatterns: {
+      type: 'array',
+      description: 'sed-like replacement patterns to mask non-deterministic URL substrings.',
+      default: [
+        's#:[0-9]{3,5}/#:PORT/#', // replace ports
+        's/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/UUID/i', // replace UUIDs
+      ],
     },
   });
 }
@@ -174,14 +182,16 @@ async function runCommand(options) {
   process.stdout.write(`Saving CI build (${build.id})\n`);
 
   const lhrs = getSavedLHRs();
+  const urlReplacementPatterns = options.urlReplacementPatterns.filter(Boolean);
 
   for (const lhr of lhrs) {
     const parsedLHR = JSON.parse(lhr);
+    const url = replaceUrlPatterns(parsedLHR.finalUrl, urlReplacementPatterns);
     const run = await api.createRun({
       projectId: project.id,
       buildId: build.id,
       representative: false,
-      url: parsedLHR.finalUrl,
+      url,
       lhr,
     });
 

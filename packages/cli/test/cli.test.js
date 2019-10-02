@@ -146,7 +146,10 @@ describe('Lighthouse CI CLI', () => {
 
       const runs = await response.json();
       expect(runs.map(run => run.id)).toEqual([runBId, runAId]);
-      expect(runs.map(run => run.url)).toEqual([urlToCollect, urlToCollect]);
+      expect(runs.map(run => run.url)).toEqual([
+        'http://localhost:PORT/app/', // make sure we replaced the port
+        'http://localhost:PORT/app/',
+      ]);
       expect(runs.map(run => JSON.parse(run.lhr))).toMatchObject([
         {requestedUrl: urlToCollect},
         {requestedUrl: urlToCollect},

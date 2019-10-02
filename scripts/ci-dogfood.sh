@@ -17,7 +17,11 @@ sleep 10
 # Seed the database with some data for us to audit.
 yarn start:seed-database
 # Collect our LHCI results.
-yarn start collect --url=http://localhost:9009/app
+rm -rf .lighthouseci/
+for url in $(LHCI_ROOT_URL=http://localhost:9009 node ./scripts/ci-dogfood-get-urls.js); do
+  yarn start collect "--url=$url" --additive
+done
+
 # Upload the results to our canary server.
 yarn start upload --serverBaseUrl="$LHCI_CANARY_SERVER_URL" --token="$LHCI_CANARY_SERVER_TOKEN"
 

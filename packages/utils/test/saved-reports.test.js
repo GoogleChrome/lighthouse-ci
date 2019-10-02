@@ -28,6 +28,8 @@ describe('replaceUrlPatterns', () => {
   it('should support regex flags', () => {
     expect(replaceUrlPatterns('localhost', ['s/lOcAlHoSt/pwned/'])).toEqual('localhost');
     expect(replaceUrlPatterns('localhost', ['s/lOcAlHoSt/pwned/i'])).toEqual('pwned');
+    expect(replaceUrlPatterns('localhost', ['s/L/$/i'])).toEqual('$ocalhost');
+    expect(replaceUrlPatterns('localhost', ['s/L/$/ig'])).toEqual('$oca$host');
   });
 
   it('should allow alternate control characters and backreferences', () => {

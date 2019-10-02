@@ -43,6 +43,7 @@ declare global {
         method: 'node' | 'docker';
         numberOfRuns: number;
         headful: boolean;
+        additive: boolean;
         settings?: LighthouseSettings;
       }
     }

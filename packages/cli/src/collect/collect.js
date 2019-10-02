@@ -14,7 +14,8 @@ const {saveLHR, clearSavedLHRs} = require('@lhci/utils/src/saved-reports.js');
 function buildCommand(yargs) {
   return yargs.options({
     method: {type: 'string', choices: ['node', 'docker'], default: 'node'},
-    headful: {type: 'boolean', description: 'When enabled runs with a headful Chrome'},
+    headful: {type: 'boolean', description: 'Run with a headful Chrome'},
+    additive: {type: 'boolean', description: 'Skips clearing of previous collect data'},
     url: {description: 'The URL to run Lighthouse on.', required: true},
     settings: {description: 'The Lighthouse settings and flags to use when collecting'},
     numberOfRuns: {
@@ -34,7 +35,7 @@ async function runCommand(options) {
   if (options.method !== 'node') throw new Error(`Method "${options.method}" not yet supported`);
   const runner = new LighthouseRunner();
 
-  clearSavedLHRs();
+  if (!options.additive) clearSavedLHRs();
   process.stdout.write(`Running Lighthouse ${options.numberOfRuns} time(s)\n`);
 
   for (let i = 0; i < options.numberOfRuns; i++) {

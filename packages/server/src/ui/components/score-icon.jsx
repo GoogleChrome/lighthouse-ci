@@ -6,12 +6,18 @@
 
 import {h} from 'preact';
 
-/** @param {{audit: LH.AuditResult}} props */
+/** @param {{score: number}} props */
 export const ScoreIcon = props => {
-  const score = props.audit.score || 0;
+  const score = props.score;
   if (score >= 0.9) return <i className="lh-score-pass" />;
   if (score >= 0.5) return <i className="lh-score-average" />;
-  return <i className="lh-score-fail" />;
+  return (
+    <i className="lh-score-fail">
+      <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+        <polygon points="10,110 60,10 110,110" />
+      </svg>
+    </i>
+  );
 };
 
 /** @param {{audit: LH.AuditResult}} props */

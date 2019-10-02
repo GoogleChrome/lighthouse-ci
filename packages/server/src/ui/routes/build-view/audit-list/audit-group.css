@@ -31,6 +31,10 @@
 .audit-group__audit-title {
   margin-left: var(--base-spacing);
   font-weight: var(--medium-font-weight);
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .audit-group__audit-diff {

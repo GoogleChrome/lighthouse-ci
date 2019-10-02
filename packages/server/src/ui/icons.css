@@ -5,13 +5,16 @@
  */
 
 i.lh-score-fail {
-  position: relative;
   display: block;
-  width: 0;
-  height: 0;
-  border-left: calc(var(--base-icon-size) / 2) solid transparent;
-  border-right: calc(var(--base-icon-size) / 2) solid transparent;
-  border-bottom: var(--base-icon-size) solid var(--fail-color);
+  width: var(--base-icon-size);
+  height: var(--base-icon-size);
+}
+
+i.lh-score-fail polygon {
+  /* the SVG is on a 120x120 viewBox, so scale up the strokeWidth */
+  stroke: var(--fail-color);
+  stroke-width: 15px;
+  fill: none;
 }
 
 i.lh-score-average {

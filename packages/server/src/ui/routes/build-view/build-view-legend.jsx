@@ -6,15 +6,16 @@
 
 import {h} from 'preact';
 import './build-view-legend.css';
+import {ScoreIcon} from '../../components/score-icon';
 
 export const BuildViewLegend = () => {
   return (
     <div className="build-view__legend">
-      <i className="lh-score-fail" />
+      <ScoreIcon score={0} />
       <span className="build-view-legend__label">0-49</span>
-      <i className="lh-score-average" />
+      <ScoreIcon score={0.5} />
       <span className="build-view-legend__label">50-89</span>
-      <i className="lh-score-pass" />
+      <ScoreIcon score={1} />
       <span className="build-view-legend__label">90-100</span>
       <i className="build-view-legend__chip build-view-legend__chip--regression" />
       <span className="build-view-legend__label">Regression</span>

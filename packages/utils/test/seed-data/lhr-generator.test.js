@@ -58,6 +58,56 @@ describe('createLHR', () => {
       },
     });
   });
+
+  it('should generate items correctly', () => {
+    const random = new PRandom();
+    const itemA = {
+      url: 'http://example.com/script.js',
+      averageWastedMs: 500,
+      averageTotalBytes: 10000,
+      averageWastedBytes: 1000,
+    };
+
+    const itemB = {
+      node: {type: 'node', snippet: '<pre>pwned</pre>'},
+    };
+
+    const lhr = createLHR(
+      'http://example.com',
+      [{auditId: 'audit', passRate: 0, items: [itemA, itemB]}],
+      random
+    );
+
+    expect(lhr).toMatchObject({
+      audits: {
+        audit: {
+          details: {
+            headings: [
+              {key: 'url', valueType: 'url', label: 'URL'},
+              {key: 'wastedMs', valueType: 'timespanMs', label: 'Wasted Ms'},
+              {key: 'totalBytes', valueType: 'bytes', label: 'Total Bytes'},
+              {key: 'wastedBytes', valueType: 'bytes', label: 'Wasted Bytes'},
+              {key: 'node', valueType: 'text', label: 'Node'},
+            ],
+            items: [
+              {
+                totalBytes: 10998.033925890923,
+                url: 'http://example.com/script.js',
+                wastedBytes: 1065.8302195370197,
+                wastedMs: 506.31933622062206,
+              },
+              {
+                node: {
+                  snippet: '<pre>pwned</pre>',
+                  type: 'node',
+                },
+              },
+            ],
+          },
+        },
+      },
+    });
+  });
 });
 
 describe('generateNumericValue', () => {

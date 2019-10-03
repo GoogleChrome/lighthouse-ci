@@ -96,16 +96,22 @@ function createLHR(pageUrl, auditDefs, prandom) {
           }
 
           headersAsObject.url = {key: 'url', valueType: 'url', label: 'URL'};
-          item.url = new URL(url, pageUrl);
+          item.url = new URL(url, pageUrl).href;
         }
 
         for (const key of Object.keys(rest)) {
-          const dataKey = key.replace('average', '').replace(/^\w/, v => v.toLowerCase());
-          const valueType = key.endsWith('Ms') ? 'timespanMs' : 'bytes';
-          headersAsObject[dataKey] = {key: dataKey, valueType, label: _.startCase(dataKey)};
-          // @ts-ignore - tsc can't understand Object.keys
-          const averageValue = rest[key];
-          item[dataKey] = generateNumericValue(averageValue, prandom);
+          if (key.startsWith('average')) {
+            const dataKey = key.replace('average', '').replace(/^\w/, v => v.toLowerCase());
+            const valueType = key.endsWith('Ms') ? 'timespanMs' : 'bytes';
+            headersAsObject[dataKey] = {key: dataKey, valueType, label: _.startCase(dataKey)};
+            // @ts-ignore - tsc can't understand Object.keys
+            const averageValue = rest[key];
+            item[dataKey] = generateNumericValue(averageValue, prandom);
+          } else {
+            headersAsObject[key] = {key, valueType: 'text', label: _.startCase(key)};
+            // @ts-ignore - tsc can't understand Object.keys
+            item[key] = rest[key];
+          }
         }
 
         items.push(item);

@@ -237,7 +237,7 @@ function createDataset() {
         branch: 'test_0',
         hash: 'aaa5b0a3c1ea447b8c3c9bac839abb9d9f6824d2',
         externalBuildUrl: 'http://travis-ci.org/org/repo/1024',
-        commitMessage: 'feat: test out change that regresses TTI',
+        commitMessage: 'feat: regresses TTI',
         author: 'Patrick Hulce <patrick@example.com>',
         avatarUrl: 'https://avatars1.githubusercontent.com/u/2301202?s=460&v=4',
         ancestorHash: 'ac839abb9aa3c1ea447b8c3c9ba5b0ad9f6824d2', // build 2
@@ -250,7 +250,7 @@ function createDataset() {
         branch: 'test_1',
         hash: 'c1ea447b8c3c9ba5b0ad9f6824d2ac839abb9aa3',
         externalBuildUrl: 'http://travis-ci.org/org/repo/1025',
-        commitMessage: 'feat: test out change that improves TTI',
+        commitMessage: 'feat: improves TTI',
         author: 'Patrick Hulce <patrick@example.com>',
         avatarUrl: 'https://avatars1.githubusercontent.com/u/2301202?s=460&v=4',
         ancestorHash: '30cf658d9d72669af568d37ea60d945bfb3b0fc3', // build 1

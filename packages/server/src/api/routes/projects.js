@@ -117,6 +117,20 @@ function createRouter(context) {
     })
   );
 
+  // GET /projects/:id/builds/:id/ancestor
+  router.get(
+    '/:projectId/builds/:buildId/ancestor',
+    handleAsyncError(async (req, res) => {
+      const build = await context.storageMethod.findAncestorBuildById(
+        req.params.projectId,
+        req.params.buildId
+      );
+
+      if (!build) return res.sendStatus(404);
+      res.json(build);
+    })
+  );
+
   // GET /projects/<id>/builds/<id>/runs
   router.get(
     '/:projectId/builds/:buildId/runs',

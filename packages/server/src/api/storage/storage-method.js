@@ -97,6 +97,16 @@ class StorageMethod {
   }
 
   /**
+   * @param {string} projectId
+   * @param {string} buildId
+   * @return {Promise<LHCI.ServerCommand.Build | undefined>}
+   */
+  // eslint-disable-next-line no-unused-vars
+  async findAncestorBuildById(projectId, buildId) {
+    throw new Error('Unimplemented');
+  }
+
+  /**
    * @param {StrictOmit<LHCI.ServerCommand.Build, 'id'>} unsavedBuild
    * @return {Promise<LHCI.ServerCommand.Build>}
    */

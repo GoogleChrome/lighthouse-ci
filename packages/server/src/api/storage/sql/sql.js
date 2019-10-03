@@ -306,6 +306,52 @@ class SqlStorageMethod {
   /**
    * @param {string} projectId
    * @param {string} buildId
+   * @return {Promise<LHCI.ServerCommand.Build | undefined>}
+   */
+  async findAncestorBuildById(projectId, buildId) {
+    const {buildModel} = this._sql();
+    const build = await this._findByPk(buildModel, buildId);
+    if (!build || (build && build.projectId !== projectId)) return undefined;
+
+    if (build.ancestorHash) {
+      const ancestorsByHash = await this._findAll(buildModel, {
+        where: {projectId: build.projectId, hash: build.ancestorHash},
+        limit: 1,
+      });
+
+      if (ancestorsByHash.length) return clone(ancestorsByHash[0]);
+    }
+
+    const where = {
+      projectId: build.projectId,
+      branch: 'master',
+      id: {[Sequelize.Op.ne]: build.id},
+    };
+
+    const nearestBuildAfter = await buildModel.findAll({
+      where: {...where, runAt: {[Sequelize.Op.gte]: build.runAt}},
+      order: [['runAt', 'ASC']],
+      limit: 1,
+    });
+
+    const nearestBuildBefore = await buildModel.findAll({
+      where: {...where, runAt: {[Sequelize.Op.lte]: build.runAt}},
+      order: [['runAt', 'DESC']],
+      limit: 1,
+    });
+
+    /** @param {string} date */
+    const getDateDistance = date =>
+      Math.abs(new Date(date).getTime() - new Date(build.runAt).getTime());
+    const candidates = nearestBuildBefore
+      .concat(nearestBuildAfter)
+      .sort((a, b) => getDateDistance(a.runAt) - getDateDistance(b.runAt));
+    return clone(candidates[0]);
+  }
+
+  /**
+   * @param {string} projectId
+   * @param {string} buildId
    * @param {LHCI.ServerCommand.GetRunsOptions} [options]
    * @return {Promise<LHCI.ServerCommand.Run[]>}
    */

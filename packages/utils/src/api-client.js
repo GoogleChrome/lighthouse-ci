@@ -208,6 +208,17 @@ class ApiClient {
   /**
    * @param {string} projectId
    * @param {string} buildId
+   * @return {Promise<LHCI.ServerCommand.Build | undefined>}
+   */
+  async findAncestorBuildById(projectId, buildId) {
+    return this._convert404ToUndefined(
+      this._get(`/v1/projects/${projectId}/builds/${buildId}/ancestor`)
+    );
+  }
+
+  /**
+   * @param {string} projectId
+   * @param {string} buildId
    * @param {LHCI.ServerCommand.GetRunsOptions} [options]
    * @return {Promise<LHCI.ServerCommand.Run[]>}
    */

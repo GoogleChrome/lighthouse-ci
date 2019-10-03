@@ -18,6 +18,7 @@ function runTests(state) {
   let buildA;
   let buildB;
   let buildC;
+  let buildD;
   let runA;
   let runB;
   let runC;
@@ -103,7 +104,7 @@ function runTests(state) {
         author: 'Paul Irish <paul@example.com>',
         avatarUrl: 'https://avatars1.githubusercontent.com/u/39191?s=460&v=4',
         commitMessage: 'feat: add some more awesome features',
-        ancestorHash: 'e0acdd50ed0fdcfdceb2508498be50cc55c696ef',
+        ancestorHash: buildA.hash,
         runAt: new Date().toISOString(),
       };
 
@@ -111,6 +112,26 @@ function runTests(state) {
       expect(buildB).toHaveProperty('id');
       expect(buildB.projectId).toEqual(projectA.id);
       expect(buildB).toMatchObject(payload);
+    });
+
+    it('should create a 3rd build (w/o an ancestor)', async () => {
+      const payload = {
+        projectId: projectA.id,
+        lifecycle: 'unsealed',
+        hash: '50cc55c696eb25084ebe0acdd50ed0fdcfdce98a',
+        branch: 'other_branch',
+        externalBuildUrl: 'http://travis-ci.org/org/repo/2',
+        author: 'Paul Irish <paul@example.com>',
+        avatarUrl: 'https://avatars1.githubusercontent.com/u/39191?s=460&v=4',
+        commitMessage: 'feat: a branch without an ancestor',
+        ancestorHash: '',
+        runAt: new Date().toISOString(),
+      };
+
+      buildC = await client.createBuild(payload);
+      expect(buildC).toHaveProperty('id');
+      expect(buildC.projectId).toEqual(projectA.id);
+      expect(buildC).toMatchObject(payload);
     });
 
     it('should create a build in different project', async () => {
@@ -127,15 +148,15 @@ function runTests(state) {
         runAt: new Date().toISOString(),
       };
 
-      buildC = await client.createBuild(payload);
-      expect(buildC).toHaveProperty('id');
-      expect(buildC.projectId).toEqual(projectB.id);
-      expect(buildC).toMatchObject(payload);
+      buildD = await client.createBuild(payload);
+      expect(buildD).toHaveProperty('id');
+      expect(buildD.projectId).toEqual(projectB.id);
+      expect(buildD).toMatchObject(payload);
     });
 
     it('should list builds', async () => {
       const builds = await client.getBuilds(projectA.id);
-      expect(builds).toEqual([buildB, buildA]);
+      expect(builds).toEqual([buildC, buildB, buildA]);
     });
 
     it('should list builds filtered by branch', async () => {
@@ -150,7 +171,7 @@ function runTests(state) {
 
     it('should list builds for another project', async () => {
       const builds = await client.getBuilds(projectB.id);
-      expect(builds).toEqual([buildC]);
+      expect(builds).toEqual([buildD]);
     });
 
     it('should list builds for missing project', async () => {
@@ -172,12 +193,65 @@ function runTests(state) {
   describe('/:projectId/branches', () => {
     it('should list branches', async () => {
       const branches = await client.getBranches(projectA.id);
-      expect(branches).toEqual([{branch: 'test_branch'}, {branch: 'master'}]);
+      expect(branches).toEqual([
+        {branch: 'test_branch'},
+        {branch: 'other_branch'},
+        {branch: 'master'},
+      ]);
     });
 
     it('should handle missing ids', async () => {
       const branches = await client.getBranches('MISSING');
       expect(branches).toEqual([]);
+    });
+  });
+
+  describe('/:projectId/builds/:buildId/ancestor', () => {
+    it('should not find a build with no ancestor', async () => {
+      const build = await client.findAncestorBuildById(buildA.projectId, buildA.id);
+      expect(build).toEqual(undefined);
+    });
+
+    it('should find a build with an explicit ancestor', async () => {
+      const build = await client.findAncestorBuildById(buildB.projectId, buildB.id);
+      expect(build).toEqual(buildA);
+    });
+
+    it('should find a build with an implicit prior ancestor', async () => {
+      const build = await client.findAncestorBuildById(buildC.projectId, buildC.id);
+      expect(build).toEqual(buildA);
+    });
+
+    it('should find a build with complicated ancestor', async () => {
+      const project = await client.createProject(projectA);
+      const buildWithoutAncestor = await client.createBuild({
+        ...buildC,
+        projectId: project.id,
+        branch: 'feature_branch',
+        runAt: new Date('2019-09-01').toISOString(),
+      });
+
+      let ancestor = await client.findAncestorBuildById(project.id, buildWithoutAncestor.id);
+      expect(ancestor).toEqual(undefined);
+
+      const implicitPriorAncestorBuild = await client.createBuild({
+        ...buildA,
+        projectId: project.id,
+        branch: 'master',
+        runAt: new Date('2019-01-01').toISOString(),
+      });
+      ancestor = await client.findAncestorBuildById(project.id, buildWithoutAncestor.id);
+      expect(ancestor).toEqual(implicitPriorAncestorBuild);
+
+      const implicitFutureAncestorBuild = await client.createBuild({
+        ...buildA,
+        projectId: project.id,
+        branch: 'master',
+        runAt: new Date('2019-09-02').toISOString(),
+      });
+
+      ancestor = await client.findAncestorBuildById(project.id, buildWithoutAncestor.id);
+      expect(ancestor).toEqual(implicitFutureAncestorBuild);
     });
   });
 

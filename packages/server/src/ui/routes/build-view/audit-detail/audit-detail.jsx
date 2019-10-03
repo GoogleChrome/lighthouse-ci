@@ -6,7 +6,8 @@
 
 import {h} from 'preact';
 import clsx from 'clsx';
-import {ScoreWord} from '../../../components/score-icon';
+import {ScoreWord, ScoreIcon} from '../../../components/score-icon';
+import {Markdown} from '../../../components/markdown';
 import {TableDetails} from './table-details';
 import {NumericDiff} from '../audit-list/numeric-diff';
 import {getDiffLabel} from '@lhci/utils/src/audit-diff-finder';
@@ -54,8 +55,13 @@ export const AuditDetail = props => {
 
   return (
     <div id={`audit-detail-pane-audit--${audit.id}`} className={clsx('audit-detail-pane__audit')}>
+      <div className="audit-detail-pane__score">
+        <ScoreIcon score={audit.score || 0} />
+      </div>
       <div className="audit-detail-pane__audit-title">{audit.title}</div>
-      <div className="audit-detail-pane__audit-description">{audit.description}</div>
+      <div className="audit-detail-pane__audit-description">
+        <Markdown text={audit.description || ''} />
+      </div>
       <div className="audit-detail-pane__audit-details">
         <Details pair={props.pair} />
       </div>

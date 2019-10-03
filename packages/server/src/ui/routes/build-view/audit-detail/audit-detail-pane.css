@@ -34,9 +34,17 @@
 }
 
 .audit-detail-pane__audit {
+  position: relative;
   padding: calc(2 * var(--base-spacing));
+  padding-left: calc(3 * var(--base-spacing));
 
   border-bottom: 1px solid var(--base-border-color);
+}
+
+.audit-detail-pane__score {
+  position: absolute;
+  left: var(--base-spacing);
+  top: calc(2 * var(--base-spacing) + var(--header-font-size) / 4);
 }
 
 .audit-detail-pane__audit-title {
@@ -45,6 +53,7 @@
 
 .audit-detail-pane__audit-description {
   color: var(--secondary-text-color);
+  margin-top: calc(var(--base-spacing) / 2);
 }
 
 .audit-detail-pane__audit-details {

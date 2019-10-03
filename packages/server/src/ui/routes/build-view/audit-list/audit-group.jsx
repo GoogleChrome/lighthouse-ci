@@ -12,7 +12,7 @@ import clsx from 'clsx';
 import {AuditDiff} from './audit-diff';
 
 /**
- * @param {{key?: string, group: {title: string}, selectedAuditId: string|null, setSelectedAuditId: (id: string|null) => void, pairs: Array<LHCI.AuditPair>, baseLhr?: LH.Result, variant?: 'standard'|'numeric'}} props
+ * @param {{key?: string, group: {id: string, title: string}, selectedAuditId: string|null, setSelectedAuditId: (id: string|null) => void, pairs: Array<LHCI.AuditPair>, baseLhr?: LH.Result, variant?: 'standard'|'numeric'}} props
  */
 export const AuditGroup = props => {
   const {group, pairs} = props;
@@ -23,6 +23,11 @@ export const AuditGroup = props => {
       <div className="audit-group__audits">
         {pairs.map(pair => {
           const {audit} = pair;
+
+          // Only metrics are allowed to display the numericValue diff in this view.
+          if (group.id !== 'metrics') {
+            pair = {...pair, diffs: pair.diffs.filter(diff => diff.type !== 'numericValue')};
+          }
 
           return (
             <div

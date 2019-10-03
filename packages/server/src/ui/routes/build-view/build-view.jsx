@@ -46,7 +46,7 @@ function computeAuditGroups(lhr, baseLhr) {
         const audits = auditRefGroup
           .map(ref => ({...lhr.audits[ref.id], id: ref.id}))
           .sort((a, b) => (a.score || 0) - (b.score || 0));
-        return {id: groupId, group, audits};
+        return {id: groupId, group: {...group, id: groupId}, audits};
       });
     })
     .reduce((a, b) => a.concat(b));
@@ -80,8 +80,8 @@ function computeAuditGroups(lhr, baseLhr) {
   return auditGroups;
 }
 
-/** @typedef {{id: string, audits: Array<LH.AuditResult>, group: {title: string}}} IntermediateAuditGroupDef */
-/** @typedef {{id: string, pairs: Array<LHCI.AuditPair>, group: {title: string}}} AuditGroupDef */
+/** @typedef {{id: string, audits: Array<LH.AuditResult>, group: {id: string, title: string}}} IntermediateAuditGroupDef */
+/** @typedef {{id: string, pairs: Array<LHCI.AuditPair>, group: {id: string, title: string}}} AuditGroupDef */
 
 /** @param {{selectedUrl: string, setUrl(url: string): void, build: LHCI.ServerCommand.Build | null, lhr?: LH.Result, baseLhr?: LH.Result, urls: Array<string>}} props */
 const BuildViewScoreAndUrl = props => {

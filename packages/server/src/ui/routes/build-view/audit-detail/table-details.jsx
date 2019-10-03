@@ -18,9 +18,10 @@ const ROW_STATE_SORT_ORDER = ['added', 'worse', 'ambiguous', 'removed', 'better'
 export const TableDetails = props => {
   const {audit, baseAudit, diffs} = props.pair;
   if (!audit.details) return <Fragment />;
-  const {headings, items: compareItems} = audit.details;
-  if (!headings || !compareItems) return <Fragment />;
+  const {headings: compareHeadings, items: compareItems} = audit.details;
+  if (!compareHeadings || !compareItems) return <Fragment />;
 
+  const baseHeadings = (baseAudit && baseAudit.details && baseAudit.details.headings) || [];
   const baseItems = (baseAudit && baseAudit.details && baseAudit.details.items) || [];
 
   const zippedItems = zipBaseAndCompareItems(baseItems, compareItems).sort(
@@ -32,6 +33,8 @@ export const TableDetails = props => {
         getRowLabelForIndex(diffs, b.compare && b.compare.index, b.base && b.base.index)
       )
   );
+
+  const headings = compareHeadings.length ? compareHeadings : baseHeadings;
 
   return (
     <div className="table-details">

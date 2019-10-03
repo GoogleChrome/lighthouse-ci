@@ -9,11 +9,12 @@ import './simple-details.css';
 
 /** @param {{type: LH.DetailsType, baseValue: any, compareValue: any}} props */
 export const SimpleDetails = props => {
+  let type = props.type;
   const {compareValue, baseValue} = props;
   const value = compareValue === undefined ? baseValue : compareValue;
 
   if (typeof value === 'object' && value.type) {
-    return <SimpleDetails {...value} />;
+    type = value.type;
   }
 
   const numericBase = Number.isFinite(baseValue) ? baseValue : 0;
@@ -27,7 +28,7 @@ export const SimpleDetails = props => {
   const compareDisplay = `Compare Value: ${Math.round(numericCompare).toLocaleString()}`;
   const title = `${baseDisplay}, ${compareDisplay}`;
 
-  switch (props.type) {
+  switch (type) {
     case 'bytes': {
       const kb = Math.round((numericCompare - numericBase) / 1024);
       return (
@@ -64,6 +65,8 @@ export const SimpleDetails = props => {
     }
     case 'text':
       return <span>{value}</span>;
+    case 'node':
+      return <pre>{value.snippet}</pre>;
     default:
       return <pre>{JSON.stringify(props).slice(0, 20)}</pre>;
   }

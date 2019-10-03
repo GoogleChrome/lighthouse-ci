@@ -13,6 +13,7 @@ declare global {
 
   namespace LH {
     export type DetailsType =
+      | 'node'
       | 'code'
       | 'bytes'
       | 'ms'

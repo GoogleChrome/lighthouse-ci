@@ -13,7 +13,6 @@ import {
   useProject,
   useBuild,
   useOptionalAncestorBuild,
-  useBuildURLs,
   useOptionalBuildRepresentativeRuns,
 } from '../../hooks/use-api-data';
 import {BuildHashSelector} from './build-hash-selector';

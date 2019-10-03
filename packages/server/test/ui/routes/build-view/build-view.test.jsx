@@ -27,28 +27,26 @@ describe('BuildView', () => {
   });
 
   it('should render the build and missing comparison build', async () => {
-    fetchMock.mockResponseOnce(JSON.stringify({name: 'My Project'}));
+    fetchMock.mockResponseOnce(JSON.stringify({name: 'My Project'})); // getProject
     fetchMock.mockResponseOnce(
       JSON.stringify({hash: 'abcd', commitMessage: 'test: write some tests'})
-    );
-    fetchMock.mockResponseOnce(JSON.stringify([]));
-    fetchMock.mockResponseOnce(JSON.stringify([]));
-    fetchMock.mockResponseOnce(JSON.stringify([]));
-    fetchMock.mockResponseOnce(JSON.stringify([]));
+    ); // getBuild
+    fetchMock.mockResponseOnce(JSON.stringify([])); // getBuilds - ancestors
+    fetchMock.mockResponseOnce(JSON.stringify([])); // getRuns - compare
+    fetchMock.mockResponseOnce(JSON.stringify([])); // getRuns - base
 
     const {getAllByText} = render(<BuildView projectId="1" buildId="2" />);
     await wait(() => getAllByText(/write some tests/));
   });
 
   it('should render the build and the comparison build', async () => {
-    fetchMock.mockResponseOnce(JSON.stringify({name: 'My Project'}));
+    fetchMock.mockResponseOnce(JSON.stringify({name: 'My Project'})); // getProject
     fetchMock.mockResponseOnce(
       JSON.stringify({hash: 'abcd', commitMessage: 'test: write some tests', ancestorHash: '1234'})
-    );
-    fetchMock.mockResponseOnce(JSON.stringify([]));
-    fetchMock.mockResponseOnce(JSON.stringify([{hash: '1234', commitMessage: 'fix: master'}]));
-    fetchMock.mockResponseOnce(JSON.stringify([]));
-    fetchMock.mockResponseOnce(JSON.stringify([]));
+    ); // getBuild
+    fetchMock.mockResponseOnce(JSON.stringify([{hash: '1234', commitMessage: 'fix: master'}])); // getBuilds - ancestors
+    fetchMock.mockResponseOnce(JSON.stringify([])); // getRuns - compare
+    fetchMock.mockResponseOnce(JSON.stringify([])); // getRuns - base
 
     const {getAllByText} = render(<BuildView projectId="1" buildId="2" />);
     await wait(() => getAllByText(/write some tests/));

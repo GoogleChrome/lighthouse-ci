@@ -30,7 +30,7 @@ const Legend = props => {
     <div className="dashboard-graphs__legend">
       {urls.map((url, i) => {
         return (
-          <div className="legend-item">
+          <div className="legend-item" key={url}>
             <div className="legend-item__color-chip" style={{backgroundColor: COLORS[i]}} />
             <span>{url}</span>
           </div>

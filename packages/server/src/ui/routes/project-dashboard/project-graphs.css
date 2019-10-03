@@ -10,6 +10,33 @@
   flex-wrap: wrap;
 }
 
+.dashboard-graphs__legend {
+  width: 100%;
+  padding: var(--base-spacing);
+
+  font-weight: var(--medium-font-weight);
+
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+.legend-item {
+  margin: 0 var(--base-spacing);
+
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+.legend-item__color-chip {
+  height: 2px;
+  width: calc(2 * var(--base-spacing));
+  margin-right: calc(var(--base-spacing) / 2);
+}
+
 .dashboard-graph {
   width: calc(50% - 2 * var(--base-spacing));
   /* Note this value must be set in JavaScript as well for the Plot height. */

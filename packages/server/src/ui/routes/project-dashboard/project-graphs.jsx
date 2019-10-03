@@ -16,6 +16,30 @@ import './project-graphs.css';
 
 const COLORS = ['#4587f4', '#f44587', '#87f445'];
 
+/** @param {Array<StatisticWithBuild>} stats */
+function computeURLsFromStats(stats) {
+  return [...new Set(stats.map(stat => stat.url))].sort((a, b) => a.length - b.length);
+}
+
+/** @param {{statistics?: Array<StatisticWithBuild>}} props */
+const Legend = props => {
+  if (!props.statistics) return null;
+
+  const urls = computeURLsFromStats(props.statistics);
+  return (
+    <div className="dashboard-graphs__legend">
+      {urls.map((url, i) => {
+        return (
+          <div className="legend-item">
+            <div className="legend-item__color-chip" style={{backgroundColor: COLORS[i]}} />
+            <span>{url}</span>
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
 /** @typedef {LHCI.ServerCommand.Statistic & {build: LHCI.ServerCommand.Build}} StatisticWithBuild */
 
 /** @param {{title: string, statisticName: LHCI.ServerCommand.StatisticName, statistics?: Array<StatisticWithBuild>, loadingState: import('../../components/async-loader').LoadingState, builds: LHCI.ServerCommand.Build[]}} props */
@@ -25,10 +49,7 @@ const StatisticPlot = props => {
       loadingState={props.loadingState}
       asyncData={props.statistics}
       render={allStats => {
-        const urls = [...new Set(allStats.map(stat => stat.url))].sort(
-          (a, b) => a.length - b.length
-        );
-
+        const urls = computeURLsFromStats(allStats);
         const matchingStats = allStats
           .filter(stat => stat.name === props.statisticName)
           .sort((a, b) => a.build.runAt.localeCompare(b.build.runAt));
@@ -135,6 +156,7 @@ export const ProjectGraphs = props => {
 
   return (
     <div className="dashboard-graphs">
+      <Legend statistics={statsWithBuilds} />
       <StatisticPlot
         title="Performance"
         statisticName="category_performance_average"

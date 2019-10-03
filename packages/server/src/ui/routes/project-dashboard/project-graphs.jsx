@@ -14,6 +14,8 @@ import {Plot} from '../../components/plot.jsx';
 
 import './project-graphs.css';
 
+const COLORS = ['#4587f4', '#f44587', '#87f445'];
+
 /** @typedef {LHCI.ServerCommand.Statistic & {build: LHCI.ServerCommand.Build}} StatisticWithBuild */
 
 /** @param {{title: string, statisticName: LHCI.ServerCommand.StatisticName, statistics?: Array<StatisticWithBuild>, loadingState: import('../../components/async-loader').LoadingState, builds: LHCI.ServerCommand.Build[]}} props */
@@ -23,31 +25,42 @@ const StatisticPlot = props => {
       loadingState={props.loadingState}
       asyncData={props.statistics}
       render={allStats => {
-        const statsUngrouped = allStats
+        const urls = [...new Set(allStats.map(stat => stat.url))].sort(
+          (a, b) => a.length - b.length
+        );
+
+        const matchingStats = allStats
           .filter(stat => stat.name === props.statisticName)
           .sort((a, b) => a.build.runAt.localeCompare(b.build.runAt));
         // We need to merge the stats by hash to handle multiple URLs.
-        const stats = _.groupBy(statsUngrouped, stat => stat.build.hash).map(group => {
-          const value = group.map(stat => stat.value).reduce((a, b) => a + b) / group.length;
-          return {...group[0], value};
-        });
+        const builds = _.uniqBy(matchingStats, stat => stat.build.hash).map(stat => stat.build);
 
-        const xs = stats.map((_, i) => i);
+        /** @type {Array<Array<StatisticWithBuild|null>>} */
+        const ys = [];
+        for (let i = 0; i < urls.length; i++) {
+          /** @type {Array<StatisticWithBuild|null>} */
+          const ysForUrl = [];
+          const statsForUrl = matchingStats.filter(stat => stat.url === urls[i]);
+          for (const build of builds) {
+            ysForUrl.push(statsForUrl.find(stat => stat.buildId === build.id) || null);
+          }
+          ys.push(ysForUrl);
+        }
+
+        const xs = ys[0].map((_, i) => i);
         return (
           <Paper className="dashboard-graph">
             <h3 className="dashboard-graph__title">{props.title}</h3>
             <Plot
               useResizeHandler
-              data={[
-                {
-                  x: xs,
-                  y: stats.map(x => Math.round(x.value * 100)),
-                  type: 'scatter',
-                  mode: 'lines+markers',
-                  marker: {color: '#4587f4'},
-                  hoverinfo: /** @type {*} */ ('y'),
-                },
-              ]}
+              data={ys.map((yVals, i) => ({
+                x: xs,
+                y: yVals.map(stat => (stat ? Math.round(stat.value * 100) : 0)),
+                type: 'scatter',
+                mode: 'lines+markers',
+                marker: {color: COLORS[i]},
+                hoverinfo: /** @type {*} */ ('y'),
+              }))}
               layout={{
                 height: 300,
                 autosize: true,
@@ -57,8 +70,8 @@ const StatisticPlot = props => {
                 xaxis: {
                   tickfont: {color: '#888'},
                   tickvals: xs,
-                  ticktext: stats.map(x => {
-                    const build = props.builds.find(build => build.id === x.buildId);
+                  ticktext: xs.map(i => {
+                    const build = builds[i];
                     if (!build) return 'Unknown';
                     return build.hash.slice(0, 8);
                   }),

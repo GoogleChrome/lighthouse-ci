@@ -108,6 +108,9 @@ module.exports = {
     return JSON.parse(JSON.stringify(o));
   },
   /**
+   * Filters items by referential uniqueness of the value returned by keyFn.
+   * Unique items are guaranteed to be in the same order of the original array.
+   *
    * @template TArr
    * @template TKey
    * @param {Array<TArr>} items

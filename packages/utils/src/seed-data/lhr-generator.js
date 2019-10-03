@@ -14,7 +14,7 @@ const LOREM_IPSUM =
   'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin urna nunc, molestie sed hendrerit et, vulputate vitae mauris. Sed tempor vitae risus vel hendrerit. Nulla vestibulum malesuada erat vitae laoreet. Phasellus sodales vehicula dolor, dictum ullamcorper metus aliquam id. Nullam porttitor posuere purus id rhoncus. Sed et mi ligula. Donec imperdiet nulla sit amet justo cursus, id tempus ex accumsan. Maecenas ultricies elit eget lectus posuere vestibulum. Cras vestibulum neque nec justo congue feugiat non id dui. Pellentesque dapibus ac orci sed malesuada. Sed rhoncus vitae lorem eget facilisis. Donec auctor tortor a tortor egestas, vel condimentum lacus auctor.';
 
 /** @typedef {{url?: string, inclusionRate?: number, averageWastedMs?: number, averageTotalBytes?: number, averageWastedBytes?: number}} ItemGenDef */
-/** @typedef {{auditId: string, passRate?: number, averageNumericValue?: number, averageWastedMs?: number, items?: ItemGenDef[]}} AuditGenDef */
+/** @typedef {{auditId: string, passRate?: number, averageNumericValue?: number, averageWastedMs?: number, items?: ItemGenDef[], unit?: string}} AuditGenDef */
 
 /** @param {string} auditId */
 function getCategoryForAuditId(auditId) {
@@ -64,13 +64,22 @@ function createLHR(pageUrl, auditDefs, prandom) {
 
   const loremIpsumTokens = LOREM_IPSUM.split(' ');
   for (const auditDef of auditDefs) {
-    const {auditId, averageNumericValue, averageWastedMs} = auditDef;
+    const {auditId, averageNumericValue, averageWastedMs, unit = 'items'} = auditDef;
+    const groupId = getGroupForAuditId(auditId);
     if (typeof averageNumericValue === 'number') {
       const numericValue = generateNumericValue(averageNumericValue, prandom);
       // score of 100 = <1000
       // score of 0 = >10000
       const score = 1 - Math.min(1, Math.max((numericValue - 1000) / 9000, 0));
-      audits[auditId] = {score, numericValue, scoreDisplayMode: 'numeric'};
+      audits[auditId] = {
+        score,
+        numericValue,
+        scoreDisplayMode: 'numeric',
+        displayValue:
+          groupId === 'metrics'
+            ? `${(numericValue / 1000).toLocaleString(undefined, {maximumFractionDigits: 1})} s`
+            : `${numericValue} ${unit}`,
+      };
     } else if (typeof averageWastedMs === 'number') {
       const wastedMs = generateNumericValue(averageWastedMs, prandom);
       // score of 100 = <100
@@ -79,6 +88,9 @@ function createLHR(pageUrl, auditDefs, prandom) {
       audits[auditId] = {
         score,
         scoreDisplayMode: 'numeric',
+        displayValue: `${(wastedMs / 1000).toLocaleString(undefined, {
+          maximumFractionDigits: 1,
+        })} s`,
         details: {type: 'opportunity', overallSavingsMs: wastedMs, items: []},
       };
     } else {

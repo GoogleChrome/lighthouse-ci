@@ -139,9 +139,14 @@ function createDataset() {
     'uses-responsive-images': {averageWastedMs: 400, items: fiftyFiftyImages},
     'uses-minified-files': {averageWastedMs: 800, items: fiftyFiftyImages},
     'uses-optimized-images': {averageWastedMs: 1400, items: fiftyFiftyImages},
-    'diagnostic-bootup-time': {passRate: 0.5, items: permanentScripts},
-    'diagnostic-main-thread-time': {averageNumericValue: 5000, items: permanentScripts},
+    'diagnostic-dom-size': {averageNumericValue: 2000, unit: 'elements'},
+    'diagnostic-main-thread-time': {averageNumericValue: 5000, unit: 'ms', items: permanentScripts},
     'diagnostic-cache-headers': {passRate: 0.5, items: permanentScripts},
+    'diagnostic-total-byte-weight': {
+      averageNumericValue: 8000,
+      unit: 'KB',
+      items: fiftyFiftyImages,
+    },
 
     'a11y-color-contrast': {passRate: 0.5, items: elements},
     'a11y-labels': {passRate: 0.5, items: elements},

@@ -109,6 +109,25 @@ function createDataset() {
     },
   ];
 
+  const elements = [
+    {
+      inclusionRate: 0.5,
+      node: {type: 'node', snippet: '<a href="/home">Home</a>', selector: 'header > nav > a'},
+    },
+    {
+      inclusionRate: 0.5,
+      node: {type: 'node', snippet: '<nav class="my-nav">', selector: 'header > nav'},
+    },
+    {
+      inclusionRate: 0.5,
+      node: {type: 'node', snippet: '<header id="header">', selector: 'header'},
+    },
+    {
+      inclusionRate: 0.5,
+      node: {type: 'node', snippet: '<a href="/away">Away</a>', selector: 'a.big-link'},
+    },
+  ];
+
   const auditsToFake = {
     'first-contentful-paint': {averageNumericValue: 1000},
     'first-meaningful-paint': {averageNumericValue: 1000},
@@ -124,16 +143,17 @@ function createDataset() {
     'diagnostic-main-thread-time': {averageNumericValue: 5000, items: permanentScripts},
     'diagnostic-cache-headers': {passRate: 0.5, items: permanentScripts},
 
-    'a11y-color-contrast': {passRate: 0.5},
-    'a11y-labels': {passRate: 0.5},
-    'a11y-duplicate-id': {passRate: 0.5},
-    'a11y-alt-text': {passRate: 0.5},
+    'a11y-color-contrast': {passRate: 0.5, items: elements},
+    'a11y-labels': {passRate: 0.5, items: elements},
+    'a11y-duplicate-id': {passRate: 0.5, items: elements},
+    'a11y-alt-text': {passRate: 0.5, items: elements},
 
-    'pwa-https': {passRate: 0.8},
-    'pwa-manifest': {passRate: 0.4},
-    'pwa-service-worker': {passRate: 0.2},
-    'pwa-start-url': {passRate: 0.2},
-    'pwa-offline': {passRate: 0.2},
+    'pwa-fast-reliable-https': {passRate: 0.7},
+    'pwa-fast-reliable-offline': {passRate: 0.7},
+    'pwa-installable-manifest': {passRate: 0.7},
+    'pwa-installable-start-url': {passRate: 0.7},
+    'pwa-optimized-service-worker': {passRate: 0.7},
+    'pwa-optimized-omnibox': {passRate: 0.7},
 
     'best-practices-console-errors': {passRate: 0.2},
     'best-practices-rel-noopener': {passRate: 0.8},
@@ -217,10 +237,10 @@ function createDataset() {
         branch: 'test_0',
         hash: 'aaa5b0a3c1ea447b8c3c9bac839abb9d9f6824d2',
         externalBuildUrl: 'http://travis-ci.org/org/repo/1024',
-        commitMessage: 'feat: test out a risky change',
+        commitMessage: 'feat: test out change that regresses TTI',
         author: 'Patrick Hulce <patrick@example.com>',
         avatarUrl: 'https://avatars1.githubusercontent.com/u/2301202?s=460&v=4',
-        ancestorHash: 'ac839abb9aa3c1ea447b8c3c9ba5b0ad9f6824d2',
+        ancestorHash: 'ac839abb9aa3c1ea447b8c3c9ba5b0ad9f6824d2', // build 2
         runAt: '2019-08-09T20:15:28.904Z',
       },
       {
@@ -230,10 +250,10 @@ function createDataset() {
         branch: 'test_1',
         hash: 'c1ea447b8c3c9ba5b0ad9f6824d2ac839abb9aa3',
         externalBuildUrl: 'http://travis-ci.org/org/repo/1025',
-        commitMessage: 'feat: test out a different risky change',
+        commitMessage: 'feat: test out change that improves TTI',
         author: 'Patrick Hulce <patrick@example.com>',
         avatarUrl: 'https://avatars1.githubusercontent.com/u/2301202?s=460&v=4',
-        ancestorHash: '30cf658d9d72669af568d37ea60d945bfb3b0fc3',
+        ancestorHash: '30cf658d9d72669af568d37ea60d945bfb3b0fc3', // build 1
         runAt: '2019-08-09T23:15:28.904Z',
       },
       {
@@ -300,6 +320,11 @@ function createDataset() {
         6
       ),
       ...createRuns(
+        {projectId: '0', buildId: '3', url: 'http://localhost:1234/viewer/#checkout'},
+        auditsToFake,
+        7
+      ),
+      ...createRuns(
         // this build is a branch that regresses metrics
         {projectId: '0', buildId: '4', url: 'http://localhost:1234/viewer/#home'},
         {
@@ -314,7 +339,7 @@ function createDataset() {
             ),
           },
         },
-        7
+        8
       ),
       ...createRuns(
         // this build is a branch that improves metrics
@@ -331,17 +356,44 @@ function createDataset() {
             ),
           },
         },
-        8
+        9
+      ),
+      ...createRuns(
+        // this build is a branch that improves metrics
+        {projectId: '0', buildId: '5', url: 'http://localhost:1234/viewer/#checkout'},
+        {
+          ...auditsToFake,
+          interactive: {averageNumericValue: 2800},
+          'diagnostic-main-thread-time': {
+            averageNumericValue: 1700,
+            items: permanentScripts.map(item =>
+              item.url.includes('app')
+                ? {...item, averageWastedMs: item.averageWastedMs - 1000}
+                : item
+            ),
+          },
+        },
+        10
       ),
       ...createRuns(
         {projectId: '0', buildId: '6', url: 'http://localhost:1234/viewer/#home'},
         {...auditsToFake, interactive: {averageNumericValue: 12000}},
-        9
+        11
+      ),
+      ...createRuns(
+        {projectId: '0', buildId: '6', url: 'http://localhost:1234/viewer/#checkout'},
+        {...auditsToFake, interactive: {averageNumericValue: 12000}},
+        12
       ),
       ...createRuns(
         {projectId: '0', buildId: '7', url: 'http://localhost:1234/viewer/#home'},
         auditsToFake,
-        10
+        13
+      ),
+      ...createRuns(
+        {projectId: '0', buildId: '7', url: 'http://localhost:1234/viewer/#checkout'},
+        auditsToFake,
+        14
       ),
     ],
   };

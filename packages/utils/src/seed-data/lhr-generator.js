@@ -31,12 +31,16 @@ function getGroupForAuditId(auditId) {
   if (auditId === 'first-meaningful-paint') return 'metrics';
   if (auditId === 'speed-index') return 'metrics';
   if (auditId === 'interactive') return 'metrics';
+  if (auditId === 'first-cpu-idle') return 'metrics';
+  if (auditId === 'max-potential-fid') return 'metrics';
   if (auditId.startsWith('diagnostic-')) return 'diagnostics';
   if (auditId.startsWith('uses-')) return 'load-opportunities';
   if (auditId.startsWith('a11y')) return 'accessibility';
   if (auditId.startsWith('seo')) return 'seo';
   if (auditId.startsWith('best-practices')) return 'best-practices';
-  if (auditId.startsWith('pwa')) return 'pwa';
+  if (auditId.startsWith('pwa-fast-reliable')) return 'pwa-fast-reliable';
+  if (auditId.startsWith('pwa-installable')) return 'pwa-installable';
+  if (auditId.startsWith('pwa-optimized')) return 'pwa-optimized';
 }
 
 /** @param {number} average @param {PRandom} prandom */
@@ -174,7 +178,9 @@ function createLHR(pageUrl, auditDefs, prandom) {
       accessibility: {title: 'Accessibility'},
       seo: {title: 'SEO'},
       'best-practices': {title: 'Best Practices'},
-      pwa: {title: 'PWA'},
+      'pwa-fast-reliable': {title: 'PWA Fast & Reliable'},
+      'pwa-installable': {title: 'PWA Installable'},
+      'pwa-optimized': {title: 'PWA Optimized'},
     },
     runWarnings: [],
     userAgent: 'Chrome!',

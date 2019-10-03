@@ -4,12 +4,13 @@
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
  */
 
-import {h} from 'preact';
+import {h, Fragment} from 'preact';
 import clsx from 'clsx';
 import {ScoreWord, ScoreIcon} from '../../../components/score-icon';
 import {Markdown} from '../../../components/markdown';
 import {TableDetails} from './table-details';
 import {NumericDiff} from '../audit-list/numeric-diff';
+import {ItemDiff} from '../audit-list/audit-diff';
 import {getDiffLabel} from '@lhci/utils/src/audit-diff-finder';
 
 /** @param {{pair: LHCI.AuditPair, diff: LHCI.AuditDiff}} props */
@@ -34,15 +35,34 @@ const ScoreOnlyDetails = props => {
 
 /** @param {{pair: LHCI.AuditPair, key?: string}} props */
 const Details = props => {
-  const {details} = props.pair.audit;
-  const type = details && details.type;
-  if (type === 'table' || type === 'opportunity') return <TableDetails pair={props.pair} />;
+  const {pair} = props;
+  const displayValue = pair.audit.displayValue;
+  const type = pair.audit.details && pair.audit.details.type;
 
-  const diffs = props.pair.diffs;
-  const numericDiff = diffs.find(diff => diff.type === 'numericValue');
-  if (numericDiff && numericDiff.type === 'numericValue') return <NumericDiff diff={numericDiff} />;
+  let itemDiff = undefined;
+  let tableDetails = undefined;
+  let numericDetails = undefined;
 
-  const scoreDiff = diffs.find(diff => diff.type === 'score');
+  if (type === 'table' || type === 'opportunity') {
+    tableDetails = <TableDetails pair={pair} />;
+    if (pair.baseAudit) itemDiff = <ItemDiff {...pair} baseAudit={pair.baseAudit} />;
+  }
+
+  const numericDiff = pair.diffs.find(diff => diff.type === 'numericValue');
+  if (numericDiff && numericDiff.type === 'numericValue') {
+    numericDetails = <NumericDiff diff={numericDiff} displayValue={displayValue} />;
+  }
+
+  if (tableDetails || numericDiff) {
+    return (
+      <Fragment>
+        <div className="audit-detail-pane__audit-details-summary">{numericDetails || itemDiff}</div>
+        {tableDetails}
+      </Fragment>
+    );
+  }
+
+  const scoreDiff = pair.diffs.find(diff => diff.type === 'score');
   if (scoreDiff && scoreDiff.type === 'score')
     return <ScoreOnlyDetails diff={scoreDiff} pair={props.pair} />;
 

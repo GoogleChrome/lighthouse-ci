@@ -60,6 +60,21 @@
   margin-top: var(--base-spacing);
 }
 
+.audit-detail-pane__audit-details-summary {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: var(--base-spacing) 0;
+}
+
+.audit-detail-pane__audit-details-summary .audit-numeric-diff {
+  width: 100%;
+}
+
+.audit-detail-pane__audit-details-summary .audit-numeric-diff__bar {
+  flex-grow: 1;
+}
+
 .audit-detail-pane__audit-details--binary {
   display: flex;
   flex-direction: row;

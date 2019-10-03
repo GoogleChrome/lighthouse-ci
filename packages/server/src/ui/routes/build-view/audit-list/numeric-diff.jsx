@@ -19,16 +19,47 @@ const toNearestRoundNumber = (x, direction) => {
   return fn(x / 2500) * 2500;
 };
 
-/** @param {number} x @param {{asDelta?: boolean, withSuffix?: boolean}} options*/
-const toDisplay = (x, options = {}) => {
+/** @param {string} displayValue @return {'ms'|'bytes'|'none'} */
+const getUnitFromDisplayValue = displayValue => {
+  if (/\d\s(ms|s)$/.test(displayValue)) return 'ms';
+  if (/\d\s(KB|MB)$/.test(displayValue)) return 'bytes';
+  return 'none';
+};
+
+/** @param {number} x @param {{asDelta?: boolean, unit: 'ms'|'bytes'|'none', withSuffix?: boolean}} options */
+const toDisplay = (x, options) => {
+  const {asDelta = false, withSuffix = false, unit = 'none'} = options;
   let value = Math.round(x);
   let fractionDigits = 0;
-  let suffix = ' ms';
+  let suffix = '';
 
-  if (Math.abs(value) >= 50) {
-    value /= 1000;
-    fractionDigits = 1;
-    suffix = ' s';
+  if (unit === 'ms') {
+    suffix = ' ms';
+
+    if (Math.abs(value) >= 50) {
+      value /= 1000;
+      fractionDigits = 1;
+      suffix = ' s';
+    }
+  }
+
+  if (unit === 'bytes') {
+    suffix = ' KB';
+    value /= 1024;
+
+    if (Math.abs(value) >= 500) {
+      value /= 1024;
+      fractionDigits = 1;
+      suffix = ' MB';
+    }
+  }
+
+  if (unit === 'none') {
+    if (Math.abs(value) >= 50) {
+      value /= 1000;
+      fractionDigits = 1;
+      suffix = 'K';
+    }
   }
 
   const string = value.toLocaleString(undefined, {
@@ -36,12 +67,13 @@ const toDisplay = (x, options = {}) => {
     maximumFractionDigits: fractionDigits,
   });
 
-  return `${options.asDelta && value >= 0 ? '+' : ''}${string}${options.withSuffix ? suffix : ''}`;
+  return `${asDelta && value >= 0 ? '+' : ''}${string}${withSuffix ? suffix : ''}`;
 };
 
-/** @param {{diff: LHCI.NumericAuditDiff}} props */
+/** @param {{diff: LHCI.NumericAuditDiff, displayValue?: string}} props */
 export const NumericDiff = props => {
-  const {diff} = props;
+  const {diff, displayValue = ''} = props;
+  const unit = getUnitFromDisplayValue(displayValue);
   const currentNumericValue = diff.compareValue;
   const baseNumericValue = diff.baseValue;
 
@@ -64,7 +96,7 @@ export const NumericDiff = props => {
   return (
     <Fragment>
       <div className="audit-numeric-diff">
-        <div className="audit-numeric-diff__left-label">{toDisplay(lowerLimit)}</div>
+        <div className="audit-numeric-diff__left-label">{toDisplay(lowerLimit, {unit})}</div>
         <div className="audit-numeric-diff__bar">
           <div
             className={clsx('audit-numeric-diff__box', {
@@ -72,7 +104,13 @@ export const NumericDiff = props => {
               'audit-numeric-diff__box--regression': deltaType === 'regression',
             })}
             style={{left: `${boxLeft}%`, right: `${boxRight}%`}}
-            title={`${toDisplay(baseNumericValue)} -> ${toDisplay(currentNumericValue)}`}
+            title={`${toDisplay(baseNumericValue, {unit, withSuffix: true})} -> ${toDisplay(
+              currentNumericValue,
+              {
+                withSuffix: true,
+                unit,
+              }
+            )}`}
           >
             <div
               className="audit-numeric-diff__now"
@@ -82,11 +120,11 @@ export const NumericDiff = props => {
               className="audit-numeric-diff__delta-label"
               style={{[minValueIsCurrentValue ? 'right' : 'left']: '100%'}}
             >
-              {toDisplay(delta, {asDelta: true, withSuffix: true})}
+              {toDisplay(delta, {asDelta: true, withSuffix: true, unit})}
             </div>
           </div>
         </div>
-        <div className="audit-numeric-diff__right-label">{toDisplay(upperLimit)}</div>
+        <div className="audit-numeric-diff__right-label">{toDisplay(upperLimit, {unit})}</div>
       </div>
     </Fragment>
   );

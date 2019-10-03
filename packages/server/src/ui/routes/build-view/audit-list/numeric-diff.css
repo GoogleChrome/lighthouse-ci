@@ -12,7 +12,7 @@
 
 .audit-numeric-diff__bar {
   position: relative;
-  width: 200px;
+  min-width: 200px;
   background: var(--secondary-background-color);
   margin: 0 var(--base-spacing);
 }

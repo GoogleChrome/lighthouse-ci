@@ -56,7 +56,7 @@ function getUniqueBaseCompareIndexPairs(diffs) {
 }
 
 /** @param {{diffs: Array<LHCI.AuditDiff>, audit: LH.AuditResult, baseAudit: LH.AuditResult}} props */
-const ItemDiff = props => {
+export const ItemDiff = props => {
   const {diffs, baseAudit} = props;
   if (!baseAudit.details || !baseAudit.details.items) return null;
 
@@ -113,7 +113,7 @@ export const AuditDiff = props => {
 
   const numericDiff = diffs.find(diff => diff.type === 'numericValue');
   if (numericDiff && numericDiff.type === 'numericValue') {
-    return <NumericDiff diff={numericDiff} />;
+    return <NumericDiff diff={numericDiff} displayValue={audit.displayValue} />;
   }
 
   const hasItemDiff = diffs.some(

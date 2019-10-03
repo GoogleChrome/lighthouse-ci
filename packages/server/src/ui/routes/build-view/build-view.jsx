@@ -84,7 +84,7 @@ function computeAuditGroups(lhr, baseLhr) {
 /** @typedef {{id: string, audits: Array<LH.AuditResult>, group: {title: string}}} IntermediateAuditGroupDef */
 /** @typedef {{id: string, pairs: Array<LHCI.AuditPair>, group: {title: string}}} AuditGroupDef */
 
-/** @param {{selectedUrl: string, setUrl(url: string): void, build: LHCI.ServerCommand.Build | null, lhr?: LH.Result, baseLhr?: LH.Result, urls: Array<{url: string}>}} props */
+/** @param {{selectedUrl: string, setUrl(url: string): void, build: LHCI.ServerCommand.Build | null, lhr?: LH.Result, baseLhr?: LH.Result, urls: Array<string>}} props */
 const BuildViewScoreAndUrl = props => {
   return (
     <div className="build-view__scores-and-url">
@@ -93,7 +93,7 @@ const BuildViewScoreAndUrl = props => {
           className="build-view__url-dropdown"
           value={props.selectedUrl}
           setValue={props.setUrl}
-          options={props.urls.map(({url}) => ({value: url, label: url}))}
+          options={props.urls.map(url => ({value: url, label: url}))}
         />
         <BuildScoreComparison {...props} />
       </div>
@@ -122,16 +122,20 @@ const AuditGroups = props => {
   );
 };
 
-/** @param {{project: LHCI.ServerCommand.Project, build: LHCI.ServerCommand.Build, ancestorBuild: LHCI.ServerCommand.Build | null, buildUrls: Array<{url: string}>, runs: Array<LHCI.ServerCommand.Run>}} props */
+/** @param {{project: LHCI.ServerCommand.Project, build: LHCI.ServerCommand.Build, ancestorBuild: LHCI.ServerCommand.Build | null, runs: Array<LHCI.ServerCommand.Run>}} props */
 const BuildView_ = props => {
   const [openBuildHash, setOpenBuild] = useState(/** @type {null|'base'|'compare'} */ (null));
   const [selectedUrlState, setUrl] = useState('');
   const [selectedAuditId, setAuditId] = useState(/** @type {string|null} */ (null));
   const selectedUrl = selectedUrlState || (props.runs[0] && props.runs[0].url);
 
+  const compareRuns = props.runs.filter(run => run.buildId === props.build.id);
+  const availableUrls = [...new Set(compareRuns.map(run => run.url))];
+  const run = compareRuns.find(run => run.url === selectedUrl);
+
   const ancestorBuildId = props.ancestorBuild && props.ancestorBuild.id;
-  const run = props.runs.find(run => run.buildId === props.build.id);
-  const baseRun = props.runs.find(run => run.buildId === ancestorBuildId);
+  const baseRuns = props.runs.filter(run => run.buildId === ancestorBuildId);
+  const baseRun = baseRuns.find(run => run.url === selectedUrl);
 
   /** @type {LH.Result|undefined} */
   let lhr;
@@ -214,7 +218,7 @@ const BuildView_ = props => {
           baseLhr={baseLhr}
           selectedUrl={selectedUrl}
           setUrl={setUrl}
-          urls={props.buildUrls}
+          urls={availableUrls}
         />
         <div className="container">
           <BuildViewLegend />
@@ -238,7 +242,6 @@ const BuildView_ = props => {
 export const BuildView = props => {
   const projectLoadingData = useProject(props.projectId);
   const buildLoadingData = useBuild(props.projectId, props.buildId);
-  const buildUrlsData = useBuildURLs(props.projectId, props.buildId);
 
   const ancestorHashOptions = props.baseHash ? {ancestorHash: props.baseHash} : buildLoadingData[1];
   const ancestorBuildData = useOptionalAncestorBuild(props.projectId, ancestorHashOptions);
@@ -258,7 +261,6 @@ export const BuildView = props => {
         projectLoadingData,
         buildLoadingData,
         ancestorBuildData,
-        buildUrlsData,
         runData,
         baseRunData
       )}
@@ -266,7 +268,6 @@ export const BuildView = props => {
         projectLoadingData,
         buildLoadingData,
         ancestorBuildData,
-        buildUrlsData,
         runData,
         baseRunData
       )}
@@ -275,12 +276,11 @@ export const BuildView = props => {
           <h1>Loading...</h1>
         </Page>
       )}
-      render={([project, build, ancestorBuild, buildUrls, runs, baseRuns]) => (
+      render={([project, build, ancestorBuild, runs, baseRuns]) => (
         <BuildView_
           project={project}
           build={build}
           ancestorBuild={ancestorBuild}
-          buildUrls={buildUrls}
           runs={runs.concat(baseRuns)}
         />
       )}

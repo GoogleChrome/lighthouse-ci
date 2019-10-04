@@ -328,15 +328,19 @@ class SqlStorageMethod {
       id: {[Sequelize.Op.ne]: build.id},
     };
 
-    const nearestBuildAfter = await buildModel.findAll({
-      where: {...where, runAt: {[Sequelize.Op.gte]: build.runAt}},
-      order: [['runAt', 'ASC']],
-      limit: 1,
-    });
-
     const nearestBuildBefore = await buildModel.findAll({
       where: {...where, runAt: {[Sequelize.Op.lte]: build.runAt}},
       order: [['runAt', 'DESC']],
+      limit: 1,
+    });
+
+    if (build.branch === 'master') {
+      return nearestBuildBefore[0];
+    }
+
+    const nearestBuildAfter = await buildModel.findAll({
+      where: {...where, runAt: {[Sequelize.Op.gte]: build.runAt}},
+      order: [['runAt', 'ASC']],
       limit: 1,
     });
 

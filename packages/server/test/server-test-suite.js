@@ -226,6 +226,7 @@ function runTests(state) {
       const project = await client.createProject(projectA);
       const buildWithoutAncestor = await client.createBuild({
         ...buildC,
+        commitMessage: 'buildWithoutAncestor',
         projectId: project.id,
         branch: 'feature_branch',
         runAt: new Date('2019-09-01').toISOString(),
@@ -236,15 +237,19 @@ function runTests(state) {
 
       const implicitPriorAncestorBuild = await client.createBuild({
         ...buildA,
+        commitMessage: 'implicitPriorAncestorBuild',
         projectId: project.id,
         branch: 'master',
         runAt: new Date('2019-01-01').toISOString(),
       });
       ancestor = await client.findAncestorBuildById(project.id, buildWithoutAncestor.id);
       expect(ancestor).toEqual(implicitPriorAncestorBuild);
+      ancestor = await client.findAncestorBuildById(project.id, implicitPriorAncestorBuild.id);
+      expect(ancestor).toEqual(undefined);
 
       const implicitFutureAncestorBuild = await client.createBuild({
         ...buildA,
+        commitMessage: 'implicitFutureAncestorBuild',
         projectId: project.id,
         branch: 'master',
         runAt: new Date('2019-09-02').toISOString(),
@@ -252,6 +257,27 @@ function runTests(state) {
 
       ancestor = await client.findAncestorBuildById(project.id, buildWithoutAncestor.id);
       expect(ancestor).toEqual(implicitFutureAncestorBuild);
+      ancestor = await client.findAncestorBuildById(project.id, implicitFutureAncestorBuild.id);
+      expect(ancestor).toEqual(implicitPriorAncestorBuild);
+      ancestor = await client.findAncestorBuildById(project.id, implicitPriorAncestorBuild.id);
+      expect(ancestor).toEqual(undefined);
+
+      const implicit2ndFutureAncestorBuild = await client.createBuild({
+        ...buildA,
+        commitMessage: 'implicit2ndFutureAncestorBuild',
+        projectId: project.id,
+        branch: 'master',
+        runAt: new Date('2019-09-03').toISOString(),
+      });
+
+      ancestor = await client.findAncestorBuildById(project.id, buildWithoutAncestor.id);
+      expect(ancestor).toEqual(implicitFutureAncestorBuild);
+      ancestor = await client.findAncestorBuildById(project.id, implicit2ndFutureAncestorBuild.id);
+      expect(ancestor).toEqual(implicitFutureAncestorBuild);
+      ancestor = await client.findAncestorBuildById(project.id, implicitFutureAncestorBuild.id);
+      expect(ancestor).toEqual(implicitPriorAncestorBuild);
+      ancestor = await client.findAncestorBuildById(project.id, implicitPriorAncestorBuild.id);
+      expect(ancestor).toEqual(undefined);
     });
   });
 

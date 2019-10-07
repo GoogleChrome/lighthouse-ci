@@ -5,8 +5,11 @@
  */
 'use strict';
 
+const fs = require('fs');
+const path = require('path');
 const {getSavedLHRs} = require('@lhci/utils/src/saved-reports.js');
 const {getAllAssertionResults} = require('@lhci/utils/src/assertions.js');
+const {convertBudgetsToAssertions} = require('@lhci/utils/src/budgets-converter.js');
 const log = require('lighthouse-logger');
 
 /**
@@ -21,7 +24,16 @@ function buildCommand(yargs) {
     assertions: {
       description: 'The assertions to use.',
     },
+    budgetsFile: {
+      description: 'The path (relative to cwd) to a budgets.json file.',
+    },
   });
+}
+
+/** @param {string} budgetsFile @return {Array<LHCI.AssertCommand.Budget>} */
+function readBudgets(budgetsFile) {
+  const fullyResolvedPath = path.resolve(process.cwd(), budgetsFile);
+  return JSON.parse(fs.readFileSync(fullyResolvedPath, 'utf8'));
 }
 
 /**
@@ -29,7 +41,13 @@ function buildCommand(yargs) {
  * @return {Promise<void>}
  */
 async function runCommand(options) {
-  if (!options.assertions && !options.preset) throw new Error('No assertions to use');
+  const {budgetsFile, assertions, assertMatrix, preset} = options;
+  const areAssertionsSet = Boolean(assertions || assertMatrix || preset);
+  if (!areAssertionsSet && !budgetsFile) throw new Error('No assertions to use');
+  if (budgetsFile && areAssertionsSet) throw new Error('Cannot use both budgets AND assertions');
+  // If we have a budgets file, convert it to our assertions format.
+  if (budgetsFile) options = convertBudgetsToAssertions(readBudgets(budgetsFile));
+
   const lhrs = getSavedLHRs().map(json => JSON.parse(json));
   const results = getAllAssertionResults(options, lhrs);
 

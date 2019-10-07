@@ -29,6 +29,7 @@ declare global {
       }
 
       export interface Options extends BaseOptions {
+        budgetsFile?: string;
         assertMatrix?: BaseOptions[];
       }
 

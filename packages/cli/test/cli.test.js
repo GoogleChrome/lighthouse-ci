@@ -18,6 +18,7 @@ const {startServer, waitForCondition, CLI_PATH} = require('./test-utils.js');
 describe('Lighthouse CI CLI', () => {
   const rcFile = path.join(__dirname, 'fixtures/lighthouserc.json');
   const rcExtendedFile = path.join(__dirname, 'fixtures/lighthouserc-extended.json');
+  const budgetsFile = path.join(__dirname, 'fixtures/budgets.json');
 
   let server;
   let projectToken;
@@ -236,7 +237,6 @@ describe('Lighthouse CI CLI', () => {
 
       const stderrClean = stderr.replace(/\d{4,}(\.\d{1,})?/g, 'XXXX');
       expect(stdout).toMatchInlineSnapshot(`""`);
-      // Update this test and the URL to use LHCI Server UI once it's built
       expect(stderrClean).toMatchInlineSnapshot(`
         "Checking assertions against 2 run(s)
 
@@ -247,6 +247,32 @@ describe('Lighthouse CI CLI', () => {
 
 
         [31m✘[0m [1mfirst-contentful-paint[0m failure for [1mmaxNumericValue[0m assertion
+              expected: <=[32m1[0m
+                 found: [31mXXXX[0m
+            [2mall values: XXXX, XXXX[0m
+
+        Assertion failed. Exiting with status code 1.
+        "
+      `);
+      expect(status).toEqual(1);
+    });
+
+    it('should assert failures from a budgets file', () => {
+      let {stdout = '', stderr = '', status = -1} = spawnSync(CLI_PATH, [
+        'assert',
+        `--budgets-file=${budgetsFile}`,
+      ]);
+
+      stdout = stdout.toString();
+      stderr = stderr.toString();
+      status = status || 0;
+
+      const stderrClean = stderr.replace(/\d{4,}(\.\d{1,})?/g, 'XXXX');
+      expect(stdout).toMatchInlineSnapshot(`""`);
+      expect(stderrClean).toMatchInlineSnapshot(`
+        "Checking assertions against 2 run(s)
+
+        [31m✘[0m [1mresource-summary[0m.script.size failure for [1mmaxNumericValue[0m assertion
               expected: <=[32m1[0m
                  found: [31mXXXX[0m
             [2mall values: XXXX, XXXX[0m

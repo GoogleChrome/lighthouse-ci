@@ -66,5 +66,10 @@ describe('Representative Runs', () => {
 
       expect(computeRepresentativeRuns(runs)).toEqual([{id: 4}]);
     });
+
+    it('should support empty arrays', () => {
+      expect(computeRepresentativeRuns([])).toEqual([]);
+      expect(computeRepresentativeRuns([[], []])).toEqual([]);
+    });
   });
 });

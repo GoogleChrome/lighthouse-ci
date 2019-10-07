@@ -533,6 +533,14 @@ describe('getAllAssertionResults', () => {
         },
       ]);
     });
+
+    it('should work when no filter matches', () => {
+      const assertions = {'first-contentful-paint': ['error', {minScore: 0.9}]};
+      const matchingUrlPattern = 'this-will-never-match-anything';
+      const results = getAllAssertionResults({assertions, matchingUrlPattern}, lhrs);
+
+      expect(results).toEqual([]);
+    });
   });
 
   describe('assertMatrix', () => {

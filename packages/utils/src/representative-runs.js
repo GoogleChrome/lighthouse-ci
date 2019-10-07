@@ -31,6 +31,8 @@ function computeRepresentativeRuns(runsByUrl) {
   const representativeRuns = [];
 
   for (const runs of runsByUrl) {
+    if (!runs.length) continue;
+
     const sortedByFcp = runs
       .slice()
       .sort(

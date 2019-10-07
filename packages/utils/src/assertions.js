@@ -236,12 +236,46 @@ function doesLHRMatchPattern(pattern, lhr) {
 }
 
 /**
- * @param {LHCI.AssertCommand.BaseOptions} options
- * @param {LH.Result[]} lhrs
- * @return {AssertionResult[]}
+ * Gets the assertion results for a particular audit. This method delegates some of the unique
+ * handling for budgets and auditProperty assertions as necessary.
+ *
+ * @param {string} auditId
+ * @param {Array<string>|undefined} auditProperty
+ * @param {Array<LH.AuditResult>} auditResults
+ * @param {LHCI.AssertCommand.AssertionOptions} assertionOptions
+ * @return {AssertionResultNoURL[]}
  */
-function getAllFilteredAssertionResults(options, lhrs) {
-  const {preset = '', ...optionOverrides} = options;
+function getAssertionResultsForAudit(auditId, auditProperty, auditResults, assertionOptions) {
+  if (auditId === 'performance-budget') {
+    return getBudgetAssertionResults(auditResults);
+  } else if (auditId === 'resource-summary' && auditProperty) {
+    if (auditProperty.length !== 2 || !['size', 'count'].includes(auditProperty[1])) {
+      throw new Error(`Invalid resource-summary assertion "${auditProperty}"`);
+    }
+
+    const psuedoAuditResults = auditResults.map(result => {
+      if (!result || !result.details || !result.details.items) return;
+      const itemKey = auditProperty[1] === 'count' ? 'requestCount' : 'size';
+      const item = result.details.items.find(item => item.resourceType === auditProperty[0]);
+      if (!item) return;
+      return {...result, numericValue: item[itemKey]};
+    });
+
+    return getAssertionResults(psuedoAuditResults, assertionOptions).map(result => ({
+      ...result,
+      auditProperty: auditProperty.join('.'),
+    }));
+  } else {
+    return getAssertionResults(auditResults, assertionOptions);
+  }
+}
+
+/**
+ * @param {LHCI.AssertCommand.BaseOptions} baseOptions
+ * @param {LH.Result[]} unfilteredLhrs
+ */
+function resolveAssertionOptionsAndLhrs(baseOptions, unfilteredLhrs) {
+  const {preset = '', ...optionOverrides} = baseOptions;
   let optionsToUse = optionOverrides;
   const presetMatch = preset.match(/lighthouse:(.*)$/);
   if (presetMatch) {
@@ -250,19 +284,18 @@ function getAllFilteredAssertionResults(options, lhrs) {
   }
 
   const {assertions = {}, matchingUrlPattern: urlPattern} = optionsToUse;
-  const lhrsToUse = urlPattern ? lhrs.filter(lhr => doesLHRMatchPattern(urlPattern, lhr)) : lhrs;
-  // If we don't have any LHRs, just return early.
-  if (!lhrsToUse.length) return [];
+  const lhrs = urlPattern
+    ? unfilteredLhrs.filter(lhr => doesLHRMatchPattern(urlPattern, lhr))
+    : unfilteredLhrs;
+
   // Double-check we've only got one URL to look at that should have been pre-grouped in `getAllAssertionResults`.
-  const uniqueURLs = new Set(lhrsToUse.map(lhr => lhr.finalUrl));
+  const uniqueURLs = new Set(lhrs.map(lhr => lhr.finalUrl));
   if (uniqueURLs.size > 1) throw new Error('Can only assert one URL at a time!');
-  const lhrURL = lhrsToUse[0].finalUrl;
+
   const medianLhrs = computeRepresentativeRuns([
-    lhrsToUse.map(lhr => /** @type {[LH.Result, LH.Result]} */ ([lhr, lhr])),
+    lhrs.map(lhr => /** @type {[LH.Result, LH.Result]} */ ([lhr, lhr])),
   ]);
 
-  /** @type {AssertionResult[]} */
-  const results = [];
   const auditsToAssert = [...new Set(Object.keys(assertions).map(_.kebabCase))].map(
     assertionKey => {
       const [auditId, ...rest] = assertionKey.split('.');
@@ -271,42 +304,47 @@ function getAllFilteredAssertionResults(options, lhrs) {
     }
   );
 
+  return {
+    assertions,
+    auditsToAssert,
+    medianLhrs,
+    lhrs: lhrs,
+    url: (lhrs[0] && lhrs[0].finalUrl) || '',
+  };
+}
+
+/**
+ * @param {LHCI.AssertCommand.BaseOptions} baseOptions
+ * @param {LH.Result[]} unfilteredLhrs
+ * @return {AssertionResult[]}
+ */
+function getAllFilteredAssertionResults(baseOptions, unfilteredLhrs) {
+  const {assertions, auditsToAssert, medianLhrs, lhrs, url} = resolveAssertionOptionsAndLhrs(
+    baseOptions,
+    unfilteredLhrs
+  );
+
+  // If we don't have any data, just return early.
+  if (!lhrs.length) return [];
+
+  /** @type {AssertionResult[]} */
+  const results = [];
+
   for (const {assertionKey, auditId, auditProperty} of auditsToAssert) {
     const [level, assertionOptions] = normalizeAssertion(assertions[assertionKey]);
     if (level === 'off') continue;
 
-    const lhrsToUseForAudit =
-      assertionOptions.mergeMethod === 'median-run' ? medianLhrs : lhrsToUse;
+    const lhrsToUseForAudit = assertionOptions.mergeMethod === 'median-run' ? medianLhrs : lhrs;
     const auditResults = lhrsToUseForAudit.map(lhr => lhr.audits[auditId]);
-
-    /** @type {Array<AssertionResultNoURL>} */
-    let assertionResults = [];
-    if (auditId === 'performance-budget') {
-      assertionResults = getBudgetAssertionResults(auditResults);
-    } else if (auditId === 'resource-summary' && auditProperty) {
-      if (auditProperty.length !== 2 || !['size', 'count'].includes(auditProperty[1])) {
-        throw new Error(`Invalid resource-summary assertion "${auditProperty}"`);
-      }
-
-      const psuedoAuditResults = auditResults.map(result => {
-        if (!result || !result.details || !result.details.items) return;
-        const itemKey = auditProperty[1] === 'count' ? 'requestCount' : 'size';
-        const item = result.details.items.find(item => item.resourceType === auditProperty[0]);
-        if (!item) return;
-        return {...result, numericValue: item[itemKey]};
-      });
-
-      assertionResults = getAssertionResults(psuedoAuditResults, assertionOptions);
-      assertionResults = assertionResults.map(result => ({
-        ...result,
-        auditProperty: auditProperty.join('.'),
-      }));
-    } else {
-      assertionResults = getAssertionResults(auditResults, assertionOptions);
-    }
+    const assertionResults = getAssertionResultsForAudit(
+      auditId,
+      auditProperty,
+      auditResults,
+      assertionOptions
+    );
 
     for (const result of assertionResults) {
-      results.push({...result, auditId, level, url: lhrURL});
+      results.push({...result, auditId, level, url});
     }
   }
 

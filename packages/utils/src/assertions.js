@@ -117,23 +117,26 @@ function getAssertionResult(auditResults, mergeMethod, assertionType, expectedVa
 }
 
 /**
- * @param {LH.AuditResult[]} auditResults
+ * @param {Array<LH.AuditResult|undefined>} possibleAuditResults
  * @param {LHCI.AssertCommand.AssertionOptions} options
  * @return {AssertionResultNoURL[]}
  */
-function getAssertionResults(auditResults, options) {
+function getAssertionResults(possibleAuditResults, options) {
   const {minScore, maxLength, maxNumericValue, mergeMethod = 'optimistic'} = options;
-  if (auditResults.some(result => result === undefined)) {
+  if (possibleAuditResults.some(result => result === undefined)) {
     return [
       {
         name: 'auditRan',
         expected: 1,
         actual: 0,
-        values: auditResults.map(result => (result === undefined ? 0 : 1)),
+        values: possibleAuditResults.map(result => (result === undefined ? 0 : 1)),
         operator: '>=',
       },
     ];
   }
+
+  // We just checked that all of them are defined, so redefine for easier tsc.
+  const auditResults = /** @type {Array<LH.AuditResult>} */ (possibleAuditResults);
 
   /** @type {AssertionResultNoURL[]} */
   const results = [];
@@ -250,29 +253,57 @@ function getAllFilteredAssertionResults(options, lhrs) {
   const lhrsToUse = urlPattern ? lhrs.filter(lhr => doesLHRMatchPattern(urlPattern, lhr)) : lhrs;
   // If we don't have any LHRs, just return early.
   if (!lhrsToUse.length) return [];
-  // Double-check we've only got one URL to look at.
+  // Double-check we've only got one URL to look at that should have been pre-grouped in `getAllAssertionResults`.
   const uniqueURLs = new Set(lhrsToUse.map(lhr => lhr.finalUrl));
   if (uniqueURLs.size > 1) throw new Error('Can only assert one URL at a time!');
   const lhrURL = lhrsToUse[0].finalUrl;
-  const medianRuns = computeRepresentativeRuns([
+  const medianLhrs = computeRepresentativeRuns([
     lhrsToUse.map(lhr => /** @type {[LH.Result, LH.Result]} */ ([lhr, lhr])),
   ]);
 
   /** @type {AssertionResult[]} */
   const results = [];
-  const auditsToAssert = new Set(Object.keys(assertions).map(_.kebabCase));
-  for (const auditId of auditsToAssert) {
-    const [level, assertionOptions] = normalizeAssertion(assertions[auditId]);
+  const auditsToAssert = [...new Set(Object.keys(assertions).map(_.kebabCase))].map(
+    assertionKey => {
+      const [auditId, ...rest] = assertionKey.split('.');
+      if (!rest.length) return {assertionKey, auditId};
+      return {assertionKey, auditId, auditProperty: rest};
+    }
+  );
+
+  for (const {assertionKey, auditId, auditProperty} of auditsToAssert) {
+    const [level, assertionOptions] = normalizeAssertion(assertions[assertionKey]);
     if (level === 'off') continue;
 
     const lhrsToUseForAudit =
-      assertionOptions.mergeMethod === 'median-run' ? medianRuns : lhrsToUse;
+      assertionOptions.mergeMethod === 'median-run' ? medianLhrs : lhrsToUse;
     const auditResults = lhrsToUseForAudit.map(lhr => lhr.audits[auditId]);
 
-    const assertionResults =
-      auditId === 'performance-budget'
-        ? getBudgetAssertionResults(auditResults)
-        : getAssertionResults(auditResults, assertionOptions);
+    /** @type {Array<AssertionResultNoURL>} */
+    let assertionResults = [];
+    if (auditId === 'performance-budget') {
+      assertionResults = getBudgetAssertionResults(auditResults);
+    } else if (auditId === 'resource-summary' && auditProperty) {
+      if (auditProperty.length !== 2 || !['size', 'count'].includes(auditProperty[1])) {
+        throw new Error(`Invalid resource-summary assertion "${auditProperty}"`);
+      }
+
+      const psuedoAuditResults = auditResults.map(result => {
+        if (!result || !result.details || !result.details.items) return;
+        const itemKey = auditProperty[1] === 'count' ? 'requestCount' : 'size';
+        const item = result.details.items.find(item => item.resourceType === auditProperty[0]);
+        if (!item) return;
+        return {...result, numericValue: item[itemKey]};
+      });
+
+      assertionResults = getAssertionResults(psuedoAuditResults, assertionOptions);
+      assertionResults = assertionResults.map(result => ({
+        ...result,
+        auditProperty: auditProperty.join('.'),
+      }));
+    } else {
+      assertionResults = getAssertionResults(auditResults, assertionOptions);
+    }
 
     for (const result of assertionResults) {
       results.push({...result, auditId, level, url: lhrURL});

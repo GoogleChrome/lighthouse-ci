@@ -25,6 +25,7 @@ describe('getAllAssertionResults', () => {
             numericValue: 5000,
           },
           'network-requests': {
+            score: 0,
             details: {items: [1, 2, 3, 4]},
           },
         },
@@ -39,6 +40,7 @@ describe('getAllAssertionResults', () => {
             numericValue: 5500,
           },
           'network-requests': {
+            score: 0,
             details: {items: [1, 2]},
           },
         },
@@ -218,7 +220,9 @@ describe('getAllAssertionResults', () => {
   });
 
   describe('presets', () => {
-    const auditIds = Object.keys(lighthouseAllPreset.assertions);
+    const auditIds = Object.keys(lighthouseAllPreset.assertions).filter(
+      id => lighthouseAllPreset.assertions[id][0] !== 'off'
+    );
 
     beforeEach(() => {
       const lhrA = {audits: {}};

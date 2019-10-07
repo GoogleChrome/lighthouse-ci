@@ -152,63 +152,6 @@ describe('getAllAssertionResults', () => {
     expect(results).toMatchObject([{actual: 0, expected: 1, name: 'minScore'}]);
   });
 
-  it('should use mergeMethod optimistic', () => {
-    const assertions = {
-      'first-contentful-paint': ['warn', {mergeMethod: 'optimistic', minScore: 1}],
-    };
-
-    const results = getAllAssertionResults({assertions}, lhrs);
-    expect(results).toMatchObject([{actual: 0.8}]);
-  });
-
-  it('should use mergeMethod pessimistic', () => {
-    const assertions = {
-      'first-contentful-paint': ['warn', {mergeMethod: 'pessimistic', minScore: 1}],
-    };
-
-    const results = getAllAssertionResults({assertions}, lhrs);
-    expect(results).toMatchObject([{actual: 0.6}]);
-  });
-
-  it('should use mergeMethod median', () => {
-    const assertions = {
-      'first-contentful-paint': ['warn', {mergeMethod: 'median', minScore: 1}],
-    };
-
-    const results = getAllAssertionResults({assertions}, lhrs);
-    expect(results).toMatchObject([{actual: 0.7}]);
-  });
-
-  it('should handle partial failure with mode optimistic', () => {
-    const assertions = {
-      'first-contentful-paint': ['warn', {mergeMethod: 'optimistic'}],
-    };
-
-    lhrs[1].audits['first-contentful-paint'].score = null;
-    const results = getAllAssertionResults({assertions}, lhrs);
-    expect(results).toMatchObject([{actual: 0.6, expected: 1, name: 'minScore'}]);
-  });
-
-  it('should handle partial failure with mode median', () => {
-    const assertions = {
-      'first-contentful-paint': ['warn', {mergeMethod: 'median'}],
-    };
-
-    lhrs[1].audits['first-contentful-paint'].score = null;
-    const results = getAllAssertionResults({assertions}, lhrs);
-    expect(results).toMatchObject([{actual: 0.6, expected: 1, name: 'minScore'}]);
-  });
-
-  it('should handle partial failure when mode is pessimistic', () => {
-    const assertions = {
-      'first-contentful-paint': ['warn', {mergeMethod: 'pessimistic'}],
-    };
-
-    lhrs[1].audits['first-contentful-paint'].score = null;
-    const results = getAllAssertionResults({assertions}, lhrs);
-    expect(results).toMatchObject([{actual: 0, expected: 1, name: 'auditRan'}]);
-  });
-
   it('should de-dupe camelcase audits', () => {
     const assertions = {
       firstContentfulPaint: ['warn', {mergeMethod: 'optimistic', minScore: 1}],
@@ -217,6 +160,117 @@ describe('getAllAssertionResults', () => {
 
     const results = getAllAssertionResults({assertions}, lhrs);
     expect(results).toMatchObject([{actual: 0.8}]);
+  });
+
+  describe('mergeMethod', () => {
+    it('should use mergeMethod optimistic', () => {
+      const assertions = {
+        'first-contentful-paint': ['warn', {mergeMethod: 'optimistic', minScore: 1}],
+        'network-requests': ['warn', {mergeMethod: 'optimistic', maxLength: 1}],
+      };
+
+      const results = getAllAssertionResults({assertions}, lhrs);
+      expect(results).toMatchObject([{actual: 0.8}, {actual: 2}]);
+    });
+
+    it('should use mergeMethod pessimistic', () => {
+      const assertions = {
+        'first-contentful-paint': ['warn', {mergeMethod: 'pessimistic', minScore: 1}],
+        'network-requests': ['warn', {mergeMethod: 'pessimistic', maxLength: 1}],
+      };
+
+      const results = getAllAssertionResults({assertions}, lhrs);
+      expect(results).toMatchObject([{actual: 0.6}, {actual: 4}]);
+    });
+
+    it('should use mergeMethod median', () => {
+      const assertions = {
+        'first-contentful-paint': ['warn', {mergeMethod: 'median', minScore: 1}],
+        'network-requests': ['warn', {mergeMethod: 'median', maxLength: 1}],
+      };
+
+      const results = getAllAssertionResults({assertions}, lhrs);
+      expect(results).toMatchObject([{actual: 0.7}, {actual: 3}]);
+    });
+
+    it('should use mergeMethod median-run', () => {
+      const lhrs = [
+        // This is the "median-run" by FCP and interactive.
+        {
+          finalUrl: 'http://example.com',
+          audits: {
+            'first-contentful-paint': {numericValue: 5000},
+            interactive: {numericValue: 10000},
+            'other-audit': {numericValue: 23000},
+          },
+        },
+        {
+          finalUrl: 'http://example.com',
+          audits: {
+            'first-contentful-paint': {numericValue: 1000},
+            interactive: {numericValue: 5000},
+            'other-audit': {numericValue: 5000},
+          },
+        },
+        {
+          finalUrl: 'http://example.com',
+          audits: {
+            'first-contentful-paint': {numericValue: 10000},
+            interactive: {numericValue: 15000},
+            'other-audit': {numericValue: 2000},
+          },
+        },
+      ];
+
+      const assertions = {
+        'other-audit': ['warn', {mergeMethod: 'median-run', maxNumericValue: 10000}],
+      };
+
+      const results = getAllAssertionResults({assertions}, lhrs);
+      // The assertion should use the median run, not the median of the values.
+      expect(results).toEqual([
+        {
+          level: 'warn',
+          auditId: 'other-audit',
+          actual: 23000,
+          expected: 10000,
+          name: 'maxNumericValue',
+          operator: '<=',
+          url: 'http://example.com',
+          values: [23000],
+        },
+      ]);
+    });
+
+    it('should handle partial failure with mode optimistic', () => {
+      const assertions = {
+        'first-contentful-paint': ['warn', {mergeMethod: 'optimistic'}],
+      };
+
+      lhrs[1].audits['first-contentful-paint'].score = null;
+      const results = getAllAssertionResults({assertions}, lhrs);
+      expect(results).toMatchObject([{actual: 0.6, expected: 1, name: 'minScore'}]);
+    });
+
+    it('should handle partial failure with mode median', () => {
+      const assertions = {
+        'first-contentful-paint': ['warn', {mergeMethod: 'median'}],
+      };
+
+      lhrs[1].audits['first-contentful-paint'].score = null;
+      const results = getAllAssertionResults({assertions}, lhrs);
+      expect(results).toMatchObject([{actual: 0.6, expected: 1, name: 'minScore'}]);
+    });
+
+    it('should handle partial failure when mode is pessimistic', () => {
+      const assertions = {
+        'first-contentful-paint': ['warn', {mergeMethod: 'pessimistic'}],
+      };
+
+      lhrs[1].audits['first-contentful-paint'].score = null;
+      const results = getAllAssertionResults({assertions}, lhrs);
+      expect(results).toMatchObject([{actual: 0, expected: 1, name: 'auditRan'}]);
+    });
   });
 
   describe('presets', () => {

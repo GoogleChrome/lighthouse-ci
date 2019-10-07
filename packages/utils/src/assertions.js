@@ -6,6 +6,7 @@
 'use strict';
 
 const _ = require('./lodash.js');
+const {computeRepresentativeRuns} = require('./representative-runs.js');
 
 /** @typedef {keyof StrictOmit<LHCI.AssertCommand.AssertionOptions, 'mergeMethod'>|'auditRan'} AssertionType */
 
@@ -253,6 +254,9 @@ function getAllFilteredAssertionResults(options, lhrs) {
   const uniqueURLs = new Set(lhrsToUse.map(lhr => lhr.finalUrl));
   if (uniqueURLs.size > 1) throw new Error('Can only assert one URL at a time!');
   const lhrURL = lhrsToUse[0].finalUrl;
+  const medianRuns = computeRepresentativeRuns([
+    lhrsToUse.map(lhr => /** @type {[LH.Result, LH.Result]} */ ([lhr, lhr])),
+  ]);
 
   /** @type {AssertionResult[]} */
   const results = [];
@@ -261,7 +265,10 @@ function getAllFilteredAssertionResults(options, lhrs) {
     const [level, assertionOptions] = normalizeAssertion(assertions[auditId]);
     if (level === 'off') continue;
 
-    const auditResults = lhrsToUse.map(lhr => lhr.audits[auditId]);
+    const lhrsToUseForAudit =
+      assertionOptions.mergeMethod === 'median-run' ? medianRuns : lhrsToUse;
+    const auditResults = lhrsToUseForAudit.map(lhr => lhr.audits[auditId]);
+
     const assertionResults =
       auditId === 'performance-budget'
         ? getBudgetAssertionResults(auditResults)

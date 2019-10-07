@@ -7,7 +7,7 @@
 declare global {
   namespace LHCI {
     namespace AssertCommand {
-      export type AssertionMergeMethod = 'median' | 'optimistic' | 'pessimistic';
+      export type AssertionMergeMethod = 'median' | 'optimistic' | 'pessimistic' | 'median-run';
 
       export type AssertionFailureLevel = 'off' | 'warn' | 'error';
 

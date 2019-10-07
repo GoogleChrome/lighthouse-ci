@@ -6,7 +6,7 @@
 'use strict';
 
 const _ = require('@lhci/utils/src/lodash.js');
-const {computeRepresentativeRuns} = require('../representative-runs.js');
+const {computeRepresentativeRuns} = require('@lhci/utils/src/representative-runs.js');
 const statisticDefinitions = require('../statistic-definitions.js');
 
 class StorageMethod {

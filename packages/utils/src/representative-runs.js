@@ -22,11 +22,12 @@ function getMedianSortValue(lhr, medianFcp, medianInteractive) {
 }
 
 /**
- * @param {Array<Array<[LHCI.ServerCommand.Run, LH.Result]>>} runsByUrl
- * @return {Array<LHCI.ServerCommand.Run>}
+ * @template T
+ * @param {Array<Array<[T, LH.Result]>>} runsByUrl
+ * @return {Array<T>}
  */
 function computeRepresentativeRuns(runsByUrl) {
-  /** @type {Array<LHCI.ServerCommand.Run>} */
+  /** @type {Array<T>} */
   const representativeRuns = [];
 
   for (const runs of runsByUrl) {

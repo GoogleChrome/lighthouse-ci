@@ -153,10 +153,29 @@ export function useOptionalBuildRepresentativeRuns(projectId, buildId, url) {
 
 /**
  * @param {string|undefined} projectId
+ * @param {string|undefined} buildId
+ * @return {[LoadingState, LHCI.ServerCommand.Build | null | undefined]}
+ */
+export function useAncestorBuild(projectId, buildId) {
+  const [apiLoadingState, build] = useApiData(
+    'findAncestorBuildById',
+    projectId && buildId ? [projectId, buildId] : undefined
+  );
+
+  // If we couldn't find an ancestor build but we tried, consider it loaded with `null` to differentiate from `undefined`.
+  if (apiLoadingState === 'loaded' && !build) {
+    return ['loaded', null];
+  }
+
+  return [apiLoadingState, build];
+}
+
+/**
+ * @param {string|undefined} projectId
  * @param {{ancestorHash?: string} | undefined} build
  * @return {[LoadingState, LHCI.ServerCommand.Build | null | undefined]}
  */
-export function useOptionalAncestorBuild(projectId, build) {
+export function useOptionalBuildByHash(projectId, build) {
   // Construct this options object in a `useMemo` to prevent infinitely re-requesting.
   const getBuildsOptions = useMemo(() => build && {hash: build.ancestorHash}, [
     build && build.ancestorHash,

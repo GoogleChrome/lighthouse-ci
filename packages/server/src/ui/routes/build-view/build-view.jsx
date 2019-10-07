@@ -12,8 +12,9 @@ import {Dropdown} from '../../components/dropdown';
 import {
   useProject,
   useBuild,
-  useOptionalAncestorBuild,
+  useOptionalBuildByHash,
   useOptionalBuildRepresentativeRuns,
+  useAncestorBuild,
 } from '../../hooks/use-api-data';
 import {BuildHashSelector} from './build-hash-selector';
 import {BuildSelectorPill} from './build-selector-pill';
@@ -241,16 +242,22 @@ const BuildView_ = props => {
 export const BuildView = props => {
   const projectLoadingData = useProject(props.projectId);
   const buildLoadingData = useBuild(props.projectId, props.buildId);
+  const ancestorBuildData = useAncestorBuild(props.projectId, props.buildId);
 
-  const ancestorHashOptions = props.baseHash ? {ancestorHash: props.baseHash} : buildLoadingData[1];
-  const ancestorBuildData = useOptionalAncestorBuild(props.projectId, ancestorHashOptions);
-  const ancestorBuildId = ancestorBuildData[1] && ancestorBuildData[1].id;
+  const baseOverrideOptions = props.baseHash ? {ancestorHash: props.baseHash} : buildLoadingData[1];
+  const baseOverrideData = useOptionalBuildByHash(props.projectId, baseOverrideOptions);
+
+  const baseBuildData =
+    ancestorBuildData[0] === 'loaded' && !ancestorBuildData[1]
+      ? baseOverrideData
+      : ancestorBuildData;
+  const baseBuildId = baseBuildData[1] && baseBuildData[1].id;
 
   const runData = useOptionalBuildRepresentativeRuns(props.projectId, props.buildId, null);
 
   const baseRunData = useOptionalBuildRepresentativeRuns(
     props.projectId,
-    ancestorBuildId === null ? 'EMPTY_QUERY' : ancestorBuildId,
+    baseBuildId === null ? 'EMPTY_QUERY' : baseBuildId,
     null
   );
 
@@ -259,14 +266,14 @@ export const BuildView = props => {
       loadingState={combineLoadingStates(
         projectLoadingData,
         buildLoadingData,
-        ancestorBuildData,
+        baseBuildData,
         runData,
         baseRunData
       )}
       asyncData={combineAsyncData(
         projectLoadingData,
         buildLoadingData,
-        ancestorBuildData,
+        baseBuildData,
         runData,
         baseRunData
       )}

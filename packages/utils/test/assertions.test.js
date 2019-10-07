@@ -8,6 +8,7 @@
 /* eslint-env jest */
 
 const lighthouseAllPreset = require('@lhci/utils/src/presets/all.js');
+const {convertBudgetsToAssertions} = require('@lhci/utils/src/budgets-converter.js');
 const {getAllAssertionResults} = require('@lhci/utils/src/assertions.js');
 
 describe('getAllAssertionResults', () => {
@@ -322,12 +323,11 @@ describe('getAllAssertionResults', () => {
   });
 
   describe('budgets', () => {
-    it('should return assertion results for budgets UI', () => {
-      const assertions = {
-        'performance-budget': 'error',
-      };
+    let lhrWithBudget;
+    let lhrWithResourceSummary;
 
-      const lhr = {
+    beforeEach(() => {
+      lhrWithBudget = {
         finalUrl: 'http://page-1.com',
         audits: {
           'performance-budget': {
@@ -358,8 +358,50 @@ describe('getAllAssertionResults', () => {
         },
       };
 
+      lhrWithResourceSummary = {
+        finalUrl: 'http://example.com',
+        audits: {
+          'resource-summary': {
+            details: {
+              items: [
+                {
+                  resourceType: 'document',
+                  label: 'Document',
+                  requestCount: 1,
+                  size: 1143,
+                },
+                {
+                  resourceType: 'font',
+                  label: 'Font',
+                  requestCount: 2,
+                  size: 86751,
+                },
+                {
+                  resourceType: 'stylesheet',
+                  label: 'Stylesheet',
+                  requestCount: 3,
+                  size: 9842,
+                },
+                {
+                  resourceType: 'third-party',
+                  label: 'Third-party',
+                  requestCount: 7,
+                  size: 94907,
+                },
+              ],
+            },
+          },
+        },
+      };
+    });
+
+    it('should return assertion results for budgets UI', () => {
+      const assertions = {
+        'performance-budget': 'error',
+      };
+
       // Include the LHR twice to exercise our de-duping logic.
-      const lhrs = [lhr, lhr];
+      const lhrs = [lhrWithBudget, lhrWithBudget];
       const results = getAllAssertionResults({assertions}, lhrs);
       expect(results).toEqual([
         {
@@ -398,50 +440,64 @@ describe('getAllAssertionResults', () => {
       ]);
     });
 
-    it('should assert budgets after the fact', () => {
-      const lhr = {
-        finalUrl: 'http://example.com',
-        audits: {
-          'resource-summary': {
-            details: {
-              items: [
-                {
-                  resourceType: 'document',
-                  label: 'Document',
-                  requestCount: 1,
-                  size: 1143,
-                },
-                {
-                  resourceType: 'font',
-                  label: 'Font',
-                  requestCount: 2,
-                  size: 86751,
-                },
-                {
-                  resourceType: 'stylesheet',
-                  label: 'Stylesheet',
-                  requestCount: 3,
-                  size: 9842,
-                },
-                {
-                  resourceType: 'third-party',
-                  label: 'Third-party',
-                  requestCount: 7,
-                  size: 94907,
-                },
-              ],
-            },
-          },
+    it('should assert budgets natively', () => {
+      const budgets = [
+        {
+          resourceCounts: [
+            {resourceType: 'font', budget: 1},
+            {resourceType: 'third-party', budget: 5},
+          ],
+          resourceSizes: [{resourceType: 'document', budget: 400}],
         },
-      };
+      ];
 
+      const lhrs = [lhrWithResourceSummary, lhrWithResourceSummary];
+      const results = getAllAssertionResults(convertBudgetsToAssertions(budgets), lhrs);
+      expect(results).toEqual([
+        {
+          url: 'http://example.com',
+          actual: 2,
+          auditId: 'resource-summary',
+          auditProperty: 'font.count',
+          expected: 1,
+          level: 'error',
+          name: 'maxNumericValue',
+          operator: '<=',
+          values: [2, 2],
+        },
+        {
+          url: 'http://example.com',
+          actual: 7,
+          auditId: 'resource-summary',
+          auditProperty: 'third-party.count',
+          expected: 5,
+          level: 'error',
+          name: 'maxNumericValue',
+          operator: '<=',
+          values: [7, 7],
+        },
+        {
+          url: 'http://example.com',
+          actual: 1143,
+          auditId: 'resource-summary',
+          auditProperty: 'document.size',
+          expected: 400,
+          level: 'error',
+          name: 'maxNumericValue',
+          operator: '<=',
+          values: [1143, 1143],
+        },
+      ]);
+    });
+
+    it('should assert budgets after the fact', () => {
       const assertions = {
         'resource-summary.document.size': ['error', {maxNumericValue: 400}],
         'resource-summary.font.count': ['warn', {maxNumericValue: 1}],
         'resource-summary.third-party.count': ['warn', {maxNumericValue: 5}],
       };
 
-      const lhrs = [lhr, lhr];
+      const lhrs = [lhrWithResourceSummary, lhrWithResourceSummary];
       const results = getAllAssertionResults({assertions}, lhrs);
       expect(results).toEqual([
         {

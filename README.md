@@ -42,12 +42,7 @@ Saves all the runs in the `.lighthouseci/` folder to the server as a single buil
 lhci assert --preset=lighthouse:recommended --assertions.speed-index=off
 ```
 
-Asserts the conditions in the Lighthouse CI config and preset. Currently, assert supports the following features:
-
-1. **Assertions** - there are 2 assertions for each audit, `minScore` and `maxLength`. `minScore` asserts that the score of the audit is at least the provided value. `maxLength` asserts that the number of items flagged by the audit is no more than the provided value.
-2. **Merge Strategies** - there are 3 merging strategies `median`, `optimistic`, `pessimistic`. Median fails if the median run fails, optimistic fails only if all runs fail, and pessimistic fails if any of the runs fail.
-3. Error and warn levels are both available.
-4. **Presets** - there are two built-in presets `lighthouse:all`, which has every audit set to error if it's not a 100, and `lighthouse:recommended` which has every audit set to warn if it's not 100 and the _metrics_ error if not >=90.
+Asserts the conditions in the Lighthouse CI config and exits with the appropriate status code if there were any failures. See the [assertion docs](./docs/assertions.md) for more.
 
 ## Configuration
 

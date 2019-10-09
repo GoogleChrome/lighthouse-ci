@@ -8,7 +8,7 @@
 const fs = require('fs');
 const path = require('path');
 const LHCI_DIR = path.join(process.cwd(), '.lighthouseci');
-const LH_REGEX = /^lhr-\d+\.json$/;
+const LHR_REGEX = /^lhr-\d+\.json$/;
 
 function ensureDirectoryExists() {
   if (!fs.existsSync(LHCI_DIR)) fs.mkdirSync(LHCI_DIR);
@@ -23,7 +23,7 @@ function getSavedLHRs() {
   /** @type {string[]} */
   const lhrs = [];
   for (const file of fs.readdirSync(LHCI_DIR)) {
-    if (!LH_REGEX.test(file)) continue;
+    if (!LHR_REGEX.test(file)) continue;
 
     const filePath = path.join(LHCI_DIR, file);
     lhrs.push(fs.readFileSync(filePath, 'utf8'));
@@ -42,10 +42,20 @@ function saveLHR(lhr) {
   fs.writeFileSync(filePath, lhr);
 }
 
+/**
+ * @param {LH.Result} lhr
+ * @return {string}
+ */
+function getHTMLReportForLHR(lhr) {
+  // @ts-ignore - lighthouse doesn't publish .d.ts files yet
+  const ReportGenerator = require('lighthouse/lighthouse-core/report/report-generator.js');
+  return ReportGenerator.generateReportHtml(lhr);
+}
+
 function clearSavedLHRs() {
   ensureDirectoryExists();
   for (const file of fs.readdirSync(LHCI_DIR)) {
-    if (!LH_REGEX.test(file)) continue;
+    if (!LHR_REGEX.test(file)) continue;
 
     const filePath = path.join(LHCI_DIR, file);
     fs.unlinkSync(filePath);
@@ -76,6 +86,7 @@ function replaceUrlPatterns(url, sedLikeReplacementPatterns) {
 }
 
 module.exports = {
+  getHTMLReportForLHR,
   getSavedLHRs,
   saveLHR,
   clearSavedLHRs,

@@ -14,6 +14,7 @@ const uploadCmd = require('./upload/upload.js');
 const collectCmd = require('./collect/collect.js');
 const serverCmd = require('./server/server.js');
 const wizardCmd = require('./wizard/wizard.js');
+const openCmd = require('./open/open.js');
 
 async function run() {
   /** @type {any} */
@@ -32,6 +33,12 @@ async function run() {
     )
     .command('assert', 'Assert that the latest results meet expectations', commandYargs =>
       assertCmd.buildCommand(commandYargs)
+    )
+    .command('open', 'Opens the HTML reports of collected runs', commandYargs =>
+      openCmd.buildCommand(commandYargs)
+    )
+    .command('wizard', 'Step-by-step wizard for CI tasks like creating a project', commandYargs =>
+      wizardCmd.buildCommand(commandYargs)
     )
     .command('server', 'Run Lighthouse CI server', commandYargs =>
       serverCmd.buildCommand(commandYargs)
@@ -56,6 +63,9 @@ async function run() {
     }
     case 'wizard':
       await wizardCmd.runCommand(argv);
+      break;
+    case 'open':
+      await openCmd.runCommand(argv);
       break;
     default:
       throw new Error(`Unrecognized command ${argv._[0]}`);

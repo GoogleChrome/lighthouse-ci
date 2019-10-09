@@ -126,14 +126,14 @@ describe('Lighthouse CI CLI', () => {
       uuids = stdout.match(UUID_REGEX);
       const cleansedStdout = stdout.replace(UUID_REGEX, '<UUID>').replace(/:\d+/g, '<PORT>');
       expect(cleansedStdout).toMatchInlineSnapshot(`
-        "Saving CI project AwesomeCIProjectName (<UUID>)
-        Saving CI build (<UUID>)
-        Saved LHR to http://localhost<PORT> (<UUID>)
-        Saved LHR to http://localhost<PORT> (<UUID>)
-        Done saving build results to Lighthouse CI
-        View build diff at http://localhost<PORT>/app/projects/<UUID>/builds/<UUID>
-        "
-      `);
+                "Saving CI project AwesomeCIProjectName (<UUID>)
+                Saving CI build (<UUID>)
+                Saved LHR to http://localhost<PORT> (<UUID>)
+                Saved LHR to http://localhost<PORT> (<UUID>)
+                Done saving build results to Lighthouse CI
+                View build diff at http://localhost<PORT>/app/projects/<UUID>/builds/<UUID>
+                "
+            `);
       expect(stderr).toMatchInlineSnapshot(`""`);
       expect(status).toEqual(0);
       expect(uuids).toHaveLength(6);
@@ -181,12 +181,14 @@ describe('Lighthouse CI CLI', () => {
 
       expect(stdout).toMatchInlineSnapshot(`""`);
       expect(stderr).toMatchInlineSnapshot(`
-        "Checking assertions against 2 run(s)
+        "Checking assertions against 1 URL(s), 2 total run(s)
 
-        [31m✘[0m [1mworks-offline[0m failure for [1mminScore[0m assertion
-              expected: >=[32m1[0m
-                 found: [31m0[0m
-            [2mall values: 0, 0[0m
+        1 result(s) for [1mhttp://localhost:64077/app/[0m
+
+          [31m✘[0m  [1mworks-offline[0m failure for [1mminScore[0m assertion
+                expected: >=[32m1[0m
+                   found: [31m0[0m
+              [2mall values: 0, 0[0m
 
         Assertion failed. Exiting with status code 1.
         "
@@ -210,12 +212,14 @@ describe('Lighthouse CI CLI', () => {
       const stderrClean = stderr.replace(/\d{4,8}(\.\d{1,8})?/g, 'XXXX');
       expect(stdout).toMatchInlineSnapshot(`""`);
       expect(stderrClean).toMatchInlineSnapshot(`
-        "Checking assertions against 2 run(s)
+        "Checking assertions against 1 URL(s), 2 total run(s)
 
-        [31m✘[0m [1mperformance-budget[0m.script.size failure for [1mmaxNumericValue[0m assertion
-              expected: <=[32mXXXX[0m
-                 found: [31mXXXX[0m
-            [2mall values: XXXX[0m
+        1 result(s) for [1mhttp://localhost:XXXX/app/[0m
+
+          [31m✘[0m  [1mperformance-budget[0m.script.size failure for [1mmaxNumericValue[0m assertion
+                expected: <=[32mXXXX[0m
+                   found: [31mXXXX[0m
+              [2mall values: XXXX[0m
 
         Assertion failed. Exiting with status code 1.
         "
@@ -238,18 +242,20 @@ describe('Lighthouse CI CLI', () => {
       const stderrClean = stderr.replace(/\d{4,}(\.\d{1,})?/g, 'XXXX');
       expect(stdout).toMatchInlineSnapshot(`""`);
       expect(stderrClean).toMatchInlineSnapshot(`
-        "Checking assertions against 2 run(s)
+        "Checking assertions against 1 URL(s), 2 total run(s)
 
-        [31m✘[0m [1mperformance-budget[0m.script.size failure for [1mmaxNumericValue[0m assertion
-              expected: <=[32mXXXX[0m
-                 found: [31mXXXX[0m
-            [2mall values: XXXX[0m
+        2 result(s) for [1mhttp://localhost:XXXX/app/[0m
+
+          [31m✘[0m  [1mfirst-contentful-paint[0m failure for [1mmaxNumericValue[0m assertion
+                expected: <=[32m1[0m
+                   found: [31mXXXX[0m
+              [2mall values: XXXX, XXXX[0m
 
 
-        [31m✘[0m [1mfirst-contentful-paint[0m failure for [1mmaxNumericValue[0m assertion
-              expected: <=[32m1[0m
-                 found: [31mXXXX[0m
-            [2mall values: XXXX, XXXX[0m
+          [31m✘[0m  [1mperformance-budget[0m.script.size failure for [1mmaxNumericValue[0m assertion
+                expected: <=[32mXXXX[0m
+                   found: [31mXXXX[0m
+              [2mall values: XXXX[0m
 
         Assertion failed. Exiting with status code 1.
         "
@@ -270,12 +276,14 @@ describe('Lighthouse CI CLI', () => {
       const stderrClean = stderr.replace(/\d{4,}(\.\d{1,})?/g, 'XXXX');
       expect(stdout).toMatchInlineSnapshot(`""`);
       expect(stderrClean).toMatchInlineSnapshot(`
-        "Checking assertions against 2 run(s)
+        "Checking assertions against 1 URL(s), 2 total run(s)
 
-        [31m✘[0m [1mresource-summary[0m.script.size failure for [1mmaxNumericValue[0m assertion
-              expected: <=[32m1[0m
-                 found: [31mXXXX[0m
-            [2mall values: XXXX, XXXX[0m
+        1 result(s) for [1mhttp://localhost:XXXX/app/[0m
+
+          [31m✘[0m  [1mresource-summary[0m.script.size failure for [1mmaxNumericValue[0m assertion
+                expected: <=[32m1[0m
+                   found: [31mXXXX[0m
+              [2mall values: XXXX, XXXX[0m
 
         Assertion failed. Exiting with status code 1.
         "

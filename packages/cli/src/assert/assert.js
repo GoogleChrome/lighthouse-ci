@@ -7,6 +7,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const _ = require('@lhci/utils/src/lodash.js');
 const {getSavedLHRs} = require('@lhci/utils/src/saved-reports.js');
 const {getAllAssertionResults} = require('@lhci/utils/src/assertions.js');
 const {convertBudgetsToAssertions} = require('@lhci/utils/src/budgets-converter.js');
@@ -49,24 +50,38 @@ async function runCommand(options) {
   if (budgetsFile) options = convertBudgetsToAssertions(readBudgets(budgetsFile));
 
   const lhrs = getSavedLHRs().map(json => JSON.parse(json));
-  const results = getAllAssertionResults(options, lhrs);
+  const allResults = getAllAssertionResults(options, lhrs);
+  const groupedResults = _.groupBy(allResults, result => result.url);
 
-  process.stderr.write(`Checking assertions against ${lhrs.length} run(s)\n`);
+  process.stderr.write(
+    `Checking assertions against ${groupedResults.length} URL(s), ${lhrs.length} total run(s)\n\n`
+  );
 
   let hasFailure = false;
-  for (const result of results) {
-    hasFailure = hasFailure || result.level === 'error';
-    const label = result.level === 'warn' ? 'warning' : 'failure';
-    const warningOrErrorIcon = result.level === 'warn' ? '⚠️  ' : log.redify(log.cross);
-    const idPart = `${log.bold}${result.auditId}${log.reset}`;
-    const propertyPart = result.auditProperty ? `.${result.auditProperty}` : '';
-    const namePart = `${log.bold}${result.name}${log.reset}`;
-    process.stderr.write(`
-${warningOrErrorIcon} ${idPart}${propertyPart} ${label} for ${namePart} assertion
-      expected: ${result.operator}${log.greenify(result.expected)}
-         found: ${log.redify(result.actual)}
-    ${log.dim}all values: ${result.values.join(', ')}${log.reset}
-\n`);
+  for (const results of groupedResults) {
+    const url = results[0].url;
+    const sortedResults = results.sort((a, b) => {
+      const {level: levelA = 'error', auditId: auditIdA = 'unknown'} = a;
+      const {level: levelB = 'error', auditId: auditIdB = 'unknown'} = b;
+      return levelA.localeCompare(levelB) || auditIdA.localeCompare(auditIdB);
+    });
+
+    process.stderr.write(`${sortedResults.length} result(s) for ${log.bold}${url}${log.reset}\n`);
+
+    for (const result of sortedResults) {
+      hasFailure = hasFailure || result.level === 'error';
+      const label = result.level === 'warn' ? 'warning' : 'failure';
+      const warningOrErrorIcon = result.level === 'warn' ? '⚠️ ' : `${log.redify(log.cross)} `;
+      const idPart = `${log.bold}${result.auditId}${log.reset}`;
+      const propertyPart = result.auditProperty ? `.${result.auditProperty}` : '';
+      const namePart = `${log.bold}${result.name}${log.reset}`;
+      process.stderr.write(`
+  ${warningOrErrorIcon} ${idPart}${propertyPart} ${label} for ${namePart} assertion
+        expected: ${result.operator}${log.greenify(result.expected)}
+           found: ${log.redify(result.actual)}
+      ${log.dim}all values: ${result.values.join(', ')}${log.reset}
+  \n`);
+    }
   }
 
   if (hasFailure) {

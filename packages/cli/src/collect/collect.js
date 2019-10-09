@@ -41,7 +41,7 @@ async function runCommand(options) {
   for (let i = 0; i < options.numberOfRuns; i++) {
     process.stdout.write(`Run #${i + 1}...`);
     try {
-      const lhr = await runner.run(options.url, {
+      const lhr = await runner.runUntilSuccess(options.url, {
         headful: options.headful,
         settings: options.settings,
       });

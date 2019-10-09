@@ -87,6 +87,26 @@ class LighthouseRunner {
 
     return promise;
   }
+
+  /**
+   * @param {string} url
+   * @param {Partial<LHCI.CollectCommand.Options>} [options]
+   * @return {Promise<string>}
+   */
+  async runUntilSuccess(url, options = {}) {
+    /** @type {Array<Error>} */
+    const attempts = [];
+
+    while (attempts.length < 3) {
+      try {
+        return await this.run(url, options);
+      } catch (err) {
+        attempts.push(err);
+      }
+    }
+
+    throw attempts[0];
+  }
 }
 
 module.exports = LighthouseRunner;

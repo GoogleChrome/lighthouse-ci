@@ -30,11 +30,15 @@ function runTests(state) {
   });
 
   describe('/v1/projects', () => {
+    let projectAToken;
     it('should create a project', async () => {
       const payload = {name: 'Lighthouse', externalUrl: 'https://github.com/lighthouse'};
       projectA = await client.createProject(payload);
+      projectAToken = projectA.token;
       expect(projectA).toHaveProperty('id');
+      expect(projectA).toHaveProperty('token');
       expect(projectA).toMatchObject(payload);
+      expect(projectAToken).toMatch(/^\w{8}-\w{4}/);
     });
 
     it('should create a 2nd project', async () => {
@@ -47,14 +51,7 @@ function runTests(state) {
 
     it('should list projects', async () => {
       const projects = await client.getProjects();
-      expect(projects).toEqual([projectB, projectA]);
-    });
-
-    let projectAToken;
-    it('should get a project token', async () => {
-      const token = await client.getProjectToken(projectA);
-      expect(typeof token).toBe('string');
-      projectAToken = token;
+      expect(projects).toEqual([{...projectB, token: ''}, {...projectA, token: ''}]);
     });
 
     it('should fetch a project by a token', async () => {
@@ -64,7 +61,7 @@ function runTests(state) {
 
     it('should fetch a project by ID', async () => {
       const project = await client.findProjectById(projectA.id);
-      expect(project).toEqual(projectA);
+      expect(project).toEqual({...projectA, token: ''});
     });
   });
 

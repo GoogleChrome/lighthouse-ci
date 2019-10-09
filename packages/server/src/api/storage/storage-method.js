@@ -32,15 +32,6 @@ class StorageMethod {
   }
 
   /**
-   * @param {LHCI.ServerCommand.Project} project
-   * @return {Promise<string>}
-   */
-  // eslint-disable-next-line no-unused-vars
-  async getProjectToken(project) {
-    throw new Error('Unimplemented');
-  }
-
-  /**
    * @param {string} token
    * @return {Promise<LHCI.ServerCommand.Project | undefined>}
    */
@@ -59,7 +50,7 @@ class StorageMethod {
   }
 
   /**
-   * @param {StrictOmit<LHCI.ServerCommand.Project, 'id'>} project
+   * @param {StrictOmit<LHCI.ServerCommand.Project, 'id'|'token'>} project
    * @return {Promise<LHCI.ServerCommand.Project>}
    */
   // eslint-disable-next-line no-unused-vars

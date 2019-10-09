@@ -135,7 +135,7 @@ class SqlStorageMethod {
       options.where = {...options.where};
 
       for (const key of Object.keys(options.where)) {
-        if (!key.endsWith('Id')) continue;
+        if (!key.endsWith('Id') && key !== 'token') continue;
         // @ts-ignore - `options.where` is not indexable in tsc's eyes
         options.where[key] = validateUuidOrEmpty(options.where[key]);
       }
@@ -196,21 +196,13 @@ class SqlStorageMethod {
   }
 
   /**
-   * @param {LHCI.ServerCommand.Project} project
-   * @return {Promise<string>}
-   */
-  async getProjectToken(project) {
-    return project.id;
-  }
-
-  /**
    * @param {string} token
    * @return {Promise<LHCI.ServerCommand.Project | undefined>}
    */
   async findProjectByToken(token) {
     const {projectModel} = this._sql();
-    const project = await this._findByPk(projectModel, token);
-    return clone(project || undefined);
+    const projects = await this._findAll(projectModel, {where: {token}, limit: 1});
+    return clone(projects[0]);
   }
 
   /**
@@ -224,12 +216,12 @@ class SqlStorageMethod {
   }
 
   /**
-   * @param {StrictOmit<LHCI.ServerCommand.Project, 'id'>} unsavedProject
+   * @param {StrictOmit<LHCI.ServerCommand.Project, 'id'|'token'>} unsavedProject
    * @return {Promise<LHCI.ServerCommand.Project>}
    */
   async createProject(unsavedProject) {
     const {projectModel} = this._sql();
-    const project = await projectModel.create({...unsavedProject, id: uuid.v4()});
+    const project = await projectModel.create({...unsavedProject, token: uuid.v4(), id: uuid.v4()});
     return clone(project);
   }
 

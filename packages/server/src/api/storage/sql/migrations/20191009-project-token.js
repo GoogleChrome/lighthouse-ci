@@ -7,15 +7,19 @@
 
 /* eslint-disable new-cap */
 
-const Sequelize = require('sequelize');
-
 module.exports = {
-  tableName: 'projects',
-  attributes: {
-    id: {type: Sequelize.UUID(), primaryKey: true},
-    name: {type: Sequelize.STRING(40)},
-    externalUrl: {type: Sequelize.STRING(256)},
-    token: {type: Sequelize.UUID()},
+  /**
+   * @param {import('sequelize').QueryInterface} queryInterface
+   * @param {typeof import('sequelize')} Sequelize
+   */
+  up: async (queryInterface, Sequelize) => {
+    await queryInterface.addColumn('projects', 'token', {type: Sequelize.UUID()});
+    await queryInterface.bulkUpdate('projects', {token: Sequelize.col('id')}, {token: null});
   },
-  indexes: [],
+  /**
+   * @param {import('sequelize').QueryInterface} queryInterface
+   */
+  down: async queryInterface => {
+    await queryInterface.removeColumn('projects', 'token');
+  },
 };

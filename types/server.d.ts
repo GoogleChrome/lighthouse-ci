@@ -19,6 +19,7 @@ declare global {
         id: string;
         name: string;
         externalUrl: string;
+        token: string;
         createdAt?: string;
         updatedAt?: string;
       }

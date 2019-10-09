@@ -154,7 +154,7 @@ class ApiClient {
   }
 
   /**
-   * @param {StrictOmit<LHCI.ServerCommand.Project, 'id'>} unsavedProject
+   * @param {StrictOmit<LHCI.ServerCommand.Project, 'id'|'token'>} unsavedProject
    * @return {Promise<LHCI.ServerCommand.Project>}
    */
   async createProject(unsavedProject) {

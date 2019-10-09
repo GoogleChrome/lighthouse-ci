@@ -7,12 +7,16 @@
 declare global {
   namespace LHCI {
     namespace AssertCommand {
-      export type AssertionMergeMethod = 'median' | 'optimistic' | 'pessimistic' | 'median-run';
+      export type AssertionAggregationMethod =
+        | 'median'
+        | 'optimistic'
+        | 'pessimistic'
+        | 'median-run';
 
       export type AssertionFailureLevel = 'off' | 'warn' | 'error';
 
       export interface AssertionOptions {
-        mergeMethod?: AssertionMergeMethod;
+        aggregationMethod?: AssertionAggregationMethod;
         minScore?: number;
         maxLength?: number;
         maxNumericValue?: number;

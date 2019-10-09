@@ -8,7 +8,7 @@
 const _ = require('./lodash.js');
 const {computeRepresentativeRuns} = require('./representative-runs.js');
 
-/** @typedef {keyof StrictOmit<LHCI.AssertCommand.AssertionOptions, 'mergeMethod'>|'auditRan'} AssertionType */
+/** @typedef {keyof StrictOmit<LHCI.AssertCommand.AssertionOptions, 'aggregationMethod'>|'auditRan'} AssertionType */
 
 /**
  * @typedef AssertionResult
@@ -64,12 +64,12 @@ function normalizeAssertion(assertion) {
 
 /**
  * @param {number[]} values
- * @param {LHCI.AssertCommand.AssertionMergeMethod} mergeMethod
+ * @param {LHCI.AssertCommand.AssertionAggregationMethod} aggregationMethod
  * @param {AssertionType} assertionType
  * @return {number}
  */
-function getValueForMergeMethod(values, mergeMethod, assertionType) {
-  if (mergeMethod === 'median') {
+function getValueForAggregationMethod(values, aggregationMethod, assertionType) {
+  if (aggregationMethod === 'median') {
     const medianIndex = Math.floor((values.length - 1) / 2);
     const sorted = values.slice().sort((a, b) => a - b);
     if (values.length % 2 === 1) return sorted[medianIndex];
@@ -77,32 +77,36 @@ function getValueForMergeMethod(values, mergeMethod, assertionType) {
   }
 
   const useMin =
-    (mergeMethod === 'optimistic' && assertionType.startsWith('max')) ||
-    (mergeMethod === 'pessimistic' && assertionType.startsWith('min'));
+    (aggregationMethod === 'optimistic' && assertionType.startsWith('max')) ||
+    (aggregationMethod === 'pessimistic' && assertionType.startsWith('min'));
   return useMin ? Math.min(...values) : Math.max(...values);
 }
 
 /**
  * @param {LH.AuditResult[]} auditResults
- * @param {LHCI.AssertCommand.AssertionMergeMethod} mergeMethod
+ * @param {LHCI.AssertCommand.AssertionAggregationMethod} aggregationMethod
  * @param {AssertionType} assertionType
  * @param {number} expectedValue
  * @return {AssertionResultNoURL[]}
  */
-function getAssertionResult(auditResults, mergeMethod, assertionType, expectedValue) {
+function getAssertionResult(auditResults, aggregationMethod, assertionType, expectedValue) {
   const values = auditResults.map(AUDIT_TYPE_VALUE_GETTERS[assertionType]);
   const filteredValues = values.filter(isFiniteNumber);
 
   if (
-    (!filteredValues.length && mergeMethod !== 'pessimistic') ||
-    (filteredValues.length !== values.length && mergeMethod === 'pessimistic')
+    (!filteredValues.length && aggregationMethod !== 'pessimistic') ||
+    (filteredValues.length !== values.length && aggregationMethod === 'pessimistic')
   ) {
     const didRun = values.map(value => (isFiniteNumber(value) ? 1 : 0));
     return [{name: 'auditRan', expected: 1, actual: 0, values: didRun, operator: '=='}];
   }
 
   const {operator, passesFn} = AUDIT_TYPE_OPERATORS[assertionType];
-  const actualValue = getValueForMergeMethod(filteredValues, mergeMethod, assertionType);
+  const actualValue = getValueForAggregationMethod(
+    filteredValues,
+    aggregationMethod,
+    assertionType
+  );
   if (passesFn(actualValue, expectedValue)) return [];
 
   return [
@@ -122,7 +126,7 @@ function getAssertionResult(auditResults, mergeMethod, assertionType, expectedVa
  * @return {AssertionResultNoURL[]}
  */
 function getAssertionResults(possibleAuditResults, options) {
-  const {minScore, maxLength, maxNumericValue, mergeMethod = 'optimistic'} = options;
+  const {minScore, maxLength, maxNumericValue, aggregationMethod = 'optimistic'} = options;
   if (possibleAuditResults.some(result => result === undefined)) {
     return [
       {
@@ -147,19 +151,19 @@ function getAssertionResults(possibleAuditResults, options) {
 
   if (maxLength !== undefined) {
     hadManualAssertion = true;
-    results.push(...getAssertionResult(auditResults, mergeMethod, 'maxLength', maxLength));
+    results.push(...getAssertionResult(auditResults, aggregationMethod, 'maxLength', maxLength));
   }
 
   if (maxNumericValue !== undefined) {
     hadManualAssertion = true;
     results.push(
-      ...getAssertionResult(auditResults, mergeMethod, 'maxNumericValue', maxNumericValue)
+      ...getAssertionResult(auditResults, aggregationMethod, 'maxNumericValue', maxNumericValue)
     );
   }
 
   const realMinScore = minScore === undefined && !hadManualAssertion ? 1 : minScore;
   if (realMinScore !== undefined) {
-    results.push(...getAssertionResult(auditResults, mergeMethod, 'minScore', realMinScore));
+    results.push(...getAssertionResult(auditResults, aggregationMethod, 'minScore', realMinScore));
   }
 
   return results;
@@ -334,7 +338,8 @@ function getAllFilteredAssertionResults(baseOptions, unfilteredLhrs) {
     const [level, assertionOptions] = normalizeAssertion(assertions[assertionKey]);
     if (level === 'off') continue;
 
-    const lhrsToUseForAudit = assertionOptions.mergeMethod === 'median-run' ? medianLhrs : lhrs;
+    const lhrsToUseForAudit =
+      assertionOptions.aggregationMethod === 'median-run' ? medianLhrs : lhrs;
     const auditResults = lhrsToUseForAudit.map(lhr => lhr.audits[auditId]);
     const assertionResults = getAssertionResultsForAudit(
       auditId,

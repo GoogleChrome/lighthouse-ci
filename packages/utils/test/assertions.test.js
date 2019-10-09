@@ -120,7 +120,7 @@ describe('getAllAssertionResults', () => {
 
   it('should use minScore = 1 by default', () => {
     const assertions = {
-      'first-contentful-paint': ['warn', {mergeMethod: 'optimistic'}],
+      'first-contentful-paint': ['warn', {aggregationMethod: 'optimistic'}],
     };
 
     const results = getAllAssertionResults({assertions}, lhrs);
@@ -155,46 +155,46 @@ describe('getAllAssertionResults', () => {
 
   it('should de-dupe camelcase audits', () => {
     const assertions = {
-      firstContentfulPaint: ['warn', {mergeMethod: 'optimistic', minScore: 1}],
-      'first-contentful-paint': ['warn', {mergeMethod: 'optimistic', minScore: 1}],
+      firstContentfulPaint: ['warn', {aggregationMethod: 'optimistic', minScore: 1}],
+      'first-contentful-paint': ['warn', {aggregationMethod: 'optimistic', minScore: 1}],
     };
 
     const results = getAllAssertionResults({assertions}, lhrs);
     expect(results).toMatchObject([{actual: 0.8}]);
   });
 
-  describe('mergeMethod', () => {
-    it('should use mergeMethod optimistic', () => {
+  describe('aggregationMethod', () => {
+    it('should use aggregationMethod optimistic', () => {
       const assertions = {
-        'first-contentful-paint': ['warn', {mergeMethod: 'optimistic', minScore: 1}],
-        'network-requests': ['warn', {mergeMethod: 'optimistic', maxLength: 1}],
+        'first-contentful-paint': ['warn', {aggregationMethod: 'optimistic', minScore: 1}],
+        'network-requests': ['warn', {aggregationMethod: 'optimistic', maxLength: 1}],
       };
 
       const results = getAllAssertionResults({assertions}, lhrs);
       expect(results).toMatchObject([{actual: 0.8}, {actual: 2}]);
     });
 
-    it('should use mergeMethod pessimistic', () => {
+    it('should use aggregationMethod pessimistic', () => {
       const assertions = {
-        'first-contentful-paint': ['warn', {mergeMethod: 'pessimistic', minScore: 1}],
-        'network-requests': ['warn', {mergeMethod: 'pessimistic', maxLength: 1}],
+        'first-contentful-paint': ['warn', {aggregationMethod: 'pessimistic', minScore: 1}],
+        'network-requests': ['warn', {aggregationMethod: 'pessimistic', maxLength: 1}],
       };
 
       const results = getAllAssertionResults({assertions}, lhrs);
       expect(results).toMatchObject([{actual: 0.6}, {actual: 4}]);
     });
 
-    it('should use mergeMethod median', () => {
+    it('should use aggregationMethod median', () => {
       const assertions = {
-        'first-contentful-paint': ['warn', {mergeMethod: 'median', minScore: 1}],
-        'network-requests': ['warn', {mergeMethod: 'median', maxLength: 1}],
+        'first-contentful-paint': ['warn', {aggregationMethod: 'median', minScore: 1}],
+        'network-requests': ['warn', {aggregationMethod: 'median', maxLength: 1}],
       };
 
       const results = getAllAssertionResults({assertions}, lhrs);
       expect(results).toMatchObject([{actual: 0.7}, {actual: 3}]);
     });
 
-    it('should use mergeMethod median-run', () => {
+    it('should use aggregationMethod median-run', () => {
       const lhrs = [
         // This is the "median-run" by FCP and interactive.
         {
@@ -224,7 +224,7 @@ describe('getAllAssertionResults', () => {
       ];
 
       const assertions = {
-        'other-audit': ['warn', {mergeMethod: 'median-run', maxNumericValue: 10000}],
+        'other-audit': ['warn', {aggregationMethod: 'median-run', maxNumericValue: 10000}],
       };
 
       const results = getAllAssertionResults({assertions}, lhrs);
@@ -245,7 +245,7 @@ describe('getAllAssertionResults', () => {
 
     it('should handle partial failure with mode optimistic', () => {
       const assertions = {
-        'first-contentful-paint': ['warn', {mergeMethod: 'optimistic'}],
+        'first-contentful-paint': ['warn', {aggregationMethod: 'optimistic'}],
       };
 
       lhrs[1].audits['first-contentful-paint'].score = null;
@@ -255,7 +255,7 @@ describe('getAllAssertionResults', () => {
 
     it('should handle partial failure with mode median', () => {
       const assertions = {
-        'first-contentful-paint': ['warn', {mergeMethod: 'median'}],
+        'first-contentful-paint': ['warn', {aggregationMethod: 'median'}],
       };
 
       lhrs[1].audits['first-contentful-paint'].score = null;
@@ -265,7 +265,7 @@ describe('getAllAssertionResults', () => {
 
     it('should handle partial failure when mode is pessimistic', () => {
       const assertions = {
-        'first-contentful-paint': ['warn', {mergeMethod: 'pessimistic'}],
+        'first-contentful-paint': ['warn', {aggregationMethod: 'pessimistic'}],
       };
 
       lhrs[1].audits['first-contentful-paint'].score = null;
@@ -292,7 +292,7 @@ describe('getAllAssertionResults', () => {
 
     it('should use the preset with changes', () => {
       const assertions = {
-        'first-contentful-paint': ['warn', {mergeMethod: 'pessimistic', minScore: 0.6}],
+        'first-contentful-paint': ['warn', {aggregationMethod: 'pessimistic', minScore: 0.6}],
       };
 
       const results = getAllAssertionResults({preset: 'lighthouse:all', assertions}, lhrs);

@@ -5,7 +5,9 @@
  */
 'use strict';
 
+const path = require('path');
 const uuid = require('uuid');
+const Umzug = require('umzug');
 const Sequelize = require('sequelize');
 const {omit} = require('@lhci/utils/src/lodash.js');
 const {E422} = require('../../express-utils.js');
@@ -62,6 +64,21 @@ function createSequelize(options) {
   return new Sequelize(options.sqlConnectionUrl, {
     ...sequelizeOptions,
     ssl: !!options.sqlConnectionSsl,
+  });
+}
+
+/**
+ * @param {import('sequelize').Sequelize} sequelize
+ */
+function createUmzug(sequelize) {
+  return new Umzug({
+    logging: () => {},
+    storage: 'sequelize',
+    storageOptions: {sequelize: /** @type {*} */ (sequelize)},
+    migrations: {
+      path: path.join(__dirname, 'migrations'),
+      params: [sequelize.getQueryInterface(), Sequelize],
+    },
   });
 }
 
@@ -145,8 +162,6 @@ class SqlStorageMethod {
 
     runModelDefn.attributes.projectId.references.model = projectModel;
     runModelDefn.attributes.buildId.references.model = buildModel;
-    // SQLite doesn't support long text fields so supress the warning
-    if (options.sqlDialect === 'sqlite') runModelDefn.attributes.lhr.type = Sequelize.TEXT;
     const runModel = sequelize.define(runModelDefn.tableName, runModelDefn.attributes);
 
     statisticModelDefn.attributes.projectId.references.model = projectModel;
@@ -156,7 +171,12 @@ class SqlStorageMethod {
       statisticModelDefn.attributes
     );
 
-    await sequelize.sync({force: options.sqlDangerouslyForceMigration});
+    const umzug = createUmzug(sequelize);
+    if (options.sqlDangerouslyResetDatabase) {
+      await umzug.down({to: 0});
+    }
+
+    await umzug.up();
 
     this._sequelize = {sequelize, projectModel, buildModel, runModel, statisticModel};
   }

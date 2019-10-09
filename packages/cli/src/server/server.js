@@ -41,7 +41,7 @@ function buildCommand(yargs) {
       default: false,
       description: 'The path to a SQLite database on disk.',
     },
-    'storage.sqlDangerouslyForceMigration': {
+    'storage.sqlDangerouslyResetDatabase': {
       description:
         'Whether to force the database to the required schema. WARNING: THIS WILL DELETE ALL DATA',
       type: 'boolean',

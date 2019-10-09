@@ -10,7 +10,7 @@ declare global {
   namespace LHCI {
     namespace ServerCommand {
       export type TableDefinition<T, TAllKeys extends keyof T = keyof T> = {
-        [K in TAllKeys]: import('sequelize').DefineAttributeColumnOptions;
+        [K in TAllKeys]: import('sequelize').DefineAttributeColumnOptions
       };
 
       export type TableAttributes<T, TAllKeys extends keyof T = keyof T> = {[K in TAllKeys]: {}};
@@ -89,7 +89,7 @@ declare global {
         sqlDatabasePath?: string;
         sqlConnectionSsl?: string;
         sqlConnectionUrl?: string;
-        sqlDangerouslyForceMigration?: boolean;
+        sqlDangerouslyResetDatabase?: boolean;
       }
 
       export interface Options {

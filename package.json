@@ -38,6 +38,7 @@
     "@types/plotly.js": "^1.44.9",
     "@types/puppeteer": "^1.19.0",
     "@types/sequelize": "^4.27.34",
+    "@types/umzug": "^2.2.2",
     "@types/uuid": "^3.4.4",
     "@types/yargs": "^12.0.8",
     "babel-eslint": "^10.0.2",

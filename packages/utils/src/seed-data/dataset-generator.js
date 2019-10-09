@@ -175,11 +175,13 @@ function createDataset() {
         id: '',
         name: 'Lighthouse Viewer',
         externalUrl: 'https://travis-ci.org/GoogleChrome/lighthouse',
+        token: '',
       },
       {
         id: '',
         name: 'Lighthouse Dashboard',
         externalUrl: 'https://travis-ci.org/GoogleChrome/lighthouse-ci',
+        token: '',
       },
     ],
     builds: [

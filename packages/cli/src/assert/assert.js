@@ -79,8 +79,7 @@ async function runCommand(options) {
   ${warningOrErrorIcon} ${idPart}${propertyPart} ${label} for ${namePart} assertion
         expected: ${result.operator}${log.greenify(result.expected)}
            found: ${log.redify(result.actual)}
-      ${log.dim}all values: ${result.values.join(', ')}${log.reset}
-  \n`);
+      ${log.dim}all values: ${result.values.join(', ')}${log.reset}\n\n`);
     }
   }
 

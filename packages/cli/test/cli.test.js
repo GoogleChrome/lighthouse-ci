@@ -179,11 +179,12 @@ describe('Lighthouse CI CLI', () => {
       stderr = stderr.toString();
       status = status || 0;
 
+      const stderrClean = stderr.replace(/:\d{4,6}/g, ':XXXX');
       expect(stdout).toMatchInlineSnapshot(`""`);
-      expect(stderr).toMatchInlineSnapshot(`
+      expect(stderrClean).toMatchInlineSnapshot(`
         "Checking assertions against 1 URL(s), 2 total run(s)
 
-        1 result(s) for [1mhttp://localhost:64077/app/[0m
+        1 result(s) for [1mhttp://localhost:XXXX/app/[0m
 
           [31m✘[0m  [1mworks-offline[0m failure for [1mminScore[0m assertion
                 expected: >=[32m1[0m

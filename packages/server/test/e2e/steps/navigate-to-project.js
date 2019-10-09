@@ -5,15 +5,14 @@
  */
 'use strict';
 
+const {waitForNetworkIdle0} = require('../../test-utils.js');
+
 /* eslint-env jest, browser */
 
 module.exports = (state, projectName) => {
   describe('navigate to project', () => {
     it('should navigate to the project list', async () => {
-      await Promise.all([
-        state.page.goto(`${state.rootURL}/app`),
-        state.page.waitForNavigation({waitUntil: ['networkidle0', 'load']}),
-      ]);
+      await Promise.all([state.page.goto(`${state.rootURL}/app`), waitForNetworkIdle0(state.page)]);
     });
 
     it('should click on link to project', async () => {
@@ -24,10 +23,7 @@ module.exports = (state, projectName) => {
         throw new Error(`${links.map(link => link.textContent)} did not include ${name}`);
       }, projectName);
 
-      await Promise.all([
-        clickPromise,
-        state.page.waitForNavigation({waitUntil: ['networkidle0', 'load']}),
-      ]);
+      await Promise.all([clickPromise, waitForNetworkIdle0(state.page)]);
     });
 
     it('should wait for the dashboard to load', async () => {

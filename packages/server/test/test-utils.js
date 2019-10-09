@@ -62,6 +62,41 @@ function cleanup() {
   }
 }
 
+function waitForNetworkIdle0(page) {
+  let idleTimeout;
+  let inflight = 0;
+
+  return new Promise((resolve, reject) => {
+    const timeoutTimeout = setTimeout(() => {
+      reject(new Error('Timed out'));
+      cleanup();
+    }, 30000);
+
+    const requestListener = () => {
+      clearTimeout(idleTimeout);
+      inflight++;
+    };
+
+    const responseListener = () => {
+      inflight--;
+      if (inflight !== 0) return;
+      idleTimeout = setTimeout(() => {
+        resolve();
+        cleanup();
+      }, 500);
+    };
+
+    const cleanup = () => {
+      page.removeListener('request', requestListener);
+      page.removeListener('response', responseListener);
+      clearTimeout(timeoutTimeout);
+    };
+
+    page.on('request', requestListener);
+    page.on('response', responseListener);
+  });
+}
+
 /** @type {typeof import('@testing-library/dom').fireEvent} */
 const dispatchEvent = (...args) => testingLibrary.fireEvent(...args);
 
@@ -88,4 +123,5 @@ module.exports = {
   dispatchEvent,
   prettyDOM,
   snapshotDOM,
+  waitForNetworkIdle0,
 };

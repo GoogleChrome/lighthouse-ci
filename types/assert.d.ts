@@ -28,6 +28,7 @@ declare global {
 
       export interface BaseOptions {
         matchingUrlPattern?: string;
+        aggregationMethod?: AssertionAggregationMethod;
         preset?: 'lighthouse:all' | 'lighthouse:recommended';
         assertions?: Assertions;
       }

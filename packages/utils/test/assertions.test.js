@@ -164,6 +164,16 @@ describe('getAllAssertionResults', () => {
   });
 
   describe('aggregationMethod', () => {
+    it('should default to aggregationMethod optimistic', () => {
+      const assertions = {
+        'first-contentful-paint': ['warn', {minScore: 1}],
+        'network-requests': ['warn', {maxLength: 1}],
+      };
+
+      const results = getAllAssertionResults({assertions}, lhrs);
+      expect(results).toMatchObject([{actual: 0.8}, {actual: 2}]);
+    });
+
     it('should use aggregationMethod optimistic', () => {
       const assertions = {
         'first-contentful-paint': ['warn', {aggregationMethod: 'optimistic', minScore: 1}],
@@ -241,6 +251,26 @@ describe('getAllAssertionResults', () => {
           values: [23000],
         },
       ]);
+    });
+
+    it('should use file-wide default when set', () => {
+      const assertions = {
+        'first-contentful-paint': ['warn', {minScore: 1}],
+        'network-requests': ['warn', {maxLength: 1}],
+      };
+
+      const results = getAllAssertionResults({assertions, aggregationMethod: 'pessimistic'}, lhrs);
+      expect(results).toMatchObject([{actual: 0.6}, {actual: 4}]);
+    });
+
+    it('should override file-wide default when set', () => {
+      const assertions = {
+        'first-contentful-paint': ['warn', {minScore: 1, aggregationMethod: 'pessimistic'}],
+        'network-requests': ['warn', {maxLength: 1}],
+      };
+
+      const results = getAllAssertionResults({assertions, aggregationMethod: 'median'}, lhrs);
+      expect(results).toMatchObject([{actual: 0.6}, {actual: 3}]);
     });
 
     it('should handle partial failure with mode optimistic', () => {

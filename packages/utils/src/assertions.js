@@ -287,7 +287,7 @@ function resolveAssertionOptionsAndLhrs(baseOptions, unfilteredLhrs) {
     optionsToUse = _.merge(_.cloneDeep(presetData), optionsToUse);
   }
 
-  const {assertions = {}, matchingUrlPattern: urlPattern} = optionsToUse;
+  const {assertions = {}, matchingUrlPattern: urlPattern, aggregationMethod} = optionsToUse;
   const lhrs = urlPattern
     ? unfilteredLhrs.filter(lhr => doesLHRMatchPattern(urlPattern, lhr))
     : unfilteredLhrs;
@@ -312,6 +312,7 @@ function resolveAssertionOptionsAndLhrs(baseOptions, unfilteredLhrs) {
     assertions,
     auditsToAssert,
     medianLhrs,
+    aggregationMethod,
     lhrs: lhrs,
     url: (lhrs[0] && lhrs[0].finalUrl) || '',
   };
@@ -323,10 +324,14 @@ function resolveAssertionOptionsAndLhrs(baseOptions, unfilteredLhrs) {
  * @return {AssertionResult[]}
  */
 function getAllFilteredAssertionResults(baseOptions, unfilteredLhrs) {
-  const {assertions, auditsToAssert, medianLhrs, lhrs, url} = resolveAssertionOptionsAndLhrs(
-    baseOptions,
-    unfilteredLhrs
-  );
+  const {
+    assertions,
+    auditsToAssert,
+    medianLhrs,
+    lhrs,
+    url,
+    aggregationMethod,
+  } = resolveAssertionOptionsAndLhrs(baseOptions, unfilteredLhrs);
 
   // If we don't have any data, just return early.
   if (!lhrs.length) return [];
@@ -338,14 +343,14 @@ function getAllFilteredAssertionResults(baseOptions, unfilteredLhrs) {
     const [level, assertionOptions] = normalizeAssertion(assertions[assertionKey]);
     if (level === 'off') continue;
 
-    const lhrsToUseForAudit =
-      assertionOptions.aggregationMethod === 'median-run' ? medianLhrs : lhrs;
+    const options = {aggregationMethod, ...assertionOptions};
+    const lhrsToUseForAudit = options.aggregationMethod === 'median-run' ? medianLhrs : lhrs;
     const auditResults = lhrsToUseForAudit.map(lhr => lhr.audits[auditId]);
     const assertionResults = getAssertionResultsForAudit(
       auditId,
       auditProperty,
       auditResults,
-      assertionOptions
+      options
     );
 
     for (const result of assertionResults) {

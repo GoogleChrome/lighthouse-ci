@@ -37,7 +37,14 @@ function buildCommand(yargs) {
         'The type of target to upload the data to. If set to anything other than "lhci", ' +
         'some of the options will not apply.',
     },
-    token: {type: 'string'},
+    token: {
+      type: 'string',
+      description: 'The Lighthouse CI server token for the project, only applies to `lhci` target.',
+    },
+    githubToken: {
+      type: 'string',
+      description: 'The GitHub token to use to apply a status check.',
+    },
     serverBaseUrl: {
       description: 'The base URL of the server where results will be saved.',
       default: 'http://localhost:9001/',
@@ -169,6 +176,71 @@ function getAncestorHashForBranch() {
   return result.stdout.trim();
 }
 
+function getRepoSlug() {
+  if (envVars.TRAVIS_PULL_REQUEST_SLUG) return envVars.TRAVIS_PULL_REQUEST_SLUG;
+  if (envVars.TRAVIS_REPO_SLUG) return envVars.TRAVIS_REPO_SLUG;
+}
+
+/** @param {string} url */
+function getCleanUrl(url) {
+  return url.replace(/^https?:../, '').replace(/[^a-z0-9/]+/gi, '-');
+}
+
+/**
+ * @param {{slug: string, hash: string, state: 'failure'|'success', targetUrl: string, description: string, context: string, token: string}} options
+ */
+async function postStatusToGitHub(options) {
+  const {slug, hash, state, targetUrl, context, description, token} = options;
+  const url = `https://api.github.com/repos/${slug}/statuses/${hash}`;
+  const payload = {state, context, description, target_url: targetUrl};
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json', Authorization: `token ${token}`},
+    body: JSON.stringify(payload),
+  });
+
+  if (response.status === 201) {
+    process.stdout.write(`GitHub accepted "${state}" status for "${context}".\n`);
+  } else {
+    process.stdout.write(`GitHub responded with ${response.status}\n${await response.text()}\n\n`);
+  }
+}
+
+/**
+ * @param {LHCI.UploadCommand.Options} options
+ * @param {Map<string, string>} targetUrlMap
+ * @return {Promise<void>}
+ */
+async function runGithubStatusCheck(options, targetUrlMap) {
+  const hash = getCurrentHash();
+  const slug = getRepoSlug();
+
+  if (!hash || !slug || slug.includes('/') || !options.githubToken) return;
+
+  const assertionResults = loadAssertionResults();
+  const groupedResults = _.groupBy(assertionResults, result => result.url);
+
+  for (const group of groupedResults) {
+    const rawUrl = group[0].url;
+    const url = replaceUrlPatterns(rawUrl, options.urlReplacementPatterns);
+    const failedResults = group.filter(result => result.level === 'error');
+    const state = failedResults.length ? 'failure' : 'success';
+    const context = `lhci/${getCleanUrl(url)}`;
+    const description = `${url} failed ${failedResults.length} Lighthouse assertion(s)`;
+    const targetUrl = targetUrlMap.get(rawUrl) || rawUrl;
+
+    await postStatusToGitHub({
+      slug,
+      hash,
+      state,
+      context,
+      description,
+      targetUrl,
+      token: options.githubToken,
+    });
+  }
+}
+
 /**
  * @param {LHCI.UploadCommand.Options} options
  * @return {Promise<void>}
@@ -202,8 +274,14 @@ async function runLHCITarget(options) {
   process.stdout.write(`Saving CI project ${project.name} (${project.id})\n`);
   process.stdout.write(`Saving CI build (${build.id})\n`);
 
-  const lhrs = getSavedLHRs();
+  const lhrs = loadSavedLHRs();
   const urlReplacementPatterns = options.urlReplacementPatterns.filter(Boolean);
+  const targetUrlMap = new Map();
+
+  const buildViewUrl = new URL(
+    `/app/projects/${build.projectId}/builds/${build.id}`,
+    options.serverBaseUrl
+  );
 
   for (const lhr of lhrs) {
     const parsedLHR = JSON.parse(lhr);
@@ -216,25 +294,30 @@ async function runLHCITarget(options) {
       lhr,
     });
 
+    buildViewUrl.searchParams.set('compareUrl', url);
+    targetUrlMap.set(parsedLHR.finalUrl, buildViewUrl.href);
     process.stdout.write(`Saved LHR to ${options.serverBaseUrl} (${run.id})\n`);
   }
 
-  const buildViewUrl = new URL(
-    `/app/projects/${build.projectId}/builds/${build.id}`,
-    options.serverBaseUrl
-  );
-
+  buildViewUrl.searchParams.delete('compareUrl');
   await api.sealBuild(build.projectId, build.id);
   process.stdout.write(`Done saving build results to Lighthouse CI\n`);
   process.stdout.write(`View build diff at ${buildViewUrl.href}\n`);
+
+  await runGithubStatusCheck(options, targetUrlMap);
 }
 
-async function runTemporaryPublicStorageTarget() {
+/**
+ * @param {LHCI.UploadCommand.Options} options
+ * @return {Promise<void>}
+ */
+async function runTemporaryPublicStorageTarget(options) {
   /** @type {Array<LH.Result>} */
-  const lhrs = getSavedLHRs().map(lhr => JSON.parse(lhr));
+  const lhrs = loadSavedLHRs().map(lhr => JSON.parse(lhr));
   /** @type {Array<Array<[LH.Result, LH.Result]>>} */
   const lhrsByUrl = _.groupBy(lhrs, lhr => lhr.finalUrl).map(lhrs => lhrs.map(lhr => [lhr, lhr]));
   const representativeLhrs = computeRepresentativeRuns(lhrsByUrl);
+  const targetUrlMap = new Map();
 
   for (const lhr of representativeLhrs) {
     const urlAudited = lhr.finalUrl;
@@ -250,6 +333,7 @@ async function runTemporaryPublicStorageTarget() {
       const {success, url} = await response.json();
       if (success && url) {
         process.stdout.write(`success!\nOpen the report at ${url}\n`);
+        targetUrlMap.set(urlAudited, url);
       } else {
         process.stdout.write(`failed!\n`);
       }
@@ -258,6 +342,8 @@ async function runTemporaryPublicStorageTarget() {
       process.stderr.write(err.stack + '\n');
     }
   }
+
+  await runGithubStatusCheck(options, targetUrlMap);
 }
 
 /**
@@ -269,7 +355,7 @@ async function runCommand(options) {
     case 'lhci':
       return runLHCITarget(options);
     case 'temporary-public-storage':
-      return runTemporaryPublicStorageTarget();
+      return runTemporaryPublicStorageTarget(options);
     default:
       throw new Error(`Unrecognized target "${options.target}"`);
   }

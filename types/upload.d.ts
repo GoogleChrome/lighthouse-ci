@@ -7,7 +7,10 @@
 declare global {
   namespace LHCI {
     namespace UploadCommand {
+      export type UploadTarget = 'lhci' | 'temporary-public-storage';
+
       export interface Options {
+        target: UploadTarget;
         token: string;
         serverBaseUrl: string;
         urlReplacementPatterns: string[];

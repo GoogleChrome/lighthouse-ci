@@ -166,6 +166,22 @@ describe('Lighthouse CI CLI', () => {
       const build = await response.json();
       expect(build).toMatchObject({lifecycle: 'sealed'});
     });
+
+    it('should support target=temporary-public-storage', async () => {
+      let {stdout = '', stderr = '', status = -1} = spawnSync(CLI_PATH, [
+        'upload',
+        `--target=temporary-public-storage`,
+      ]);
+
+      stdout = stdout.toString();
+      stderr = stderr.toString();
+      status = status || 0;
+
+      expect(stdout).toContain('...success!');
+      expect(stdout).toContain('Open the report at');
+      expect(stderr).toEqual(``);
+      expect(status).toEqual(0);
+    });
   });
 
   describe('assert', () => {

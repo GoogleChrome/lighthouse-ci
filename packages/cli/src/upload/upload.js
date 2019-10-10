@@ -7,18 +7,36 @@
 
 const URL = require('url').URL;
 const crypto = require('crypto');
+const fetch = require('isomorphic-fetch');
 const childProcess = require('child_process');
+const _ = require('@lhci/utils/src/lodash.js');
 const ApiClient = require('@lhci/utils/src/api-client.js');
-const {getSavedLHRs, replaceUrlPatterns} = require('@lhci/utils/src/saved-reports.js');
+const {computeRepresentativeRuns} = require('@lhci/utils/src/representative-runs.js');
+const {
+  getSavedLHRs,
+  replaceUrlPatterns,
+  getHTMLReportForLHR,
+} = require('@lhci/utils/src/saved-reports.js');
 
 const envVars = process.env;
+
+const TEMPORARY_PUBLIC_STORAGE_URL =
+  'https://us-central1-lighthouse-infrastructure.cloudfunctions.net/saveHtmlReport';
 
 /**
  * @param {import('yargs').Argv} yargs
  */
 function buildCommand(yargs) {
   return yargs.options({
-    token: {type: 'string', required: true},
+    target: {
+      type: 'string',
+      default: 'lhci',
+      choices: ['lhci', 'temporary-public-storage'],
+      description:
+        'The type of target to upload the data to. If set to anything other than "lhci", ' +
+        'some of the options will not apply.',
+    },
+    token: {type: 'string'},
     serverBaseUrl: {
       description: 'The base URL of the server where results will be saved.',
       default: 'http://localhost:9001/',
@@ -154,7 +172,9 @@ function getAncestorHashForBranch() {
  * @param {LHCI.UploadCommand.Options} options
  * @return {Promise<void>}
  */
-async function runCommand(options) {
+async function runLHCITarget(options) {
+  if (!options.token) throw new Error('Must provide token for LHCI target');
+
   const api = new ApiClient({rootURL: options.serverBaseUrl});
 
   const project = await api.findProjectByToken(options.token);
@@ -206,6 +226,52 @@ async function runCommand(options) {
   await api.sealBuild(build.projectId, build.id);
   process.stdout.write(`Done saving build results to Lighthouse CI\n`);
   process.stdout.write(`View build diff at ${buildViewUrl.href}\n`);
+}
+
+async function runTemporaryPublicStorageTarget() {
+  /** @type {Array<LH.Result>} */
+  const lhrs = getSavedLHRs().map(lhr => JSON.parse(lhr));
+  /** @type {Array<Array<[LH.Result, LH.Result]>>} */
+  const lhrsByUrl = _.groupBy(lhrs, lhr => lhr.finalUrl).map(lhrs => lhrs.map(lhr => [lhr, lhr]));
+  const representativeLhrs = computeRepresentativeRuns(lhrsByUrl);
+
+  for (const lhr of representativeLhrs) {
+    const urlAudited = lhr.finalUrl;
+    process.stdout.write(`Uploading median LHR of ${urlAudited}...`);
+
+    try {
+      const response = await fetch(TEMPORARY_PUBLIC_STORAGE_URL, {
+        method: 'POST',
+        headers: {'content-type': 'text/html'},
+        body: getHTMLReportForLHR(lhr),
+      });
+
+      const {success, url} = await response.json();
+      if (success && url) {
+        process.stdout.write(`success!\nOpen the report at ${url}\n`);
+      } else {
+        process.stdout.write(`failed!\n`);
+      }
+    } catch (err) {
+      process.stdout.write(`failed!\n`);
+      process.stderr.write(err.stack + '\n');
+    }
+  }
+}
+
+/**
+ * @param {LHCI.UploadCommand.Options} options
+ * @return {Promise<void>}
+ */
+async function runCommand(options) {
+  switch (options.target) {
+    case 'lhci':
+      return runLHCITarget(options);
+    case 'temporary-public-storage':
+      return runTemporaryPublicStorageTarget();
+    default:
+      throw new Error(`Unrecognized target "${options.target}"`);
+  }
 }
 
 module.exports = {buildCommand, runCommand};

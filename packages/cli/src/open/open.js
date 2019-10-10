@@ -10,7 +10,7 @@ const tmp = require('tmp');
 const open = require('open');
 const _ = require('@lhci/utils/src/lodash.js');
 const {computeRepresentativeRuns} = require('@lhci/utils/src/representative-runs.js');
-const {getSavedLHRs, getHTMLReportForLHR} = require('@lhci/utils/src/saved-reports.js');
+const {loadSavedLHRs, getHTMLReportForLHR} = require('@lhci/utils/src/saved-reports.js');
 
 /**
  * @param {import('yargs').Argv} yargs
@@ -27,7 +27,7 @@ function buildCommand(yargs) {
  */
 async function runCommand(options) {
   /** @type {Array<LH.Result>} */
-  const lhrs = getSavedLHRs().map(lhr => JSON.parse(lhr));
+  const lhrs = loadSavedLHRs().map(lhr => JSON.parse(lhr));
   /** @type {Array<Array<[LH.Result, LH.Result]>>} */
   const groupedByUrl = _.groupBy(lhrs, lhr => lhr.finalUrl).map(lhrs =>
     lhrs.map(lhr => [lhr, lhr])

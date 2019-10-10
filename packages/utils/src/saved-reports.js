@@ -9,6 +9,7 @@ const fs = require('fs');
 const path = require('path');
 const LHCI_DIR = path.join(process.cwd(), '.lighthouseci');
 const LHR_REGEX = /^lhr-\d+\.json$/;
+const ASSERTION_RESULTS_PATH = path.join(LHCI_DIR, 'assertion-results.json');
 
 function ensureDirectoryExists() {
   if (!fs.existsSync(LHCI_DIR)) fs.mkdirSync(LHCI_DIR);
@@ -17,7 +18,7 @@ function ensureDirectoryExists() {
 /**
  * @return {string[]}
  */
-function getSavedLHRs() {
+function loadSavedLHRs() {
   ensureDirectoryExists();
 
   /** @type {string[]} */
@@ -67,6 +68,19 @@ function getSavedReportsDirectory() {
   return LHCI_DIR;
 }
 
+/** @return {Array<import('./assertions').AssertionResult>} */
+function loadAssertionResults() {
+  ensureDirectoryExists();
+  if (!fs.existsSync(ASSERTION_RESULTS_PATH)) return [];
+  return JSON.parse(fs.readFileSync(ASSERTION_RESULTS_PATH, 'utf8'));
+}
+
+/** @param {Array<import('./assertions').AssertionResult>} results */
+function saveAssertionResults(results) {
+  ensureDirectoryExists();
+  return fs.writeFileSync(ASSERTION_RESULTS_PATH, JSON.stringify(results, null, 2));
+}
+
 /**
  * @param {string} url
  * @param {string[]} sedLikeReplacementPatterns
@@ -87,9 +101,11 @@ function replaceUrlPatterns(url, sedLikeReplacementPatterns) {
 
 module.exports = {
   getHTMLReportForLHR,
-  getSavedLHRs,
+  loadSavedLHRs,
   saveLHR,
   clearSavedLHRs,
+  loadAssertionResults,
+  saveAssertionResults,
   getSavedReportsDirectory,
   replaceUrlPatterns,
 };

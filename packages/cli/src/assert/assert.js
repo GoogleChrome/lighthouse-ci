@@ -8,7 +8,7 @@
 const fs = require('fs');
 const path = require('path');
 const _ = require('@lhci/utils/src/lodash.js');
-const {getSavedLHRs} = require('@lhci/utils/src/saved-reports.js');
+const {loadSavedLHRs, saveAssertionResults} = require('@lhci/utils/src/saved-reports.js');
 const {getAllAssertionResults} = require('@lhci/utils/src/assertions.js');
 const {convertBudgetsToAssertions} = require('@lhci/utils/src/budgets-converter.js');
 const log = require('lighthouse-logger');
@@ -49,7 +49,7 @@ async function runCommand(options) {
   // If we have a budgets file, convert it to our assertions format.
   if (budgetsFile) options = convertBudgetsToAssertions(readBudgets(budgetsFile));
 
-  const lhrs = getSavedLHRs().map(json => JSON.parse(json));
+  const lhrs = loadSavedLHRs().map(json => JSON.parse(json));
   const allResults = getAllAssertionResults(options, lhrs);
   const groupedResults = _.groupBy(allResults, result => result.url);
 
@@ -82,6 +82,8 @@ async function runCommand(options) {
       ${log.dim}all values: ${result.values.join(', ')}${log.reset}\n\n`);
     }
   }
+
+  saveAssertionResults(allResults);
 
   if (hasFailure) {
     process.stderr.write(`Assertion failed. Exiting with status code 1.\n`);

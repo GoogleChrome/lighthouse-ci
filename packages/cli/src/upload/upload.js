@@ -13,7 +13,8 @@ const _ = require('@lhci/utils/src/lodash.js');
 const ApiClient = require('@lhci/utils/src/api-client.js');
 const {computeRepresentativeRuns} = require('@lhci/utils/src/representative-runs.js');
 const {
-  getSavedLHRs,
+  loadSavedLHRs,
+  loadAssertionResults,
   replaceUrlPatterns,
   getHTMLReportForLHR,
 } = require('@lhci/utils/src/saved-reports.js');

@@ -115,7 +115,7 @@ describe('Lighthouse CI CLI', () => {
       let {stdout = '', stderr = '', status = -1} = spawnSync(
         CLI_PATH,
         ['upload', `--serverBaseUrl=http://localhost:${server.port}`],
-        {env: {...process.env, LHCI_TOKEN: projectToken}}
+        {env: {...process.env, LHCI_TOKEN: projectToken, LHCI_GITHUB_TOKEN: ''}}
       );
 
       stdout = stdout.toString();
@@ -168,10 +168,11 @@ describe('Lighthouse CI CLI', () => {
     });
 
     it('should support target=temporary-public-storage', async () => {
-      let {stdout = '', stderr = '', status = -1} = spawnSync(CLI_PATH, [
-        'upload',
-        `--target=temporary-public-storage`,
-      ]);
+      let {stdout = '', stderr = '', status = -1} = spawnSync(
+        CLI_PATH,
+        ['upload', `--target=temporary-public-storage`],
+        {env: {...process.env, LHCI_GITHUB_TOKEN: ''}}
+      );
 
       stdout = stdout.toString();
       stderr = stderr.toString();

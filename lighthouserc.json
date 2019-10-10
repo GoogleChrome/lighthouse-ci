@@ -1,0 +1,31 @@
+{
+  "ci": {
+    "assert": {
+      "preset": "lighthouse:recommended",
+      "assertions": {
+        "dom-size": ["error", {"maxNumericValue": 3000}],
+
+        "uses-rel-preload": "off",
+        "uses-responsive-images": "off",
+        "uses-rel-preconnect": "off",
+        "font-display": "off",
+
+        "meta-description": "off",
+        "listitem": "off",
+        "label": "off",
+        "html-has-lang": "off",
+        "content-width": "off",
+        "color-contrast": "off",
+        "bypass": "off",
+        "tap-targets": "off",
+
+        "installable-manifest": "off",
+        "offline-start-url": "off",
+        "service-worker": "off",
+        "splash-screen": "off",
+        "themed-omnibox": "off",
+        "works-offline": "off"
+      }
+    }
+  }
+}

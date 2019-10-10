@@ -9,6 +9,7 @@
         "uses-responsive-images": "off",
         "uses-rel-preconnect": "off",
         "font-display": "off",
+        "offscreen-images": "off",
 
         "meta-description": "off",
         "listitem": "off",

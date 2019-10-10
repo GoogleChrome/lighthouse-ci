@@ -21,6 +21,11 @@ const {
 
 const envVars = process.env;
 
+/** @param {string} message */
+const print = message => {
+  process.stdout.write(message);
+};
+
 const TEMPORARY_PUBLIC_STORAGE_URL =
   'https://us-central1-lighthouse-infrastructure.cloudfunctions.net/saveHtmlReport';
 
@@ -200,9 +205,9 @@ async function postStatusToGitHub(options) {
   });
 
   if (response.status === 201) {
-    process.stdout.write(`GitHub accepted "${state}" status for "${context}".\n`);
+    print(`GitHub accepted "${state}" status for "${context}".\n`);
   } else {
-    process.stdout.write(`GitHub responded with ${response.status}\n${await response.text()}\n\n`);
+    print(`GitHub responded with ${response.status}\n${await response.text()}\n\n`);
   }
 }
 
@@ -215,7 +220,10 @@ async function runGithubStatusCheck(options, targetUrlMap) {
   const hash = getCurrentHash();
   const slug = getRepoSlug();
 
-  if (!hash || !slug || slug.includes('/') || !options.githubToken) return;
+  if (!options.githubToken) return print('No GitHub token set, skipping status check.\n');
+  print('GitHub token found, attempting to set status...\n');
+  if (!slug || !slug.includes('/')) return print(`Invalid repo slug "${slug}", skipping.\n`);
+  if (!hash) return print(`Invalid hash "${hash}"\n, skipping.`);
 
   const assertionResults = loadAssertionResults();
   const groupedResults = _.groupBy(assertionResults, result => result.url);
@@ -271,8 +279,8 @@ async function runLHCITarget(options) {
     runAt: new Date().toISOString(),
   });
 
-  process.stdout.write(`Saving CI project ${project.name} (${project.id})\n`);
-  process.stdout.write(`Saving CI build (${build.id})\n`);
+  print(`Saving CI project ${project.name} (${project.id})\n`);
+  print(`Saving CI build (${build.id})\n`);
 
   const lhrs = loadSavedLHRs();
   const urlReplacementPatterns = options.urlReplacementPatterns.filter(Boolean);
@@ -296,13 +304,13 @@ async function runLHCITarget(options) {
 
     buildViewUrl.searchParams.set('compareUrl', url);
     targetUrlMap.set(parsedLHR.finalUrl, buildViewUrl.href);
-    process.stdout.write(`Saved LHR to ${options.serverBaseUrl} (${run.id})\n`);
+    print(`Saved LHR to ${options.serverBaseUrl} (${run.id})\n`);
   }
 
   buildViewUrl.searchParams.delete('compareUrl');
   await api.sealBuild(build.projectId, build.id);
-  process.stdout.write(`Done saving build results to Lighthouse CI\n`);
-  process.stdout.write(`View build diff at ${buildViewUrl.href}\n`);
+  print(`Done saving build results to Lighthouse CI\n`);
+  print(`View build diff at ${buildViewUrl.href}\n`);
 
   await runGithubStatusCheck(options, targetUrlMap);
 }
@@ -321,7 +329,7 @@ async function runTemporaryPublicStorageTarget(options) {
 
   for (const lhr of representativeLhrs) {
     const urlAudited = lhr.finalUrl;
-    process.stdout.write(`Uploading median LHR of ${urlAudited}...`);
+    print(`Uploading median LHR of ${urlAudited}...`);
 
     try {
       const response = await fetch(TEMPORARY_PUBLIC_STORAGE_URL, {
@@ -332,13 +340,13 @@ async function runTemporaryPublicStorageTarget(options) {
 
       const {success, url} = await response.json();
       if (success && url) {
-        process.stdout.write(`success!\nOpen the report at ${url}\n`);
+        print(`success!\nOpen the report at ${url}\n`);
         targetUrlMap.set(urlAudited, url);
       } else {
-        process.stdout.write(`failed!\n`);
+        print(`failed!\n`);
       }
     } catch (err) {
-      process.stdout.write(`failed!\n`);
+      print(`failed!\n`);
       process.stderr.write(err.stack + '\n');
     }
   }

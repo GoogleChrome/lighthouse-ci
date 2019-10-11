@@ -186,11 +186,6 @@ function getRepoSlug() {
   if (envVars.TRAVIS_REPO_SLUG) return envVars.TRAVIS_REPO_SLUG;
 }
 
-/** @param {string} url */
-function getCleanUrl(url) {
-  return url.replace(/^https?:../, '').replace(/[^a-z0-9/]+/gi, '-');
-}
-
 /**
  * @param {{slug: string, hash: string, state: 'failure'|'success', targetUrl: string, description: string, context: string, token: string}} options
  */
@@ -226,15 +221,23 @@ async function runGithubStatusCheck(options, targetUrlMap) {
   if (!hash) return print(`Invalid hash "${hash}"\n, skipping.`);
 
   const assertionResults = loadAssertionResults();
-  const groupedResults = _.groupBy(assertionResults, result => result.url);
+  const groupedResults = _.groupBy(assertionResults, result => result.url).sort(
+    (a, b) => a[0].url.length - b[0].url.length
+  );
 
+  let index = 0;
   for (const group of groupedResults) {
+    index++;
     const rawUrl = group[0].url;
     const url = replaceUrlPatterns(rawUrl, options.urlReplacementPatterns);
     const failedResults = group.filter(result => result.level === 'error');
+    const warnResults = group.filter(result => result.level === 'warn');
     const state = failedResults.length ? 'failure' : 'success';
-    const context = `lhci/${getCleanUrl(url)}`;
-    const description = `${url} failed ${failedResults.length} Lighthouse assertion(s)`;
+    const context = `lhci/url-${index}`;
+    const warningsLabel = warnResults.length ? ` with ${warnResults.length} warning(s)` : '';
+    const description = failedResults.length
+      ? `${url} failed ${failedResults.length} Lighthouse assertion(s)`
+      : `${url} passed${warningsLabel}`;
     const targetUrl = targetUrlMap.get(rawUrl) || rawUrl;
 
     await postStatusToGitHub({

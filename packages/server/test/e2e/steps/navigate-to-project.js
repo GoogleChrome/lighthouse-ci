@@ -5,7 +5,7 @@
  */
 'use strict';
 
-const {waitForNetworkIdle0} = require('../../test-utils.js');
+const {waitForNetworkIdle0, waitForAllImages} = require('../../test-utils.js');
 
 /* eslint-env jest, browser */
 
@@ -24,6 +24,7 @@ module.exports = (state, projectName) => {
       }, projectName);
 
       await Promise.all([clickPromise, waitForNetworkIdle0(state.page)]);
+      await waitForAllImages(state.page);
     });
 
     it('should wait for the dashboard to load', async () => {

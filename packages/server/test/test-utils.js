@@ -97,6 +97,22 @@ function waitForNetworkIdle0(page) {
   });
 }
 
+/** @param {import('puppeteer').Page} page */
+async function waitForAllImages(page) {
+  await page.evaluate(async () => {
+    const selectors = Array.from(document.querySelectorAll('img'));
+    await Promise.all(
+      selectors.map(img => {
+        if (img.complete) return;
+        return new Promise((resolve, reject) => {
+          img.addEventListener('load', resolve);
+          img.addEventListener('error', reject);
+        });
+      })
+    );
+  });
+}
+
 /** @type {typeof import('@testing-library/dom').fireEvent} */
 const dispatchEvent = (...args) => testingLibrary.fireEvent(...args);
 
@@ -124,4 +140,5 @@ module.exports = {
   prettyDOM,
   snapshotDOM,
   waitForNetworkIdle0,
+  waitForAllImages,
 };

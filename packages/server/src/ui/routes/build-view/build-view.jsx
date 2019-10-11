@@ -28,6 +28,7 @@ import {BuildViewLegend} from './build-view-legend';
 import clsx from 'clsx';
 import {findAuditDiffs, getDiffSeverity} from '@lhci/utils/src/audit-diff-finder';
 import {BuildViewEmpty} from './build-view-empty';
+import {route} from 'preact-router';
 
 /**
  * @param {LH.Result} lhr
@@ -84,7 +85,7 @@ function computeAuditGroups(lhr, baseLhr) {
 /** @typedef {{id: string, audits: Array<LH.AuditResult>, group: {id: string, title: string}}} IntermediateAuditGroupDef */
 /** @typedef {{id: string, pairs: Array<LHCI.AuditPair>, group: {id: string, title: string}}} AuditGroupDef */
 
-/** @param {{selectedUrl: string, setUrl(url: string): void, build: LHCI.ServerCommand.Build | null, lhr?: LH.Result, baseLhr?: LH.Result, urls: Array<string>}} props */
+/** @param {{selectedUrl: string, build: LHCI.ServerCommand.Build | null, lhr?: LH.Result, baseLhr?: LH.Result, urls: Array<string>}} props */
 const BuildViewScoreAndUrl = props => {
   return (
     <div className="build-view__scores-and-url">
@@ -92,7 +93,11 @@ const BuildViewScoreAndUrl = props => {
         <Dropdown
           className="build-view__url-dropdown"
           value={props.selectedUrl}
-          setValue={props.setUrl}
+          setValue={url => {
+            const to = new URL(window.location.href);
+            to.searchParams.set('compareUrl', url);
+            route(`${to.pathname}${to.search}`);
+          }}
           options={props.urls.map(url => ({value: url, label: url}))}
         />
         <BuildScoreComparison {...props} />
@@ -122,12 +127,11 @@ const AuditGroups = props => {
   );
 };
 
-/** @param {{project: LHCI.ServerCommand.Project, build: LHCI.ServerCommand.Build, ancestorBuild: LHCI.ServerCommand.Build | null, runs: Array<LHCI.ServerCommand.Run>}} props */
+/** @param {{project: LHCI.ServerCommand.Project, build: LHCI.ServerCommand.Build, ancestorBuild: LHCI.ServerCommand.Build | null, runs: Array<LHCI.ServerCommand.Run>, compareUrl?: string}} props */
 const BuildView_ = props => {
   const [openBuildHash, setOpenBuild] = useState(/** @type {null|'base'|'compare'} */ (null));
-  const [selectedUrlState, setUrl] = useState('');
   const [selectedAuditId, setAuditId] = useState(/** @type {string|null} */ (null));
-  const selectedUrl = selectedUrlState || (props.runs[0] && props.runs[0].url);
+  const selectedUrl = props.compareUrl || (props.runs[0] && props.runs[0].url);
 
   const compareRuns = props.runs.filter(run => run.buildId === props.build.id);
   const availableUrls = [...new Set(compareRuns.map(run => run.url))];
@@ -217,7 +221,6 @@ const BuildView_ = props => {
           lhr={lhr}
           baseLhr={baseLhr}
           selectedUrl={selectedUrl}
-          setUrl={setUrl}
           urls={availableUrls}
         />
         <div className="container">
@@ -238,7 +241,7 @@ const BuildView_ = props => {
   );
 };
 
-/** @param {{projectId: string, buildId: string, baseHash?: string}} props */
+/** @param {{projectId: string, buildId: string, baseHash?: string, compareUrl?: string}} props */
 export const BuildView = props => {
   const projectLoadingData = useProject(props.projectId);
   const buildLoadingData = useBuild(props.projectId, props.buildId);
@@ -286,6 +289,7 @@ export const BuildView = props => {
         <BuildView_
           project={project}
           build={build}
+          compareUrl={props.compareUrl}
           ancestorBuild={ancestorBuild}
           runs={runs.concat(baseRuns)}
         />

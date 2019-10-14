@@ -67,7 +67,9 @@ export const SimpleDetails = props => {
       return <span>{value}</span>;
     case 'node':
       return <pre>{value.snippet}</pre>;
-    default:
-      return <pre>{JSON.stringify(props).slice(0, 20)}</pre>;
+    default: {
+      const debugdata = JSON.stringify(props);
+      return <pre title={debugdata}>{debugdata.slice(0, 20)}</pre>;
+    }
   }
 };

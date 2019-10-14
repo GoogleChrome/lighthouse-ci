@@ -64,10 +64,11 @@ export const TableDetails = props => {
               <tr key={key}>
                 <td className="table-column--row-label">{state}</td>
                 {headings.map((heading, j) => {
+                  const itemType = heading.valueType || heading.itemType || 'unknown';
                   return (
-                    <td key={j} className={`table-column--${heading.valueType}`}>
+                    <td key={j} className={`table-column--${itemType}`}>
                       <SimpleDetails
-                        type={heading.valueType}
+                        type={itemType}
                         compareValue={compare && compare.item[heading.key]}
                         baseValue={base && base.item[heading.key]}
                       />

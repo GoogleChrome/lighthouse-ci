@@ -21,7 +21,8 @@ declare global {
       | 'text'
       | 'numeric'
       | 'url'
-      | 'thumbnail';
+      | 'thumbnail'
+      | 'unknown';
 
     export interface AuditResult {
       id?: string;
@@ -34,7 +35,12 @@ declare global {
         type: string;
         items?: Array<Record<string, any>>;
         overallSavingsMs?: number;
-        headings?: Array<{key: string; valueType: DetailsType; label?: string}>;
+        headings?: Array<{
+          key: string;
+          valueType?: DetailsType;
+          itemType?: DetailsType;
+          label?: string;
+        }>;
       };
       scoreDisplayMode?:
         | 'notApplicable'

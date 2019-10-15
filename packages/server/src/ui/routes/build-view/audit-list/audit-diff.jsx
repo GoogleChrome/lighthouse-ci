@@ -11,7 +11,7 @@ import {NumericDiff} from './numeric-diff';
 import {getDiffLabel, getRowLabelForIndex} from '@lhci/utils/src/audit-diff-finder';
 
 /** @param {{diff: LHCI.AuditDiff, audit: LH.AuditResult, baseAudit: LH.AuditResult}} props */
-const StandardDiff = props => {
+const ScoreDiff = props => {
   return (
     <Fragment>
       <ScoreWord audit={props.baseAudit} />
@@ -23,6 +23,23 @@ const StandardDiff = props => {
         arrow_forward
       </i>
       <ScoreWord audit={props.audit} />
+    </Fragment>
+  );
+};
+
+/** @param {{diff: LHCI.DisplayValueAuditDiff, audit: LH.AuditResult, baseAudit: LH.AuditResult}} props */
+const DisplayValueDiff = props => {
+  return (
+    <Fragment>
+      <span>{props.diff.baseValue}</span>
+      <i
+        className={`material-icons audit-group__diff-arrow audit-group__diff-arrow--${getDiffLabel(
+          props.diff
+        )}`}
+      >
+        arrow_forward
+      </i>
+      <span>{props.diff.compareValue}</span>
     </Fragment>
   );
 };
@@ -124,6 +141,9 @@ export const AuditDiff = props => {
   }
 
   const scoreDiff = diffs.find(diff => diff.type === 'score');
-  if (!scoreDiff) return noDiffAvailable;
-  return <StandardDiff diff={scoreDiff} audit={audit} baseAudit={baseAudit} />;
+  if (scoreDiff) return <ScoreDiff diff={scoreDiff} audit={audit} baseAudit={baseAudit} />;
+
+  const displayValueDiff = diffs.find(diff => diff.type === 'displayValue');
+  if (!displayValueDiff || displayValueDiff.type !== 'displayValue') return noDiffAvailable;
+  return <DisplayValueDiff diff={displayValueDiff} audit={audit} baseAudit={baseAudit} />;
 };

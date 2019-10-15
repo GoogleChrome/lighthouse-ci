@@ -43,6 +43,20 @@ function createRuns(run, audits, prandomVariant, numberOfRuns = 5) {
 }
 
 /**
+ * @param {Record<string, StrictOmit<AuditGenDef, 'auditId'>>} auditsToFakeSrc
+ * @return {Record<string, StrictOmit<AuditGenDef, 'auditId'>>}
+ */
+function removeAllItems(auditsToFakeSrc) {
+  const output = JSON.parse(JSON.stringify(auditsToFakeSrc));
+  for (const value of Object.values(output)) {
+    if (!value.items) continue;
+    value.items = [];
+  }
+
+  return output;
+}
+
+/**
  * @return {{projects: Array<LHCI.ServerCommand.Project>, builds: Array<LHCI.ServerCommand.Build>, runs: Array<LHCI.ServerCommand.Run>}}
  */
 function createDataset() {
@@ -143,7 +157,7 @@ function createDataset() {
     'diagnostic-main-thread-time': {averageNumericValue: 5000, unit: 'ms', items: permanentScripts},
     'diagnostic-cache-headers': {passRate: 0.5, items: permanentScripts},
     'diagnostic-total-byte-weight': {
-      averageNumericValue: 8000,
+      averageNumericValue: 8000 * 1024,
       unit: 'KB',
       items: fiftyFiftyImages,
     },
@@ -289,6 +303,19 @@ function createDataset() {
         ancestorHash: '3c9ba5c17b8ea44cb24d2ac839abb0ad9f689aa3', // this doesn't match anything
         runAt: '2019-08-10T01:13:28.904Z',
       },
+      {
+        id: '8',
+        projectId: '0',
+        lifecycle: 'unsealed',
+        branch: 'master',
+        hash: '824cbea447b8a5b0ad9f61c3c9d2ac839abb9aa3',
+        externalBuildUrl: 'http://travis-ci.org/org/repo/1025',
+        commitMessage: 'test: empty base',
+        author: 'Paul Irish <paul@example.com>',
+        avatarUrl: 'https://avatars1.githubusercontent.com/u/39191?s=460&v=4',
+        ancestorHash: '3c9ba5c17b8ea44cb24d2ac839abb0ad9f689aa3', // this doesn't match anything
+        runAt: '2019-10-10T01:15:28.904Z',
+      },
     ],
     runs: [
       ...createRuns(
@@ -338,6 +365,7 @@ function createDataset() {
           ...auditsToFake,
           interactive: {averageNumericValue: 7000},
           'diagnostic-main-thread-time': {
+            unit: 'ms',
             averageNumericValue: 6000,
             items: permanentScripts.map(item =>
               item.url.includes('app')
@@ -355,6 +383,7 @@ function createDataset() {
           ...auditsToFake,
           interactive: {averageNumericValue: 3000},
           'diagnostic-main-thread-time': {
+            unit: 'ms',
             averageNumericValue: 2000,
             items: permanentScripts.map(item =>
               item.url.includes('app')
@@ -372,6 +401,7 @@ function createDataset() {
           ...auditsToFake,
           interactive: {averageNumericValue: 2800},
           'diagnostic-main-thread-time': {
+            unit: 'ms',
             averageNumericValue: 1700,
             items: permanentScripts.map(item =>
               item.url.includes('app')
@@ -401,6 +431,11 @@ function createDataset() {
         {projectId: '0', buildId: '7', url: 'http://localhost:1234/viewer/#checkout'},
         auditsToFake,
         14
+      ),
+      ...createRuns(
+        {projectId: '0', buildId: '8', url: 'http://localhost:1234/viewer/#home'},
+        removeAllItems(auditsToFake),
+        15
       ),
     ],
   };

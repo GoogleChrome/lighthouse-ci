@@ -35,6 +35,7 @@ declare global {
         type: string;
         items?: Array<Record<string, any>>;
         overallSavingsMs?: number;
+        overallSavingsBytes?: number;
         headings?: Array<{
           key: string;
           valueType?: DetailsType;

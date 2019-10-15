@@ -78,20 +78,31 @@ function createLHR(pageUrl, auditDefs, prandom) {
         displayValue:
           groupId === 'metrics'
             ? `${(numericValue / 1000).toLocaleString(undefined, {maximumFractionDigits: 1})} s`
-            : `${numericValue} ${unit}`,
+            : `${Math.round(numericValue)} ${unit}`,
       };
     } else if (typeof averageWastedMs === 'number') {
       const wastedMs = generateNumericValue(averageWastedMs, prandom);
       // score of 100 = <100
       // score of 0 = >1000
       const score = 1 - Math.min(1, Math.max((wastedMs - 100) / 900, 0));
+      const hasBytes = auditDef.items && auditDef.items.some(item => item.averageWastedBytes);
+      const wastedBytes = wastedMs * 257;
       audits[auditId] = {
         score,
         scoreDisplayMode: 'numeric',
-        displayValue: `${(wastedMs / 1000).toLocaleString(undefined, {
-          maximumFractionDigits: 1,
-        })} s`,
-        details: {type: 'opportunity', overallSavingsMs: wastedMs, items: []},
+        displayValue: hasBytes
+          ? `${(wastedBytes / 1024).toLocaleString(undefined, {
+              maximumFractionDigits: 0,
+            })} KB`
+          : `${(wastedMs / 1000).toLocaleString(undefined, {
+              maximumFractionDigits: 1,
+            })} s`,
+        details: {
+          type: 'opportunity',
+          overallSavingsMs: wastedMs,
+          overallSavingsBytes: hasBytes ? wastedBytes : undefined,
+          items: [],
+        },
       };
     } else {
       const {passRate = 1} = auditDef;
@@ -133,18 +144,14 @@ function createLHR(pageUrl, auditDefs, prandom) {
         items.push(item);
       }
 
-      const opportunityDetails = audits[auditId].details;
-      const opportunityMs = opportunityDetails && opportunityDetails.overallSavingsMs;
-      audits[auditId].details = {
-        type: opportunityMs ? 'opportunity' : 'table',
-        overallSavingsMs: opportunityMs,
-        headings: Object.values(headersAsObject).map(header => {
-          // Do the inverse of _getCanonicalizedTableHeadings
-          if (opportunityMs) return header;
-          return {...header, itemType: header.valueType, text: header.label};
-        }),
-        items,
-      };
+      const details = audits[auditId].details || {type: 'table'};
+      details.headings = Object.values(headersAsObject).map(header => {
+        // Do the inverse of _getCanonicalizedTableHeadings
+        if (getGroupForAuditId(auditId) === 'load-opportunities') return header;
+        return {...header, itemType: header.valueType, text: header.label, valueType: undefined};
+      });
+      details.items = items;
+      audits[auditId].details = details;
     }
 
     audits[auditId].title = _.startCase(auditId);

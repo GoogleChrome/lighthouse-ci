@@ -59,7 +59,7 @@ describe('createLHR', () => {
     });
   });
 
-  it('should generate items correctly', () => {
+  it('should generate opportunity items correctly', () => {
     const random = new PRandom();
     const itemA = {
       url: 'http://example.com/script.js',
@@ -74,14 +74,24 @@ describe('createLHR', () => {
 
     const lhr = createLHR(
       'http://example.com',
-      [{auditId: 'audit', passRate: 0, items: [itemA, itemB]}],
+      [
+        {
+          auditId: 'uses-text-compression',
+          averageWastedMs: 500,
+          items: [itemA, itemB],
+        },
+      ],
       random
     );
 
     expect(lhr).toMatchObject({
       audits: {
-        audit: {
+        'uses-text-compression': {
+          scoreDisplayMode: 'numeric',
+          displayValue: '138 KB',
           details: {
+            overallSavingsMs: 548.7281855195761,
+            overallSavingsBytes: 141023.14367853105,
             headings: [
               {key: 'url', valueType: 'url', label: 'URL'},
               {key: 'wastedMs', valueType: 'timespanMs', label: 'Wasted Ms'},

@@ -251,7 +251,7 @@ export const BuildView = props => {
   const baseOverrideData = useOptionalBuildByHash(props.projectId, baseOverrideOptions);
 
   const baseBuildData =
-    ancestorBuildData[0] === 'loaded' && !ancestorBuildData[1]
+    props.baseHash || (ancestorBuildData[0] === 'loaded' && !ancestorBuildData[1])
       ? baseOverrideData
       : ancestorBuildData;
   const baseBuildId = baseBuildData[1] && baseBuildData[1].id;

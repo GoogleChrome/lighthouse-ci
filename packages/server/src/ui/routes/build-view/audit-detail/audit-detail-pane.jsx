@@ -33,7 +33,7 @@ export const AuditDetailPane = props => {
   return (
     <div className="audit-detail-pane" ref={el => (paneElementRef.current = el)}>
       <div className="audit-detail-pane__close" onClick={() => props.setSelectedAuditId(null)}>
-        x
+        <i className="material-icons">close</i>
       </div>
       {props.pairs.map(pair => {
         const {audit} = pair;

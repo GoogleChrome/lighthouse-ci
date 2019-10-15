@@ -21,16 +21,24 @@
 
 .audit-detail-pane__close {
   position: fixed;
+  z-index: 10;
   top: calc(var(--page-header-height) + 10px);
   right: 20px;
-  height: 20px;
-  width: 20px;
-  border-radius: 20px;
-  line-height: 20px;
-  text-align: center;
+
+  height: 30px;
+  width: 30px;
+  border-radius: 30px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
   background: var(--secondary-background-color);
   cursor: pointer;
+}
+
+.audit-detail-pane__close i.material-icons {
+  font-size: 22px;
 }
 
 .audit-detail-pane__audit {

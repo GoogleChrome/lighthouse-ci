@@ -50,8 +50,15 @@ export const SimpleDetails = props => {
     }
     case 'thumbnail':
       return <img style={{width: 48, height: 48, objectFit: 'cover'}} src={value} />;
-    case 'url':
-      return <span title={value}>{new URL(value).pathname}</span>;
+    case 'url': {
+      let display = value;
+      try {
+        const url = new URL(value);
+        display = url.pathname;
+      } catch (_) {}
+
+      return <span title={value}>{display}</span>;
+    }
     case 'code':
       return <pre>{value}</pre>;
     case 'numeric': {

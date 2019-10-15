@@ -29,13 +29,15 @@ import clsx from 'clsx';
 import {findAuditDiffs, getDiffSeverity} from '@lhci/utils/src/audit-diff-finder';
 import {BuildViewEmpty} from './build-view-empty';
 import {route} from 'preact-router';
+import {BuildViewOptions} from './build-view-options';
 
 /**
  * @param {LH.Result} lhr
  * @param {LH.Result|undefined} baseLhr
+ * @param {{percentAbsoluteDeltaThreshold: number}} options
  * @return {Array<AuditGroupDef>}
  */
-function computeAuditGroups(lhr, baseLhr) {
+function computeAuditGroups(lhr, baseLhr, options) {
   /** @type {Array<IntermediateAuditGroupDef|undefined>} */
   const rawAuditGroups = Object.values(lhr.categories)
     .map(category => {
@@ -62,9 +64,7 @@ function computeAuditGroups(lhr, baseLhr) {
     const auditPairs = intermediateGroup.audits
       .map(audit => {
         const baseAudit = baseLhr && baseLhr.audits[audit.id || ''];
-        const diffs = baseAudit
-          ? findAuditDiffs(baseAudit, audit, {percentAbsoluteDeltaThreshold: 0.05})
-          : [];
+        const diffs = baseAudit ? findAuditDiffs(baseAudit, audit, options) : [];
         const maxSeverity = Math.max(...diffs.map(getDiffSeverity), 0);
         return {audit, baseAudit, diffs, maxSeverity, group: intermediateGroup.group};
       })
@@ -129,6 +129,7 @@ const AuditGroups = props => {
 
 /** @param {{project: LHCI.ServerCommand.Project, build: LHCI.ServerCommand.Build, ancestorBuild: LHCI.ServerCommand.Build | null, runs: Array<LHCI.ServerCommand.Run>, compareUrl?: string}} props */
 const BuildView_ = props => {
+  const [percentAbsoluteDeltaThreshold, setDiffThreshold] = useState(0.05);
   const [openBuildHash, setOpenBuild] = useState(/** @type {null|'base'|'compare'} */ (null));
   const [selectedAuditId, setAuditId] = useState(/** @type {string|null} */ (null));
   const selectedUrl = props.compareUrl || (props.runs[0] && props.runs[0].url);
@@ -172,7 +173,7 @@ const BuildView_ = props => {
     );
   }
 
-  const auditGroups = computeAuditGroups(lhr, baseLhr);
+  const auditGroups = computeAuditGroups(lhr, baseLhr, {percentAbsoluteDeltaThreshold});
 
   return (
     <Page
@@ -224,7 +225,15 @@ const BuildView_ = props => {
           urls={availableUrls}
         />
         <div className="container">
-          <BuildViewLegend />
+          <div className="build-view__legend-and-options">
+            <BuildViewLegend />
+            <BuildViewOptions
+              compareLhr={lhr}
+              baseLhr={baseLhr}
+              percentAbsoluteDeltaThreshold={percentAbsoluteDeltaThreshold}
+              setPercentAbsoluteDeltaThreshold={setDiffThreshold}
+            />
+          </div>
           {auditGroups.length && baseLhr ? (
             <AuditGroups
               auditGroups={auditGroups}

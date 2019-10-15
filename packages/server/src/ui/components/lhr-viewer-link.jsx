@@ -6,11 +6,12 @@
 
 import {h} from 'preact';
 
-/** @param {{children: string|JSX.Element|JSX.Element[], lhr: LH.Result}} props */
+/** @param {{children: string|JSX.Element|JSX.Element[], lhr: LH.Result, className?: string}} props */
 export const LhrViewerLink = props => {
   const {children, lhr} = props;
   return (
     <span
+      className={props.className}
       onClick={evt => {
         evt.preventDefault();
         evt.stopImmediatePropagation();

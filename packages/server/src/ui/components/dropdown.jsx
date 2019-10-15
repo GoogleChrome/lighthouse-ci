@@ -8,11 +8,12 @@ import {h} from 'preact';
 import clsx from 'clsx';
 import './dropdown.css';
 
-/** @param {{options: Array<{value: string, label: string}>, value: string, setValue(v: string): void, className?: string}} props */
+/** @param {{options: Array<{value: string, label: string}>, value: string, setValue(v: string): void, className?: string, title?: string}} props */
 export const Dropdown = props => {
-  const {options, value, setValue, className} = props;
+  const {options, value, setValue, className, title} = props;
   return (
     <select
+      title={title}
       className={clsx('dropdown', className)}
       onChange={evt => {
         if (!(evt.target instanceof HTMLSelectElement)) return;

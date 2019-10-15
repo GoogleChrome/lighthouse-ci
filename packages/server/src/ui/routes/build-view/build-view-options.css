@@ -4,34 +4,32 @@
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
  */
 
-.build-view--with-audit-selection {
-  width: 50%;
-}
-
-.build-view__scores-and-url {
-  height: 260px;
-  width: calc(100% + 2 * var(--base-spacing));
-  padding: var(--base-spacing);
-  margin: calc(-1 * var(--base-spacing));
-  margin-bottom: var(--base-spacing);
-
-  background: var(--highlighted-background-color);
-  border-bottom: 1px solid var(--base-border-color);
-}
-
-.build-view__scores-and-url .container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.build-view__url-dropdown {
-  height: calc(var(--header-font-size) + var(--base-spacing));
-  margin-bottom: var(--base-spacing);
-}
-
-.build-view__legend-and-options {
+.build-view__options {
   display: flex;
   flex-direction: row;
-  justify-content: center;
+
+  width: fit-content;
+  padding: var(--base-spacing);
+
+  background: var(--highlighted-background-color);
+  border: 1px solid var(--base-border-color);
+  border-radius: 9999px; /* force fully rounded corners */
+
+  font-family: var(--monospace-font-family);
+}
+
+.build-view-options__report-link {
+  height: 20px;
+  margin-right: calc(var(--base-spacing) / 4);
+
+  cursor: pointer;
+}
+
+.build-view-options__report-link img {
+  width: 20px;
+  height: 20px;
+}
+
+.build-view-options__dropdown {
+  margin-left: calc(var(--base-spacing) / 4);
 }

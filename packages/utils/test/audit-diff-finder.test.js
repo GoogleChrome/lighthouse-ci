@@ -562,6 +562,26 @@ describe('#zipBaseAndCompareItems', () => {
     ]);
   });
 
+  it('should not zip ambiguous values', () => {
+    const base = [
+      {node: {snippet: '<a>Text</a>'}, count: 1},
+      {node: {snippet: '<a>Text</a>'}, count: 1},
+    ];
+    const compare = [{node: {snippet: '<a>Text</a>'}, count: 1}];
+    const zipped = zipBaseAndCompareItems(base, compare);
+    expect(zipped).toEqual([
+      {
+        base: {item: base[0], kind: 'base', index: 0},
+      },
+      {
+        base: {item: base[1], kind: 'base', index: 1},
+      },
+      {
+        compare: {item: compare[0], kind: 'compare', index: 0},
+      },
+    ]);
+  });
+
   it('should zip multiple items', () => {
     const base = [
       {missingInCompare: true},

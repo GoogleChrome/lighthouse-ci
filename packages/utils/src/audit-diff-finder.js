@@ -242,6 +242,15 @@ function findAuditDetailItemKeyDiffs(auditId, baseEntry, compareEntry) {
 
   return diffs;
 }
+
+/** @param {string} s */
+function replaceNondeterministicStrings(s) {
+  return s
+    .replace(/\b[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\b/gi, 'UUID')
+    .replace(/:[0-9]{3,5}\//, ':PORT/')
+    .replace(/\.[0-9a-f]{8}\.(js|css|woff|html|png|jpeg|jpg|svg)/, '.HASH.$1');
+}
+
 /**
  * TODO: consider doing more than URL-based comparisons.
  *
@@ -255,7 +264,7 @@ function zipBaseAndCompareItems(baseItems, compareItems) {
       ...baseItems.map((item, i) => ({item, kind: 'base', index: i})),
       ...compareItems.map((item, i) => ({item, kind: 'compare', index: i})),
     ],
-    entry => (entry.item.url === undefined ? JSON.stringify(entry.item) : entry.item.url)
+    entry => replaceNondeterministicStrings(getItemKey(entry.item))
   );
 
   /** @type {Array<{base?: DetailItemEntry, compare?: DetailItemEntry}>} */
@@ -453,4 +462,5 @@ module.exports = {
   getRowLabelForIndex,
   getMostSevereDiffLabel,
   zipBaseAndCompareItems,
+  replaceNondeterministicStrings,
 };

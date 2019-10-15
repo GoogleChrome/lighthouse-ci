@@ -13,6 +13,8 @@ const {
   getDiffLabel,
   getRowLabel,
   getRowLabelForIndex,
+  zipBaseAndCompareItems,
+  replaceNondeterministicStrings,
 } = require('@lhci/utils/src/audit-diff-finder.js');
 
 describe('#findAuditDiffs', () => {
@@ -514,5 +516,37 @@ describe('#getRowLabel', () => {
     expect(getRowLabelForIndex(diffs, 27, undefined)).toEqual('added');
     expect(getRowLabelForIndex(diffs, undefined, 5)).toEqual('removed');
     expect(getRowLabelForIndex(diffs, 2, 0)).toEqual('better');
+  });
+});
+
+describe('#replaceNondeterministicStrings', () => {
+  it('should work on non-replacements', () => {
+    expect(replaceNondeterministicStrings('nonsense')).toEqual('nonsense');
+    expect(replaceNondeterministicStrings('Other')).toEqual('Other');
+    expect(replaceNondeterministicStrings('Unknown')).toEqual('Unknown');
+    expect(replaceNondeterministicStrings('foo.notahash.js')).toEqual('foo.notahash.js');
+    expect(replaceNondeterministicStrings('foo.1234567.js')).toEqual('foo.1234567.js');
+    expect(replaceNondeterministicStrings('at foo.js:1234')).toEqual('at foo.js:1234');
+    expect(replaceNondeterministicStrings('http://localhost/foo')).toEqual('http://localhost/foo');
+    expect(replaceNondeterministicStrings('data:image/png;base64,abcdef')).toEqual(
+      'data:image/png;base64,abcdef'
+    );
+  });
+
+  it('should replace hash parts', () => {
+    expect(replaceNondeterministicStrings('foo.12345678.js')).toEqual('foo.HASH.js');
+    expect(replaceNondeterministicStrings('foo.abcdef12.js')).toEqual('foo.HASH.js');
+  });
+
+  it('should replace ports', () => {
+    expect(replaceNondeterministicStrings('http://localhost:1337/foo?bar=1#baz')).toEqual(
+      'http://localhost:PORT/foo?bar=1#baz'
+    );
+  });
+
+  it('should replace uuids', () => {
+    expect(
+      replaceNondeterministicStrings('<a href="/app/12345678-1234-1234-1234-123456781234">Text</a>')
+    ).toEqual('<a href="/app/UUID">Text</a>');
   });
 });

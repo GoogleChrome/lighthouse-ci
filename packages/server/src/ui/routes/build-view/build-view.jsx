@@ -107,7 +107,7 @@ const BuildViewScoreAndUrl = props => {
   );
 };
 
-/** @param {{auditGroups: Array<AuditGroupDef|undefined>, baseLhr?: LH.Result, selectedAuditId: string|null, setSelectedAuditId: (id: string|null) => void}} props */
+/** @param {{auditGroups: Array<AuditGroupDef|undefined>, baseLhr?: LH.Result, selectedAuditId: string|null, setSelectedAuditId: (id: string|null) => void, showAsNarrow: boolean}} props */
 const AuditGroups = props => {
   return (
     <div className="build-view__audit-groups">
@@ -116,6 +116,7 @@ const AuditGroups = props => {
         return (
           <AuditGroup
             key={auditGroup.id}
+            showAsNarrow={props.showAsNarrow}
             pairs={auditGroup.pairs}
             group={auditGroup.group}
             baseLhr={props.baseLhr}
@@ -220,13 +221,17 @@ const BuildView_ = props => {
           'build-view--with-audit-selection': !!selectedAuditId,
         })}
       >
-        <BuildViewScoreAndUrl
-          build={props.build}
-          lhr={lhr}
-          baseLhr={baseLhr}
-          selectedUrl={selectedUrl}
-          urls={availableUrls}
-        />
+        {selectedAuditId ? (
+          <Fragment />
+        ) : (
+          <BuildViewScoreAndUrl
+            build={props.build}
+            lhr={lhr}
+            baseLhr={baseLhr}
+            selectedUrl={selectedUrl}
+            urls={availableUrls}
+          />
+        )}
         <div className="container">
           <BuildViewWarnings
             build={props.build}
@@ -236,16 +241,21 @@ const BuildView_ = props => {
           />
           {auditGroups.length && baseLhr ? (
             <Fragment>
-              <div className="build-view__legend-and-options">
-                <BuildViewLegend />
-                <BuildViewOptions
-                  compareLhr={lhr}
-                  baseLhr={baseLhr}
-                  percentAbsoluteDeltaThreshold={percentAbsoluteDeltaThreshold}
-                  setPercentAbsoluteDeltaThreshold={setDiffThreshold}
-                />
-              </div>
+              {selectedAuditId ? (
+                <Fragment />
+              ) : (
+                <div className="build-view__legend-and-options">
+                  <BuildViewLegend />
+                  <BuildViewOptions
+                    compareLhr={lhr}
+                    baseLhr={baseLhr}
+                    percentAbsoluteDeltaThreshold={percentAbsoluteDeltaThreshold}
+                    setPercentAbsoluteDeltaThreshold={setDiffThreshold}
+                  />
+                </div>
+              )}
               <AuditGroups
+                showAsNarrow={!!selectedAuditId}
                 auditGroups={auditGroups}
                 baseLhr={baseLhr}
                 selectedAuditId={selectedAuditId}

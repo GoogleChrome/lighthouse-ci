@@ -85,7 +85,7 @@ const toDisplay = (x, options) => {
   return `${asDelta && value >= 0 ? '+' : ''}${string}${withSuffix ? suffix : ''}`;
 };
 
-/** @param {{diff: LHCI.NumericAuditDiff, audit?: LH.AuditResult, groupId?: string}} props */
+/** @param {{diff: LHCI.NumericAuditDiff, audit?: LH.AuditResult, groupId?: string, showAsNarrow?: boolean}} props */
 export const NumericDiff = props => {
   const {diff, audit, groupId} = props;
   const unit = getUnitFromAudit(audit, groupId);
@@ -107,6 +107,14 @@ export const NumericDiff = props => {
   const boxRight = 100 - (100 * (maxValue - lowerLimit)) / range;
   const deltaType = getDeltaLabel(delta, 'audit');
   const minValueIsCurrentValue = minValue === currentNumericValue;
+
+  if (props.showAsNarrow) {
+    return (
+      <div className={clsx('audit-numeric-diff', `text--${deltaType}`)}>
+        {toDisplay(delta, {asDelta: true, withSuffix: true, unit})}
+      </div>
+    );
+  }
 
   return (
     <Fragment>

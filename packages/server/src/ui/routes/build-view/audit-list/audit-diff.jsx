@@ -72,7 +72,7 @@ function getUniqueBaseCompareIndexPairs(diffs) {
   );
 }
 
-/** @param {{diffs: Array<LHCI.AuditDiff>, audit: LH.AuditResult, baseAudit: LH.AuditResult}} props */
+/** @param {{diffs: Array<LHCI.AuditDiff>, audit: LH.AuditResult, baseAudit: LH.AuditResult, showAsNarrow?: boolean}} props */
 export const ItemDiff = props => {
   const {diffs, baseAudit} = props;
   if (!baseAudit.details || !baseAudit.details.items) return null;
@@ -85,7 +85,7 @@ export const ItemDiff = props => {
   const regressionCount = rowLabels.filter(label => label === 'regression').length;
   const improvementCount = rowLabels.filter(label => label === 'improvement').length;
 
-  return (
+  const baseElements = (
     <Fragment>
       <div className="audit-group__diff-badge-group">
         <i className="material-icons">list</i>
@@ -100,6 +100,12 @@ export const ItemDiff = props => {
       >
         arrow_forward
       </i>
+    </Fragment>
+  );
+
+  return (
+    <Fragment>
+      {props.showAsNarrow ? <Fragment /> : baseElements}
       <div className="audit-group__diff-badge-group">
         <i className="material-icons">list</i>
         <div className="audit-group__diff-badges">
@@ -121,7 +127,7 @@ export const ItemDiff = props => {
   );
 };
 
-/** @param {{pair: LHCI.AuditPair}} props */
+/** @param {{pair: LHCI.AuditPair, showAsNarrow: boolean}} props */
 export const AuditDiff = props => {
   const {audit, baseAudit, diffs, group} = props.pair;
   const noDiffAvailable = <span>No diff available</span>;
@@ -130,14 +136,28 @@ export const AuditDiff = props => {
 
   const numericDiff = diffs.find(diff => diff.type === 'numericValue');
   if (numericDiff && numericDiff.type === 'numericValue') {
-    return <NumericDiff diff={numericDiff} audit={audit} groupId={group.id} />;
+    return (
+      <NumericDiff
+        diff={numericDiff}
+        audit={audit}
+        groupId={group.id}
+        showAsNarrow={props.showAsNarrow}
+      />
+    );
   }
 
   const hasItemDiff = diffs.some(
     diff => diff.type === 'itemAddition' || diff.type === 'itemRemoval' || diff.type === 'itemDelta'
   );
   if (hasItemDiff) {
-    return <ItemDiff diffs={diffs} audit={audit} baseAudit={baseAudit} />;
+    return (
+      <ItemDiff
+        diffs={diffs}
+        audit={audit}
+        baseAudit={baseAudit}
+        showAsNarrow={props.showAsNarrow}
+      />
+    );
   }
 
   const scoreDiff = diffs.find(diff => diff.type === 'score');

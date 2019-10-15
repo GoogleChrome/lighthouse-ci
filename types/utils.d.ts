@@ -10,6 +10,7 @@ declare global {
       | 'error'
       | 'score'
       | 'numericValue'
+      | 'displayValue'
       | 'itemCount'
       | 'itemAddition'
       | 'itemRemoval'
@@ -52,8 +53,15 @@ declare global {
       compareValue?: number;
     }
 
+    export interface DisplayValueAuditDiff extends BaseAuditDiff {
+      type: 'displayValue';
+      baseValue: string;
+      compareValue: string;
+    }
+
     export type AuditDiff =
       | NumericAuditDiff
+      | DisplayValueAuditDiff
       | ItemAdditionAuditDiff
       | ItemRemovalAuditDiff
       | NumericItemAuditDiff

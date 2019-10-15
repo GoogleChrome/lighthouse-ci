@@ -17,8 +17,8 @@ const {
 
 describe('#findAuditDiffs', () => {
   it('should return empty array for identical audits', () => {
-    const baseAudit = {id: 'audit', score: 0.5};
-    const compareAudit = {id: 'audit', score: 0.5};
+    const baseAudit = {id: 'audit', score: 0.5, displayValue: '4 items'};
+    const compareAudit = {id: 'audit', score: 0.5, displayValue: '4 items'};
     expect(findAuditDiffs(baseAudit, compareAudit)).toEqual([]);
   });
 
@@ -167,6 +167,19 @@ describe('#findAuditDiffs', () => {
         type: 'numericValue',
         baseValue: 0,
         compareValue: 1600,
+      },
+    ]);
+  });
+
+  it('should find a displayValue diff', () => {
+    const baseAudit = {id: 'audit', score: 0.4, displayValue: '4 items'};
+    const compareAudit = {id: 'audit', score: 0.4, displayValue: '2 items'};
+    expect(findAuditDiffs(baseAudit, compareAudit)).toEqual([
+      {
+        auditId: 'audit',
+        type: 'displayValue',
+        baseValue: '4 items',
+        compareValue: '2 items',
       },
     ]);
   });

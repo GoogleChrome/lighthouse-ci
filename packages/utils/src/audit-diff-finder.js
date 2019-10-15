@@ -166,6 +166,10 @@ function createAuditDiff(diff) {
     return {auditId, type, baseItemIndex};
   }
 
+  if (type === 'displayValue') {
+    throw new Error('Do not use createAuditDiff for displayValue, just manually create');
+  }
+
   if (
     typeof compareValue !== 'number' ||
     typeof baseValue !== 'number' ||
@@ -354,7 +358,7 @@ function normalizeDetailsItems(audit) {
 /**
  * @param {LH.AuditResult} baseAudit
  * @param {LH.AuditResult} compareAudit
- * @param {{forceAllScoreDiffs?: boolean, percentAbsoluteDeltaThreshold?: number}} options
+ * @param {{forceAllScoreDiffs?: boolean, skipDisplayValueDiffs?: boolean, percentAbsoluteDeltaThreshold?: number}} options
  * @return {Array<LHCI.AuditDiff>}
  */
 function findAuditDiffs(baseAudit, compareAudit, options = {}) {
@@ -388,6 +392,15 @@ function findAuditDiffs(baseAudit, compareAudit, options = {}) {
     );
   }
 
+  if (typeof baseAudit.displayValue === 'string' || typeof compareAudit.displayValue === 'string') {
+    diffs.push({
+      auditId,
+      type: 'displayValue',
+      baseValue: baseAudit.displayValue || '',
+      compareValue: compareAudit.displayValue || '',
+    });
+  }
+
   if (
     (baseAudit.details && baseAudit.details.items) ||
     (compareAudit.details && compareAudit.details.items)
@@ -415,6 +428,10 @@ function findAuditDiffs(baseAudit, compareAudit, options = {}) {
     // If it's a score and we're not forcing all score diffs, only flag level changes.
     if (diff.type === 'score' && !options.forceAllScoreDiffs) {
       return getScoreLevel(diff.baseValue) !== getScoreLevel(diff.compareValue);
+    }
+    // If it's a display value change, ensure the values are different, and defer to the options.
+    if (diff.type === 'displayValue') {
+      return diff.baseValue !== diff.compareValue && !options.skipDisplayValueDiffs;
     }
 
     // Ensure the percent delta is above our threshold (0 by default).

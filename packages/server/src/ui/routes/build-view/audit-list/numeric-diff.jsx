@@ -132,7 +132,12 @@ export const NumericDiff = props => {
               style={{left: minValueIsCurrentValue ? '0%' : '100%'}}
             />
             <div
-              className="audit-numeric-diff__delta-label"
+              className={clsx('audit-numeric-diff__delta-label', {
+                'audit-numeric-diff__delta-label--narrow-left':
+                  deltaType === 'improvement' && boxLeft < 20,
+                'audit-numeric-diff__delta-label--narrow-right':
+                  deltaType === 'regression' && boxRight < 20,
+              })}
               style={{[minValueIsCurrentValue ? 'right' : 'left']: '100%'}}
             >
               {toDisplay(delta, {asDelta: true, withSuffix: true, unit})}

@@ -11,6 +11,7 @@ module.exports = {
   /**
    * @param {import('sequelize').QueryInterface} queryInterface
    * @param {typeof import('sequelize')} Sequelize
+   * @param {LHCI.ServerCommand.StorageOptions} options
    */
   up: async (queryInterface, Sequelize) => {
     await queryInterface.createTable('projects', {
@@ -41,7 +42,7 @@ module.exports = {
       buildId: {type: Sequelize.UUID()},
       representative: {type: Sequelize.BOOLEAN},
       url: {type: Sequelize.STRING({length: 256})},
-      lhr: {type: Sequelize.TEXT('long')},
+      lhr: {type: Sequelize.TEXT},
       createdAt: {type: Sequelize.DATE()},
       updatedAt: {type: Sequelize.DATE()},
     });
@@ -51,7 +52,7 @@ module.exports = {
       buildId: {type: Sequelize.UUID()},
       url: {type: Sequelize.STRING({length: 256})},
       name: {type: Sequelize.STRING({length: 100})},
-      value: {type: Sequelize.DOUBLE(12, 4)},
+      value: {type: Sequelize.NUMERIC(12, 4)},
       createdAt: {type: Sequelize.DATE()},
       updatedAt: {type: Sequelize.DATE()},
     });

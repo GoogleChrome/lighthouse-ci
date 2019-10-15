@@ -69,15 +69,16 @@ function createSequelize(options) {
 
 /**
  * @param {import('sequelize').Sequelize} sequelize
+ * @param {LHCI.ServerCommand.StorageOptions} options
  */
-function createUmzug(sequelize) {
+function createUmzug(sequelize, options) {
   return new Umzug({
     logging: () => {},
     storage: 'sequelize',
     storageOptions: {sequelize: /** @type {*} */ (sequelize)},
     migrations: {
       path: path.join(__dirname, 'migrations'),
-      params: [sequelize.getQueryInterface(), Sequelize],
+      params: [sequelize.getQueryInterface(), Sequelize, options],
     },
   });
 }
@@ -171,7 +172,7 @@ class SqlStorageMethod {
       statisticModelDefn.attributes
     );
 
-    const umzug = createUmzug(sequelize);
+    const umzug = createUmzug(sequelize, options);
     if (options.sqlDangerouslyResetDatabase) {
       await umzug.down({to: 0});
     }

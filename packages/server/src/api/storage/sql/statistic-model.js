@@ -20,7 +20,7 @@ module.exports = {
     buildId: {type: Sequelize.UUID(), references: {model: ModelRef, key: 'id'}},
     url: {type: Sequelize.STRING({length: 256})},
     name: {type: Sequelize.STRING({length: 100})},
-    value: {type: Sequelize.DOUBLE(12, 4)},
+    value: {type: Sequelize.NUMERIC(12, 4)},
   },
   indexes: [],
 };

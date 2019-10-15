@@ -38,3 +38,14 @@
   flex-direction: row;
   justify-content: center;
 }
+
+.build-view__warning {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.build-view__warning i {
+  color: var(--average-color);
+  margin-right: calc(var(--base-spacing) / 2);
+}

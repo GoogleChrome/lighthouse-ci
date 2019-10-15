@@ -30,6 +30,7 @@ import {findAuditDiffs, getDiffSeverity} from '@lhci/utils/src/audit-diff-finder
 import {BuildViewEmpty} from './build-view-empty';
 import {route} from 'preact-router';
 import {BuildViewOptions} from './build-view-options';
+import {BuildViewWarnings} from './build-view-warnings';
 
 /**
  * @param {LH.Result} lhr
@@ -127,7 +128,7 @@ const AuditGroups = props => {
   );
 };
 
-/** @param {{project: LHCI.ServerCommand.Project, build: LHCI.ServerCommand.Build, ancestorBuild: LHCI.ServerCommand.Build | null, runs: Array<LHCI.ServerCommand.Run>, compareUrl?: string}} props */
+/** @param {{project: LHCI.ServerCommand.Project, build: LHCI.ServerCommand.Build, ancestorBuild: LHCI.ServerCommand.Build | null, runs: Array<LHCI.ServerCommand.Run>, compareUrl?: string, hasBaseOverride: boolean}} props */
 const BuildView_ = props => {
   const [percentAbsoluteDeltaThreshold, setDiffThreshold] = useState(0.05);
   const [openBuildHash, setOpenBuild] = useState(/** @type {null|'base'|'compare'} */ (null));
@@ -225,22 +226,30 @@ const BuildView_ = props => {
           urls={availableUrls}
         />
         <div className="container">
-          <div className="build-view__legend-and-options">
-            <BuildViewLegend />
-            <BuildViewOptions
-              compareLhr={lhr}
-              baseLhr={baseLhr}
-              percentAbsoluteDeltaThreshold={percentAbsoluteDeltaThreshold}
-              setPercentAbsoluteDeltaThreshold={setDiffThreshold}
-            />
-          </div>
+          <BuildViewWarnings
+            build={props.build}
+            baseBuild={props.ancestorBuild}
+            baseLhr={baseLhr}
+            hasBaseOverride={props.hasBaseOverride}
+          />
           {auditGroups.length && baseLhr ? (
-            <AuditGroups
-              auditGroups={auditGroups}
-              baseLhr={baseLhr}
-              selectedAuditId={selectedAuditId}
-              setSelectedAuditId={setAuditId}
-            />
+            <Fragment>
+              <div className="build-view__legend-and-options">
+                <BuildViewLegend />
+                <BuildViewOptions
+                  compareLhr={lhr}
+                  baseLhr={baseLhr}
+                  percentAbsoluteDeltaThreshold={percentAbsoluteDeltaThreshold}
+                  setPercentAbsoluteDeltaThreshold={setDiffThreshold}
+                />
+              </div>
+              <AuditGroups
+                auditGroups={auditGroups}
+                baseLhr={baseLhr}
+                selectedAuditId={selectedAuditId}
+                setSelectedAuditId={setAuditId}
+              />
+            </Fragment>
           ) : (
             <BuildViewEmpty lhr={lhr} />
           )}
@@ -301,6 +310,7 @@ export const BuildView = props => {
           compareUrl={props.compareUrl}
           ancestorBuild={ancestorBuild}
           runs={runs.concat(baseRuns)}
+          hasBaseOverride={!!props.baseHash}
         />
       )}
     />

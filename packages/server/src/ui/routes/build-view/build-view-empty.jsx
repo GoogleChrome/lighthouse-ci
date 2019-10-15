@@ -7,21 +7,20 @@
 import {h} from 'preact';
 import './build-view-empty.css';
 import {LhrViewerLink} from '../../components/lhr-viewer-link';
-
-// @ts-ignore - tsc doesn't know how to handle static assets
-const logoSvgPath = require('../../logo.svg');
+import {Paper} from '../../components/paper';
 
 /** @param {{lhr: LH.Result, baseLhr?: LH.Result}} props */
 export const BuildViewEmpty = props => {
   return (
-    <div className="build-view__empty">
-      <p>No differences found!</p>
-      <LhrViewerLink lhr={props.lhr}>
-        <div className="build-view-empty__lhr-link">
-          <img src={logoSvgPath} />
-          <div>Open Report</div>
-        </div>
-      </LhrViewerLink>
-    </div>
+    <Paper className="build-view__empty">
+      <i className="material-icons">insert_emoticon</i>
+      <div>
+        Woah, no differences found! Switch base builds to explore other differences, or{' '}
+        <LhrViewerLink className="build-view-empty__lhr-link" lhr={props.lhr}>
+          open the Lighthouse report
+        </LhrViewerLink>
+        .
+      </div>
+    </Paper>
   );
 };

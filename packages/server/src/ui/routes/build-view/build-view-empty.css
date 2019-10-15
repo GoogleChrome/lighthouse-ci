@@ -6,24 +6,22 @@
 
 .build-view__empty {
   display: flex;
-  flex-direction: column;
-  justify-content: center;
+  flex-direction: row;
   align-items: center;
 
-  min-height: 300px;
+  min-height: 110px;
+
+  font-size: var(--header-font-size);
 }
 
-.build-view__empty p {
-  font-size: var(--header-font-size);
-  margin-bottom: var(--base-spacing);
+.build-view__empty i {
+  color: var(--improvement-color);
+  font-size: 40px;
+  margin: 0 var(--base-spacing);
 }
 
 .build-view-empty__lhr-link {
   cursor: pointer;
   text-align: center;
-}
-
-.build-view-empty__lhr-link img {
-  width: 100px;
-  height: 100px;
+  color: var(--improvement-color);
 }

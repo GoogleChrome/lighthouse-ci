@@ -6,7 +6,7 @@
 
 import {h, Fragment} from 'preact';
 import _ from '@lhci/utils/src/lodash';
-import {useState, useMemo} from 'preact/hooks';
+import {useState, useMemo, useCallback} from 'preact/hooks';
 import {AsyncLoader, combineLoadingStates, combineAsyncData} from '../../components/async-loader';
 import {Dropdown} from '../../components/dropdown';
 import {
@@ -134,6 +134,7 @@ const BuildView_ = props => {
   const [openBuildHash, setOpenBuild] = useState(/** @type {null|'base'|'compare'} */ (null));
   const [selectedAuditId, setAuditId] = useState(/** @type {string|null} */ (null));
   const selectedUrl = props.compareUrl || (props.runs[0] && props.runs[0].url);
+  const buildHashSelectorCloseFn = useCallback(() => setOpenBuild(null), [setOpenBuild]);
 
   const compareRuns = props.runs.filter(run => run.buildId === props.build.id);
   const availableUrls = [...new Set(compareRuns.map(run => run.url))];
@@ -202,6 +203,7 @@ const BuildView_ = props => {
           selector={openBuildHash}
           lhr={lhr}
           baseLhr={baseLhr}
+          close={buildHashSelectorCloseFn}
         />
       )) || <Fragment />}
       {(selectedAuditId && (

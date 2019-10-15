@@ -11,9 +11,10 @@ import {useBranchBuilds} from '../../hooks/use-api-data';
 import {AsyncLoader, combineLoadingStates, combineAsyncData} from '../../components/async-loader';
 import {Pill} from '../../components/pill';
 import {LhrViewerLink} from '../../components/lhr-viewer-link';
+import {useEffect} from 'preact/hooks';
 
 /**
- * @param {{build: LHCI.ServerCommand.Build, ancestorBuild?: LHCI.ServerCommand.Build | null, selector: 'base'|'compare', branchBuilds: Array<LHCI.ServerCommand.Build>, baseBuilds: Array<LHCI.ServerCommand.Build>, lhr: LH.Result, baseLhr?: LH.Result}} props
+ * @param {{build: LHCI.ServerCommand.Build, ancestorBuild?: LHCI.ServerCommand.Build | null, selector: 'base'|'compare', branchBuilds: Array<LHCI.ServerCommand.Build>, baseBuilds: Array<LHCI.ServerCommand.Build>, lhr: LH.Result, baseLhr?: LH.Result, close: () => void}} props
  */
 const BuildHashSelector_ = props => {
   const {branchBuilds, baseBuilds, ancestorBuild} = props;
@@ -23,6 +24,23 @@ const BuildHashSelector_ = props => {
       .sort((a, b) => new Date(b.runAt).getTime() - new Date(a.runAt).getTime()),
     build => build.id
   );
+
+  useEffect(() => {
+    /** @param {MouseEvent} evt */
+    const listener = evt => {
+      const target = evt.target;
+      if (!(target instanceof HTMLElement)) return;
+      // Click was within the BuildHashSelector, don't close it.
+      if (target.closest('.build-hash-selector')) return;
+      // Click was on a BuildSelectorPill, don't close it.
+      if (target.closest('.build-selector-pill')) return;
+      // Click was outside our target area, close it.
+      props.close();
+    };
+
+    document.addEventListener('click', listener);
+    return () => document.removeEventListener('click', listener);
+  }, [props.close]);
 
   return (
     <div className="container">
@@ -92,7 +110,7 @@ const BuildHashSelector_ = props => {
 };
 
 /**
- * @param {{build: LHCI.ServerCommand.Build, ancestorBuild?: LHCI.ServerCommand.Build | null, selector: 'base'|'compare', lhr: LH.Result, baseLhr?: LH.Result}} props
+ * @param {{build: LHCI.ServerCommand.Build, ancestorBuild?: LHCI.ServerCommand.Build | null, selector: 'base'|'compare', lhr: LH.Result, baseLhr?: LH.Result, close: () => void}} props
  */
 export const BuildHashSelector = props => {
   const branchLoadingData = useBranchBuilds(props.build.projectId, props.build.branch);

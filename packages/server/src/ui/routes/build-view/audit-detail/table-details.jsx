@@ -43,8 +43,9 @@ export const TableDetails = props => {
           <tr>
             <th />
             {headings.map((heading, i) => {
+              const itemType = heading.valueType || heading.itemType || 'unknown';
               return (
-                <th className={`table-column--${heading.valueType}`} key={i}>
+                <th className={`table-column--${itemType}`} key={i}>
                   {heading.label}
                 </th>
               );

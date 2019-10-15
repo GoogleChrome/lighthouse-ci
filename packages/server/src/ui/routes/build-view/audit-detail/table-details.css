@@ -37,6 +37,9 @@
 .table-column--code,
 .table-column--node {
   text-align: left;
+  max-width: 30vw;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .table-column--bytes,

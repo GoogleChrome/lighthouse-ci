@@ -64,6 +64,7 @@ declare global {
       baseAudit?: LH.AuditResult;
       diffs: Array<AuditDiff>;
       maxSeverity: number;
+      group: {id: string; title: string};
     }
   }
 }

@@ -36,7 +36,6 @@ const ScoreOnlyDetails = props => {
 /** @param {{pair: LHCI.AuditPair, key?: string}} props */
 const Details = props => {
   const {pair} = props;
-  const displayValue = pair.audit.displayValue;
   const type = pair.audit.details && pair.audit.details.type;
 
   let itemDiff = undefined;
@@ -50,7 +49,7 @@ const Details = props => {
 
   const numericDiff = pair.diffs.find(diff => diff.type === 'numericValue');
   if (numericDiff && numericDiff.type === 'numericValue') {
-    numericDetails = <NumericDiff diff={numericDiff} displayValue={displayValue} />;
+    numericDetails = <NumericDiff diff={numericDiff} audit={pair.audit} />;
   }
 
   if (tableDetails || numericDiff) {

@@ -19,10 +19,25 @@ const toNearestRoundNumber = (x, direction) => {
   return fn(x / 2500) * 2500;
 };
 
-/** @param {string} displayValue @return {'ms'|'bytes'|'none'} */
-const getUnitFromDisplayValue = displayValue => {
-  if (/\d\s(ms|s)$/.test(displayValue)) return 'ms';
-  if (/\d\s(KB|MB)$/.test(displayValue)) return 'bytes';
+/**
+ * @param {LH.AuditResult|undefined} audit
+ * @param {string|undefined} groupId
+ * @return {'ms'|'bytes'|'none'}
+ */
+const getUnitFromAudit = (audit, groupId) => {
+  if (groupId === 'metrics') return 'ms';
+  if (groupId === 'load-opportunities') return 'ms';
+  if (!audit) return 'none';
+
+  if (audit.details) {
+    const details = audit.details;
+    if (details.overallSavingsMs) return 'ms';
+  }
+
+  const displayValue = audit.displayValue || '';
+  if (/^[0-9,.]+\s(ms|s)$/.test(displayValue)) return 'ms';
+  if (/^[0-9,.]+\s(KB|MB)$/.test(displayValue)) return 'bytes';
+
   return 'none';
 };
 
@@ -70,10 +85,10 @@ const toDisplay = (x, options) => {
   return `${asDelta && value >= 0 ? '+' : ''}${string}${withSuffix ? suffix : ''}`;
 };
 
-/** @param {{diff: LHCI.NumericAuditDiff, displayValue?: string}} props */
+/** @param {{diff: LHCI.NumericAuditDiff, audit?: LH.AuditResult, groupId?: string}} props */
 export const NumericDiff = props => {
-  const {diff, displayValue = ''} = props;
-  const unit = getUnitFromDisplayValue(displayValue);
+  const {diff, audit, groupId} = props;
+  const unit = getUnitFromAudit(audit, groupId);
   const currentNumericValue = diff.compareValue;
   const baseNumericValue = diff.baseValue;
 

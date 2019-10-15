@@ -106,14 +106,14 @@ export const ItemDiff = props => {
 
 /** @param {{pair: LHCI.AuditPair}} props */
 export const AuditDiff = props => {
-  const {audit, baseAudit, diffs} = props.pair;
+  const {audit, baseAudit, diffs, group} = props.pair;
   const noDiffAvailable = <span>No diff available</span>;
 
   if (!baseAudit) return noDiffAvailable;
 
   const numericDiff = diffs.find(diff => diff.type === 'numericValue');
   if (numericDiff && numericDiff.type === 'numericValue') {
-    return <NumericDiff diff={numericDiff} displayValue={audit.displayValue} />;
+    return <NumericDiff diff={numericDiff} audit={audit} groupId={group.id} />;
   }
 
   const hasItemDiff = diffs.some(

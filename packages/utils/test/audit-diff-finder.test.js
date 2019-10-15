@@ -173,6 +173,12 @@ describe('#findAuditDiffs', () => {
     ]);
   });
 
+  it('should hide a numericValue diff with passing score and no items', () => {
+    const baseAudit = {id: 'audit', score: 1, numericValue: 3200};
+    const compareAudit = {id: 'audit', score: 1, numericValue: 1600};
+    expect(findAuditDiffs(baseAudit, compareAudit)).toEqual([]);
+  });
+
   it('should hide just a displayValue diff', () => {
     const baseAudit = {id: 'audit', score: 0.4, displayValue: '4 items'};
     const compareAudit = {id: 'audit', score: 0.4, displayValue: '2 items'};

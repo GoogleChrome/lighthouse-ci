@@ -465,6 +465,17 @@ function findAuditDiffs(baseAudit, compareAudit, options = {}) {
   // If the only diff found was a displayValue diff, skip it as the others were probably ignored by
   // our percentAbsoluteDeltaThreshold.
   if (filteredDiffs.length === 1 && filteredDiffs[0].type === 'displayValue') return [];
+
+  // If the only diff found was a numericValue/displayValue diff *AND* we were passing, skip it.
+  // This only happens on audits that have flaky
+  if (
+    filteredDiffs.every(diff => diff.type === 'displayValue' || diff.type === 'numericValue') &&
+    compareAudit.score === 1 &&
+    baseAudit.score === 1
+  ) {
+    return [];
+  }
+
   return filteredDiffs;
 }
 

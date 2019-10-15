@@ -35,8 +35,8 @@ const getUnitFromAudit = (audit, groupId) => {
   }
 
   const displayValue = audit.displayValue || '';
-  if (/^[0-9,.]+\s(ms|s)$/.test(displayValue)) return 'ms';
-  if (/^[0-9,.]+\s(KB|MB)$/.test(displayValue)) return 'bytes';
+  if (/[0-9,.]+\s(ms|s)$/.test(displayValue)) return 'ms';
+  if (/[0-9,.]+\s(KB|MB)$/.test(displayValue)) return 'bytes';
 
   return 'none';
 };

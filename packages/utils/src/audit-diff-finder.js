@@ -420,7 +420,7 @@ function findAuditDiffs(baseAudit, compareAudit, options = {}) {
     diffs.push(...findAuditDetailItemsDiffs(auditId, baseItems, compareItems));
   }
 
-  return diffs.filter(diff => {
+  const filteredDiffs = diffs.filter(diff => {
     // Errors are always surfaced.
     if (diff.type === 'error') return true;
     // Additions and removals are always surfaced.
@@ -437,6 +437,11 @@ function findAuditDiffs(baseAudit, compareAudit, options = {}) {
     // Ensure the percent delta is above our threshold (0 by default).
     return getDeltaStats(diff).percentAbsoluteDelta > percentAbsoluteDeltaThreshold;
   });
+
+  // If the only diff found was a displayValue diff, skip it as the others were probably ignored by
+  // our percentAbsoluteDeltaThreshold.
+  if (filteredDiffs.length === 1 && filteredDiffs[0].type === 'displayValue') return [];
+  return filteredDiffs;
 }
 
 module.exports = {

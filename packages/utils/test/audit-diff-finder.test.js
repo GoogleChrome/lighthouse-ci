@@ -171,10 +171,22 @@ describe('#findAuditDiffs', () => {
     ]);
   });
 
-  it('should find a displayValue diff', () => {
+  it('should hide just a displayValue diff', () => {
     const baseAudit = {id: 'audit', score: 0.4, displayValue: '4 items'};
     const compareAudit = {id: 'audit', score: 0.4, displayValue: '2 items'};
+    expect(findAuditDiffs(baseAudit, compareAudit)).toEqual([]);
+  });
+
+  it('should find a displayValue diff', () => {
+    const baseAudit = {id: 'audit', score: 0.3, displayValue: '4 items'};
+    const compareAudit = {id: 'audit', score: 1, displayValue: '2 items'};
     expect(findAuditDiffs(baseAudit, compareAudit)).toEqual([
+      {
+        auditId: 'audit',
+        type: 'score',
+        baseValue: 0.3,
+        compareValue: 1,
+      },
       {
         auditId: 'audit',
         type: 'displayValue',

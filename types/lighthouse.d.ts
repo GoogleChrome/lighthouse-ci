@@ -21,6 +21,7 @@ declare global {
       | 'text'
       | 'numeric'
       | 'url'
+      | 'link'
       | 'thumbnail'
       | 'unknown';
 

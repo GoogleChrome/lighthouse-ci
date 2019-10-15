@@ -59,6 +59,14 @@ export const SimpleDetails = props => {
 
       return <span title={value}>{display}</span>;
     }
+    case 'link': {
+      if (!value.url) return <span>{value.text}</span>;
+      return (
+        <a target="_blank" rel="noopener noreferrer" href={value.url}>
+          {value.text}
+        </a>
+      );
+    }
     case 'code':
       return <pre>{value}</pre>;
     case 'numeric': {

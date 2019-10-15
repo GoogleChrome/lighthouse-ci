@@ -26,8 +26,11 @@
 }
 
 .build-view__url-dropdown {
-  height: calc(var(--header-font-size) + var(--base-spacing));
   margin-bottom: var(--base-spacing);
+}
+
+.build-view__url-dropdown select {
+  height: calc(var(--header-font-size) + var(--base-spacing));
 }
 
 .build-view__legend-and-options {

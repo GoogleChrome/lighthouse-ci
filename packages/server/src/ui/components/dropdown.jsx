@@ -12,21 +12,24 @@ import './dropdown.css';
 export const Dropdown = props => {
   const {options, value, setValue, className, title} = props;
   return (
-    <select
-      title={title}
-      className={clsx('dropdown', className)}
-      onChange={evt => {
-        if (!(evt.target instanceof HTMLSelectElement)) return;
-        setValue(evt.target.value);
-      }}
-    >
-      {options.map(option => {
-        return (
-          <option key={option.value} value={option.value} selected={option.value === value}>
-            {option.label}
-          </option>
-        );
-      })}
-    </select>
+    <div className={className} style={{position: 'relative'}}>
+      <select
+        title={title}
+        className={clsx('dropdown')}
+        onChange={evt => {
+          if (!(evt.target instanceof HTMLSelectElement)) return;
+          setValue(evt.target.value);
+        }}
+      >
+        {options.map(option => {
+          return (
+            <option key={option.value} value={option.value} selected={option.value === value}>
+              {option.label}
+            </option>
+          );
+        })}
+      </select>
+      <div className="dropdown__chevron" />
+    </div>
   );
 };

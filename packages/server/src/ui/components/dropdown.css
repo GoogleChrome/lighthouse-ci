@@ -19,3 +19,17 @@
   font-size: var(--base-font-size);
   font-weight: var(--medium-font-weight);
 }
+
+.dropdown__chevron {
+  background: var(--base-text-color);
+  width: 0;
+  height: 0;
+  position: absolute;
+  border-left: 5px solid var(--highlighted-background-color);
+  border-right: 5px solid var(--highlighted-background-color);
+
+  border-top: 5px solid var(--base-text-color);
+
+  top: calc(55% - 5px);
+  right: 0;
+}

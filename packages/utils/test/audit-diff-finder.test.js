@@ -519,6 +519,81 @@ describe('#getRowLabel', () => {
   });
 });
 
+describe('#zipBaseAndCompareItems', () => {
+  it('should zip URLs', () => {
+    const base = [{url: 'https://localhost/resource.js', time: 1}];
+    const compare = [{url: 'https://localhost/resource.js', time: 2}];
+    const zipped = zipBaseAndCompareItems(base, compare);
+    expect(zipped).toEqual([
+      {
+        base: {item: base[0], kind: 'base', index: 0},
+        compare: {item: compare[0], kind: 'compare', index: 0},
+      },
+    ]);
+  });
+
+  it('should zip labels', () => {
+    const base = [{label: 'Documents', requestCount: 1}];
+    const compare = [{label: 'Documents', requestCount: 2}];
+    const zipped = zipBaseAndCompareItems(base, compare);
+    expect(zipped).toEqual([
+      {
+        base: {item: base[0], kind: 'base', index: 0},
+        compare: {item: compare[0], kind: 'compare', index: 0},
+      },
+    ]);
+  });
+
+  it('should zip nodes', () => {
+    const base = [{node: {snippet: '<a>Text</a>'}, count: 1}];
+    const compare = [{node: {snippet: '<a>Text</a>'}, count: 1}];
+    const zipped = zipBaseAndCompareItems(base, compare);
+    expect(zipped).toEqual([
+      {
+        base: {item: base[0], kind: 'base', index: 0},
+        compare: {item: compare[0], kind: 'compare', index: 0},
+      },
+    ]);
+  });
+
+  it('should zip multiple items', () => {
+    const base = [
+      {missingInCompare: true},
+      {label: 'Documents', requestCount: 1},
+      {node: {snippet: '<a>Text</a>'}, count: 1},
+      {url: 'https://localhost/resource.12345678.js', time: 1},
+    ];
+    const compare = [
+      {url: 'https://localhost/resource.87654321.js', time: 2},
+      {label: 'Documents', requestCount: 2},
+      {node: {snippet: '<a>Text</a>'}, count: 1},
+      {missingInBase: true},
+    ];
+
+    const zipped = zipBaseAndCompareItems(base, compare);
+    expect(zipped).toEqual([
+      {
+        base: {item: base[0], kind: 'base', index: 0},
+      },
+      {
+        base: {item: base[1], kind: 'base', index: 1},
+        compare: {item: compare[1], kind: 'compare', index: 1},
+      },
+      {
+        base: {item: base[2], kind: 'base', index: 2},
+        compare: {item: compare[2], kind: 'compare', index: 2},
+      },
+      {
+        base: {item: base[3], kind: 'base', index: 3},
+        compare: {item: compare[0], kind: 'compare', index: 0},
+      },
+      {
+        compare: {item: compare[3], kind: 'compare', index: 3},
+      },
+    ]);
+  });
+});
+
 describe('#replaceNondeterministicStrings', () => {
   it('should work on non-replacements', () => {
     expect(replaceNondeterministicStrings('nonsense')).toEqual('nonsense');

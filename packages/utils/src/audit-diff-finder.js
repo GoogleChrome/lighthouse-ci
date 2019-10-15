@@ -259,6 +259,21 @@ function replaceNondeterministicStrings(s) {
  * @return {Array<{base?: DetailItemEntry, compare?: DetailItemEntry}>}
  */
 function zipBaseAndCompareItems(baseItems, compareItems) {
+  /** @param {Record<string, any>} item */
+  const getItemKey = item => {
+    // For most opportunities, diagnostics, etc where 1 row === 1 resource
+    if (typeof item.url === 'string') return item.url;
+    // For the pre-grouped audits like resource-summary
+    if (typeof item.label === 'string') return item.label;
+    // For dom-size
+    if (typeof item.statistic === 'string') return item.statistic;
+    // For third-party-summary
+    if (item.entity && typeof item.entity.text === 'string') return item.entity.text;
+
+    // For everything else, use the entire object, actually works OK on most nodes.
+    return JSON.stringify(item);
+  };
+
   const groupedByKey = _.groupIntoMap(
     [
       ...baseItems.map((item, i) => ({item, kind: 'base', index: i})),

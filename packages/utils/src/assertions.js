@@ -231,6 +231,38 @@ function getBudgetAssertionResults(auditResults) {
 }
 
 /**
+ * Gets the assertion results for a particular audit. This method delegates some of the unique
+ * handling for budgets and auditProperty assertions as necessary.
+ *
+ * @param {Array<string>} auditProperty
+ * @param {LHCI.AssertCommand.AssertionOptions} assertionOptions
+ * @param {Array<LH.Result>} lhrs
+ * @return {AssertionResultNoURL[]}
+ */
+function getCategoryAssertionResults(auditProperty, assertionOptions, lhrs) {
+  if (auditProperty.length !== 1) {
+    throw new Error(`Invalid resource-summary assertion "${auditProperty.join('.')}"`);
+  }
+
+  const categoryId = auditProperty[0];
+
+  /** @type {Array<LH.AuditResult|undefined>} */
+  const psuedoAudits = lhrs.map(lhr => {
+    const category = lhr.categories[categoryId];
+    if (!category) return undefined;
+
+    return {
+      score: category.score,
+    };
+  });
+
+  return getAssertionResults(psuedoAudits, assertionOptions).map(result => ({
+    ...result,
+    auditProperty: categoryId,
+  }));
+}
+
+/**
  * @param {string} pattern
  * @param {LH.Result} lhr
  * @return {boolean}
@@ -247,14 +279,17 @@ function doesLHRMatchPattern(pattern, lhr) {
  * @param {Array<string>|undefined} auditProperty
  * @param {Array<LH.AuditResult>} auditResults
  * @param {LHCI.AssertCommand.AssertionOptions} assertionOptions
+ * @param {Array<LH.Result>} lhrs
  * @return {AssertionResultNoURL[]}
  */
-function getAssertionResultsForAudit(auditId, auditProperty, auditResults, assertionOptions) {
+function getAssertionResultsForAudit(auditId, auditProperty, auditResults, assertionOptions, lhrs) {
   if (auditId === 'performance-budget') {
     return getBudgetAssertionResults(auditResults);
+  } else if (auditId === 'categories' && auditProperty) {
+    return getCategoryAssertionResults(auditProperty, assertionOptions, lhrs);
   } else if (auditId === 'resource-summary' && auditProperty) {
     if (auditProperty.length !== 2 || !['size', 'count'].includes(auditProperty[1])) {
-      throw new Error(`Invalid resource-summary assertion "${auditProperty}"`);
+      throw new Error(`Invalid resource-summary assertion "${auditProperty.join('.')}"`);
     }
 
     const psuedoAuditResults = auditResults.map(result => {
@@ -350,7 +385,8 @@ function getAllFilteredAssertionResults(baseOptions, unfilteredLhrs) {
       auditId,
       auditProperty,
       auditResults,
-      options
+      options,
+      lhrs
     );
 
     for (const result of assertionResults) {

@@ -18,6 +18,7 @@ describe('getAllAssertionResults', () => {
     lhrs = [
       {
         finalUrl: 'http://page-1.com',
+        categories: {pwa: {score: 0.5}},
         audits: {
           'first-contentful-paint': {
             score: 0.6,
@@ -33,6 +34,7 @@ describe('getAllAssertionResults', () => {
       },
       {
         finalUrl: 'http://page-1.com',
+        categories: {pwa: {score: 0.8}},
         audits: {
           'first-contentful-paint': {
             score: 0.8,
@@ -76,7 +78,7 @@ describe('getAllAssertionResults', () => {
     expect(results).toEqual([]);
   });
 
-  it('should assert failures', () => {
+  it('should assert audit failures', () => {
     const assertions = {
       'first-contentful-paint': ['error', {minScore: 0.9}],
       'network-requests': ['warn', {maxLength: 1}],
@@ -114,6 +116,27 @@ describe('getAllAssertionResults', () => {
         name: 'maxNumericValue',
         operator: '<=',
         values: [5000, 5500],
+      },
+    ]);
+  });
+
+  it('should assert category failures', () => {
+    const assertions = {
+      'categories.pwa': 'warn',
+    };
+
+    const results = getAllAssertionResults({assertions}, lhrs);
+    expect(results).toEqual([
+      {
+        url: 'http://page-1.com',
+        actual: 0.8,
+        auditId: 'categories',
+        auditProperty: 'pwa',
+        expected: 1,
+        level: 'warn',
+        name: 'minScore',
+        operator: '>=',
+        values: [0.5, 0.8],
       },
     ]);
   });

@@ -26,6 +26,10 @@
 }
 
 .build-score-comparison-item__delta {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+
   margin-top: var(--base-spacing);
   padding: 0 var(--base-spacing);
   height: var(--build-score-delta-badge-height);
@@ -39,10 +43,23 @@
   text-align: center;
 }
 
+.build-score-comparison-item__delta > .pwa-icon {
+  margin-right: calc(var(--base-spacing) / 2);
+}
+
+.build-score-comparison-item__delta > .pwa-icon:last-child {
+  margin-right: 0;
+}
+
 .build-score-comparison-item--improvement .build-score-comparison-item__delta {
   background-color: var(--improvement-color);
 }
 
 .build-score-comparison-item--regression .build-score-comparison-item__delta {
   background-color: var(--regression-color);
+}
+
+.build-score-comparison-item--pwa .build-score-comparison-item__delta {
+  background-color: var(--secondary-background-color);
+  color: var(--base-text-color);
 }

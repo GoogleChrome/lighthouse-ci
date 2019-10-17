@@ -74,7 +74,7 @@ function computeAuditGroups(lhr, baseLhr, options) {
     const auditGroup = {
       id: intermediateGroup.id,
       group: intermediateGroup.group,
-      pairs: auditPairs.sort((a, b) => b.maxSeverity - a.maxSeverity),
+      pairs: auditPairs.sort((a, b) => (a.audit.score || 0) - (b.audit.score || 0)),
     };
 
     if (auditGroup.pairs.length) auditGroups.push(auditGroup);

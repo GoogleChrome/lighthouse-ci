@@ -128,15 +128,23 @@ export const BuildScoreComparison = props => {
   const {lhr, baseLhr} = props;
   if (!lhr) return null;
 
+  const categoryIds = Object.keys(lhr.categories);
+
   return (
     <div className="build-score-comparison">
-      {Object.keys(lhr.categories).map(id => {
-        return id === 'pwa' ? (
-          <PwaScoreItem lhr={lhr} baseLhr={baseLhr} categoryId={id} />
-        ) : (
-          <StandardScoreItem lhr={lhr} baseLhr={baseLhr} categoryId={id} />
-        );
-      })}
+      {categoryIds
+        .sort((idA, idB) => {
+          const sortKeyA = idA === 'pwa' ? Infinity : categoryIds.indexOf(idA);
+          const sortKeyB = idB === 'pwa' ? Infinity : categoryIds.indexOf(idB);
+          return sortKeyA - sortKeyB;
+        })
+        .map(id => {
+          return id === 'pwa' ? (
+            <PwaScoreItem lhr={lhr} baseLhr={baseLhr} categoryId={id} />
+          ) : (
+            <StandardScoreItem lhr={lhr} baseLhr={baseLhr} categoryId={id} />
+          );
+        })}
     </div>
   );
 };

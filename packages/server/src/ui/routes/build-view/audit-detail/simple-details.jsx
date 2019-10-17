@@ -52,12 +52,19 @@ export const SimpleDetails = props => {
       return <img style={{width: 48, height: 48, objectFit: 'cover'}} src={value} />;
     case 'url': {
       let display = value;
+      let hostname = '';
       try {
         const url = new URL(value);
         display = url.pathname;
+        hostname = url.hostname;
       } catch (_) {}
 
-      return <span title={value}>{display}</span>;
+      return (
+        <span title={value}>
+          {display}
+          {hostname ? <span className="simple-details__url-hostname">({hostname})</span> : ''}
+        </span>
+      );
     }
     case 'link': {
       if (!value.url) return <span>{value.text}</span>;

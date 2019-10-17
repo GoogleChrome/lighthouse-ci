@@ -11,3 +11,9 @@
 .simple-details--regression {
   color: var(--regression-color);
 }
+
+.simple-details__url-hostname {
+  color: var(--secondary-text-color);
+  margin-left: calc(var(--base-spacing) / 2);
+  font-size: var(--subtext-font-size);
+}

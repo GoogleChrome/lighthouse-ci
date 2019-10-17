@@ -207,6 +207,20 @@ async function postStatusToGitHub(options) {
 }
 
 /**
+ *
+ * @param {string} rawUrl
+ * @param {LHCI.UploadCommand.Options} options
+ */
+function getUrlLabelForGithub(rawUrl, options) {
+  try {
+    const url = new URL(rawUrl);
+    return replaceUrlPatterns(url.pathname, options.urlReplacementPatterns);
+  } catch (_) {
+    return replaceUrlPatterns(rawUrl, options.urlReplacementPatterns);
+  }
+}
+
+/**
  * @param {LHCI.UploadCommand.Options} options
  * @param {Map<string, string>} targetUrlMap
  * @return {Promise<void>}
@@ -225,30 +239,58 @@ async function runGithubStatusCheck(options, targetUrlMap) {
     (a, b) => a[0].url.length - b[0].url.length
   );
 
-  let index = 0;
-  for (const group of groupedResults) {
-    index++;
-    const rawUrl = group[0].url;
-    const url = replaceUrlPatterns(rawUrl, options.urlReplacementPatterns);
-    const failedResults = group.filter(result => result.level === 'error');
-    const warnResults = group.filter(result => result.level === 'warn');
-    const state = failedResults.length ? 'failure' : 'success';
-    const context = `lhci/url-${index}`;
-    const warningsLabel = warnResults.length ? ` with ${warnResults.length} warning(s)` : '';
-    const description = failedResults.length
-      ? `${url} failed ${failedResults.length} Lighthouse assertion(s)`
-      : `${url} passed${warningsLabel}`;
-    const targetUrl = targetUrlMap.get(rawUrl) || rawUrl;
+  if (groupedResults.length) {
+    for (const group of groupedResults) {
+      const rawUrl = group[0].url;
+      const urlLabel = getUrlLabelForGithub(rawUrl, options);
+      const failedResults = group.filter(result => result.level === 'error');
+      const warnResults = group.filter(result => result.level === 'warn');
+      const state = failedResults.length ? 'failure' : 'success';
+      const context = `lhci/url${urlLabel}`;
+      const warningsLabel = warnResults.length ? ` with ${warnResults.length} warning(s)` : '';
+      const description = failedResults.length
+        ? `Failed ${failedResults.length} assertion(s)`
+        : `Passed${warningsLabel}`;
+      const targetUrl = targetUrlMap.get(rawUrl) || rawUrl;
 
-    await postStatusToGitHub({
-      slug,
-      hash,
-      state,
-      context,
-      description,
-      targetUrl,
-      token: options.githubToken,
-    });
+      await postStatusToGitHub({
+        slug,
+        hash,
+        state,
+        context,
+        description,
+        targetUrl,
+        token: options.githubToken,
+      });
+    }
+  } else {
+    /** @type {Array<LH.Result>} */
+    const lhrs = loadSavedLHRs().map(lhr => JSON.parse(lhr));
+    /** @type {Array<Array<[LH.Result, LH.Result]>>} */
+    const lhrsByUrl = _.groupBy(lhrs, lhr => lhr.finalUrl).map(lhrs => lhrs.map(lhr => [lhr, lhr]));
+    const representativeLhrs = computeRepresentativeRuns(lhrsByUrl);
+
+    for (const lhr of representativeLhrs) {
+      const rawUrl = lhr.finalUrl;
+      const urlLabel = getUrlLabelForGithub(rawUrl, options);
+      const state = 'success';
+      const context = `lhci/url${urlLabel}`;
+      const categoriesDescription = Object.values(lhr.categories)
+        .map(category => `${category.title}: ${Math.round(category.score * 100)}`)
+        .join(', ');
+      const description = `${categoriesDescription}`;
+      const targetUrl = targetUrlMap.get(rawUrl) || rawUrl;
+
+      await postStatusToGitHub({
+        slug,
+        hash,
+        state,
+        context,
+        description,
+        targetUrl,
+        token: options.githubToken,
+      });
+    }
   }
 }
 

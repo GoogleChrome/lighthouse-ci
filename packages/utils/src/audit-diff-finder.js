@@ -265,6 +265,8 @@ function zipBaseAndCompareItems(baseItems, compareItems) {
     if (typeof item.url === 'string') return item.url;
     // For the pre-grouped audits like resource-summary
     if (typeof item.label === 'string') return item.label;
+    // For the pre-grouped audits like mainthread-work-breakdown
+    if (typeof item.groupLabel === 'string') return item.groupLabel;
     // For dom-size
     if (typeof item.statistic === 'string') return item.statistic;
     // For third-party-summary

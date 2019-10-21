@@ -50,11 +50,12 @@ async function runCommand(options) {
   if (budgetsFile) options = convertBudgetsToAssertions(readBudgets(budgetsFile));
 
   const lhrs = loadSavedLHRs().map(json => JSON.parse(json));
+  const uniqueUrls = new Set(lhrs.map(lhr => lhr.finalUrl));
   const allResults = getAllAssertionResults(options, lhrs);
   const groupedResults = _.groupBy(allResults, result => result.url);
 
   process.stderr.write(
-    `Checking assertions against ${groupedResults.length} URL(s), ${lhrs.length} total run(s)\n\n`
+    `Checking assertions against ${uniqueUrls.size} URL(s), ${lhrs.length} total run(s)\n\n`
   );
 
   let hasFailure = false;

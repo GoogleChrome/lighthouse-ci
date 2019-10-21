@@ -1,0 +1,12 @@
+{
+  "ci": {
+    "assert": {
+      "assertions": {
+        "viewport": "error"
+      }
+    },
+    "upload": {
+      "target": "temporary-public-storage"
+    }
+  }
+}

@@ -10,6 +10,7 @@ const yargs = require('yargs');
 const loadAndParseRcFile = require('@lhci/utils/src/lighthouserc.js').loadAndParseRcFile;
 const getVersion = require('@lhci/utils/src/version.js').getVersion;
 const assertCmd = require('./assert/assert.js');
+const autorunCmd = require('./autorun/autorun.js');
 const uploadCmd = require('./upload/upload.js');
 const collectCmd = require('./collect/collect.js');
 const serverCmd = require('./server/server.js');
@@ -34,6 +35,9 @@ async function run() {
     .command('assert', 'Assert that the latest results meet expectations', commandYargs =>
       assertCmd.buildCommand(commandYargs)
     )
+    .command('autorun', 'Run collect/assert/upload with sensible defaults', commandYargs =>
+      autorunCmd.buildCommand(commandYargs)
+    )
     .command('open', 'Opens the HTML reports of collected runs', commandYargs =>
       openCmd.buildCommand(commandYargs)
     )
@@ -53,6 +57,9 @@ async function run() {
       break;
     case 'upload':
       await uploadCmd.runCommand(argv);
+      break;
+    case 'autorun':
+      await autorunCmd.runCommand(argv);
       break;
     case 'server': {
       const {port} = await serverCmd.runCommand(argv);

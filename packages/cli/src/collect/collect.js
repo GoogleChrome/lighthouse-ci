@@ -74,6 +74,8 @@ async function determineUrls(options) {
   const pathToBuildDir = path.resolve(process.cwd(), options.buildDir);
   const server = new FallbackServer(pathToBuildDir);
   await server.listen();
+  process.stdout.write(`Started a web server on port ${server.port}...\n`);
+
   const urls = server.getAvailableUrls();
   return {urls, close: () => server.close()};
 }

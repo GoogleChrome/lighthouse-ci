@@ -24,6 +24,10 @@ class FallbackServer {
     this._server = undefined;
   }
 
+  get port() {
+    return this._port;
+  }
+
   /** @return {Promise<void>} */
   listen() {
     const server = createHttpServer(this._app);
@@ -32,7 +36,7 @@ class FallbackServer {
       server.listen(0, () => {
         const serverAddress = server.address();
         if (typeof serverAddress === 'string' || !serverAddress) {
-          return reject(`Invalid server address "${serverAddress}"`);
+          return reject(new Error(`Invalid server address "${serverAddress}"`));
         }
 
         this._port = serverAddress.port;

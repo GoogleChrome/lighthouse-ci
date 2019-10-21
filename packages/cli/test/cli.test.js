@@ -98,9 +98,10 @@ describe('Lighthouse CI CLI', () => {
       stderr = stderr.toString();
       status = status || 0;
 
-      const stdoutClean = stdout.replace(/:\d{4,6}/g, ':XXXX');
+      const stdoutClean = stdout.replace(/:\d{4,6}/g, ':XXXX').replace(/port \d{4,6}/, 'port XXXX');
       expect(stdoutClean).toMatchInlineSnapshot(`
-        "Running Lighthouse 2 time(s) on http://localhost:XXXX/checkout.html
+        "Started a web server on port XXXX...
+        Running Lighthouse 2 time(s) on http://localhost:XXXX/checkout.html
         Run #1...done.
         Run #2...done.
         Running Lighthouse 2 time(s) on http://localhost:XXXX/index.html

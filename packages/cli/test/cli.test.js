@@ -19,6 +19,7 @@ describe('Lighthouse CI CLI', () => {
   const rcFile = path.join(__dirname, 'fixtures/lighthouserc.json');
   const rcExtendedFile = path.join(__dirname, 'fixtures/lighthouserc-extended.json');
   const budgetsFile = path.join(__dirname, 'fixtures/budgets.json');
+  const buildDir = path.join(__dirname, 'fixtures');
 
   let server;
   let projectToken;
@@ -86,7 +87,33 @@ describe('Lighthouse CI CLI', () => {
   });
 
   describe('collect', () => {
-    it('should collect results', () => {
+    it('should collect results from buildDir', () => {
+      let {stdout = '', stderr = '', status = -1} = spawnSync(CLI_PATH, [
+        'collect',
+        `--rc-file=${rcFile}`,
+        `--build-dir=${buildDir}`,
+      ]);
+
+      stdout = stdout.toString();
+      stderr = stderr.toString();
+      status = status || 0;
+
+      const stdoutClean = stdout.replace(/:\d{4,6}/g, ':XXXX');
+      expect(stdoutClean).toMatchInlineSnapshot(`
+        "Running Lighthouse 2 time(s) on http://localhost:XXXX/checkout.html
+        Run #1...done.
+        Run #2...done.
+        Running Lighthouse 2 time(s) on http://localhost:XXXX/index.html
+        Run #1...done.
+        Run #2...done.
+        Done running Lighthouse!
+        "
+      `);
+      expect(stderr.toString()).toMatchInlineSnapshot(`""`);
+      expect(status).toEqual(0);
+    }, 90000);
+
+    it('should collect results from explicit urls', () => {
       let {stdout = '', stderr = '', status = -1} = spawnSync(CLI_PATH, [
         'collect',
         `--rc-file=${rcFile}`,
@@ -99,7 +126,7 @@ describe('Lighthouse CI CLI', () => {
 
       const stdoutClean = stdout.replace(/:\d{4,6}/g, ':XXXX');
       expect(stdoutClean).toMatchInlineSnapshot(`
-        "Running Lighthouse 2 time(s) on https://localhost:XXXX
+        "Running Lighthouse 2 time(s) on https://localhost:XXXX/app/
         Run #1...done.
         Run #2...done.
         Done running Lighthouse!

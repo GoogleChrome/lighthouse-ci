@@ -5,6 +5,8 @@
  */
 'use strict';
 
+const path = require('path');
+const FallbackServer = require('./fallback-server.js');
 const LighthouseRunner = require('./lighthouse-runner.js');
 const {saveLHR, clearSavedLHRs} = require('@lhci/utils/src/saved-reports.js');
 
@@ -16,7 +18,10 @@ function buildCommand(yargs) {
     method: {type: 'string', choices: ['node'], default: 'node'},
     headful: {type: 'boolean', description: 'Run with a headful Chrome'},
     additive: {type: 'boolean', description: 'Skips clearing of previous collect data'},
-    url: {description: 'The URL to run Lighthouse on.', required: true},
+    url: {description: 'The URL to run Lighthouse on.'},
+    buildDir: {
+      description: 'The build directory where your HTML files to run Lighthouse on are located.',
+    },
     settings: {description: 'The Lighthouse settings and flags to use when collecting'},
     numberOfRuns: {
       alias: 'n',
@@ -54,15 +59,40 @@ async function runOnUrl(url, options) {
 
 /**
  * @param {LHCI.CollectCommand.Options} options
+ * @return {Promise<{urls: Array<string>, close: () => void}>}
+ */
+async function determineUrls(options) {
+  if (options.url) {
+    return {
+      urls: Array.isArray(options.url) ? options.url : [options.url],
+      close: () => undefined,
+    };
+  }
+
+  if (!options.buildDir) throw new Error('Either url or buildDir required');
+
+  const pathToBuildDir = path.resolve(process.cwd(), options.buildDir);
+  const server = new FallbackServer(pathToBuildDir);
+  await server.listen();
+  const urls = server.getAvailableUrls();
+  return {urls, close: () => server.close()};
+}
+
+/**
+ * @param {LHCI.CollectCommand.Options} options
  * @return {Promise<void>}
  */
 async function runCommand(options) {
   if (options.method !== 'node') throw new Error(`Method "${options.method}" not yet supported`);
   if (!options.additive) clearSavedLHRs();
 
-  const urls = Array.isArray(options.url) ? options.url : [options.url];
-  for (const url of urls) {
-    await runOnUrl(url, options);
+  const {urls, close} = await determineUrls(options);
+  try {
+    for (const url of urls) {
+      await runOnUrl(url, options);
+    }
+  } finally {
+    close();
   }
 
   process.stdout.write(`Done running Lighthouse!\n`);

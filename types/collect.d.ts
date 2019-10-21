@@ -39,7 +39,8 @@ declare global {
       }
 
       export interface Options {
-        url: string | string[];
+        url?: string | string[];
+        buildDir?: string;
         method: 'node';
         numberOfRuns: number;
         headful: boolean;

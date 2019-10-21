@@ -39,8 +39,8 @@ module.exports = {
     'uses-rel-preconnect': ['error', {maxLength: 0}],
     'uses-rel-preload': ['error', {maxLength: 0}],
     'uses-responsive-images': ['error', {maxLength: 0}],
+    'uses-text-compression': ['error', {maxLength: 0}],
     // Audits that don't typically apply in dev environments or are more opinionated (warn)
-    'uses-text-compression': ['warn', {maxLength: 0}],
     'render-blocking-resources': ['warn', {maxLength: 0}],
     'uses-webp-images': ['warn', {maxLength: 0}],
     'uses-long-cache-ttl': ['warn', {maxLength: 0}],

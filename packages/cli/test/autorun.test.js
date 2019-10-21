@@ -56,6 +56,9 @@ describe('Lighthouse CI autorun CLI', () => {
       1 result(s) for [1mhttp://localhost:XXXX/good.html[0m
 
         [31m✘[0m  [1mviewport[0m failure for [1mminScore[0m assertion
+           Does not have a \`<meta name=\\"viewport\\">\` tag with \`width\` or \`initial-scale\`
+           Documentation: https://web.dev/viewport
+
               expected: >=[32m1[0m
                  found: [31m0[0m
             [2mall values: 0, 0, 0[0m

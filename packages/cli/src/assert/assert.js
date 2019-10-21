@@ -72,12 +72,23 @@ async function runCommand(options) {
     for (const result of sortedResults) {
       hasFailure = hasFailure || result.level === 'error';
       const label = result.level === 'warn' ? 'warning' : 'failure';
-      const warningOrErrorIcon = result.level === 'warn' ? '⚠️ ' : `${log.redify(log.cross)} `;
+      const icon = result.level === 'warn' ? '⚠️ ' : `${log.redify(log.cross)} `;
       const idPart = `${log.bold}${result.auditId}${log.reset}`;
       const propertyPart = result.auditProperty ? `.${result.auditProperty}` : '';
       const namePart = `${log.bold}${result.name}${log.reset}`;
+
+      const auditTitlePart = result.auditTitle || '';
+      const documentationPart = result.auditDocumentationLink
+        ? `Documentation: ${result.auditDocumentationLink}`
+        : '';
+      const titleAndDocs = [auditTitlePart, documentationPart]
+        .filter(Boolean)
+        .map(s => `     ` + s)
+        .join('\n');
+      const humanFriendlyParts = titleAndDocs ? `\n${titleAndDocs}\n` : '';
+
       process.stderr.write(`
-  ${warningOrErrorIcon} ${idPart}${propertyPart} ${label} for ${namePart} assertion
+  ${icon} ${idPart}${propertyPart} ${label} for ${namePart} assertion${humanFriendlyParts}
         expected: ${result.operator}${log.greenify(result.expected)}
            found: ${log.redify(result.actual)}
       ${log.dim}all values: ${result.values.join(', ')}${log.reset}\n\n`);

@@ -234,6 +234,9 @@ describe('Lighthouse CI CLI', () => {
         1 result(s) for [1mhttp://localhost:XXXX/app/[0m
 
           [31m✘[0m  [1mworks-offline[0m failure for [1mminScore[0m assertion
+             Current page does not respond with a 200 when offline
+             Documentation: https://web.dev/works-offline
+
                 expected: >=[32m1[0m
                    found: [31m0[0m
               [2mall values: 0, 0[0m
@@ -265,6 +268,9 @@ describe('Lighthouse CI CLI', () => {
         1 result(s) for [1mhttp://localhost:XXXX/app/[0m
 
           [31m✘[0m  [1mperformance-budget[0m.script.size failure for [1mmaxNumericValue[0m assertion
+             Performance budget
+             Documentation: https://developers.google.com/web/tools/lighthouse/audits/budgets
+
                 expected: <=[32mXXXX[0m
                    found: [31mXXXX[0m
               [2mall values: XXXX[0m
@@ -295,12 +301,18 @@ describe('Lighthouse CI CLI', () => {
         2 result(s) for [1mhttp://localhost:XXXX/app/[0m
 
           [31m✘[0m  [1mfirst-contentful-paint[0m failure for [1mmaxNumericValue[0m assertion
+             First Contentful Paint
+             Documentation: https://web.dev/first-contentful-paint
+
                 expected: <=[32m1[0m
                    found: [31mXXXX[0m
               [2mall values: XXXX, XXXX[0m
 
 
           [31m✘[0m  [1mperformance-budget[0m.script.size failure for [1mmaxNumericValue[0m assertion
+             Performance budget
+             Documentation: https://developers.google.com/web/tools/lighthouse/audits/budgets
+
                 expected: <=[32mXXXX[0m
                    found: [31mXXXX[0m
               [2mall values: XXXX[0m
@@ -329,6 +341,9 @@ describe('Lighthouse CI CLI', () => {
         1 result(s) for [1mhttp://localhost:XXXX/app/[0m
 
           [31m✘[0m  [1mresource-summary[0m.script.size failure for [1mmaxNumericValue[0m assertion
+             Keep request counts low and transfer sizes small
+             Documentation: https://developers.google.com/web/tools/lighthouse/audits/budgets
+
                 expected: <=[32m1[0m
                    found: [31mXXXX[0m
               [2mall values: XXXX, XXXX[0m

@@ -10,8 +10,31 @@ Before you can start using this guide, your project should already meet the foll
 
 1. Source code is managed with git (GitHub, GitLab, Bitbucket, etc).
 2. Branches/pull requests are gated on the results of a continuous integration build process (Travis CI, CircleCI, Azure Pipelines, AppVeyor, etc).
+3. Your CI process can build your project into production assets (typically provided as a `npm run build` command in most frameworks).
 
 In the examples that follow, use of GitHub and Travis CI are assumed but the same concepts apply to other providers. Refer to your specific provider's documentation for how to accomplish each setup step.
+
+## Quick Start
+
+Lighthouse CI comes with an automatic setup that should work for many default web projects. If you run a matrix build process, , read up on the details in [Setup](#setup).
+
+**.travis.yml**
+
+```yaml
+sudo: required
+dist: xenial # use xenial or later
+language: node_js
+node_js:
+  - 10 # use Node 10 LTS or later
+before_install:
+  - npm install -g @lhci/cli@next # install LHCI
+script:
+  - npm run build # build your site
+  - npm test # run your normal tests
+  - lhci autorun # run lighthouse CI
+addons:
+  chrome: stable # make sure you have Chrome available
+```
 
 ## Setup
 
@@ -74,17 +97,16 @@ fi
 
 #### Deploy Your Code
 
-To run Lighthouse CI, the code you'd like to test with Lighthouse needs to be available on a server. You can either use a local development server or deploy to a public/intranet location. For this example, we'll assume your site is already built in a local directory called `./dist` and we'll use a local server.
+To run Lighthouse CI, the code you'd like to test with Lighthouse needs to be available on a server. You can either use the built-in Lighthouse CI server, a custom local development server, or deploy to a public/intranet location. For this example, we'll assume your site is already built in a local directory called `./dist`, and we'll use the the `http-server` node package as an example custom server implementation (do not follow this structure just to use `http-server`, it is less fully featured than `lhci collect --build-dir=./dist`, see [Run Lighthouse CI](#run-lighthouse-ci) for more).
 
 ```bash
 #!/bin/bash
 
 # ... (build condition check)
 
-# Start a local development server to server our built site, can also use your
+# Start a custom local development server to host our files
+# Protip: deploy your code to a web-accessible staging server here instead for more realistic performance metrics
 npx http-server -p 9000 ./dist &
-# Wait for the server to start up
-sleep 5
 
 # ... (run lighthouse ci)
 
@@ -94,7 +116,7 @@ kill $!
 
 #### Run Lighthouse CI
 
-Now that we have our environment ready, time to run Lighthouse CI.
+Now that we have our environment ready, time to run Lighthouse CI. The `collect` command takes either a build directory filled with production files, or a list of URLs to audit. When given a build directory, Lighthouse CI will handle the server for you, but since we're using a custom server implementation here, we'll use the URL mode.
 
 ```bash
 #!/bin/bash
@@ -121,7 +143,7 @@ exit $EXIT_CODE
 
 #### Completed Script
 
-The complete script will look something like the below.
+The complete script might look something like the below.
 
 ```bash
 #!/bin/bash
@@ -132,7 +154,6 @@ if [[ "$TRAVIS_NODE_VERSION" != "10" ]]; then
 fi
 
 npx http-server -p 9000 ./dist &
-sleep 5
 
 npm install -g @lhci/cli@next
 lhci collect --url=http://localhost:9000/index.html

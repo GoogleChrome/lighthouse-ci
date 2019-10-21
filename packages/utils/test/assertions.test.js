@@ -186,6 +186,56 @@ describe('getAllAssertionResults', () => {
     expect(results).toMatchObject([{actual: 0.8}]);
   });
 
+  describe('title and documntation', () => {
+    it('should set auditTitle', () => {
+      const assertions = {
+        'first-contentful-paint': ['warn', {aggregationMethod: 'pessimistic'}],
+      };
+
+      // Make sure it pulls from failing audit
+      lhrs[0].audits['first-contentful-paint'].title = 'Passed';
+      lhrs[0].audits['first-contentful-paint'].score = 1;
+      lhrs[1].audits['first-contentful-paint'].title = 'First Contentful Paint';
+
+      const results = getAllAssertionResults({assertions}, lhrs);
+      expect(results).toMatchObject([{auditTitle: 'First Contentful Paint'}]);
+    });
+
+    it('should set auditDocumentationLink', () => {
+      const assertions = {
+        'first-contentful-paint': ['warn', {aggregationMethod: 'optimistic'}],
+      };
+
+      lhrs[0].audits['first-contentful-paint'].description = [
+        'First contentful paint is a really cool [metric](https://example.com/)',
+        '[Learn More](https://www.web.dev/first-contentful-paint).',
+        'There are other cool [metrics](https://example.com/) too.',
+      ].join(' ');
+
+      const results = getAllAssertionResults({assertions}, lhrs);
+      expect(results).toMatchObject([
+        {auditDocumentationLink: 'https://www.web.dev/first-contentful-paint'},
+      ]);
+    });
+
+    it('should not set auditDocumentationLink when no match', () => {
+      const assertions = {
+        'first-contentful-paint': ['warn', {aggregationMethod: 'optimistic'}],
+      };
+
+      lhrs[0].audits['first-contentful-paint'].description = [
+        'First contentful paint is a really cool [metric](https://example.com/)',
+        '[Learn More](https://non-documentation-link.com/first-contentful-paint).',
+        'There are other cool [metrics](https://example.com/) too.',
+      ].join(' ');
+
+      const results = getAllAssertionResults({assertions}, lhrs);
+      expect(results).toHaveLength(1);
+      expect(results[0]).not.toHaveProperty('auditTitle');
+      expect(results[0]).not.toHaveProperty('auditDocumentationLink');
+    });
+  });
+
   describe('aggregationMethod', () => {
     it('should default to aggregationMethod optimistic', () => {
       const assertions = {

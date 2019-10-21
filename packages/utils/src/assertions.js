@@ -6,6 +6,7 @@
 'use strict';
 
 const _ = require('./lodash.js');
+const {splitMarkdownLink} = require('./markdown.js');
 const {computeRepresentativeRuns} = require('./representative-runs.js');
 
 /** @typedef {keyof StrictOmit<LHCI.AssertCommand.AssertionOptions, 'aggregationMethod'>|'auditRan'} AssertionType */
@@ -21,6 +22,8 @@ const {computeRepresentativeRuns} = require('./representative-runs.js');
  * @property {LHCI.AssertCommand.AssertionFailureLevel} [level]
  * @property {string} [auditId]
  * @property {string|undefined} [auditProperty]
+ * @property {string|undefined} [auditTitle]
+ * @property {string|undefined} [auditDocumentationLink]
  */
 
 /** @typedef {StrictOmit<AssertionResult, 'url'>} AssertionResultNoURL */
@@ -338,8 +341,16 @@ function resolveAssertionOptionsAndLhrs(baseOptions, unfilteredLhrs) {
   const auditsToAssert = [...new Set(Object.keys(assertions).map(_.kebabCase))].map(
     assertionKey => {
       const [auditId, ...rest] = assertionKey.split('.');
-      if (!rest.length) return {assertionKey, auditId};
-      return {assertionKey, auditId, auditProperty: rest};
+      const auditInstances = lhrs.map(lhr => lhr.audits[auditId]).filter(Boolean);
+      const failedAudit = auditInstances.find(audit => audit.score !== 1);
+      const audit = failedAudit || auditInstances[0] || {};
+      const auditTitle = audit.title;
+      const auditDocumentationLinkMatches = splitMarkdownLink(audit.description || '')
+        .map(segment => (segment.isLink ? segment.linkHref : ''))
+        .filter(link => link.includes('web.dev') || link.includes('developers.google.com/web'));
+      const [auditDocumentationLink] = auditDocumentationLinkMatches;
+      if (!rest.length) return {assertionKey, auditId, auditTitle, auditDocumentationLink};
+      return {assertionKey, auditId, auditTitle, auditDocumentationLink, auditProperty: rest};
     }
   );
 
@@ -374,7 +385,8 @@ function getAllFilteredAssertionResults(baseOptions, unfilteredLhrs) {
   /** @type {AssertionResult[]} */
   const results = [];
 
-  for (const {assertionKey, auditId, auditProperty} of auditsToAssert) {
+  for (const auditToAssert of auditsToAssert) {
+    const {assertionKey, auditId, auditProperty} = auditToAssert;
     const [level, assertionOptions] = normalizeAssertion(assertions[assertionKey]);
     if (level === 'off') continue;
 
@@ -390,7 +402,13 @@ function getAllFilteredAssertionResults(baseOptions, unfilteredLhrs) {
     );
 
     for (const result of assertionResults) {
-      results.push({...result, auditId, level, url});
+      const finalResult = {...result, auditId, level, url};
+      if (auditToAssert.auditTitle) finalResult.auditTitle = auditToAssert.auditTitle;
+      if (auditToAssert.auditDocumentationLink) {
+        finalResult.auditDocumentationLink = auditToAssert.auditDocumentationLink;
+      }
+
+      results.push(finalResult);
     }
   }
 

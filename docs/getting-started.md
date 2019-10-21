@@ -10,13 +10,13 @@ Before you can start using this guide, your project should already meet the foll
 
 1. Source code is managed with git (GitHub, GitLab, Bitbucket, etc).
 2. Branches/pull requests are gated on the results of a continuous integration build process (Travis CI, CircleCI, Azure Pipelines, AppVeyor, etc).
-3. Your CI process can build your project into production assets (typically provided as a `npm run build` command in most frameworks).
+3. Your CI process can build your project into production assets (typically provided as an `npm run build` command by most frameworks).
 
 In the examples that follow, use of GitHub and Travis CI are assumed but the same concepts apply to other providers. Refer to your specific provider's documentation for how to accomplish each setup step.
 
 ## Quick Start
 
-Lighthouse CI comes with an automatic setup that should work for many default web projects. If you run a matrix build process, , read up on the details in [Setup](#setup).
+Lighthouse CI comes with an automatic setup that should work for many default web projects. If you run a matrix build process, build an API alongside your frontend, or have any complicated moving parts, `autorun` might not work for you. Read up on the details in [the full setup guide](#setup).
 
 **.travis.yml**
 
@@ -35,6 +35,8 @@ script:
 addons:
   chrome: stable # make sure you have Chrome available
 ```
+
+That's it! You're good to go. Check out the [Extra Goodies](#extra-goodies) section for additional features like uploading every report to public storage, GitHub status checks, and a historical diffing server.
 
 ## Setup
 
@@ -184,6 +186,18 @@ The setup so far will automatically assert the Lighthouse team's recommended set
 }
 ```
 
+**.travis.yml**
+
+```yaml
+# ...
+script:
+  - ...
+  - lhci autorun --rc-file=lighthouserc.json
+# ...
+```
+
+OR
+
 **scripts/run-lighthouse-ci.sh**
 
 ```bash
@@ -221,6 +235,8 @@ lhci upload --target=temporary-public-storage
 # ...
 ```
 
+If you're using `autorun`, setting `ci.upload.target` to `temporary-public-storage` in your `lighthouserc.json` is all that's necessary. The upload step will happen automatically.
+
 ### Historical Reports & Diffing (Lighthouse CI Server)
 
 Historical reports and advanced report diffing is available on the Lighthouse CI server. For setup of the server itself, see [our server documentation](./server.md). Once the server is setup, you can configure your Lighthouse CI integration to upload reports to it.
@@ -237,6 +253,8 @@ lhci upload --serverBaseUrl="https://your-lhci-server-url.com" --token="$LHCI_SE
 
 # ...
 ```
+
+If you're using `autorun`, setting `ci.upload.serverBaseUrl` to your URL in your `lighthouserc.json` and including `LHCI_TOKEN` in your environment is all that's necessary. The upload step will happen automatically.
 
 ### GitHub Status Checks
 

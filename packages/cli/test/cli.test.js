@@ -97,8 +97,9 @@ describe('Lighthouse CI CLI', () => {
       stderr = stderr.toString();
       status = status || 0;
 
-      expect(stdout).toMatchInlineSnapshot(`
-        "Running Lighthouse 2 time(s)
+      const stdoutClean = stdout.replace(/:\d{4,6}/g, ':XXXX');
+      expect(stdoutClean).toMatchInlineSnapshot(`
+        "Running Lighthouse 2 time(s) on https://localhost:XXXX
         Run #1...done.
         Run #2...done.
         Done running Lighthouse!

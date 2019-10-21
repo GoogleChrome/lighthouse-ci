@@ -39,8 +39,8 @@ declare global {
       }
 
       export interface Options {
-        url: string;
-        method: 'node' | 'docker';
+        url: string | string[];
+        method: 'node';
         numberOfRuns: number;
         headful: boolean;
         additive: boolean;

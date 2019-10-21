@@ -13,7 +13,7 @@ const {saveLHR, clearSavedLHRs} = require('@lhci/utils/src/saved-reports.js');
  */
 function buildCommand(yargs) {
   return yargs.options({
-    method: {type: 'string', choices: ['node', 'docker'], default: 'node'},
+    method: {type: 'string', choices: ['node'], default: 'node'},
     headful: {type: 'boolean', description: 'Run with a headful Chrome'},
     additive: {type: 'boolean', description: 'Skips clearing of previous collect data'},
     url: {description: 'The URL to run Lighthouse on.', required: true},
@@ -28,20 +28,18 @@ function buildCommand(yargs) {
 }
 
 /**
+ * @param {string} url
  * @param {LHCI.CollectCommand.Options} options
  * @return {Promise<void>}
  */
-async function runCommand(options) {
-  if (options.method !== 'node') throw new Error(`Method "${options.method}" not yet supported`);
+async function runOnUrl(url, options) {
   const runner = new LighthouseRunner();
-
-  if (!options.additive) clearSavedLHRs();
-  process.stdout.write(`Running Lighthouse ${options.numberOfRuns} time(s)\n`);
+  process.stdout.write(`Running Lighthouse ${options.numberOfRuns} time(s) on ${url}\n`);
 
   for (let i = 0; i < options.numberOfRuns; i++) {
     process.stdout.write(`Run #${i + 1}...`);
     try {
-      const lhr = await runner.runUntilSuccess(options.url, {
+      const lhr = await runner.runUntilSuccess(url, {
         headful: options.headful,
         settings: options.settings,
       });
@@ -51,6 +49,20 @@ async function runCommand(options) {
       process.stdout.write('failed!\n');
       throw err;
     }
+  }
+}
+
+/**
+ * @param {LHCI.CollectCommand.Options} options
+ * @return {Promise<void>}
+ */
+async function runCommand(options) {
+  if (options.method !== 'node') throw new Error(`Method "${options.method}" not yet supported`);
+  if (!options.additive) clearSavedLHRs();
+
+  const urls = Array.isArray(options.url) ? options.url : [options.url];
+  for (const url of urls) {
+    await runOnUrl(url, options);
   }
 
   process.stdout.write(`Done running Lighthouse!\n`);

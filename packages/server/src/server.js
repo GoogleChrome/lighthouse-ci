@@ -9,6 +9,7 @@ const path = require('path');
 const createHttpServer = require('http').createServer;
 const express = require('express');
 const morgan = require('morgan');
+const compression = require('compression');
 const bodyParser = require('body-parser');
 const ApiClient = require('@lhci/utils/src/api-client.js');
 const createProjectsRouter = require('./api/routes/projects.js');
@@ -29,6 +30,9 @@ async function createApp(options) {
 
   const app = express();
   if (options.logLevel !== 'silent') app.use(morgan('short'));
+
+  // While LHCI should be served behind nginx/apache that handles compression, it won't always be.
+  app.use(compression());
 
   // 1. Support large payloads because LHRs are big.
   // 2. Support JSON primitives because `PUT /builds/<id>/lifecycle "sealed"`

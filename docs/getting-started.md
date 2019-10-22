@@ -16,7 +16,7 @@ In the examples that follow, use of GitHub and Travis CI are assumed but the sam
 
 ## Quick Start
 
-Lighthouse CI comes with an automatic setup that should work for many default web projects. If you run a matrix build process, build an API alongside your frontend, or have any complicated moving parts, `autorun` might not work for you. Read up on the details in [the full setup guide](#setup).
+Lighthouse CI comes with an automatic setup that should work for many default web projects. If you build an API alongside your frontend or have any complicated moving parts, `autorun` might not work for you. Read up on the details in [the full setup guide](#setup).
 
 **.travis.yml**
 
@@ -34,6 +34,17 @@ script:
   - lhci autorun # run lighthouse CI
 addons:
   chrome: stable # make sure you have Chrome available
+```
+
+**NOTE: for matrix builds, you want to ensure LHCI is only run once! For example...**
+
+```yaml
+node_js:
+  - '8'
+  - '10'
+  - '12'
+script:
+  - 'if [ "${TRAVIS_NODE_VERSION}" = "8" ]; then lhci autorun ; fi' # only run LHCI on node 8
 ```
 
 That's it! You're good to go. Check out the [Extra Goodies](#extra-goodies) section for additional features like uploading every report to public storage, GitHub status checks, and a historical diffing server.

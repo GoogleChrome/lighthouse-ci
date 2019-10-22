@@ -11,6 +11,7 @@
   left: 50%;
   bottom: 0;
   z-index: 5;
+  padding-bottom: 70vh;
 
   overflow-x: hidden;
   overflow-y: auto;

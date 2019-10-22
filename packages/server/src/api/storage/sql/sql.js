@@ -264,6 +264,11 @@ class SqlStorageMethod {
   async createBuild(unsavedBuild) {
     const {buildModel} = this._sql();
     if (unsavedBuild.lifecycle !== 'unsealed') throw new E422('Invalid lifecycle value');
+
+    const existingWhere = {projectId: unsavedBuild.projectId, hash: unsavedBuild.hash};
+    const existingForHash = await buildModel.findOne({where: existingWhere});
+    if (existingForHash) throw new E422(`Build already exists for hash "${unsavedBuild.hash}"`);
+
     const build = await buildModel.create({...unsavedBuild, id: uuid.v4()});
     return clone(build);
   }

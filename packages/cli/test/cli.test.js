@@ -213,6 +213,23 @@ describe('Lighthouse CI CLI', () => {
       expect(stderr).toEqual(``);
       expect(status).toEqual(0);
     });
+
+    it('should fail repeated attempts', () => {
+      let {stdout = '', stderr = '', status = -1} = spawnSync(
+        CLI_PATH,
+        ['upload', `--serverBaseUrl=http://localhost:${server.port}`],
+        {env: {...process.env, LHCI_TOKEN: projectToken, LHCI_GITHUB_TOKEN: ''}}
+      );
+
+      stdout = stdout.toString();
+      stderr = stderr.toString();
+      status = status || 0;
+
+      expect(stdout).toEqual('');
+      expect(stderr).toContain('Unexpected status code 422');
+      expect(stderr).toContain('Build already exists for hash');
+      expect(status).toEqual(1);
+    });
   });
 
   describe('assert', () => {

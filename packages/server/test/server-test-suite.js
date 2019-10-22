@@ -223,6 +223,7 @@ function runTests(state) {
       const project = await client.createProject(projectA);
       const buildWithoutAncestor = await client.createBuild({
         ...buildC,
+        hash: Math.random().toString(),
         commitMessage: 'buildWithoutAncestor',
         projectId: project.id,
         branch: 'feature_branch',
@@ -234,6 +235,7 @@ function runTests(state) {
 
       const implicitPriorAncestorBuild = await client.createBuild({
         ...buildA,
+        hash: Math.random().toString(),
         commitMessage: 'implicitPriorAncestorBuild',
         projectId: project.id,
         branch: 'master',
@@ -246,6 +248,7 @@ function runTests(state) {
 
       const implicitFutureAncestorBuild = await client.createBuild({
         ...buildA,
+        hash: Math.random().toString(),
         commitMessage: 'implicitFutureAncestorBuild',
         projectId: project.id,
         branch: 'master',
@@ -261,6 +264,7 @@ function runTests(state) {
 
       const implicit2ndFutureAncestorBuild = await client.createBuild({
         ...buildA,
+        hash: Math.random().toString(),
         commitMessage: 'implicit2ndFutureAncestorBuild',
         projectId: project.id,
         branch: 'master',
@@ -561,6 +565,15 @@ function runTests(state) {
       await expect(client.createBuild(payload)).rejects.toMatchObject({
         status: 422,
         body: '{"message":"Invalid lifecycle value"}',
+      });
+    });
+
+    it('should fail to create a build with same hash', async () => {
+      const payload = {...buildA, id: undefined};
+      await expect(client.createBuild(payload)).rejects.toMatchObject({
+        status: 422,
+        body:
+          '{"message":"Build already exists for hash \\"e0acdd50ed0fdcfdceb2508498be50cc55c696ef\\""}',
       });
     });
 

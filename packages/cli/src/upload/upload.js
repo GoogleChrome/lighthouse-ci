@@ -270,6 +270,8 @@ async function runGithubStatusCheck(options, targetUrlMap) {
     const lhrsByUrl = _.groupBy(lhrs, lhr => lhr.finalUrl).map(lhrs => lhrs.map(lhr => [lhr, lhr]));
     const representativeLhrs = computeRepresentativeRuns(lhrsByUrl);
 
+    if (!representativeLhrs.length) return print('No LHRs for status check, skipping.\n');
+
     for (const lhr of representativeLhrs) {
       const rawUrl = lhr.finalUrl;
       const urlLabel = getUrlLabelForGithub(rawUrl, options);

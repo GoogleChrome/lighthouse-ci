@@ -30,20 +30,20 @@ export const SimpleDetails = props => {
 
   switch (type) {
     case 'bytes': {
-      const kb = Math.round((numericCompare - numericBase) / 1024);
+      const kb = Math.abs((numericCompare - numericBase) / 1024);
       return (
         <pre className={`simple-details--${label}`} title={title}>
-          {kb >= 0 ? '+' : ''}
-          {kb.toLocaleString()} KB
+          {numericCompare >= numericBase ? '+' : '-'}
+          {kb.toLocaleString(undefined, {maximumFractionDigits: Math.abs(kb) < 1 ? 1 : 0})} KB
         </pre>
       );
     }
     case 'ms':
     case 'timespanMs': {
-      const ms = Math.round(numericCompare - numericBase);
+      const ms = Math.abs(Math.round(numericCompare - numericBase));
       return (
         <pre className={`simple-details--${label}`} title={title}>
-          {ms >= 0 ? '+' : ''}
+          {numericCompare >= numericBase ? '+' : '-'}
           {ms.toLocaleString()} ms
         </pre>
       );
@@ -77,11 +77,10 @@ export const SimpleDetails = props => {
     case 'code':
       return <pre>{value}</pre>;
     case 'numeric': {
-      const delta = numericCompare - numericBase;
       return (
         <pre className={`simple-details--${label}`}>
-          {delta >= 0 ? '+' : ''}
-          {delta.toLocaleString()}
+          {numericCompare >= numericBase ? '+' : '-'}
+          {Math.abs(numericCompare - numericBase).toLocaleString()}
         </pre>
       );
     }

@@ -32,7 +32,7 @@ export const SimpleDetails = props => {
     case 'bytes': {
       const kb = Math.abs((numericCompare - numericBase) / 1024);
       return (
-        <pre className={`simple-details--${label}`} title={title}>
+        <pre className={`simple-details--${label}`} data-tooltip={title}>
           {numericCompare >= numericBase ? '+' : '-'}
           {kb.toLocaleString(undefined, {maximumFractionDigits: Math.abs(kb) < 1 ? 1 : 0})} KB
         </pre>
@@ -42,7 +42,7 @@ export const SimpleDetails = props => {
     case 'timespanMs': {
       const ms = Math.abs(Math.round(numericCompare - numericBase));
       return (
-        <pre className={`simple-details--${label}`} title={title}>
+        <pre className={`simple-details--${label}`} data-tooltip={title}>
           {numericCompare >= numericBase ? '+' : '-'}
           {ms.toLocaleString()} ms
         </pre>
@@ -59,6 +59,7 @@ export const SimpleDetails = props => {
         hostname = url.hostname;
       } catch (_) {}
 
+      // FIXME: use title instead of data-tooltip because of the `overflow: hidden` constraints on the table cell.
       return (
         <span title={value}>
           {display}
@@ -90,7 +91,7 @@ export const SimpleDetails = props => {
       return <pre>{value.snippet}</pre>;
     default: {
       const debugdata = JSON.stringify(props);
-      return <pre title={debugdata}>{debugdata.slice(0, 20)}</pre>;
+      return <pre data-tooltip={debugdata}>{debugdata.slice(0, 20)}</pre>;
     }
   }
 };

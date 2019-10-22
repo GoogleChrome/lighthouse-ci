@@ -92,6 +92,7 @@ const BuildViewScoreAndUrl = props => {
     <div className="build-view__scores-and-url">
       <div className="container">
         <Dropdown
+          title="Comparison URL"
           className="build-view__url-dropdown"
           value={props.selectedUrl}
           setValue={url => {

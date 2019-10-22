@@ -127,7 +127,7 @@ export const NumericDiff = props => {
               'audit-numeric-diff__box--regression': deltaType === 'regression',
             })}
             style={{left: `${boxLeft}%`, right: `${boxRight}%`}}
-            title={`${toDisplay(baseNumericValue, {unit, withSuffix: true})} -> ${toDisplay(
+            data-tooltip={`${toDisplay(baseNumericValue, {unit, withSuffix: true})} to ${toDisplay(
               currentNumericValue,
               {
                 withSuffix: true,

@@ -5,6 +5,7 @@
  */
 
 @import './icons.css';
+@import './tooltips.css';
 
 :root {
   /** Material colors https://www.materialui.co/colors */

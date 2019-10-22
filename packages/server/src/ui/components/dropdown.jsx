@@ -12,9 +12,8 @@ import './dropdown.css';
 export const Dropdown = props => {
   const {options, value, setValue, className, title} = props;
   return (
-    <div className={className} style={{position: 'relative'}}>
+    <div className={className} style={{position: 'relative'}} data-tooltip={title}>
       <select
-        title={title}
         className={clsx('dropdown')}
         onChange={evt => {
           if (!(evt.target instanceof HTMLSelectElement)) return;

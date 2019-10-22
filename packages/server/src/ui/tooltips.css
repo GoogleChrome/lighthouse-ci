@@ -1,0 +1,78 @@
+/**
+ * @license Copyright 2019 Google Inc. All Rights Reserved.
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
+ */
+
+/* Element to receive the tooltip on hover */
+[data-tooltip] {
+  --tooltip-arrow-size: 6px;
+  --tooltip-max-content-size: 120px;
+  position: relative;
+}
+
+[data-tooltip]:before,
+[data-tooltip]:after {
+  position: absolute;
+  pointer-events: none;
+
+  visibility: hidden;
+  opacity: 0;
+
+  transform: translate(0, 0);
+  transition: opacity 0.2s ease, visibility 0.2s ease, transform 0.2s ease;
+  transition-delay: 300ms;
+}
+
+/* Tooltip arrow */
+[data-tooltip]:before {
+  z-index: 10001;
+  bottom: calc(100% - 2 * var(--tooltip-arrow-size));
+  left: calc(50% - var(--tooltip-arrow-size));
+
+  border: var(--tooltip-arrow-size) solid transparent;
+  border-top-color: var(--inverted-background-color);
+
+  background: transparent;
+  content: '';
+}
+
+/* Tooltip content */
+[data-tooltip]:after {
+  z-index: 10000;
+  bottom: 100%;
+  left: 50%; /* start out the content in the middle of the hover element */
+  transform: translateX(-50%); /* then shift it by 50% of tooltip width to center it */
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  width: max-content;
+  max-width: var(--tooltip-max-content-size);
+  padding: calc(var(--base-spacing) / 2);
+
+  background-color: var(--inverted-background-color);
+  color: var(--inverted-text-color);
+
+  content: attr(data-tooltip);
+  /* consistent text in tooltip since parent varies */
+  font-size: var(--subtext-font-size);
+  font-family: var(--base-font-family);
+  white-space: normal;
+  text-align: center;
+}
+
+/* Slide up and fade in arrow on hover */
+[data-tooltip]:hover:before,
+[data-tooltip]:focus:before {
+  visibility: visible;
+  opacity: 1;
+  transform: translateY(calc(-2 * var(--tooltip-arrow-size)));
+}
+
+/* Slide up and fade in content on hover */
+[data-tooltip]:hover:after,
+[data-tooltip]:focus:after {
+  visibility: visible;
+  opacity: 1;
+  transform: translate(-50%, calc(-2 * var(--tooltip-arrow-size)));
+}

@@ -7,12 +7,11 @@
 import {h, Fragment} from 'preact';
 import './table-details.css';
 import {SimpleDetails} from './simple-details';
-import {zipBaseAndCompareItems, getRowLabelForIndex} from '@lhci/utils/src/audit-diff-finder';
-
-/** @typedef {import('@lhci/utils/src/audit-diff-finder').RowLabel} RowLabel */
-
-/** @type {Array<RowLabel>} */
-const ROW_STATE_SORT_ORDER = ['added', 'worse', 'ambiguous', 'removed', 'better', 'no change'];
+import {
+  zipBaseAndCompareItems,
+  sortZippedBaseAndCompareItems,
+  getRowLabelForIndex,
+} from '@lhci/utils/src/audit-diff-finder';
 
 /** @param {{pair: LHCI.AuditPair}} props */
 export const TableDetails = props => {
@@ -24,16 +23,8 @@ export const TableDetails = props => {
   const baseHeadings = (baseAudit && baseAudit.details && baseAudit.details.headings) || [];
   const baseItems = (baseAudit && baseAudit.details && baseAudit.details.items) || [];
 
-  const zippedItems = zipBaseAndCompareItems(baseItems, compareItems).sort(
-    (a, b) =>
-      ROW_STATE_SORT_ORDER.indexOf(
-        getRowLabelForIndex(diffs, a.compare && a.compare.index, a.base && a.base.index)
-      ) -
-      ROW_STATE_SORT_ORDER.indexOf(
-        getRowLabelForIndex(diffs, b.compare && b.compare.index, b.base && b.base.index)
-      )
-  );
-
+  const zippedItems = zipBaseAndCompareItems(baseItems, compareItems);
+  const sortedItems = sortZippedBaseAndCompareItems(diffs, zippedItems);
   const headings = compareHeadings.length ? compareHeadings : baseHeadings;
 
   return (
@@ -53,7 +44,7 @@ export const TableDetails = props => {
           </tr>
         </thead>
         <tbody>
-          {zippedItems.map(({base, compare}) => {
+          {sortedItems.map(({base, compare}) => {
             const definedItem = compare || base;
             // This should never be true, but make tsc happy
             if (!definedItem) return null;

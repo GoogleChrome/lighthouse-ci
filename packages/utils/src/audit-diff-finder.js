@@ -73,6 +73,22 @@ function getRowLabel(diffs) {
 }
 
 /**
+ * @param {Array<LHCI.AuditDiff>} diffs
+ * @param {number|undefined} compareItemIndex
+ * @param {number|undefined} baseItemIndex
+ * @return {Array<LHCI.AuditDiff>}
+ */
+function getMatchingDiffsForIndex(diffs, compareItemIndex, baseItemIndex) {
+  return diffs.filter(diff => {
+    const compareIndex = 'compareItemIndex' in diff ? diff.compareItemIndex : undefined;
+    const baseIndex = 'baseItemIndex' in diff ? diff.baseItemIndex : undefined;
+    if (typeof compareIndex === 'number') return compareIndex === compareItemIndex;
+    if (typeof baseIndex === 'number') return baseIndex === baseItemIndex;
+    return false;
+  });
+}
+
+/**
  * Given the array of all diffs for an audit, determine the label for a row with particular item index.
  *
  * @param {Array<LHCI.AuditDiff>} diffs
@@ -81,15 +97,23 @@ function getRowLabel(diffs) {
  * @return {RowLabel}
  */
 function getRowLabelForIndex(diffs, compareItemIndex, baseItemIndex) {
-  const matchingDiffs = diffs.filter(diff => {
-    const compareIndex = 'compareItemIndex' in diff ? diff.compareItemIndex : undefined;
-    const baseIndex = 'baseItemIndex' in diff ? diff.baseItemIndex : undefined;
-    if (typeof compareIndex === 'number') return compareIndex === compareItemIndex;
-    if (typeof baseIndex === 'number') return baseIndex === baseItemIndex;
-    return false;
-  });
+  return getRowLabel(getMatchingDiffsForIndex(diffs, compareItemIndex, baseItemIndex));
+}
 
-  return getRowLabel(matchingDiffs);
+/**
+ * Given the array of all diffs for an audit, determine the worst numeric delta for a particular row.
+ * Used for sorting.
+ *
+ * @param {Array<LHCI.AuditDiff>} diffs
+ * @param {number|undefined} compareItemIndex
+ * @param {number|undefined} baseItemIndex
+ * @return {number|undefined}
+ */
+function getWorstNumericDeltaForIndex(diffs, compareItemIndex, baseItemIndex) {
+  const matchingDiffs = getMatchingDiffsForIndex(diffs, compareItemIndex, baseItemIndex);
+  const numericDiffs = matchingDiffs.filter(isNumericAuditDiff);
+  if (!numericDiffs.length) return undefined;
+  return Math.max(...numericDiffs.map(diff => getDeltaStats(diff).delta));
 }
 
 /** @param {Array<DiffLabel>} labels @return {DiffLabel} */
@@ -251,31 +275,29 @@ function replaceNondeterministicStrings(s) {
     .replace(/\.[0-9a-f]{8}\.(js|css|woff|html|png|jpeg|jpg|svg)/, '.HASH.$1');
 }
 
+/** @param {Record<string, any>} item @return {string} */
+function getItemKey(item) {
+  // For most opportunities, diagnostics, etc where 1 row === 1 resource
+  if (typeof item.url === 'string') return item.url;
+  // For the pre-grouped audits like resource-summary
+  if (typeof item.label === 'string') return item.label;
+  // For the pre-grouped audits like mainthread-work-breakdown
+  if (typeof item.groupLabel === 'string') return item.groupLabel;
+  // For dom-size
+  if (typeof item.statistic === 'string') return item.statistic;
+  // For third-party-summary
+  if (item.entity && typeof item.entity.text === 'string') return item.entity.text;
+
+  // For everything else, use the entire object, actually works OK on most nodes.
+  return JSON.stringify(item);
+}
+
 /**
- * TODO: consider doing more than URL-based comparisons.
- *
  * @param {Array<Record<string, any>>} baseItems
  * @param {Array<Record<string, any>>} compareItems
  * @return {Array<{base?: DetailItemEntry, compare?: DetailItemEntry}>}
  */
 function zipBaseAndCompareItems(baseItems, compareItems) {
-  /** @param {Record<string, any>} item */
-  const getItemKey = item => {
-    // For most opportunities, diagnostics, etc where 1 row === 1 resource
-    if (typeof item.url === 'string') return item.url;
-    // For the pre-grouped audits like resource-summary
-    if (typeof item.label === 'string') return item.label;
-    // For the pre-grouped audits like mainthread-work-breakdown
-    if (typeof item.groupLabel === 'string') return item.groupLabel;
-    // For dom-size
-    if (typeof item.statistic === 'string') return item.statistic;
-    // For third-party-summary
-    if (item.entity && typeof item.entity.text === 'string') return item.entity.text;
-
-    // For everything else, use the entire object, actually works OK on most nodes.
-    return JSON.stringify(item);
-  };
-
   const groupedByKey = _.groupIntoMap(
     [
       ...baseItems.map((item, i) => ({item, kind: 'base', index: i})),
@@ -304,6 +326,43 @@ function zipBaseAndCompareItems(baseItems, compareItems) {
   }
 
   return zipped;
+}
+
+/**
+ * @param {Array<LHCI.AuditDiff>} diffs
+ * @param {Array<{base?: DetailItemEntry, compare?: DetailItemEntry}>} zippedItems
+ * @return {Array<{base?: DetailItemEntry, compare?: DetailItemEntry}>}
+ */
+function sortZippedBaseAndCompareItems(diffs, zippedItems) {
+  /** @type {Array<RowLabel>} */
+  const rowLabelSortOrder = ['added', 'worse', 'ambiguous', 'removed', 'better', 'no change'];
+
+  return zippedItems.sort((a, b) => {
+    const compareIndexA = a.compare && a.compare.index;
+    const baseIndexA = a.base && a.base.index;
+    const compareIndexB = b.compare && b.compare.index;
+    const baseIndexB = b.base && b.base.index;
+
+    const rowStateIndexA = rowLabelSortOrder.indexOf(
+      getRowLabelForIndex(diffs, compareIndexA, baseIndexA)
+    );
+    const rowStateIndexB = rowLabelSortOrder.indexOf(
+      getRowLabelForIndex(diffs, compareIndexB, baseIndexB)
+    );
+
+    const labelValueA = getItemKey((a.compare && a.compare.item) || (a.base && a.base.item) || {});
+    const labelValueB = getItemKey((b.compare && b.compare.item) || (b.base && b.base.item) || {});
+
+    const numericValueA = getWorstNumericDeltaForIndex(diffs, compareIndexA, baseIndexA);
+    const numericValueB = getWorstNumericDeltaForIndex(diffs, compareIndexB, baseIndexB);
+
+    if (rowStateIndexA === rowStateIndexB) {
+      return typeof numericValueA === 'number' && typeof numericValueB === 'number'
+        ? numericValueB - numericValueA
+        : labelValueA.localeCompare(labelValueB);
+    }
+    return rowStateIndexA - rowStateIndexB;
+  });
 }
 
 /**
@@ -490,5 +549,6 @@ module.exports = {
   getRowLabelForIndex,
   getMostSevereDiffLabel,
   zipBaseAndCompareItems,
+  sortZippedBaseAndCompareItems,
   replaceNondeterministicStrings,
 };

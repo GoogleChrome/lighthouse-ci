@@ -14,6 +14,7 @@ const {
   getRowLabel,
   getRowLabelForIndex,
   zipBaseAndCompareItems,
+  sortZippedBaseAndCompareItems,
   replaceNondeterministicStrings,
 } = require('@lhci/utils/src/audit-diff-finder.js');
 
@@ -615,6 +616,137 @@ describe('#zipBaseAndCompareItems', () => {
       },
       {
         compare: {item: compare[3], kind: 'compare', index: 3},
+      },
+    ]);
+  });
+});
+
+describe('#sortZippedBaseAndCompareItems', () => {
+  const getDiffs = (base, compare) => {
+    return findAuditDiffs(
+      {score: 1, details: {items: base}},
+      {score: 1, details: {items: compare}}
+    );
+  };
+
+  it('should sort by RowLabel', () => {
+    const base = [
+      {url: 'a', wastedMs: 100},
+      {url: 'b', wastedMs: 100},
+      {url: 'c', wastedMs: 100},
+      {url: 'd', wastedMs: 100},
+    ];
+    const compare = [
+      {url: 'a', wastedMs: 100}, // no change
+      {url: 'b', wastedMs: 50}, // better
+      {url: 'c', wastedMs: 150}, // worse
+      // url d removed
+      {url: 'e', wastedMs: 100}, // added
+    ];
+
+    const zipped = sortZippedBaseAndCompareItems(
+      getDiffs(base, compare),
+      zipBaseAndCompareItems(base, compare)
+    );
+
+    expect(zipped).toEqual([
+      {
+        base: undefined,
+        compare: {index: 3, item: {url: 'e', wastedMs: 100}, kind: 'compare'},
+      },
+      {
+        base: {index: 2, item: {url: 'c', wastedMs: 100}, kind: 'base'},
+        compare: {index: 2, item: {url: 'c', wastedMs: 150}, kind: 'compare'},
+      },
+      {
+        base: {index: 3, item: {url: 'd', wastedMs: 100}, kind: 'base'},
+        compare: undefined,
+      },
+      {
+        base: {index: 1, item: {url: 'b', wastedMs: 100}, kind: 'base'},
+        compare: {index: 1, item: {url: 'b', wastedMs: 50}, kind: 'compare'},
+      },
+      {
+        base: {index: 0, item: {url: 'a', wastedMs: 100}, kind: 'base'},
+        compare: {index: 0, item: {url: 'a', wastedMs: 100}, kind: 'compare'},
+      },
+    ]);
+  });
+
+  it('should sort within a RowLabel by numeric value', () => {
+    const base = [
+      {url: 'a', wastedMs: 100},
+      {url: 'b', wastedMs: 100},
+      {url: 'c', wastedMs: 100},
+      {url: 'd', wastedMs: 100},
+    ];
+    const compare = [
+      {url: 'a', wastedMs: 110},
+      {url: 'b', wastedMs: 950},
+      {url: 'c', wastedMs: 250},
+      {url: 'd', wastedMs: 101},
+    ];
+
+    const zipped = sortZippedBaseAndCompareItems(
+      getDiffs(base, compare),
+      zipBaseAndCompareItems(base, compare)
+    );
+
+    expect(zipped).toEqual([
+      {
+        base: {index: 1, item: {url: 'b', wastedMs: 100}, kind: 'base'},
+        compare: {index: 1, item: {url: 'b', wastedMs: 950}, kind: 'compare'},
+      },
+      {
+        base: {index: 2, item: {url: 'c', wastedMs: 100}, kind: 'base'},
+        compare: {index: 2, item: {url: 'c', wastedMs: 250}, kind: 'compare'},
+      },
+      {
+        base: {index: 0, item: {url: 'a', wastedMs: 100}, kind: 'base'},
+        compare: {index: 0, item: {url: 'a', wastedMs: 110}, kind: 'compare'},
+      },
+      {
+        base: {index: 3, item: {url: 'd', wastedMs: 100}, kind: 'base'},
+        compare: {index: 3, item: {url: 'd', wastedMs: 101}, kind: 'compare'},
+      },
+    ]);
+  });
+
+  it('should sort within a RowLabel by string value', () => {
+    const base = [
+      {url: 'b', node: '<br />'},
+      {url: 'c', node: '<br />'},
+      {url: 'a', node: '<br />'},
+      {url: 'd', node: '<br />'},
+    ];
+    const compare = [
+      {url: 'b', node: '<br />'},
+      {url: 'c', node: '<br />'},
+      {url: 'a', node: '<br />'},
+      {url: 'd', node: '<br />'},
+    ];
+
+    const zipped = sortZippedBaseAndCompareItems(
+      getDiffs(base, compare),
+      zipBaseAndCompareItems(base, compare)
+    );
+
+    expect(zipped).toEqual([
+      {
+        base: {index: 2, item: {url: 'a', node: '<br />'}, kind: 'base'},
+        compare: {index: 2, item: {url: 'a', node: '<br />'}, kind: 'compare'},
+      },
+      {
+        base: {index: 0, item: {url: 'b', node: '<br />'}, kind: 'base'},
+        compare: {index: 0, item: {url: 'b', node: '<br />'}, kind: 'compare'},
+      },
+      {
+        base: {index: 1, item: {url: 'c', node: '<br />'}, kind: 'base'},
+        compare: {index: 1, item: {url: 'c', node: '<br />'}, kind: 'compare'},
+      },
+      {
+        base: {index: 3, item: {url: 'd', node: '<br />'}, kind: 'base'},
+        compare: {index: 3, item: {url: 'd', node: '<br />'}, kind: 'compare'},
       },
     ]);
   });

@@ -27,7 +27,7 @@ function buildCommand(yargs) {
     },
     'storage.sqlDialect': {
       type: 'string',
-      choices: ['sqlite', 'mysql', 'postgres'],
+      choices: ['sqlite', 'postgres'],
       default: 'sqlite',
     },
     'storage.sqlDatabasePath': {
@@ -39,7 +39,7 @@ function buildCommand(yargs) {
     'storage.sqlConnectionSsl': {
       type: 'boolean',
       default: false,
-      description: 'The path to a SQLite database on disk.',
+      description: 'Whether the SQL connection should force use of SSL',
     },
     'storage.sqlDangerouslyResetDatabase': {
       description:

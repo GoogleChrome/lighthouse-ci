@@ -1,0 +1,14 @@
+{
+  "name": "lhci",
+  "version": "0.0.0",
+  "scripts": {
+    "start": "lhci server --rc-file=./lighthouserc.json"
+  },
+  "dependencies": {
+    "@lhci/cli": "^0.1.0",
+    "@lhci/server": "^0.1.0",
+    "pg": "^7.12.1",
+    "pg-hstore": "^2.3.3",
+    "sqlite3": "^4.0.6"
+  }
+}

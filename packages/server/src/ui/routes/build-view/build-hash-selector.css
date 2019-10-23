@@ -5,25 +5,26 @@
  */
 
 .build-hash-selector {
+  --line-item-height: 40px;
+
   position: fixed;
   z-index: 10;
 
   top: var(--page-header-height);
   left: 0;
   right: 0;
+  min-height: 10vh;
   max-height: 50vh;
 
   overflow: auto;
 
   background: var(--highlighted-background-color);
-  border-bottom: 2px solid var(--base-border-color);
+  box-shadow: 0 1px 1px var(--base-border-color);
 }
 
 .build-hash-selector__list {
   list-style: none;
   padding: 0;
-  padding-bottom: var(--base-spacing);
-  margin-top: var(--base-spacing);
 }
 
 .build-hash-selector__list li {
@@ -31,9 +32,20 @@
   flex-direction: row;
   align-items: center;
 
+  height: var(--line-item-height);
   padding: calc(var(--base-spacing) / 2);
   font-weight: var(--medium-font-weight);
   border-radius: 5px;
+}
+
+.build-hash-selector__list li:hover {
+  cursor: pointer;
+  background: var(--compare-highlight-color);
+}
+
+.build-hash-selector__list li.build-hash-selector__label-li:hover {
+  cursor: initial;
+  background: none;
 }
 
 .build-hash-selector__selection {
@@ -72,4 +84,76 @@
 
 .build-hash-selector__links > * {
   margin: 0 calc(var(--base-spacing) / 2);
+}
+
+.build-hash-selector__branch-label {
+  font-family: var(--monospace-font-family);
+  margin-left: calc(var(--base-spacing) / 2);
+  margin-top: calc(var(--base-spacing) * -1);
+}
+
+.build-hash-selector__branch-label--dev-branch {
+  color: var(--dev-branch-color);
+}
+
+.git-viz {
+  position: relative;
+
+  width: 50px;
+  min-width: 50px;
+  height: var(--line-item-height);
+}
+
+.git-viz * {
+  position: absolute;
+}
+
+.git-viz__master-line {
+  border-left: 2px solid var(--neutral-color);
+  left: 9px;
+  height: var(--line-item-height);
+  width: 1px;
+}
+
+.git-viz__dev-line {
+  border-left: 2px solid var(--dev-branch-color);
+  left: 29px;
+  height: var(--line-item-height);
+  width: 1px;
+}
+
+.git-viz__master-node {
+  background: var(--neutral-color);
+  left: 5px;
+  top: 15px;
+
+  height: 10px;
+  width: 10px;
+
+  border-radius: 100%;
+  z-index: 5;
+}
+
+.git-viz__dev-node {
+  background: var(--dev-branch-color);
+  left: 25px;
+  top: 15px;
+
+  height: 10px;
+  width: 10px;
+
+  border-radius: 100%;
+  z-index: 5;
+}
+
+.git-viz__dev-branch-off {
+  left: 11px;
+  top: 0px;
+
+  height: 20px;
+  width: 20px;
+
+  border-bottom-right-radius: 100px;
+  border-right: 2px solid var(--dev-branch-color);
+  border-bottom: 2px solid var(--dev-branch-color);
 }

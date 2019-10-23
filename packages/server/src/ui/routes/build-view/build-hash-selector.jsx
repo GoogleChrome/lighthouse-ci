@@ -76,12 +76,12 @@ const BuildLineItem = props => {
       }}
     >
       <span className="build-hash-selector__selection">
-        {isCompareBranch && selector === 'base' && (
+        {isCompareBranch && (
           <Pill variant="compare" solid>
             compare
           </Pill>
         )}
-        {isBaseBranch && selector === 'compare' && (
+        {isBaseBranch && (
           <Pill variant="base" solid>
             base
           </Pill>
@@ -109,7 +109,7 @@ const BuildLineItem = props => {
  * @param {{build: LHCI.ServerCommand.Build, ancestorBuild?: LHCI.ServerCommand.Build | null, selector: 'base'|'compare', branchBuilds: Array<LHCI.ServerCommand.Build>, baseBuilds: Array<LHCI.ServerCommand.Build>, lhr: LH.Result, baseLhr?: LH.Result, close: () => void}} props
  */
 const BuildHashSelector_ = props => {
-  const {branchBuilds, baseBuilds, ancestorBuild} = props;
+  const {branchBuilds, baseBuilds} = props;
   const builds = _.uniqBy(
     branchBuilds
       .concat(baseBuilds)

@@ -49,3 +49,33 @@
   color: var(--average-color);
   margin-right: calc(var(--base-spacing) / 2);
 }
+
+.build-selector-header {
+  position: fixed;
+  height: var(--page-header-height);
+  top: 0;
+  left: 0;
+  right: 0;
+
+  margin: 0 !important;
+
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+
+  font-size: var(--base-font-size);
+  font-weight: var(--medium-font-weight);
+
+  cursor: pointer;
+  background: var(--neutral-highlight-color);
+  color: var(--neutral-color);
+}
+
+.build-selector-header * {
+  margin-left: var(--base-spacing);
+}
+
+.build-selector-header--compare {
+  background: var(--compare-highlight-color);
+  color: var(--compare-color);
+}

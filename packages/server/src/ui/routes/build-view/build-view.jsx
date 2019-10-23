@@ -183,6 +183,14 @@ const BuildView_ = props => {
     <Page
       header={
         <Fragment>
+          {openBuildHash === null ? (
+            <Fragment />
+          ) : (
+            <div className={`build-selector-header build-selector-header--${openBuildHash}`}>
+              <i className="material-icons">arrow_back</i>
+              <span>Select {_.startCase(openBuildHash)}</span>
+            </div>
+          )}
           <BuildSelectorPill
             build={props.ancestorBuild}
             variant="base"

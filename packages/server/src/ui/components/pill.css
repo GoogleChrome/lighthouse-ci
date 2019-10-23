@@ -5,20 +5,25 @@
  */
 
 .pill {
+  --pill-vertical-padding: calc((var(--pill-height) - var(--pill-content-height) - 2px) / 2);
+
   display: inline-block;
   height: var(--pill-height);
 
   margin: 0 var(--pill-spacing);
-  padding: 0 var(--pill-spacing);
+  padding: var(--pill-vertical-padding) var(--pill-spacing);
 
-  border-radius: 15px;
-  border: 1px solid var(--base-text-color);
+  border-radius: calc(var(--pill-height) / 2);
+  border: 1px solid var(--neutral-color);
 }
 
 /* pill--solid comes last to override font color */
 .pill--solid {
-  background: var(--base-text-color);
-  color: var(--inverted-text-color);
+  --pill-vertical-padding: calc((var(--pill-height) - var(--pill-content-height)) / 2);
+
+  border: none;
+  background: var(--neutral-highlight-color);
+  color: var(--neutral-color);
 }
 
 .pill--clickable {
@@ -30,15 +35,12 @@
 }
 
 .pill--compare.pill--solid {
-  background: var(--compare-color);
+  background: var(--compare-highlight-color);
+  color: var(--compare-color);
 }
 
 .pill--master-branch {
-  border-color: var(--master-branch-color);
-}
-
-.pill--master-branch.pill--solid {
-  background: var(--master-branch-color);
+  border-color: var(--neutral-color);
 }
 
 .pill--dev-branch {

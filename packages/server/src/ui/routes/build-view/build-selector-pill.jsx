@@ -7,16 +7,19 @@
 import {h, Fragment} from 'preact';
 import './build-selector-pill.css';
 import clsx from 'clsx';
+import {Pill} from '../../components/pill';
 
 /**
  *
- * @param {{build: LHCI.ServerCommand.Build}} props
+ * @param {{build: LHCI.ServerCommand.Build, variant: 'base'|'compare'}} props
  */
 const Selection = props => {
   const {hash, commitMessage = 'unknown commit'} = props.build;
   return (
     <Fragment>
-      <span className="build-selector-pill__hash">{hash.slice(0, 8)}</span>
+      <Pill className="build-selector-pill__hash" variant={props.variant} solid>
+        {hash.slice(0, 8)}
+      </Pill>
       <span className="build-selector-pill__message">{commitMessage}</span>
     </Fragment>
   );
@@ -33,12 +36,12 @@ export const BuildSelectorPill = props => {
       })}
       onClick={props.onClick}
     >
-      <div className="build-selector-pill__variant-label">{props.variant}</div>
       {props.build ? (
-        <Selection build={props.build} />
+        <Selection build={props.build} variant={props.variant} />
       ) : (
         <span className="build-selector-pill__message">None</span>
       )}
+      <div className="build-selector-pill__variant-label">{props.variant}</div>
     </div>
   );
 };

@@ -21,9 +21,12 @@
   --color-gray-900: #212121;
   --color-red-a200: #ff5252;
   --color-green-a700: #00c853;
-  --color-blue-400: #42a5f5;
+  --color-blue-100: #d4e0ff;
+  --color-blue-500: #376cff;
   --color-cyan-500: #00bcd4;
+  --color-cyan-700: #0097a7;
   --color-pink-a200: #ff4081;
+  --color-pink-600: #d81b60;
   --color-orange-500: #ff9800;
   --color-deep-orange-a200: #ff6e40;
   --color-deep-purple-400: #7e57c2;
@@ -48,10 +51,14 @@
   --fail-color: var(--color-red-a200);
 
   --improvement-color: var(--color-cyan-500);
+  --improvement-text-color: var(--color-cyan-700);
   --neutral-color: var(--color-gray-800);
+  --neutral-highlight-color: var(--color-gray-200);
   --regression-color: var(--color-pink-a200);
+  --regression-text-color: var(--color-pink-600);
 
-  --compare-color: var(--color-blue-400);
+  --compare-color: var(--color-blue-500);
+  --compare-highlight-color: var(--color-blue-100);
   --dev-branch-color: var(--color-deep-orange-a200);
   --master-branch-color: var(--color-deep-purple-400);
 
@@ -86,8 +93,8 @@
   --gauge-size: 82px;
   --gauge-stroke-width: 7px;
   --build-score-delta-badge-height: 24px;
-  --pill-height: 30px;
-  --pill-content-height: calc(var(--pill-height) - 2px);
+  --pill-height: 22px;
+  --pill-content-height: calc(var(--pill-height) - 4px);
   --pill-spacing: calc(var(--base-spacing) / 2);
   --avatar-image-size: 25px;
 

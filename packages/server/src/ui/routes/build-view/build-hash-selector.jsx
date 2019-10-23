@@ -85,7 +85,11 @@ const BuildHashSelector_ = props => {
               >
                 <span className="build-hash-selector__hash">{build.hash.slice(0, 8)}</span>
               </Pill>{' '}
-              <img className="build-hash-selector__avatar" src={build.avatarUrl} />
+              <img
+                className="build-hash-selector__avatar"
+                alt={build.author}
+                src={build.avatarUrl}
+              />
               <span className="build-hash-selector__commit">{build.commitMessage}</span>
               <span className="build-hash-selector__links">
                 {isCompareBranch && (

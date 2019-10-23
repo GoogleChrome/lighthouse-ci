@@ -19,13 +19,13 @@ export const BuildViewOptions = props => {
       {props.baseLhr ? (
         <LhrViewerLink lhr={props.baseLhr} className="build-view-options__report-link">
           <div data-tooltip="Open Base Report">
-            <img src={LOGO_SVG_URL} />
+            <img src={LOGO_SVG_URL} alt="Open Base Report" />
           </div>
         </LhrViewerLink>
       ) : null}
       <LhrViewerLink lhr={props.compareLhr} className="build-view-options__report-link">
         <div data-tooltip="Open Compare Report">
-          <img src={LOGO_SVG_URL} />
+          <img src={LOGO_SVG_URL} alt="Open Compare Report" />
         </div>
       </LhrViewerLink>
       <Dropdown

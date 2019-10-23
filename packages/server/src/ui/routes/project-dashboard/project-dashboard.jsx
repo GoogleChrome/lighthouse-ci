@@ -32,7 +32,7 @@ const ProjectDashboard_ = props => {
                 onClick={() => route(`/app/projects/${project.id}/builds/${build.id}`)}
               >
                 <td className="build-list__avatar" data-tooltip={build.author}>
-                  <img src={build.avatarUrl} />
+                  <img src={build.avatarUrl} alt={build.author} />
                 </td>
                 <td className="build-list__commit">{build.commitMessage}</td>
                 <td className="build-list__branch">

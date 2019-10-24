@@ -76,6 +76,7 @@
 
 .build-hash-selector__links {
   display: none;
+  white-space: nowrap;
 }
 
 .build-hash-selector__list li:hover .build-hash-selector__links {

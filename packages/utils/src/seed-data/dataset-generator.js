@@ -503,7 +503,7 @@ function createLoadTestDataset() {
             lhr.requestedUrl = url;
             lhr.finalUrl = url;
             for (const auditId of Object.keys(lhr.audits)) {
-              const multiplier = 1 + Math.random() * 0.4 - 2;
+              const multiplier = 1 + Math.random() * 0.4 - 0.2;
               const audit = lhr.audits[auditId];
               if (typeof audit.numericValue === 'number') {
                 audit.numericValue = audit.numericValue * multiplier;

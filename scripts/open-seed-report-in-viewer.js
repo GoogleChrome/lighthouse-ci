@@ -8,10 +8,10 @@
 
 const fs = require('fs');
 const puppeteer = require('puppeteer');
-const {createDataset} = require('../packages/utils/src/seed-data/seed-data.js');
+const {createDefaultDataset} = require('../packages/utils/src/seed-data/seed-data.js');
 
 async function run() {
-  const lhr = JSON.stringify(JSON.parse(createDataset().runs[0].lhr), null, 2);
+  const lhr = JSON.stringify(JSON.parse(createDefaultDataset().runs[0].lhr), null, 2);
   const browser = await puppeteer.launch({headless: false, devtools: true});
   const page = await browser.newPage();
   await page.goto('https://googlechrome.github.io/lighthouse/viewer/');

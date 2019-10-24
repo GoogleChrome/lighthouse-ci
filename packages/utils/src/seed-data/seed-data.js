@@ -6,18 +6,24 @@
 'use strict';
 
 const {createLHR} = require('./lhr-generator.js');
-const {createDataset} = require('./dataset-generator.js');
+const {createDefaultDataset} = require('./dataset-generator.js');
 
 /** @typedef {import('../api-client.js')} ApiClient */
 
 /**
  * @param {ApiClient} client
- * @param {{projects: LHCI.ServerCommand.Project[], builds: LHCI.ServerCommand.Build[], runs: LHCI.ServerCommand.Run[]}} [data]
+ * @param {{projects: LHCI.ServerCommand.Project[], builds: LHCI.ServerCommand.Build[], runs: LHCI.ServerCommand.Run[]}} [rawData]
  */
-async function writeSeedDataToApi(client, data) {
-  data = data || createDataset();
+async function writeSeedDataToApi(client, rawData) {
+  let data = rawData || createDefaultDataset();
   data = JSON.parse(JSON.stringify(data));
   if (!data) throw new Error('TS cannot infer truth');
+
+  if (rawData) {
+    data.runs.forEach((run, i) => {
+      run.lhr = rawData.runs[i].lhr;
+    });
+  }
 
   /** @type {Array<LHCI.ServerCommand.Project>} */
   const projects = [];
@@ -38,7 +44,12 @@ async function writeSeedDataToApi(client, data) {
     delete run.id;
     run.projectId = projects[Number(run.projectId)].id;
     run.buildId = builds[Number(run.buildId)].id;
-    await client.createRun(run);
+    await client.createRun({
+      ...run,
+      lhr:
+        // @ts-ignore - allow programmatic creation of LHR
+        typeof run.lhr === 'function' ? run.lhr() : run.lhr,
+    });
   }
 
   for (const build of builds) {
@@ -46,4 +57,4 @@ async function writeSeedDataToApi(client, data) {
   }
 }
 
-module.exports = {createLHR, createDataset, writeSeedDataToApi};
+module.exports = {createLHR, createDefaultDataset, writeSeedDataToApi};

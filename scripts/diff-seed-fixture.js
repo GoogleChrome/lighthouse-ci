@@ -8,13 +8,13 @@
 
 const fs = require('fs');
 const path = require('path');
-const {createDataset} = require('../packages/utils/src/seed-data/seed-data.js');
+const {createDefaultDataset} = require('../packages/utils/src/seed-data/seed-data.js');
 
 const FIXTURE_PATH = path.join(__dirname, '../packages/server/test/fixtures/seed-data.json');
 
 function run() {
   const existingContents = JSON.parse(fs.readFileSync(FIXTURE_PATH, 'utf8'));
-  const newContents = createDataset();
+  const newContents = createDefaultDataset();
 
   newContents.runs.forEach((newRun, i) => {
     const oldRun = existingContents.runs[i];

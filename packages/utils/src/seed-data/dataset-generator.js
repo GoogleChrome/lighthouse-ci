@@ -5,6 +5,8 @@
  */
 'use strict';
 
+const fs = require('fs');
+const path = require('path');
 const _ = require('../lodash.js');
 const PRandom = require('./prandom.js');
 const {createLHR} = require('./lhr-generator.js');
@@ -59,7 +61,7 @@ function removeAllItems(auditsToFakeSrc) {
 /**
  * @return {{projects: Array<LHCI.ServerCommand.Project>, builds: Array<LHCI.ServerCommand.Build>, runs: Array<LHCI.ServerCommand.Run>}}
  */
-function createDataset() {
+function createDefaultDataset() {
   const fiftyFiftyImages = [
     {
       inclusionRate: 0.5,
@@ -441,4 +443,90 @@ function createDataset() {
   };
 }
 
-module.exports = {createDataset, createRuns};
+/**
+ * @return {{projects: Array<LHCI.ServerCommand.Project>, builds: Array<LHCI.ServerCommand.Build>, runs: Array<LHCI.ServerCommand.Run>}}
+ */
+function createLoadTestDataset() {
+  const sourceLhr = fs.readFileSync(path.join(__dirname, 'sample-report.json'), 'utf8');
+
+  const project = {id: '0', name: 'Example', externalUrl: 'https://www.example.com', token: ''};
+  /** @type {Array<LHCI.ServerCommand.Build>} */
+  const builds = [];
+  /** @type {Array<LHCI.ServerCommand.Run>} */
+  const runs = [];
+  for (let i = 0; i < 100; i++) {
+    const runAt = new Date(
+      new Date((builds[i - 1] || {runAt: new Date('2019-07-01')}).runAt).getTime() +
+        Math.round(Math.random() * 24 * 60 * 60 * 1000)
+    ).toISOString();
+    const hash = _.padStart(`${i}`, 40, '0');
+    const ancestorHash = i % 3 === 0 ? '' : _.padStart(`${i - (i % 2 === 0 ? 2 : 1)}`, 40, '0');
+    const author =
+      i % 3 === 0
+        ? {
+            author: 'Patrick Hulce <patrick@example.com>',
+            avatarUrl: 'https://avatars1.githubusercontent.com/u/2301202?s=460&v=4',
+          }
+        : {
+            author: 'Paul Irish <paul@example.com>',
+            avatarUrl: 'https://avatars1.githubusercontent.com/u/39191?s=460&v=4',
+          };
+
+    /** @type {LHCI.ServerCommand.Build} */
+    const build = {
+      id: `${i}`,
+      projectId: project.id,
+      lifecycle: 'unsealed',
+      branch: i % 2 === 0 ? 'master' : `dev${i}`,
+      externalBuildUrl: `https://example.com#${i}`,
+      commitMessage: `${i % 2 === 0 ? 'feat' : 'fix'}: ${i}`,
+      hash,
+      ancestorHash,
+      runAt,
+      ...author,
+    };
+
+    const port = 1000 + Math.round(Math.random() * 60000);
+    const urls = [`http://localhost:${port}/index.html`, `http://localhost:${port}/about.html`];
+    for (let j = 0; j < 10; j++) {
+      for (const url of urls) {
+        runs.push({
+          id: '',
+          buildId: build.id,
+          projectId: project.id,
+          representative: false,
+          url: url.replace(/:\d+/, ':PORT'),
+          // @ts-ignore - programmatic creation of LHR supported by seed-data
+          lhr: () => {
+            /** @type {LH.Result} */
+            const lhr = JSON.parse(sourceLhr);
+            lhr.requestedUrl = url;
+            lhr.finalUrl = url;
+            for (const auditId of Object.keys(lhr.audits)) {
+              const multiplier = 1 + Math.random() * 0.4 - 2;
+              const audit = lhr.audits[auditId];
+              if (typeof audit.numericValue === 'number') {
+                audit.numericValue = audit.numericValue * multiplier;
+              }
+              if (typeof audit.score === 'number') {
+                audit.score = audit.score * multiplier;
+              }
+            }
+
+            return JSON.stringify(lhr);
+          },
+        });
+      }
+    }
+
+    builds.push(build);
+  }
+
+  return {
+    projects: [project],
+    builds,
+    runs,
+  };
+}
+
+module.exports = {createDefaultDataset, createLoadTestDataset, createRuns};

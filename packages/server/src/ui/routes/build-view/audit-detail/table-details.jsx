@@ -54,10 +54,8 @@ export const TableDetails = props => {
             {headings.map((heading, i) => {
               const itemType = heading.valueType || heading.itemType || 'unknown';
               return (
-                <Fragment>
-                  <th className={`table-column--${itemType}`} key={i}>
-                    {heading.label}
-                  </th>
+                <Fragment key={i}>
+                  <th className={`table-column--${itemType}`}>{heading.label}</th>
                   {insertRowLabelAfterIndex === i ? <th /> : null}
                 </Fragment>
               );
@@ -78,8 +76,8 @@ export const TableDetails = props => {
                 {headings.map((heading, j) => {
                   const itemType = heading.valueType || heading.itemType || 'unknown';
                   return (
-                    <Fragment>
-                      <td key={j} className={`table-column--${itemType}`}>
+                    <Fragment key={j}>
+                      <td className={`table-column--${itemType}`}>
                         <SimpleDetails
                           type={itemType}
                           compareValue={compare && compare.item[heading.key]}

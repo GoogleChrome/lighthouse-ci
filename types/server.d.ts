@@ -75,6 +75,7 @@ declare global {
       export interface GetBuildsOptions {
         branch?: string;
         hash?: string;
+        limit?: number;
       }
 
       export interface GetRunsOptions {

@@ -234,8 +234,9 @@ class SqlStorageMethod {
   async getBuilds(projectId, options = {}) {
     const {buildModel} = this._sql();
     const builds = await this._findAll(buildModel, {
-      where: {projectId, ...omit(options, [], {dropUndefined: true})},
+      where: {projectId, ...omit(options, ['limit'], {dropUndefined: true})},
       order,
+      limit: options.limit || 10,
     });
     return clone(builds);
   }

@@ -45,7 +45,6 @@ export const TableDetails = props => {
       isNumericValueType(heading.valueType || heading.itemType || 'unknown')
     ) - 1;
   if (insertRowLabelAfterIndex < 0) insertRowLabelAfterIndex = headings.length - 1;
-  console.log(insertRowLabelAfterIndex);
 
   return (
     <div className="table-details">

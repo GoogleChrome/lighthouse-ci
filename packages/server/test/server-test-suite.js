@@ -156,6 +156,11 @@ function runTests(state) {
       expect(builds).toEqual([buildC, buildB, buildA]);
     });
 
+    it('should list builds with limit', async () => {
+      const builds = await client.getBuilds(projectA.id, {limit: 1});
+      expect(builds).toEqual([buildC]);
+    });
+
     it('should list builds filtered by branch', async () => {
       const builds = await client.getBuilds(projectA.id, {branch: 'master'});
       expect(builds).toEqual([buildA]);

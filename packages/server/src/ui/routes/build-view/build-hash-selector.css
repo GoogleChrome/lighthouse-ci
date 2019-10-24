@@ -43,6 +43,11 @@
   background: var(--compare-highlight-color);
 }
 
+.build-hash-selector--base li:hover {
+  cursor: pointer;
+  background: var(--neutral-highlight-color);
+}
+
 .build-hash-selector__list li.build-hash-selector__label-li:hover {
   cursor: initial;
   background: none;

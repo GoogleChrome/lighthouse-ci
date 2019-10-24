@@ -144,7 +144,7 @@ const BuildHashSelector_ = props => {
 
   return (
     <div className="container">
-      <ul className="build-hash-selector__list">
+      <ul className={`build-hash-selector__list build-hash-selector--${props.selector}`}>
         {builds.map((build, index) => (
           <Fragment key={build.id}>
             <BuildLineItem
@@ -153,7 +153,7 @@ const BuildHashSelector_ = props => {
               compareBuild={props.build}
               baseBuild={props.ancestorBuild}
               selector={props.selector}
-              withDevLine={index <= indexOfFirstDev && build.branch !== 'master'}
+              withDevLine={index <= indexOfFirstDev && props.build.branch !== 'master'}
               withDevBranchArc={index === indexOfFirstDev + 1}
             />
             {index === indexOfFirstDev && build.branch !== 'master' ? (

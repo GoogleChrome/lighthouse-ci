@@ -5,6 +5,8 @@
  */
 
 .audit-numeric-diff {
+  --numeric-diff-bar-height: calc(var(--base-font-size) + 4px);
+
   display: flex;
   flex-direction: row;
   font-family: var(--monospace-font-family);
@@ -58,8 +60,8 @@
   bottom: 0;
   padding: 0 calc(var(--base-spacing) / 2);
 
-  font-size: calc(var(--base-font-size) * 3 / 4);
-  line-height: calc(var(--base-font-size) * 3 / 4);
+  font-size: var(--base-font-size);
+  line-height: var(--numeric-diff-bar-height);
   white-space: nowrap;
   font-weight: var(--medium-font-weight);
 
@@ -88,6 +90,8 @@
 .audit-numeric-diff__right-label {
   width: 60px;
   color: var(--secondary-text-color);
+  font-size: var(--subtext-font-size);
+  line-height: var(--numeric-diff-bar-height);
 }
 
 .audit-numeric-diff__left-label {

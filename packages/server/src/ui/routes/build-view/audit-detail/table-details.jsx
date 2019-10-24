@@ -13,6 +13,19 @@ import {
   getRowLabelForIndex,
 } from '@lhci/utils/src/audit-diff-finder';
 
+/** @param {LH.DetailsType} itemType @return {boolean} */
+function isNumericValueType(itemType) {
+  switch (itemType) {
+    case 'bytes':
+    case 'ms':
+    case 'timespanMs':
+    case 'numeric':
+      return true;
+    default:
+      return false;
+  }
+}
+
 /** @param {{pair: LHCI.AuditPair}} props */
 export const TableDetails = props => {
   const {audit, baseAudit, diffs} = props.pair;
@@ -26,19 +39,28 @@ export const TableDetails = props => {
   const zippedItems = zipBaseAndCompareItems(baseItems, compareItems);
   const sortedItems = sortZippedBaseAndCompareItems(diffs, zippedItems);
   const headings = compareHeadings.length ? compareHeadings : baseHeadings;
+  // We'll insert the row label before the first numeric heading, or last if none is found.
+  let insertRowLabelAfterIndex =
+    headings.findIndex(heading =>
+      isNumericValueType(heading.valueType || heading.itemType || 'unknown')
+    ) - 1;
+  if (insertRowLabelAfterIndex < 0) insertRowLabelAfterIndex = headings.length - 1;
+  console.log(insertRowLabelAfterIndex);
 
   return (
     <div className="table-details">
       <table>
         <thead>
           <tr>
-            <th />
             {headings.map((heading, i) => {
               const itemType = heading.valueType || heading.itemType || 'unknown';
               return (
-                <th className={`table-column--${itemType}`} key={i}>
-                  {heading.label}
-                </th>
+                <Fragment>
+                  <th className={`table-column--${itemType}`} key={i}>
+                    {heading.label}
+                  </th>
+                  {insertRowLabelAfterIndex === i ? <th /> : null}
+                </Fragment>
               );
             })}
           </tr>
@@ -54,17 +76,23 @@ export const TableDetails = props => {
 
             return (
               <tr key={key}>
-                <td className="table-column--row-label">{state}</td>
                 {headings.map((heading, j) => {
                   const itemType = heading.valueType || heading.itemType || 'unknown';
                   return (
-                    <td key={j} className={`table-column--${itemType}`}>
-                      <SimpleDetails
-                        type={itemType}
-                        compareValue={compare && compare.item[heading.key]}
-                        baseValue={base && base.item[heading.key]}
-                      />
-                    </td>
+                    <Fragment>
+                      <td key={j} className={`table-column--${itemType}`}>
+                        <SimpleDetails
+                          type={itemType}
+                          compareValue={compare && compare.item[heading.key]}
+                          baseValue={base && base.item[heading.key]}
+                        />
+                      </td>
+                      {insertRowLabelAfterIndex === j ? (
+                        <td className="table-column--row-label">
+                          {state === 'added' || state === 'removed' ? state : ''}
+                        </td>
+                      ) : null}
+                    </Fragment>
                   );
                 })}
               </tr>

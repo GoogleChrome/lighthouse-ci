@@ -213,10 +213,7 @@ class StorageMethod {
 
     const runs = await storageMethod.getRuns(projectId, buildId);
     /** @type {Array<Array<[LHCI.ServerCommand.Run, LH.Result]>>} */
-    const runsByUrl = _.groupBy(
-      runs.map(run => [run, JSON.parse(run.lhr)]),
-      ([_, lhr]) => lhr.finalUrl
-    );
+    const runsByUrl = _.groupBy(runs.map(run => [run, JSON.parse(run.lhr)]), ([run, _]) => run.url);
 
     const statisicDefinitionEntries = Object.entries(statisticDefinitions);
     const existingStatistics = context.existingStatistics || [];
@@ -226,7 +223,7 @@ class StorageMethod {
         const name = /** @type {LHCI.ServerCommand.StatisticName} */ (key);
         return Promise.all(
           runsByUrl.map(runs => {
-            const url = runs[0][1].finalUrl;
+            const url = runs[0][0].url;
             const {value} = fn(runs.map(([_, lhr]) => lhr));
             const existing = existingStatistics.find(
               s => s.name === name && s.value === value && s.url === url

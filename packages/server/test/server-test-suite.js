@@ -306,7 +306,7 @@ function runTests(state) {
       const payload = {
         projectId: projectA.id,
         buildId: buildA.id,
-        url: 'https://example.com',
+        url: 'https://example.com:PORT/',
         lhr: JSON.stringify(lhr),
       };
 
@@ -321,7 +321,7 @@ function runTests(state) {
       const payload = {
         projectId: projectA.id,
         buildId: buildA.id,
-        url: 'https://example.com',
+        url: 'https://example.com:PORT/',
         lhr: JSON.stringify({
           ...lhr,
           lighthouseVersion: '4.2.0',
@@ -341,7 +341,7 @@ function runTests(state) {
       const payload = {
         projectId: projectA.id,
         buildId: buildA.id,
-        url: 'https://example.com',
+        url: 'https://example.com:PORT/',
         lhr: JSON.stringify({
           ...lhr,
           lighthouseVersion: '4.2.0',
@@ -361,7 +361,7 @@ function runTests(state) {
       const payload = {
         projectId: projectA.id,
         buildId: buildA.id,
-        url: 'https://example.com/blog',
+        url: 'https://example.com:PORT/blog',
         lhr: JSON.stringify({
           finalUrl: 'https://example.com/blog',
           lighthouseVersion: '4.2.0',
@@ -451,82 +451,82 @@ function runTests(state) {
 
       expect(statistics).toMatchObject([
         {
-          url: 'https://example.com/',
+          url: 'https://example.com:PORT/',
           name: 'audit_first-contentful-paint_average',
           value: 2000,
         },
         {
-          url: 'https://example.com/',
+          url: 'https://example.com:PORT/',
           name: 'audit_interactive_average',
           value: 5500,
         },
         {
-          url: 'https://example.com/',
+          url: 'https://example.com:PORT/',
           name: 'audit_speed-index_average',
           value: 5000,
         },
         {
-          url: 'https://example.com/',
+          url: 'https://example.com:PORT/',
           name: 'category_accessibility_average',
           value: -1,
         },
         {
-          url: 'https://example.com/',
+          url: 'https://example.com:PORT/',
           name: 'category_best-practices_average',
           value: -1,
         },
         {
-          url: 'https://example.com/',
+          url: 'https://example.com:PORT/',
           name: 'category_performance_average',
           value: 0.45,
         },
         {
-          url: 'https://example.com/',
+          url: 'https://example.com:PORT/',
           name: 'category_pwa_average',
           value: 0.1,
         },
         {
-          url: 'https://example.com/',
+          url: 'https://example.com:PORT/',
           name: 'category_seo_average',
           value: 0.9,
         },
         {
-          url: 'https://example.com/blog',
+          url: 'https://example.com:PORT/blog',
           name: 'audit_first-contentful-paint_average',
           value: 1000,
         },
         {
-          url: 'https://example.com/blog',
+          url: 'https://example.com:PORT/blog',
           name: 'audit_interactive_average',
           value: 1000,
         },
         {
-          url: 'https://example.com/blog',
+          url: 'https://example.com:PORT/blog',
           name: 'audit_speed-index_average',
           value: 1000,
         },
         {
-          url: 'https://example.com/blog',
+          url: 'https://example.com:PORT/blog',
           name: 'category_accessibility_average',
           value: -1,
         },
         {
-          url: 'https://example.com/blog',
+          url: 'https://example.com:PORT/blog',
           name: 'category_best-practices_average',
           value: -1,
         },
         {
-          url: 'https://example.com/blog',
+          url: 'https://example.com:PORT/blog',
           name: 'category_performance_average',
           value: 0.9,
         },
         {
-          url: 'https://example.com/blog',
+          url: 'https://example.com:PORT/blog',
           name: 'category_pwa_average',
           value: 0.4,
         },
         {
-          url: 'https://example.com/blog',
+          url: 'https://example.com:PORT/blog',
           name: 'category_seo_average',
           value: 0.7,
         },
@@ -537,14 +537,20 @@ function runTests(state) {
   describe('/:projectId/urls', () => {
     it('should list urls', async () => {
       const urls = await client.getUrls(projectA.id);
-      expect(urls).toEqual([{url: 'https://example.com/blog'}, {url: 'https://example.com'}]);
+      expect(urls).toEqual([
+        {url: 'https://example.com:PORT/blog'},
+        {url: 'https://example.com:PORT/'},
+      ]);
     });
   });
 
   describe('/:projectId/builds/:buildId/urls', () => {
     it('should list urls', async () => {
       const urls = await client.getUrls(projectA.id, buildA.id);
-      expect(urls).toEqual([{url: 'https://example.com/blog'}, {url: 'https://example.com'}]);
+      expect(urls).toEqual([
+        {url: 'https://example.com:PORT/blog'},
+        {url: 'https://example.com:PORT/'},
+      ]);
     });
   });
 

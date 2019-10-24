@@ -8,51 +8,34 @@ import {h, Fragment, VNode} from 'preact';
 import clsx from 'clsx';
 import './page-header.css';
 import {useProject} from '../hooks/use-api-data';
-import {Router, Link} from 'preact-router';
+import {Link} from 'preact-router';
+import {useRouteParams} from '../hooks/use-route-params';
 
-/** @param {{children?: Array<VNode> | VNode, setIsSidebarOpen: (isOpen: boolean) => void, matches: {projectId?: string}}} props */
-const PageHeader_ = props => {
-  const [_, selectedProject] = useProject(props.matches.projectId);
+/** @param {{children?: Array<VNode> | VNode, setIsSidebarOpen: (isOpen: boolean) => void}} props */
+export const PageHeader = props => {
+  const {projectId} = useRouteParams();
+  const [_, selectedProject] = useProject(projectId);
 
   return (
-    <Fragment>
-      <div className={clsx('page-header')}>
-        <div className="page-header__left">
-          <div
-            className="page-header__sidebar-button"
-            role="button"
-            onClick={() => props.setIsSidebarOpen(true)}
-          >
-            <i className="material-icons">menu</i>
-          </div>
-          <div className="page-header__current-project">
-            <Link href={selectedProject ? `/app/projects/${selectedProject.id}` : '#'}>
-              {(selectedProject && selectedProject.name) || 'Lighthouse CI'}
-            </Link>
-          </div>
+    <div className={clsx('page-header')}>
+      <div className="page-header__left">
+        <div
+          className="page-header__sidebar-button"
+          role="button"
+          onClick={() => props.setIsSidebarOpen(true)}
+        >
+          <i className="material-icons">menu</i>
         </div>
-        <div className="page-header__center">{props.children}</div>
-        <div className="page-header__right">
-          <span />
+        <div className="page-header__current-project">
+          <Link href={selectedProject ? `/app/projects/${selectedProject.id}` : '#'}>
+            {(selectedProject && selectedProject.name) || 'Lighthouse CI'}
+          </Link>
         </div>
       </div>
-    </Fragment>
-  );
-};
-
-/** @type {any} Router types do not work properly, so fallback to any. */
-const PageHeaderNoTypes = PageHeader_;
-
-/** @param {Omit<Parameters<typeof PageHeader_>[0], 'matches'>} props */
-export const PageHeader = props => {
-  return (
-    <Router>
-      <PageHeaderNoTypes
-        path="/app/:slug?/:projectId?/:slugLevel2?/:idLevel2?"
-        setIsSidebarOpen={props.setIsSidebarOpen}
-      >
-        {props.children}
-      </PageHeaderNoTypes>
-    </Router>
+      <div className="page-header__center">{props.children}</div>
+      <div className="page-header__right">
+        <span />
+      </div>
+    </div>
   );
 };

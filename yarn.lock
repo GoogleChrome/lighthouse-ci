@@ -11117,15 +11117,15 @@ preact-async-route@^2.2.1:
   resolved "https://registry.yarnpkg.com/preact-async-route/-/preact-async-route-2.2.1.tgz#729f8f8650281973251fbbf852d5004f32f48594"
   integrity sha512-8bg1007akXs3YDmzYT4McaTe6ji2FIzcc0/NTlu+vjJaKPNQ8lNG/HQ6LP+FoIxQ4m/KH5vvJCHJN5ADp2iNGA==
 
-preact-router@^3.0.0:
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/preact-router/-/preact-router-3.0.0.tgz#352bb4c2bba3fa7aad2a686fd0371ae247ce3159"
-  integrity sha512-v/dTwXa0TAeP2NTf4YFvT+TygejoSxN4Un9y90sNJiM/r6EY6wqBEoxmCdTTz5Yb101iP3Zuwr+4Wby7ZY1S+w==
+preact-router@^3.1.0:
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/preact-router/-/preact-router-3.1.0.tgz#fed59487f812baef4a63aa63175e280fa3608151"
+  integrity sha512-OeiSIl6C4ecfKl4wmEkkz5LO68PuNYuSWk1dxpjmTIMsXVRxm0PWw6PudAISQBjYmzMY9Z6NBfXoZjQDLV3l7g==
 
-preact@^10.0.0-beta.2:
-  version "10.0.0-beta.2"
-  resolved "https://registry.yarnpkg.com/preact/-/preact-10.0.0-beta.2.tgz#659b6520eb41d5a3d178a61b3311e6ae79d8cf56"
-  integrity sha512-sKu2tdECRcmG8B2Q0GIAhTR95PhaWy15RkYFgpzfkEQLo7qqnE5lYQO2ccHNTfwuzj0LVPRdG71s5QjhnRyVbQ==
+preact@^10.0.1:
+  version "10.0.1"
+  resolved "https://registry.yarnpkg.com/preact/-/preact-10.0.1.tgz#16451887a8490dd534d60d1bc7d2ff4a70f7e0ee"
+  integrity sha512-lq7jo1rwwCd1YkiBcuOxRc3I0y1FZACa6O7tgNXt47QZJtSlLEE53f/FDNsLtiB2IVQTHbaey20TjSPmejhDyQ==
 
 prelude-ls@~1.1.2:
   version "1.1.2"

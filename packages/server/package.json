@@ -30,9 +30,9 @@
     "@babel/core": "^7.5.5",
     "clsx": "^1.0.4",
     "plotly.js": "^1.48.3",
-    "preact": "^10.0.0-beta.2",
+    "preact": "^10.0.1",
     "preact-async-route": "^2.2.1",
-    "preact-router": "^3.0.0"
+    "preact-router": "^3.1.0"
   },
   "alias": {
     "isomorphic-fetch": "clsx"

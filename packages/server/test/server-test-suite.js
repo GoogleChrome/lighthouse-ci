@@ -592,6 +592,15 @@ function runTests(state) {
         body: '{"message":"Invalid representative value"}',
       });
     });
+
+    it('should reject runs with invalid LHR', async () => {
+      await expect(
+        client.createRun({...runA, buildId: buildB.id, lhr: null})
+      ).rejects.toMatchObject({
+        status: 422,
+        body: '{"message":"Invalid LHR"}',
+      });
+    });
   });
 }
 

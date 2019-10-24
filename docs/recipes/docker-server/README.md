@@ -7,7 +7,6 @@
 _NOTE: commands below were tested with Docker 18.09.2_
 
 ```bash
-# Tested with Docker
 docker image build -t lhci .
 docker volume create lhci-data
 docker container run --publish 9001:9001 --mount='source=lhci-data,target=/data' --detach lhci

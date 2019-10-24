@@ -408,6 +408,7 @@ class SqlStorageMethod {
     const {runModel} = this._sql();
     const build = await this.findBuildById(unsavedRun.projectId, unsavedRun.buildId);
     if (!build || build.lifecycle !== 'unsealed') throw new E422('Invalid build');
+    if (typeof unsavedRun.lhr !== 'string') throw new E422('Invalid LHR');
     if (unsavedRun.representative) throw new E422('Invalid representative value');
 
     const run = await runModel.create({...unsavedRun, representative: false, id: uuid.v4()});

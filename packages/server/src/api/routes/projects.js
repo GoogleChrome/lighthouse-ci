@@ -142,10 +142,10 @@ function createRouter(context) {
   router.post(
     '/:projectId/builds/:buildId/runs',
     handleAsyncError(async (req, res) => {
-      const unsavedBuild = req.body;
-      unsavedBuild.projectId = req.params.projectId;
-      unsavedBuild.buildId = req.params.buildId;
-      const run = await context.storageMethod.createRun(unsavedBuild);
+      const unsavedRun = req.body;
+      unsavedRun.projectId = req.params.projectId;
+      unsavedRun.buildId = req.params.buildId;
+      const run = await context.storageMethod.createRun(unsavedRun);
       res.json(run);
     })
   );

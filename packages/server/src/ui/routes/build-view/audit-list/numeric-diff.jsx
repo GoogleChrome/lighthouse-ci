@@ -41,7 +41,7 @@ const getUnitFromAudit = (audit, groupId) => {
   return 'none';
 };
 
-/** @param {number} x @param {{asDelta?: boolean, unit: 'ms'|'bytes'|'none', withSuffix?: boolean}} options */
+/** @param {number} x @param {{asDelta?: boolean, unit: 'ms'|'bytes'|'none', withSuffix?: boolean, preventSecondsConversion?: boolean}} options */
 const toDisplay = (x, options) => {
   const {asDelta = false, withSuffix = false, unit = 'none'} = options;
   let value = Math.round(x);
@@ -51,7 +51,7 @@ const toDisplay = (x, options) => {
   if (unit === 'ms') {
     suffix = ' ms';
 
-    if (Math.abs(value) >= 50) {
+    if (Math.abs(value) >= 500 && !options.preventSecondsConversion) {
       value /= 1000;
       fractionDigits = 1;
       suffix = ' s';
@@ -107,11 +107,18 @@ export const NumericDiff = props => {
   const boxRight = 100 - (100 * (maxValue - lowerLimit)) / range;
   const deltaType = getDeltaLabel(delta, 'audit');
   const minValueIsCurrentValue = minValue === currentNumericValue;
+  const hoverDisplay = `${toDisplay(baseNumericValue, {unit, withSuffix: true})} to ${toDisplay(
+    currentNumericValue,
+    {
+      withSuffix: true,
+      unit,
+    }
+  )}`;
 
   if (props.showAsNarrow) {
     return (
-      <div className={clsx('audit-numeric-diff', `text--${deltaType}`)}>
-        {toDisplay(delta, {asDelta: true, withSuffix: true, unit})}
+      <div className={clsx('audit-numeric-diff', `text--${deltaType}`)} data-tooltip={hoverDisplay}>
+        {toDisplay(delta, {asDelta: true, withSuffix: true, preventSecondsConversion: true, unit})}
       </div>
     );
   }
@@ -127,13 +134,7 @@ export const NumericDiff = props => {
               'audit-numeric-diff__box--regression': deltaType === 'regression',
             })}
             style={{left: `${boxLeft}%`, right: `${boxRight}%`}}
-            data-tooltip={`${toDisplay(baseNumericValue, {unit, withSuffix: true})} to ${toDisplay(
-              currentNumericValue,
-              {
-                withSuffix: true,
-                unit,
-              }
-            )}`}
+            data-tooltip={hoverDisplay}
           >
             <div
               className="audit-numeric-diff__now"
@@ -148,7 +149,12 @@ export const NumericDiff = props => {
               })}
               style={{[minValueIsCurrentValue ? 'right' : 'left']: '100%'}}
             >
-              {toDisplay(delta, {asDelta: true, withSuffix: true, unit})}
+              {toDisplay(delta, {
+                asDelta: true,
+                withSuffix: true,
+                preventSecondsConversion: true,
+                unit,
+              })}
             </div>
           </div>
         </div>

@@ -14,6 +14,7 @@ const {
   getRowLabel,
   getRowLabelForIndex,
   zipBaseAndCompareItems,
+  synthesizeItemKeyDiffs,
   sortZippedBaseAndCompareItems,
   replaceNondeterministicStrings,
 } = require('@lhci/utils/src/audit-diff-finder.js');
@@ -248,6 +249,24 @@ describe('#findAuditDiffs', () => {
         type: 'itemAddition',
         compareItemIndex: 0,
       },
+    ]);
+  });
+
+  it('should synthesize item delta diffs', () => {
+    const detailsItem = {url: 'http://example.com/foo.js', wastedMs: 1000};
+    const baseAudit = {id: 'audit', score: 0.5, details: {items: []}};
+    const compareAudit = {id: 'audit', score: 0.5, details: {items: [detailsItem]}};
+
+    expect(findAuditDiffs(baseAudit, compareAudit)).toMatchObject([
+      {type: 'itemCount'},
+      {type: 'itemAddition'},
+    ]);
+
+    const options = {synthesizeItemKeyDiffs: true};
+    expect(findAuditDiffs(baseAudit, compareAudit, options)).toMatchObject([
+      {type: 'itemCount'},
+      {type: 'itemAddition'},
+      {type: 'itemDelta', baseValue: 0, compareValue: 1000, itemKey: 'wastedMs'},
     ]);
   });
 
@@ -517,11 +536,15 @@ describe('#getRowLabel', () => {
     const diffs = [
       {type: 'itemAddition', compareItemIndex: 27},
       {type: 'itemRemoval', baseItemIndex: 5},
+      {type: 'itemAddition', compareItemIndex: 13, baseItemIndex: undefined},
+      {type: 'itemRemoval', baseItemIndex: 8, compareItemIndex: undefined},
       {type: 'itemDelta', compareItemIndex: 2, baseItemIndex: 0, compareValue: 0, baseValue: 1},
     ];
 
     expect(getRowLabelForIndex(diffs, 27, undefined)).toEqual('added');
     expect(getRowLabelForIndex(diffs, undefined, 5)).toEqual('removed');
+    expect(getRowLabelForIndex(diffs, 13, undefined)).toEqual('added');
+    expect(getRowLabelForIndex(diffs, undefined, 8)).toEqual('removed');
     expect(getRowLabelForIndex(diffs, 2, 0)).toEqual('better');
   });
 });
@@ -750,6 +773,82 @@ describe('#sortZippedBaseAndCompareItems', () => {
       {
         base: {index: 3, item: {url: 'd', node: '<br />'}, kind: 'base'},
         compare: {index: 3, item: {url: 'd', node: '<br />'}, kind: 'compare'},
+      },
+    ]);
+  });
+});
+
+describe('#synthesizeItemKeyDiffs', () => {
+  it('should do nothing for existing diffs', () => {
+    const baseItems = [{url: 'a', propA: 10, propB: 3}];
+    const compareItems = [{url: 'a', propA: 5, propB: 6}];
+    const originalDiffs = findAuditDiffs(
+      {id: 'foo', score: 0.5, numericValue: 500, details: {items: baseItems}},
+      {id: 'foo', score: 1, numericValue: 10, details: {items: compareItems}}
+    );
+
+    const newDiffs = synthesizeItemKeyDiffs(originalDiffs, baseItems, compareItems);
+    expect(newDiffs).toEqual([]);
+  });
+
+  it('should create new item key diffs from itemAddition', () => {
+    const baseItems = [];
+    const compareItems = [{url: 'b', propA: 5, propB: 6}];
+    const originalDiffs = findAuditDiffs(
+      {id: 'foo', score: 1, details: {items: baseItems}},
+      {id: 'foo', score: 1, details: {items: compareItems}}
+    );
+
+    const newDiffs = synthesizeItemKeyDiffs(originalDiffs, baseItems, compareItems);
+    expect(newDiffs).toEqual([
+      {
+        auditId: 'foo',
+        baseItemIndex: undefined,
+        baseValue: 0,
+        compareItemIndex: 0,
+        compareValue: 5,
+        itemKey: 'propA',
+        type: 'itemDelta',
+      },
+      {
+        auditId: 'foo',
+        baseItemIndex: undefined,
+        baseValue: 0,
+        compareItemIndex: 0,
+        compareValue: 6,
+        itemKey: 'propB',
+        type: 'itemDelta',
+      },
+    ]);
+  });
+
+  it('should create new item key diffs from itemRemoval', () => {
+    const baseItems = [{url: 'a', propA: 1, propB: 2}];
+    const compareItems = [];
+    const originalDiffs = findAuditDiffs(
+      {id: 'foo', score: 1, details: {items: baseItems}},
+      {id: 'foo', score: 1, details: {items: compareItems}}
+    );
+
+    const newDiffs = synthesizeItemKeyDiffs(originalDiffs, baseItems, compareItems);
+    expect(newDiffs).toEqual([
+      {
+        auditId: 'foo',
+        baseItemIndex: 0,
+        baseValue: 1,
+        compareItemIndex: undefined,
+        compareValue: 0,
+        itemKey: 'propA',
+        type: 'itemDelta',
+      },
+      {
+        auditId: 'foo',
+        baseItemIndex: 0,
+        baseValue: 2,
+        compareItemIndex: undefined,
+        compareValue: 0,
+        itemKey: 'propB',
+        type: 'itemDelta',
       },
     ]);
   });

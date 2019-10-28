@@ -219,9 +219,10 @@ function createAuditDiff(diff) {
   };
 
   if (type === 'itemDelta') {
-    if (typeof baseItemIndex !== 'number') throw new Error('baseItemIndex is not set');
-    if (typeof compareItemIndex !== 'number') throw new Error('compareItemIndex is not set');
     if (typeof itemKey !== 'string') throw new Error('itemKey is not set');
+    if (typeof baseItemIndex !== 'number' && typeof compareItemIndex !== 'number') {
+      throw new Error('Either baseItemIndex or compareItemIndex must be set');
+    }
 
     return {
       ...numericDiffResult,
@@ -265,6 +266,53 @@ function findAuditDetailItemKeyDiffs(auditId, baseEntry, compareEntry) {
   }
 
   return diffs;
+}
+
+/**
+ * This function creates NumericItemAuditDiffs from itemAddition/itemRemoved diffs. Normally, these
+ * are superfluous data, but in some instances (table details views for example), it's desirable to
+ * understand the diff state of each individual itemKey. The missing values are assumed to be 0
+ * for the purposes of the diff.
+ *
+ * @param {Array<LHCI.AuditDiff>} diffs
+ * @param {Array<Record<string, any>>} baseItems
+ * @param {Array<Record<string, any>>} compareItems
+ * @return {Array<LHCI.AuditDiff>}
+ */
+function synthesizeItemKeyDiffs(diffs, baseItems, compareItems) {
+  /** @type {Array<LHCI.AuditDiff>} */
+  const itemKeyDiffs = [];
+
+  for (const diff of diffs) {
+    if (diff.type !== 'itemAddition' && diff.type !== 'itemRemoval') continue;
+
+    const item =
+      diff.type === 'itemAddition'
+        ? compareItems[diff.compareItemIndex]
+        : baseItems[diff.baseItemIndex];
+
+    for (const key of Object.keys(item)) {
+      const baseValue = diff.type === 'itemAddition' ? 0 : item[key];
+      const compareValue = diff.type === 'itemAddition' ? item[key] : 0;
+      if (typeof compareValue !== 'number' || typeof baseValue !== 'number') continue;
+
+      const itemIndexKeyName = diff.type === 'itemAddition' ? 'compareItemIndex' : 'baseItemIndex';
+      const itemIndexValue =
+        diff.type === 'itemAddition' ? diff.compareItemIndex : diff.baseItemIndex;
+      itemKeyDiffs.push(
+        createAuditDiff({
+          auditId: diff.auditId,
+          type: 'itemDelta',
+          itemKey: key,
+          [itemIndexKeyName]: itemIndexValue,
+          baseValue,
+          compareValue,
+        })
+      );
+    }
+  }
+
+  return itemKeyDiffs;
 }
 
 /** @param {string} s */
@@ -458,7 +506,7 @@ function normalizeDetailsItems(audit) {
 /**
  * @param {LH.AuditResult} baseAudit
  * @param {LH.AuditResult} compareAudit
- * @param {{forceAllScoreDiffs?: boolean, skipDisplayValueDiffs?: boolean, percentAbsoluteDeltaThreshold?: number}} options
+ * @param {{forceAllScoreDiffs?: boolean, skipDisplayValueDiffs?: boolean, synthesizeItemKeyDiffs?: boolean, percentAbsoluteDeltaThreshold?: number}} options
  * @return {Array<LHCI.AuditDiff>}
  */
 function findAuditDiffs(baseAudit, compareAudit, options = {}) {
@@ -518,6 +566,10 @@ function findAuditDiffs(baseAudit, compareAudit, options = {}) {
     );
 
     diffs.push(...findAuditDetailItemsDiffs(auditId, baseItems, compareItems));
+
+    if (options.synthesizeItemKeyDiffs) {
+      diffs.push(...synthesizeItemKeyDiffs(diffs, baseItems, compareItems));
+    }
   }
 
   const filteredDiffs = diffs.filter(diff => {
@@ -559,11 +611,13 @@ module.exports = {
   findAuditDiffs,
   getDiffSeverity,
   getDeltaLabel,
+  getDeltaStats,
   getDiffLabel,
   getRowLabel,
   getRowLabelForIndex,
   getMostSevereDiffLabel,
   zipBaseAndCompareItems,
+  synthesizeItemKeyDiffs,
   sortZippedBaseAndCompareItems,
   replaceNondeterministicStrings,
 };

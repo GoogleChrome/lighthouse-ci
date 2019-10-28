@@ -38,6 +38,7 @@ declare global {
         ancestorHash?: string;
         createdAt?: string;
         updatedAt?: string;
+        committedAt?: string;
       }
 
       export interface Run {

@@ -72,11 +72,30 @@ function getCurrentHash() {
   if (envVars.TRAVIS_PULL_REQUEST_SHA) return envVars.TRAVIS_PULL_REQUEST_SHA;
   if (envVars.TRAVIS_COMMIT) return envVars.TRAVIS_COMMIT;
 
-  const result = childProcess.spawnSync('git', ['rev-list', '--no-merges', '-n', '1', 'HEAD'], {
+  const result = childProcess.spawnSync('git', ['rev-list', '--no-merges', '-n1', 'HEAD'], {
     encoding: 'utf8',
   });
   if (result.status !== 0) {
     throw new Error('Unable to determine current hash with `git rev-parse HEAD`');
+  }
+
+  return result.stdout.trim();
+}
+
+/**
+ * @param {string} currentHash
+ * @return {string}
+ */
+function getCommitTime(currentHash) {
+  const result = childProcess.spawnSync(
+    'git',
+    ['log', '-n1', '-pretty="format:%cI"', currentHash],
+    {
+      encoding: 'utf8',
+    }
+  );
+  if (result.status !== 0) {
+    throw new Error('Unable to retrieve committer timestamp from commit');
   }
 
   return result.stdout.trim();
@@ -320,6 +339,7 @@ async function runLHCITarget(options) {
     branch,
     commitMessage: getCommitMessage(hash),
     author: getAuthor(hash),
+    committedAt: getCommitTime(hash),
     avatarUrl: getAvatarUrl(hash),
     ancestorHash: branch === 'master' ? getAncestorHashForMaster() : getAncestorHashForBranch(),
     externalBuildUrl: getExternalBuildUrl(),

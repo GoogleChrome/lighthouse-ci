@@ -6,35 +6,40 @@
 
 import {h} from 'preact';
 import './simple-details.css';
+import {getDiffLabel, getDeltaStats} from '@lhci/utils/src/audit-diff-finder.js';
 
-/** @param {{type: LH.DetailsType, baseValue: any, compareValue: any}} props */
+/** @param {{type: LH.DetailsType, baseValue: any, compareValue: any, diff?: LHCI.NumericItemAuditDiff}} props */
 export const SimpleDetails = props => {
   let type = props.type;
-  const {compareValue, baseValue} = props;
+  const {compareValue, baseValue, diff} = props;
   const value = compareValue === undefined ? baseValue : compareValue;
 
   if (typeof value === 'object' && value.type) {
     type = value.type;
   }
 
+  const label = diff ? getDiffLabel(diff) : 'neutral';
+
   const numericBase = Number.isFinite(baseValue) ? baseValue : 0;
   const numericCompare = Number.isFinite(compareValue) ? compareValue : 0;
-
-  let label = 'neutral';
-  if (numericCompare < numericBase) label = 'improvement';
-  if (numericCompare > numericBase) label = 'regression';
-
   const baseDisplay = `Base Value: ${Math.round(numericBase).toLocaleString()}`;
   const compareDisplay = `Compare Value: ${Math.round(numericCompare).toLocaleString()}`;
-  const title = `${baseDisplay}, ${compareDisplay}`;
+  const numericTitle = `${baseDisplay}, ${compareDisplay}`;
+  const deltaPercent =
+    diff && getDeltaStats(diff).percentAbsoluteDelta !== 1
+      ? ` (${(getDeltaStats(diff).percentAbsoluteDelta * 100).toLocaleString(undefined, {
+          maximumFractionDigits: 0,
+        })}%)`
+      : '';
 
   switch (type) {
     case 'bytes': {
       const kb = Math.abs((numericCompare - numericBase) / 1024);
       return (
-        <pre className={`simple-details--${label}`} data-tooltip={title}>
+        <pre className={`simple-details--${label}`} data-tooltip={numericTitle}>
           {numericCompare >= numericBase ? '+' : '-'}
           {kb.toLocaleString(undefined, {maximumFractionDigits: Math.abs(kb) < 1 ? 1 : 0})} KB
+          {deltaPercent}
         </pre>
       );
     }
@@ -42,9 +47,10 @@ export const SimpleDetails = props => {
     case 'timespanMs': {
       const ms = Math.abs(Math.round(numericCompare - numericBase));
       return (
-        <pre className={`simple-details--${label}`} data-tooltip={title}>
+        <pre className={`simple-details--${label}`} data-tooltip={numericTitle}>
           {numericCompare >= numericBase ? '+' : '-'}
           {ms.toLocaleString()} ms
+          {deltaPercent}
         </pre>
       );
     }
@@ -82,6 +88,7 @@ export const SimpleDetails = props => {
         <pre className={`simple-details--${label}`}>
           {numericCompare >= numericBase ? '+' : '-'}
           {Math.abs(numericCompare - numericBase).toLocaleString()}
+          {deltaPercent}
         </pre>
       );
     }

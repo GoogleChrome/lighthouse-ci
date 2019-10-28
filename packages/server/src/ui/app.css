@@ -130,7 +130,7 @@ body {
 .container {
   width: 100%;
   max-width: 762px;
-  min-width: 400px;
+  min-width: 300px;
   margin: 0 auto;
 }
 

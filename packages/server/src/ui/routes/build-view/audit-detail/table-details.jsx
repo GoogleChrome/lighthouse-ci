@@ -28,7 +28,7 @@ function isNumericValueType(itemType) {
 
 /** @param {{pair: LHCI.AuditPair}} props */
 export const TableDetails = props => {
-  const {audit, baseAudit, diffs} = props.pair;
+  const {audit, baseAudit, diffs: allDiffs} = props.pair;
   if (!audit.details) return <Fragment />;
   const {headings: compareHeadings, items: compareItems} = audit.details;
   if (!compareHeadings || !compareItems) return <Fragment />;
@@ -37,7 +37,7 @@ export const TableDetails = props => {
   const baseItems = (baseAudit && baseAudit.details && baseAudit.details.items) || [];
 
   const zippedItems = zipBaseAndCompareItems(baseItems, compareItems);
-  const sortedItems = sortZippedBaseAndCompareItems(diffs, zippedItems);
+  const sortedItems = sortZippedBaseAndCompareItems(allDiffs, zippedItems);
   const headings = compareHeadings.length ? compareHeadings : baseHeadings;
   // We'll insert the row label before the first numeric heading, or last if none is found.
   let insertRowLabelAfterIndex =
@@ -63,18 +63,27 @@ export const TableDetails = props => {
           </tr>
         </thead>
         <tbody>
-          {sortedItems.map(({base, compare}) => {
+          {sortedItems.map(({base, compare, diffs}) => {
             const definedItem = compare || base;
             // This should never be true, but make tsc happy
             if (!definedItem) return null;
 
             const key = `${base && base.index}-${compare && compare.index}`;
-            const state = getRowLabelForIndex(diffs, compare && compare.index, base && base.index);
+            const state = getRowLabelForIndex(
+              allDiffs,
+              compare && compare.index,
+              base && base.index
+            );
 
             return (
               <tr key={key}>
                 {headings.map((heading, j) => {
                   const itemType = heading.valueType || heading.itemType || 'unknown';
+                  const diff = diffs.find(
+                    /** @return {diff is LHCI.NumericItemAuditDiff} */
+                    diff => diff.type === 'itemDelta' && diff.itemKey === heading.key
+                  );
+
                   return (
                     <Fragment key={j}>
                       <td className={`table-column--${itemType}`}>
@@ -82,6 +91,7 @@ export const TableDetails = props => {
                           type={itemType}
                           compareValue={compare && compare.item[heading.key]}
                           baseValue={base && base.item[heading.key]}
+                          diff={diff}
                         />
                       </td>
                       {insertRowLabelAfterIndex === j ? (

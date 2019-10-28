@@ -8,7 +8,7 @@
   position: fixed;
   top: var(--page-header-height);
   right: 0;
-  left: 50%;
+  left: 40%;
   bottom: 0;
   z-index: 5;
   padding-bottom: 70vh;

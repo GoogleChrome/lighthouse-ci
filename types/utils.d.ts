@@ -41,8 +41,8 @@ declare global {
 
     export interface NumericItemAuditDiff extends BaseAuditDiff, BaseNumericAuditDiff {
       type: 'itemDelta';
-      baseItemIndex: number;
-      compareItemIndex: number;
+      baseItemIndex?: number;
+      compareItemIndex?: number;
       itemKey: string;
     }
 

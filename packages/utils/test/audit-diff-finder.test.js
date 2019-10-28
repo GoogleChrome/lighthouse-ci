@@ -629,7 +629,7 @@ describe('#sortZippedBaseAndCompareItems', () => {
     );
   };
 
-  it('should sort by RowLabel', () => {
+  it('should sort by RowLabel preserving diffs', () => {
     const base = [
       {url: 'a', wastedMs: 100},
       {url: 'b', wastedMs: 100},
@@ -644,31 +644,34 @@ describe('#sortZippedBaseAndCompareItems', () => {
       {url: 'e', wastedMs: 100}, // added
     ];
 
-    const zipped = sortZippedBaseAndCompareItems(
-      getDiffs(base, compare),
-      zipBaseAndCompareItems(base, compare)
-    );
+    const diffs = getDiffs(base, compare);
+    const zipped = sortZippedBaseAndCompareItems(diffs, zipBaseAndCompareItems(base, compare));
 
     expect(zipped).toEqual([
       {
         base: undefined,
         compare: {index: 3, item: {url: 'e', wastedMs: 100}, kind: 'compare'},
+        diffs: [diffs.find(diff => diff.type === 'itemAddition')],
       },
       {
         base: {index: 2, item: {url: 'c', wastedMs: 100}, kind: 'base'},
         compare: {index: 2, item: {url: 'c', wastedMs: 150}, kind: 'compare'},
+        diffs: diffs.filter(diff => diff.compareItemIndex === 2 && diff.baseItemIndex === 2),
       },
       {
         base: {index: 3, item: {url: 'd', wastedMs: 100}, kind: 'base'},
         compare: undefined,
+        diffs: [diffs.find(diff => diff.type === 'itemRemoval')],
       },
       {
         base: {index: 1, item: {url: 'b', wastedMs: 100}, kind: 'base'},
         compare: {index: 1, item: {url: 'b', wastedMs: 50}, kind: 'compare'},
+        diffs: diffs.filter(diff => diff.compareItemIndex === 1 && diff.baseItemIndex === 1),
       },
       {
         base: {index: 0, item: {url: 'a', wastedMs: 100}, kind: 'base'},
         compare: {index: 0, item: {url: 'a', wastedMs: 100}, kind: 'compare'},
+        diffs: diffs.filter(diff => diff.compareItemIndex === 0 && diff.baseItemIndex === 0),
       },
     ]);
   });
@@ -692,7 +695,7 @@ describe('#sortZippedBaseAndCompareItems', () => {
       zipBaseAndCompareItems(base, compare)
     );
 
-    expect(zipped).toEqual([
+    expect(zipped).toMatchObject([
       {
         base: {index: 1, item: {url: 'b', wastedMs: 100}, kind: 'base'},
         compare: {index: 1, item: {url: 'b', wastedMs: 950}, kind: 'compare'},
@@ -731,7 +734,7 @@ describe('#sortZippedBaseAndCompareItems', () => {
       zipBaseAndCompareItems(base, compare)
     );
 
-    expect(zipped).toEqual([
+    expect(zipped).toMatchObject([
       {
         base: {index: 2, item: {url: 'a', node: '<br />'}, kind: 'base'},
         compare: {index: 2, item: {url: 'a', node: '<br />'}, kind: 'compare'},

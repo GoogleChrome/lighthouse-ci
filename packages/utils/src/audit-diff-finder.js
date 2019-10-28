@@ -331,38 +331,53 @@ function zipBaseAndCompareItems(baseItems, compareItems) {
 /**
  * @param {Array<LHCI.AuditDiff>} diffs
  * @param {Array<{base?: DetailItemEntry, compare?: DetailItemEntry}>} zippedItems
- * @return {Array<{base?: DetailItemEntry, compare?: DetailItemEntry}>}
+ * @return {Array<{base?: DetailItemEntry, compare?: DetailItemEntry, diffs: Array<LHCI.AuditDiff>}>}
  */
 function sortZippedBaseAndCompareItems(diffs, zippedItems) {
   /** @type {Array<RowLabel>} */
   const rowLabelSortOrder = ['added', 'worse', 'ambiguous', 'removed', 'better', 'no change'];
 
-  return zippedItems.sort((a, b) => {
-    const compareIndexA = a.compare && a.compare.index;
-    const baseIndexA = a.base && a.base.index;
-    const compareIndexB = b.compare && b.compare.index;
-    const baseIndexB = b.base && b.base.index;
+  return zippedItems
+    .map(item => {
+      return {
+        ...item,
+        diffs: getMatchingDiffsForIndex(
+          diffs,
+          item.compare && item.compare.index,
+          item.base && item.base.index
+        ),
+      };
+    })
+    .sort((a, b) => {
+      const compareIndexA = a.compare && a.compare.index;
+      const baseIndexA = a.base && a.base.index;
+      const compareIndexB = b.compare && b.compare.index;
+      const baseIndexB = b.base && b.base.index;
 
-    const rowStateIndexA = rowLabelSortOrder.indexOf(
-      getRowLabelForIndex(diffs, compareIndexA, baseIndexA)
-    );
-    const rowStateIndexB = rowLabelSortOrder.indexOf(
-      getRowLabelForIndex(diffs, compareIndexB, baseIndexB)
-    );
+      const rowStateIndexA = rowLabelSortOrder.indexOf(
+        getRowLabelForIndex(diffs, compareIndexA, baseIndexA)
+      );
+      const rowStateIndexB = rowLabelSortOrder.indexOf(
+        getRowLabelForIndex(diffs, compareIndexB, baseIndexB)
+      );
 
-    const labelValueA = getItemKey((a.compare && a.compare.item) || (a.base && a.base.item) || {});
-    const labelValueB = getItemKey((b.compare && b.compare.item) || (b.base && b.base.item) || {});
+      const labelValueA = getItemKey(
+        (a.compare && a.compare.item) || (a.base && a.base.item) || {}
+      );
+      const labelValueB = getItemKey(
+        (b.compare && b.compare.item) || (b.base && b.base.item) || {}
+      );
 
-    const numericValueA = getWorstNumericDeltaForIndex(diffs, compareIndexA, baseIndexA);
-    const numericValueB = getWorstNumericDeltaForIndex(diffs, compareIndexB, baseIndexB);
+      const numericValueA = getWorstNumericDeltaForIndex(diffs, compareIndexA, baseIndexA);
+      const numericValueB = getWorstNumericDeltaForIndex(diffs, compareIndexB, baseIndexB);
 
-    if (rowStateIndexA === rowStateIndexB) {
-      return typeof numericValueA === 'number' && typeof numericValueB === 'number'
-        ? numericValueB - numericValueA
-        : labelValueA.localeCompare(labelValueB);
-    }
-    return rowStateIndexA - rowStateIndexB;
-  });
+      if (rowStateIndexA === rowStateIndexB) {
+        return typeof numericValueA === 'number' && typeof numericValueB === 'number'
+          ? numericValueB - numericValueA
+          : labelValueA.localeCompare(labelValueB);
+      }
+      return rowStateIndexA - rowStateIndexB;
+    });
 }
 
 /**

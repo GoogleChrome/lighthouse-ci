@@ -83,7 +83,8 @@ export function useProject(projectId) {
  * @return {[LoadingState, Array<LHCI.ServerCommand.Build> | undefined]}
  */
 export function useProjectBuilds(projectId) {
-  return useApiData('getBuilds', [projectId]);
+  const options = useMemo(() => ({limit: 20}), []);
+  return useApiData('getBuilds', [projectId, options]);
 }
 
 /**

@@ -13,6 +13,8 @@ import {Paper} from '../../components/paper.jsx';
 import {Plot} from '../../components/plot.jsx';
 
 import './project-graphs.css';
+import {Dropdown} from '../../components/dropdown';
+import {route} from 'preact-router';
 
 const COLORS = ['#4587f4', '#f44587', '#87f445'];
 
@@ -21,11 +23,12 @@ function computeURLsFromStats(stats) {
   return [...new Set(stats.map(stat => stat.url))].sort((a, b) => a.length - b.length);
 }
 
-/** @param {{statistics?: Array<StatisticWithBuild>}} props */
+/** @param {{statistics?: Array<StatisticWithBuild>, builds: Array<LHCI.ServerCommand.Build>, branch: string}} props */
 const Legend = props => {
   if (!props.statistics) return null;
 
   const urls = computeURLsFromStats(props.statistics);
+  const branches = Array.from(new Set(props.builds.map(build => build.branch)));
   return (
     <div className="dashboard-graphs__legend">
       {urls.map((url, i) => {
@@ -36,6 +39,15 @@ const Legend = props => {
           </div>
         );
       })}
+      <Dropdown
+        options={branches.map(branch => ({value: branch, label: branch}))}
+        value={props.branch}
+        setValue={value => {
+          const url = new URL(window.location.href);
+          url.searchParams.set('branch', value);
+          route(`${url.pathname}${url.search}`);
+        }}
+      />
     </div>
   );
 };
@@ -49,6 +61,10 @@ const StatisticPlot = props => {
       loadingState={props.loadingState}
       asyncData={props.statistics}
       render={allStats => {
+        if (allStats.length === 0) {
+          return <Paper className="dashboard-graph">No data to display</Paper>;
+        }
+
         const urls = computeURLsFromStats(allStats);
         const matchingStats = allStats
           .filter(stat => stat.name === props.statisticName)
@@ -145,7 +161,15 @@ const augmentStatsWithBuilds = (stats, builds) => {
 /** @param {{project: LHCI.ServerCommand.Project, builds: Array<LHCI.ServerCommand.Build>, runUrl?: string, branch?: string}} props */
 export const ProjectGraphs = props => {
   const {project, builds, branch = 'master'} = props;
-  const buildIds = useMemo(() => builds.map(build => build.id), builds);
+  const buildIds = useMemo(
+    () =>
+      builds
+        .filter(build => build.branch === branch)
+        .sort((a, b) => new Date(b.runAt).getTime() - new Date(a.runAt).getTime())
+        .map(build => build.id)
+        .slice(0, 8),
+    [builds, branch]
+  );
   const [loadingState, stats] = useBuildStatistics(project.id, buildIds);
   const statsWithBuildsUnfiltered = augmentStatsWithBuilds(stats, builds);
   const statsWithBuilds =
@@ -156,7 +180,7 @@ export const ProjectGraphs = props => {
 
   return (
     <div className="dashboard-graphs">
-      <Legend statistics={statsWithBuilds} />
+      <Legend statistics={statsWithBuilds} builds={builds} branch={branch} />
       <StatisticPlot
         title="Performance"
         statisticName="category_performance_average"

@@ -43,3 +43,11 @@
   font-weight: var(--medium-font-weight);
   padding-right: var(--pill-spacing);
 }
+
+.build-selector-pill--open {
+  border-width: 2px;
+}
+
+.build-selector-pill--dim {
+  opacity: 0.5;
+}

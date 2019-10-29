@@ -26,13 +26,14 @@ const Selection = props => {
 };
 
 /**
- * @param {{build: LHCI.ServerCommand.Build | null, variant: 'base'|'compare', isOpen?: boolean, onClick?: () => void}} props
+ * @param {{build: LHCI.ServerCommand.Build | null, variant: 'base'|'compare', isOpen?: boolean, isDimmed?: boolean, onClick?: () => void}} props
  */
 export const BuildSelectorPill = props => {
   return (
     <div
       className={clsx(`build-selector-pill build-selector-pill--${props.variant}`, {
         'build-selector-pill--open': props.isOpen,
+        'build-selector-pill--dim': props.isDimmed,
       })}
       onClick={props.onClick}
     >

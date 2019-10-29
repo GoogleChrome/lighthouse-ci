@@ -185,23 +185,17 @@ const BuildView_ = props => {
     <Page
       header={
         <Fragment>
-          {openBuildHash === null ? (
-            <Fragment />
-          ) : (
-            <div className={`build-selector-header build-selector-header--${openBuildHash}`}>
-              <i className="material-icons">arrow_back</i>
-              <span>Select {_.startCase(openBuildHash)}</span>
-            </div>
-          )}
           <BuildSelectorPill
             build={props.ancestorBuild}
             variant="base"
+            isDimmed={openBuildHash === 'compare'}
             isOpen={openBuildHash === 'base'}
             onClick={() => setOpenBuild(openBuildHash === 'base' ? null : 'base')}
           />
           <BuildSelectorPill
             build={props.build}
             variant="compare"
+            isDimmed={openBuildHash === 'base'}
             isOpen={openBuildHash === 'compare'}
             onClick={() => setOpenBuild(openBuildHash === 'compare' ? null : 'compare')}
           />

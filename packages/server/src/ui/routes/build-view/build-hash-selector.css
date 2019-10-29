@@ -27,28 +27,35 @@
   padding: 0;
 }
 
-.build-hash-selector__list li {
+.build-hash-selector__item {
+  position: relative;
+  height: var(--line-item-height);
+  width: 100%;
+  font-weight: var(--medium-font-weight);
+}
+
+.build-hash-selector__item > div.container {
   display: flex;
   flex-direction: row;
   align-items: center;
 
   height: var(--line-item-height);
   padding: calc(var(--base-spacing) / 2);
-  font-weight: var(--medium-font-weight);
-  border-radius: 5px;
 }
 
-.build-hash-selector__list li:hover {
+.build-hash-selector__item:hover,
+.build-hash-selector__item--selected {
   cursor: pointer;
   background: var(--compare-highlight-color);
 }
 
-.build-hash-selector--base li:hover {
+.build-hash-selector--base li:hover,
+.build-hash-selector--base .build-hash-selector__item--selected {
   cursor: pointer;
   background: var(--neutral-highlight-color);
 }
 
-.build-hash-selector__list li.build-hash-selector__label-li:hover {
+.build-hash-selector__item.build-hash-selector__label-li:hover {
   cursor: initial;
   background: none;
 }
@@ -56,6 +63,35 @@
 .build-hash-selector__selection {
   width: 90px;
   min-width: 90px;
+}
+
+.build-hash-selector__selection .pill--compare.pill--solid,
+.build-hash-selector__selection .pill--base.pill--solid {
+  text-transform: uppercase;
+  width: 90%;
+  text-align: center;
+  font-size: var(--subtext-font-size);
+}
+
+.build-hash-selector__selection .pill--compare.pill--solid {
+  background: var(--compare-color);
+  color: var(--inverted-text-color);
+}
+
+.build-hash-selector__selection .pill--base.pill--solid {
+  background: var(--neutral-color);
+  color: var(--inverted-text-color);
+}
+
+.build-hash-selector__selector-selection {
+  position: absolute;
+  right: calc(var(--base-spacing));
+  bottom: calc((var(--line-item-height) - 24px) / 2);
+  color: var(--compare-color);
+}
+
+.build-hash-selector--base .build-hash-selector__selector-selection {
+  color: var(--neutral-color);
 }
 
 .build-hash-selector__hash {
@@ -84,7 +120,7 @@
   white-space: nowrap;
 }
 
-.build-hash-selector__list li:hover .build-hash-selector__links {
+.build-hash-selector__item:hover .build-hash-selector__links {
   display: inline;
 }
 

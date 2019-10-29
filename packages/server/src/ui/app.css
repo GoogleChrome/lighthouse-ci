@@ -59,8 +59,8 @@
 
   --compare-color: var(--color-blue-500);
   --compare-highlight-color: var(--color-blue-100);
-  --dev-branch-color: var(--color-deep-orange-a200);
-  --master-branch-color: var(--color-deep-purple-400);
+  --dev-branch-color: var(--color-gray-600);
+  --master-branch-color: var(--color-gray-800);
 
   --base-font-family: 'Roboto', sans-serif;
   --base-font-weight: 400;

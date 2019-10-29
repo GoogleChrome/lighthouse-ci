@@ -5,6 +5,7 @@
  */
 
 import {h, Fragment} from 'preact';
+import clsx from 'clsx';
 import * as _ from '@lhci/utils/src/lodash.js';
 import './build-hash-selector.css';
 import {useBranchBuilds} from '../../hooks/use-api-data';
@@ -31,19 +32,21 @@ const GitViz = props => {
 const LabelLineItem = props => {
   const variant = props.branch === 'master' ? 'master-branch' : 'dev-branch';
   return (
-    <li className="build-hash-selector__label-li">
-      <span className="build-hash-selector__selection" />
-      <GitViz
-        branch={props.branch}
-        withNode={false}
-        withDevBranchArc={false}
-        withDevLine={props.withDevLine}
-      />
-      <span
-        className={`build-hash-selector__branch-label build-hash-selector__branch-label--${variant}`}
-      >
-        {props.branch}
-      </span>
+    <li className="build-hash-selector__item build-hash-selector__label-li">
+      <div className="container">
+        <span className="build-hash-selector__selection" />
+        <GitViz
+          branch={props.branch}
+          withNode={false}
+          withDevBranchArc={false}
+          withDevLine={props.withDevLine}
+        />
+        <span
+          className={`build-hash-selector__branch-label build-hash-selector__branch-label--${variant}`}
+        >
+          {props.branch}
+        </span>
+      </div>
     </li>
   );
 };
@@ -53,10 +56,15 @@ const BuildLineItem = props => {
   const {build, compareBuild, baseBuild, selector} = props;
   const isCompareBranch = build.id === compareBuild.id;
   const isBaseBranch = build.id === (baseBuild && baseBuild.id);
+  const isSelected =
+    (selector === 'base' && isBaseBranch) || (selector === 'compare' && isCompareBranch);
   const variant = build.branch === 'master' ? 'master-branch' : 'dev-branch';
 
   return (
     <li
+      className={clsx('build-hash-selector__item', {
+        'build-hash-selector__item--selected': isSelected,
+      })}
       key={build.id}
       onClick={() => {
         if (isCompareBranch && selector === 'compare') return;
@@ -75,32 +83,39 @@ const BuildLineItem = props => {
         window.location.href = url.href;
       }}
     >
-      <span className="build-hash-selector__selection">
-        {isCompareBranch && (
-          <Pill variant="compare" solid>
-            compare
-          </Pill>
-        )}
-        {isBaseBranch && (
-          <Pill variant="base" solid>
-            base
-          </Pill>
-        )}
-      </span>
-      <GitViz
-        branch={build.branch}
-        withNode
-        withDevBranchArc={props.withDevBranchArc}
-        withDevLine={props.withDevLine}
-      />
-      <Pill variant={variant}>
-        <span className="build-hash-selector__hash">{build.hash.slice(0, 8)}</span>
-      </Pill>{' '}
-      <img className="build-hash-selector__avatar" alt={build.author} src={build.avatarUrl} />
-      <span className="build-hash-selector__commit">{build.commitMessage}</span>
-      <span className="build-hash-selector__links">
-        {build.externalBuildUrl ? <a href={build.externalBuildUrl}>View Build</a> : <Fragment />}
-      </span>
+      <div className="container">
+        <span className="build-hash-selector__selection">
+          {isCompareBranch && selector === 'base' && (
+            <Pill variant="compare" solid>
+              compare
+            </Pill>
+          )}
+          {isBaseBranch && selector === 'compare' && (
+            <Pill variant="base" solid>
+              base
+            </Pill>
+          )}
+        </span>
+        <GitViz
+          branch={build.branch}
+          withNode
+          withDevBranchArc={props.withDevBranchArc}
+          withDevLine={props.withDevLine}
+        />
+        <Pill variant={variant}>
+          <span className="build-hash-selector__hash">{build.hash.slice(0, 8)}</span>
+        </Pill>{' '}
+        <img className="build-hash-selector__avatar" alt={build.author} src={build.avatarUrl} />
+        <span className="build-hash-selector__commit">{build.commitMessage}</span>
+        <span className="build-hash-selector__links">
+          {build.externalBuildUrl ? <a href={build.externalBuildUrl}>View Build</a> : <Fragment />}
+        </span>
+      </div>
+      {isSelected ? (
+        <i className="material-icons build-hash-selector__selector-selection">check</i>
+      ) : (
+        <Fragment />
+      )}
     </li>
   );
 };
@@ -143,29 +158,27 @@ const BuildHashSelector_ = props => {
   }, [props.close]);
 
   return (
-    <div className="container">
-      <ul className={`build-hash-selector__list build-hash-selector--${props.selector}`}>
-        {builds.map((build, index) => (
-          <Fragment key={build.id}>
-            <BuildLineItem
-              key={build.id}
-              build={build}
-              compareBuild={props.build}
-              baseBuild={props.ancestorBuild}
-              selector={props.selector}
-              withDevLine={index <= indexOfFirstDev && props.build.branch !== 'master'}
-              withDevBranchArc={index === indexOfFirstDev + 1}
-            />
-            {index === indexOfFirstDev && build.branch !== 'master' ? (
-              <LabelLineItem branch={build.branch} withDevLine={true} />
-            ) : null}
-            {index === builds.length - 1 ? (
-              <LabelLineItem branch={build.branch} withDevLine={false} />
-            ) : null}
-          </Fragment>
-        ))}
-      </ul>
-    </div>
+    <ul className={`build-hash-selector__list build-hash-selector--${props.selector}`}>
+      {builds.map((build, index) => (
+        <Fragment key={build.id}>
+          <BuildLineItem
+            key={build.id}
+            build={build}
+            compareBuild={props.build}
+            baseBuild={props.ancestorBuild}
+            selector={props.selector}
+            withDevLine={index <= indexOfFirstDev && props.build.branch !== 'master'}
+            withDevBranchArc={index === indexOfFirstDev + 1}
+          />
+          {index === indexOfFirstDev && build.branch !== 'master' ? (
+            <LabelLineItem branch={build.branch} withDevLine={true} />
+          ) : null}
+          {index === builds.length - 1 ? (
+            <LabelLineItem branch={build.branch} withDevLine={false} />
+          ) : null}
+        </Fragment>
+      ))}
+    </ul>
   );
 };
 

@@ -88,22 +88,37 @@ function computeAuditGroups(lhr, baseLhr, options) {
 /** @typedef {{id: string, audits: Array<LH.AuditResult>, group: {id: string, title: string}}} IntermediateAuditGroupDef */
 /** @typedef {{id: string, pairs: Array<LHCI.AuditPair>, group: {id: string, title: string}}} AuditGroupDef */
 
-/** @param {{selectedUrl: string, build: LHCI.ServerCommand.Build | null, lhr?: LH.Result, baseLhr?: LH.Result, urls: Array<string>}} props */
+/** @param {{selectedUrl: string, build: LHCI.ServerCommand.Build | null, lhr?: LH.Result, baseLhr?: LH.Result, urls: Array<string>, percentAbsoluteDeltaThreshold: number, setPercentAbsoluteDeltaThreshold: (x: number) => void}} props */
 const BuildViewScoreAndUrl = props => {
   return (
     <div className="build-view__scores-and-url">
       <div className="container">
-        <Dropdown
-          title="Comparison URL"
-          className="build-view__url-dropdown"
-          value={props.selectedUrl}
-          setValue={url => {
-            const to = new URL(window.location.href);
-            to.searchParams.set('compareUrl', url);
-            route(`${to.pathname}${to.search}`);
-          }}
-          options={props.urls.map(url => ({value: url, label: url}))}
-        />
+        <div className="build-view__dropdowns">
+          <Dropdown
+            label="URL"
+            value={props.selectedUrl}
+            setValue={url => {
+              const to = new URL(window.location.href);
+              to.searchParams.set('compareUrl', url);
+              route(`${to.pathname}${to.search}`);
+            }}
+            options={props.urls.map(url => ({value: url, label: url}))}
+          />
+          <Dropdown
+            label="Threshold"
+            value={props.percentAbsoluteDeltaThreshold.toString()}
+            setValue={value => {
+              props.setPercentAbsoluteDeltaThreshold(Number(value));
+            }}
+            options={[
+              {value: '0', label: '0%'},
+              {value: '0.05', label: '5%'},
+              {value: '0.1', label: '10%'},
+              {value: '0.15', label: '15%'},
+              {value: '0.25', label: '25%'},
+            ]}
+          />
+        </div>
         <BuildScoreComparison {...props} />
       </div>
     </div>
@@ -235,6 +250,8 @@ const BuildView_ = props => {
             baseLhr={baseLhr}
             selectedUrl={selectedUrl}
             urls={availableUrls}
+            percentAbsoluteDeltaThreshold={percentAbsoluteDeltaThreshold}
+            setPercentAbsoluteDeltaThreshold={setDiffThreshold}
           />
         )}
         <div className="container">
@@ -251,12 +268,7 @@ const BuildView_ = props => {
               ) : (
                 <div className="build-view__legend-and-options">
                   <BuildViewLegend />
-                  <BuildViewOptions
-                    compareLhr={lhr}
-                    baseLhr={baseLhr}
-                    percentAbsoluteDeltaThreshold={percentAbsoluteDeltaThreshold}
-                    setPercentAbsoluteDeltaThreshold={setDiffThreshold}
-                  />
+                  <BuildViewOptions compareLhr={lhr} baseLhr={baseLhr} />
                 </div>
               )}
               <AuditGroups

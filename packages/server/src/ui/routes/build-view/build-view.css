@@ -25,12 +25,17 @@
   align-items: center;
 }
 
-.build-view__url-dropdown {
+.build-view__dropdowns {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+
+  margin-top: calc(var(--base-spacing) / 2);
   margin-bottom: var(--base-spacing);
 }
 
-.build-view__url-dropdown select {
-  height: calc(var(--header-font-size) + var(--base-spacing));
+.build-view__dropdowns .dropdown {
+  margin-right: var(--base-spacing);
 }
 
 .build-view__legend-and-options {

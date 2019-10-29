@@ -40,6 +40,7 @@ const Legend = props => {
         );
       })}
       <Dropdown
+        label="Branch"
         options={branches.map(branch => ({value: branch, label: branch}))}
         value={props.branch}
         setValue={value => {

@@ -5,11 +5,24 @@
  */
 
 .dropdown {
+  border-bottom: 1px solid var(--strong-border-color);
+  padding-bottom: calc(var(--base-spacing) / 2);
+
+  font-family: var(--base-font-family);
+  font-size: var(--base-font-size);
+  font-weight: var(--medium-font-weight);
+}
+
+.dropdown__label {
+  color: var(--secondary-text-color);
+  margin-right: calc(var(--base-spacing) / 2);
+}
+
+.dropdown select {
   position: relative;
   background: none;
   border: none;
   border-radius: 0;
-  border-bottom: 1px solid var(--strong-border-color);
   -webkit-appearance: none;
 
   padding-right: 20px;

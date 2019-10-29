@@ -6,13 +6,12 @@
 
 import {h} from 'preact';
 import './build-view-options.css';
-import {Dropdown} from '../../components/dropdown';
 import {LhrViewerLink} from '../../components/lhr-viewer-link';
 
 // @ts-ignore
 const LOGO_SVG_URL = require('../../logo.svg');
 
-/** @param {{compareLhr: LH.Result, baseLhr?: LH.Result, percentAbsoluteDeltaThreshold: number, setPercentAbsoluteDeltaThreshold: (x: number) => void}} props */
+/** @param {{compareLhr: LH.Result, baseLhr?: LH.Result}} props */
 export const BuildViewOptions = props => {
   return (
     <div className="build-view__options">
@@ -28,21 +27,6 @@ export const BuildViewOptions = props => {
           <img src={LOGO_SVG_URL} alt="Open Compare Report" />
         </div>
       </LhrViewerLink>
-      <Dropdown
-        className="build-view-options__dropdown"
-        title="Set minimum delta threshold (% change)"
-        value={props.percentAbsoluteDeltaThreshold.toString()}
-        setValue={value => {
-          props.setPercentAbsoluteDeltaThreshold(Number(value));
-        }}
-        options={[
-          {value: '0', label: '0%'},
-          {value: '0.05', label: '5%'},
-          {value: '0.1', label: '10%'},
-          {value: '0.15', label: '15%'},
-          {value: '0.25', label: '25%'},
-        ]}
-      />
     </div>
   );
 };

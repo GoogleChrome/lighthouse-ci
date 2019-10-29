@@ -15,6 +15,7 @@ import {Page} from '../../layout/page.jsx';
 import {ProjectGraphs} from './project-graphs.jsx';
 
 import './project-dashboard.css';
+import {Pill} from '../../components/pill';
 
 /** @param {{project: LHCI.ServerCommand.Project, builds: Array<LHCI.ServerCommand.Build>, runUrl?: string, branch?: string}} props */
 const ProjectDashboard_ = props => {
@@ -31,8 +32,8 @@ const ProjectDashboard_ = props => {
                 key={build.id}
                 onClick={() => route(`/app/projects/${project.id}/builds/${build.id}`)}
               >
-                <td className="build-list__avatar" data-tooltip={build.author}>
-                  <img src={build.avatarUrl} alt={build.author} />
+                <td className="build-list__hash" data-tooltip={build.author}>
+                  <Pill avatar={build}>{build.hash.slice(0, 8)}</Pill>
                 </td>
                 <td className="build-list__commit">{build.commitMessage}</td>
                 <td className="build-list__branch">
@@ -41,7 +42,6 @@ const ProjectDashboard_ = props => {
                     {build.branch}
                   </div>
                 </td>
-                <td className="build-list__hash">{build.hash.slice(0, 8)}</td>
                 <td className="build-list__date">
                   {new Date(build.runAt).toDateString().replace(/\w+ (.*) \d{4}/, '$1')}{' '}
                   {new Date(build.runAt).toLocaleTimeString().replace(/:\d{2} /, ' ')}

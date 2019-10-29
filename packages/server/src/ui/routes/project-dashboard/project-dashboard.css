@@ -16,6 +16,7 @@
 
 .dashboard__build-list {
   width: calc(100% - var(--base-spacing) * 2);
+  max-width: calc(100% - var(--base-spacing) * 2);
   margin-left: var(--base-spacing);
 }
 
@@ -40,19 +41,16 @@
   margin: 0 calc(var(--base-spacing) / 2);
 }
 
-.build-list__avatar img {
-  width: 36px;
-  height: 36px;
-  border-radius: 100%;
-}
-
 .build-list__commit,
 .build-list__branch {
   font-weight: var(--medium-font-weight);
 }
 
-.build-list__hash,
 .build-list__date {
   color: var(--secondary-text-color);
   white-space: nowrap;
+}
+
+.build-list__hash .pill {
+  width: fit-content;
 }

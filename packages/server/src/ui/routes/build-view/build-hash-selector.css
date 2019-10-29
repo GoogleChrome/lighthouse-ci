@@ -99,14 +99,6 @@
   font-family: var(--monospace-font-family);
 }
 
-.build-hash-selector__avatar {
-  width: var(--avatar-image-size);
-  height: var(--avatar-image-size);
-
-  border-radius: 100%;
-  margin: 0 var(--base-spacing);
-}
-
 .build-hash-selector__commit {
   flex-grow: 1;
   flex-shrink: 10;

@@ -102,10 +102,9 @@ const BuildLineItem = props => {
           withDevBranchArc={props.withDevBranchArc}
           withDevLine={props.withDevLine}
         />
-        <Pill variant={variant}>
+        <Pill variant={variant} avatar={build}>
           <span className="build-hash-selector__hash">{build.hash.slice(0, 8)}</span>
         </Pill>{' '}
-        <img className="build-hash-selector__avatar" alt={build.author} src={build.avatarUrl} />
         <span className="build-hash-selector__commit">{build.commitMessage}</span>
         <span className="build-hash-selector__links">
           {build.externalBuildUrl ? <a href={build.externalBuildUrl}>View Build</a> : <Fragment />}

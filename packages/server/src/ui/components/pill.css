@@ -7,7 +7,9 @@
 .pill {
   --pill-vertical-padding: calc((var(--pill-height) - var(--pill-content-height) - 2px) / 2);
 
-  display: inline-block;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
   height: var(--pill-height);
 
   margin: 0 var(--pill-spacing);
@@ -55,4 +57,10 @@
   display: inline-block;
   height: var(--pill-content-height);
   line-height: var(--pill-content-height);
+}
+
+.pill__avatar {
+  border-radius: 100%;
+  margin-left: -5px;
+  margin-right: calc(var(--base-spacing) / 2);
 }

@@ -4,13 +4,13 @@
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
  */
 
-import {h} from 'preact';
+import {h, Fragment} from 'preact';
 import clsx from 'clsx';
 import './pill.css';
 
-/** @param {{children: string|JSX.Element|JSX.Element[], className?: string, variant?: 'base'|'compare'|'master-branch'|'dev-branch', onClick?: () => void, solid?: boolean}} props */
+/** @param {{children: string|JSX.Element|JSX.Element[], className?: string, variant?: 'base'|'compare'|'master-branch'|'dev-branch', onClick?: () => void, solid?: boolean, avatar?: Pick<LHCI.ServerCommand.Build, 'avatarUrl'|'author'>}} props */
 export const Pill = props => {
-  const {children, variant = 'base'} = props;
+  const {children, avatar, variant = 'base'} = props;
   return (
     <div
       className={clsx('pill', props.className, `pill--${variant}`, {
@@ -19,6 +19,16 @@ export const Pill = props => {
       })}
       onClick={props.onClick}
     >
+      {avatar ? (
+        <img
+          className="pill__avatar"
+          title={avatar.author}
+          alt={avatar.author}
+          src={avatar.avatarUrl}
+        />
+      ) : (
+        <Fragment />
+      )}
       <span>{children}</span>
     </div>
   );

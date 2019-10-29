@@ -29,6 +29,14 @@ function runTests(state) {
     client = new ApiClient({rootURL});
   });
 
+  describe('/version', () => {
+    it('should return the version', async () => {
+      const response = await fetch(`${rootURL}/version`);
+      const body = await response.text();
+      expect(body).toMatch(/^\d+\.\d+\.\d+/);
+    });
+  });
+
   describe('/v1/projects', () => {
     let projectAToken;
     it('should create a project', async () => {

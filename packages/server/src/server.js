@@ -15,6 +15,7 @@ const ApiClient = require('@lhci/utils/src/api-client.js');
 const createProjectsRouter = require('./api/routes/projects.js');
 const StorageMethod = require('./api/storage/storage-method.js');
 const {errorMiddleware} = require('./api/express-utils.js');
+const version = require('../package.json').version;
 
 const DIST_FOLDER = path.join(__dirname, '../dist');
 
@@ -38,6 +39,7 @@ async function createApp(options) {
   // 2. Support JSON primitives because `PUT /builds/<id>/lifecycle "sealed"`
   app.use(bodyParser.json({limit: '10mb', strict: false}));
 
+  app.use('/version', (_, res) => res.send(version));
   app.use('/v1/projects', createProjectsRouter({storageMethod}));
   app.use('/app', express.static(DIST_FOLDER));
   app.get('/app/*', (_, res) => res.sendFile(path.join(DIST_FOLDER, 'index.html')));

@@ -123,6 +123,14 @@ class ApiClient {
   }
 
   /**
+   * @return {Promise<string>}
+   */
+  async getVersion() {
+    const response = await this._fetch(this._normalizeURL('/version').href);
+    return response.text();
+  }
+
+  /**
    * @return {Promise<Array<LHCI.ServerCommand.Project>>}
    */
   async getProjects() {

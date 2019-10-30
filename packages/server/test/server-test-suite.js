@@ -31,9 +31,8 @@ function runTests(state) {
 
   describe('/version', () => {
     it('should return the version', async () => {
-      const response = await fetch(`${rootURL}/version`);
-      const body = await response.text();
-      expect(body).toMatch(/^\d+\.\d+\.\d+/);
+      const version = await client.getVersion();
+      expect(version).toMatch(/^\d+\.\d+\.\d+/);
     });
   });
 

@@ -40,7 +40,7 @@ function readRcFile(rcFile) {
 }
 
 /**
- * @param {'collect'|'assert'|'upload'} command
+ * @param {'collect'|'assert'|'upload'|'healthcheck'} command
  * @param {string[]} [args]
  * @return {{status: number}}
  */
@@ -88,6 +88,9 @@ async function runCommand(options) {
   const ciConfiguration = (rcFile && rcFile.ci) || {};
   const defaultFlags = rcFile ? [`--rc-file=${options.rcFile}`] : [];
   let hasFailure = false;
+
+  const healthcheckStatus = runChildCommand('healthcheck', [...defaultFlags, '--fatal']).status;
+  if (healthcheckStatus !== 0) process.exit(healthcheckStatus);
 
   const collectArgs = ciConfiguration.collect ? [] : [`--build-dir=${findBuildDir()}`];
   const collectStatus = runChildCommand('collect', [...defaultFlags, ...collectArgs]).status;

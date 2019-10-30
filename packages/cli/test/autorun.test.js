@@ -32,7 +32,13 @@ describe('Lighthouse CI autorun CLI', () => {
       .replace(/Open the report at.*\n/, 'Open the report at <link>\n');
     const stderrClean = stderr.replace(/:\d{4,6}/g, ':XXXX').replace(/port \d{4,6}/, 'port XXXX');
     expect(stdoutClean).toMatchInlineSnapshot(`
-      "Automatically determined ./build as \`buildDir\`.
+      "
+      ✅  .lighthouseci/ directory writable
+      ✅  Ancestor hash determinable
+      ⚠️   GitHub token set
+      Healthcheck passed!
+
+      Automatically determined ./build as \`buildDir\`.
       Set it explicitly in lighthouserc.json if incorrect.
 
       Started a web server on port XXXX...

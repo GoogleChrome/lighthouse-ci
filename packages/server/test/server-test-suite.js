@@ -91,6 +91,8 @@ function runTests(state) {
         commitMessage: 'feat: add some awesome features',
         ancestorHash: '0ed0fdcfdce0acdd5eb2508498be50cc55c696ea',
         runAt: new Date().toISOString(),
+        committedAt: new Date().toISOString(),
+        ancestorCommittedAt: new Date().toISOString(),
       };
 
       buildA = await client.createBuild(payload);
@@ -111,6 +113,8 @@ function runTests(state) {
         commitMessage: 'feat: add some more awesome features',
         ancestorHash: buildA.hash,
         runAt: new Date().toISOString(),
+        committedAt: new Date().toISOString(),
+        ancestorCommittedAt: new Date().toISOString(),
       };
 
       buildB = await client.createBuild(payload);
@@ -131,6 +135,8 @@ function runTests(state) {
         commitMessage: 'feat: a branch without an ancestor',
         ancestorHash: '',
         runAt: new Date().toISOString(),
+        committedAt: new Date().toISOString(),
+        ancestorCommittedAt: new Date().toISOString(),
       };
 
       buildC = await client.createBuild(payload);
@@ -151,6 +157,8 @@ function runTests(state) {
         commitMessage: 'feat: initial commit',
         ancestorHash: '',
         runAt: new Date().toISOString(),
+        committedAt: new Date().toISOString(),
+        ancestorCommittedAt: new Date().toISOString(),
       };
 
       buildD = await client.createBuild(payload);

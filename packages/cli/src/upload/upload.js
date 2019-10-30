@@ -6,9 +6,7 @@
 'use strict';
 
 const URL = require('url').URL;
-const crypto = require('crypto');
 const fetch = require('isomorphic-fetch');
-const childProcess = require('child_process');
 const _ = require('@lhci/utils/src/lodash.js');
 const ApiClient = require('@lhci/utils/src/api-client.js');
 const {computeRepresentativeRuns} = require('@lhci/utils/src/representative-runs.js');
@@ -18,8 +16,18 @@ const {
   replaceUrlPatterns,
   getHTMLReportForLHR,
 } = require('@lhci/utils/src/saved-reports.js');
-
-const envVars = process.env;
+const {
+  getCurrentHash,
+  getCommitTime,
+  getCurrentBranch,
+  getExternalBuildUrl,
+  getCommitMessage,
+  getAuthor,
+  getAvatarUrl,
+  getAncestorHashForMaster,
+  getAncestorHashForBranch,
+  getRepoSlug,
+} = require('@lhci/utils/src/build-context.js');
 
 /** @param {string} message */
 const print = message => {
@@ -63,142 +71,6 @@ function buildCommand(yargs) {
       ],
     },
   });
-}
-
-/**
- * @return {string}
- */
-function getCurrentHash() {
-  if (envVars.TRAVIS_PULL_REQUEST_SHA) return envVars.TRAVIS_PULL_REQUEST_SHA;
-  if (envVars.TRAVIS_COMMIT) return envVars.TRAVIS_COMMIT;
-
-  const result = childProcess.spawnSync('git', ['rev-list', '--no-merges', '-n1', 'HEAD'], {
-    encoding: 'utf8',
-  });
-  if (result.status !== 0) {
-    throw new Error('Unable to determine current hash with `git rev-parse HEAD`');
-  }
-
-  return result.stdout.trim();
-}
-
-/**
- * @param {string} hash
- * @return {string}
- */
-function getCommitTime(hash) {
-  const result = childProcess.spawnSync('git', ['log', '-n1', '--pretty="format:%cI"', hash], {
-    encoding: 'utf8',
-  });
-  if (result.status !== 0) {
-    throw new Error('Unable to retrieve committer timestamp from commit');
-  }
-
-  return result.stdout.trim();
-}
-
-/**
- * @return {string}
- */
-function getCurrentBranch() {
-  if (envVars.TRAVIS_PULL_REQUEST_BRANCH) return envVars.TRAVIS_PULL_REQUEST_BRANCH.slice(0, 40);
-  if (envVars.TRAVIS_BRANCH) return envVars.TRAVIS_BRANCH.slice(0, 40);
-
-  const result = childProcess.spawnSync('git', ['rev-parse', '--abbrev-ref', 'HEAD'], {
-    encoding: 'utf8',
-  });
-  if (result.status !== 0) {
-    throw new Error('Unable to determine current branch with `git rev-parse --abbrev-ref HEAD`');
-  }
-
-  return result.stdout.trim().slice(0, 40);
-}
-
-/**
- * @return {string}
- */
-function getExternalBuildUrl() {
-  return envVars.TRAVIS_BUILD_WEB_URL || '';
-}
-
-/**
- * @param {string} hash
- * @return {string}
- */
-function getCommitMessage(hash = 'HEAD') {
-  const result = childProcess.spawnSync('git', ['log', '--format=%s', '-n', '1', hash], {
-    encoding: 'utf8',
-  });
-  if (result.status !== 0) {
-    throw new Error('Unable to determine commit message with `git log --format=%s -n 1`');
-  }
-
-  return result.stdout.trim().slice(0, 80);
-}
-
-/**
- * @param {string} hash
- * @return {string}
- */
-function getAuthor(hash = 'HEAD') {
-  const result = childProcess.spawnSync('git', ['log', '--format=%aN <%aE>', '-n', '1', hash], {
-    encoding: 'utf8',
-  });
-  if (result.status !== 0) {
-    throw new Error('Unable to determine commit author with `git log --format=%aN <%aE> -n 1`');
-  }
-
-  return result.stdout.trim().slice(0, 256);
-}
-
-/**
- * @param {string} hash
- * @return {string}
- */
-function getAvatarUrl(hash = 'HEAD') {
-  const result = childProcess.spawnSync('git', ['log', '--format=%aE', '-n', '1', hash], {
-    encoding: 'utf8',
-  });
-  if (result.status !== 0) {
-    throw new Error('Unable to determine commit email with `git log --format=%aE -n 1`');
-  }
-
-  // Use default gravatar image, see https://en.gravatar.com/site/implement/images/.
-  const md5 = crypto.createHash('md5');
-  md5.update(result.stdout.trim().toLowerCase());
-  return `https://www.gravatar.com/avatar/${md5.digest('hex')}.jpg?d=identicon`;
-}
-
-/**
- * @return {string}
- */
-function getAncestorHashForMaster() {
-  const result = childProcess.spawnSync('git', ['rev-parse', 'HEAD^'], {encoding: 'utf8'});
-  if (result.status !== 0) {
-    throw new Error('Unable to determine previous hash with `git rev-parse HEAD^`');
-  }
-
-  return result.stdout.trim();
-}
-
-/**
- * @return {string}
- */
-function getAncestorHashForBranch() {
-  const result = childProcess.spawnSync('git', ['merge-base', 'HEAD', 'master'], {
-    encoding: 'utf8',
-  });
-
-  if (result.status !== 0) {
-    throw new Error('Unable to determine ancestor hash with `git merge-base HEAD master`');
-  }
-
-  return result.stdout.trim();
-}
-
-function getRepoSlug() {
-  if (envVars.TRAVIS_PULL_REQUEST_SLUG) return envVars.TRAVIS_PULL_REQUEST_SLUG;
-  if (envVars.TRAVIS_REPO_SLUG) return envVars.TRAVIS_REPO_SLUG;
 }
 
 /**

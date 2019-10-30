@@ -8,6 +8,8 @@ matrix:
   include:
     - node_js: '10'
     - node_js: '11'
+git:
+  depth: false # ensure we have full git history for our build-context.js tests
 cache:
   yarn: true
   directories:

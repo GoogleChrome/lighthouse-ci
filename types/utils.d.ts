@@ -6,6 +6,16 @@
 
 declare global {
   namespace LHCI {
+    export type YargsOptions = Partial<
+      {extends?: string | undefined} & AssertCommand.Options &
+        CollectCommand.Options &
+        HealthcheckCommand.Options &
+        OpenCommand.Options &
+        ServerCommand.Options &
+        UploadCommand.Options &
+        WizardCommand.Options
+    >;
+
     export type AuditDiffType =
       | 'error'
       | 'score'

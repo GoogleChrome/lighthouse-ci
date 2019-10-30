@@ -86,6 +86,59 @@ describe('Lighthouse CI CLI', () => {
     }, 30000);
   });
 
+  describe('healthcheck', () => {
+    it('should pass when things are good', async () => {
+      const LHCI_GITHUB_TOKEN = '';
+      const LHCI_TOKEN = projectToken;
+      const LHCI_SERVER_BASE_URL = `http://localhost:${server.port}`;
+      let {stdout = '', stderr = '', status = -1} = spawnSync(
+        CLI_PATH,
+        ['healthcheck', `--fatal`],
+        {env: {...process.env, LHCI_TOKEN, LHCI_GITHUB_TOKEN, LHCI_SERVER_BASE_URL}}
+      );
+
+      stdout = stdout.toString();
+      stderr = stderr.toString();
+      status = status || 0;
+
+      expect(stdout).toMatchInlineSnapshot(`
+        "✅  .lighthouseci/ directory writable
+        ✅  Ancestor hash determinable
+        ⚠️   GitHub token set
+        ✅  LHCI server reachable
+        ✅  LHCI server token valid
+        ✅  LHCI server unique build for this hash
+        Healthcheck passed!
+        "
+      `);
+      expect(stderr).toMatchInlineSnapshot(`""`);
+      expect(status).toEqual(0);
+    });
+
+    it('should fail when things are bad', async () => {
+      let {stdout = '', stderr = '', status = -1} = spawnSync(
+        CLI_PATH,
+        ['healthcheck', `--rc-file=${rcFile}`, `--fatal`, '--checks=githubToken'],
+        {env: {...process.env, LHCI_GITHUB_TOKEN: ''}}
+      );
+
+      stdout = stdout.toString();
+      stderr = stderr.toString();
+      status = status || 0;
+
+      expect(stdout).toMatchInlineSnapshot(`
+        "✅  .lighthouseci/ directory writable
+        ✅  Ancestor hash determinable
+        ❌  GitHub token set
+        ✅  LHCI server reachable
+        Healthcheck failed!
+        "
+      `);
+      expect(stderr).toMatchInlineSnapshot(`""`);
+      expect(status).toEqual(1);
+    });
+  });
+
   describe('collect', () => {
     it('should collect results from buildDir', () => {
       let {stdout = '', stderr = '', status = -1} = spawnSync(CLI_PATH, [

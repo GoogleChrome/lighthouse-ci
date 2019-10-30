@@ -9,11 +9,9 @@ const fs = require('fs');
 const path = require('path');
 const _ = require('./lodash.js');
 
-/** @typedef {Partial<LHCI.AssertCommand.Options & LHCI.CollectCommand.Options & LHCI.UploadCommand.Options & LHCI.ServerCommand.Options & {extends?: string | undefined}>} YargsOptions */
-
 /**
  * @param {string} pathToRcFile
- * @return {YargsOptions}
+ * @return {LHCI.YargsOptions}
  */
 function loadAndParseRcFile(pathToRcFile) {
   const contents = fs.readFileSync(pathToRcFile, 'utf8');
@@ -26,11 +24,11 @@ function loadAndParseRcFile(pathToRcFile) {
  *
  * @param {LHCI.LighthouseRc} rcFile
  * @param {string} pathToRcFile
- * @return {YargsOptions}
+ * @return {LHCI.YargsOptions}
  */
 function convertRcFileToYargsOptions(rcFile, pathToRcFile) {
   const {ci = {}} = rcFile;
-  /** @type {YargsOptions} */
+  /** @type {LHCI.YargsOptions} */
   let merged = {...ci.assert, ...ci.collect, ...ci.upload, ...ci.server};
   if (ci.extends) {
     const extendedRcFilePath = path.resolve(path.dirname(pathToRcFile), ci.extends);

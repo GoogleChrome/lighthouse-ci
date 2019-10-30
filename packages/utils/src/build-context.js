@@ -143,6 +143,16 @@ function getAncestorHashForBranch(hash = 'HEAD') {
   return result.stdout.trim();
 }
 
+/**
+ * @param {string} [hash]
+ * @return {string}
+ */
+function getAncestorHash(hash = 'HEAD') {
+  return getCurrentBranch() === 'master'
+    ? getAncestorHashForMaster(hash)
+    : getAncestorHashForBranch(hash);
+}
+
 function getRepoSlug() {
   if (envVars.TRAVIS_PULL_REQUEST_SLUG) return envVars.TRAVIS_PULL_REQUEST_SLUG;
   if (envVars.TRAVIS_REPO_SLUG) return envVars.TRAVIS_REPO_SLUG;
@@ -156,6 +166,7 @@ module.exports = {
   getCommitMessage,
   getAuthor,
   getAvatarUrl,
+  getAncestorHash,
   getAncestorHashForMaster,
   getAncestorHashForBranch,
   getRepoSlug,

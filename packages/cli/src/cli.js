@@ -11,6 +11,7 @@ const loadAndParseRcFile = require('@lhci/utils/src/lighthouserc.js').loadAndPar
 const getVersion = require('@lhci/utils/src/version.js').getVersion;
 const assertCmd = require('./assert/assert.js');
 const autorunCmd = require('./autorun/autorun.js');
+const healthcheckCmd = require('./healthcheck/healthcheck.js');
 const uploadCmd = require('./upload/upload.js');
 const collectCmd = require('./collect/collect.js');
 const serverCmd = require('./server/server.js');
@@ -38,6 +39,9 @@ async function run() {
     .command('autorun', 'Run collect/assert/upload with sensible defaults', commandYargs =>
       autorunCmd.buildCommand(commandYargs)
     )
+    .command('healthcheck', 'Run diagnostics to ensure a valid configuration', commandYargs =>
+      healthcheckCmd.buildCommand(commandYargs)
+    )
     .command('open', 'Opens the HTML reports of collected runs', commandYargs =>
       openCmd.buildCommand(commandYargs)
     )
@@ -60,6 +64,9 @@ async function run() {
       break;
     case 'autorun':
       await autorunCmd.runCommand(argv);
+      break;
+    case 'healthcheck':
+      await healthcheckCmd.runCommand(argv);
       break;
     case 'server': {
       const {port} = await serverCmd.runCommand(argv);

@@ -6,9 +6,10 @@
 
 declare global {
   namespace LHCI {
-    namespace OpenCommand {
+    namespace HealthcheckCommand {
       export interface Options {
-        url?: string | string[];
+        fatal?: boolean;
+        checks: string[];
       }
     }
   }

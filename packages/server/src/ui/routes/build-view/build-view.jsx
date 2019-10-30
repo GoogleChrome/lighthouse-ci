@@ -27,7 +27,6 @@ import './build-view.css';
 import {BuildViewLegend} from './build-view-legend';
 import clsx from 'clsx';
 import {findAuditDiffs, getDiffSeverity} from '@lhci/utils/src/audit-diff-finder';
-import {BuildViewEmpty} from './build-view-empty';
 import {route} from 'preact-router';
 import {BuildViewOptions} from './build-view-options';
 import {BuildViewWarnings} from './build-view-warnings';
@@ -253,7 +252,9 @@ const BuildView_ = props => {
         />
         <div className="container">
           <BuildViewWarnings
+            lhr={lhr}
             build={props.build}
+            auditGroups={auditGroups}
             baseBuild={props.ancestorBuild}
             baseLhr={baseLhr}
             hasBaseOverride={props.hasBaseOverride}
@@ -277,7 +278,7 @@ const BuildView_ = props => {
               />
             </Fragment>
           ) : (
-            <BuildViewEmpty lhr={lhr} />
+            <Fragment />
           )}
         </div>
       </div>

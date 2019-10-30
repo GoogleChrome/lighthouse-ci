@@ -56,17 +56,6 @@
   justify-content: center;
 }
 
-.build-view__warning {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-}
-
-.build-view__warning i {
-  color: var(--average-color);
-  margin-right: calc(var(--base-spacing) / 2);
-}
-
 .build-selector-header {
   position: fixed;
   height: var(--page-header-height);

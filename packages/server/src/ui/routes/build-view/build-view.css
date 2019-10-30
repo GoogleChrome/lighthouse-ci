@@ -19,6 +19,18 @@
   border-bottom: 1px solid var(--base-border-color);
 }
 
+.build-view--with-audit-selection .build-view__scores-and-url {
+  background: none;
+  border-bottom: none;
+  height: auto;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.build-view--with-audit-selection .build-view__dropdowns {
+  margin-bottom: 0;
+}
+
 .build-view__scores-and-url .container {
   display: flex;
   flex-direction: column;

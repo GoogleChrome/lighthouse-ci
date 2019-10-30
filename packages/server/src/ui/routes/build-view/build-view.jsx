@@ -88,7 +88,7 @@ function computeAuditGroups(lhr, baseLhr, options) {
 /** @typedef {{id: string, audits: Array<LH.AuditResult>, group: {id: string, title: string}}} IntermediateAuditGroupDef */
 /** @typedef {{id: string, pairs: Array<LHCI.AuditPair>, group: {id: string, title: string}}} AuditGroupDef */
 
-/** @param {{selectedUrl: string, build: LHCI.ServerCommand.Build | null, lhr?: LH.Result, baseLhr?: LH.Result, urls: Array<string>, percentAbsoluteDeltaThreshold: number, setPercentAbsoluteDeltaThreshold: (x: number) => void}} props */
+/** @param {{selectedUrl: string, selectedAuditId?: string | null, build: LHCI.ServerCommand.Build | null, lhr?: LH.Result, baseLhr?: LH.Result, urls: Array<string>, percentAbsoluteDeltaThreshold: number, setPercentAbsoluteDeltaThreshold: (x: number) => void}} props */
 const BuildViewScoreAndUrl = props => {
   return (
     <div className="build-view__scores-and-url">
@@ -119,7 +119,7 @@ const BuildViewScoreAndUrl = props => {
             ]}
           />
         </div>
-        <BuildScoreComparison {...props} />
+        {props.selectedAuditId ? <Fragment /> : <BuildScoreComparison {...props} />}
       </div>
     </div>
   );
@@ -241,19 +241,16 @@ const BuildView_ = props => {
           'build-view--with-audit-selection': !!selectedAuditId,
         })}
       >
-        {selectedAuditId ? (
-          <Fragment />
-        ) : (
-          <BuildViewScoreAndUrl
-            build={props.build}
-            lhr={lhr}
-            baseLhr={baseLhr}
-            selectedUrl={selectedUrl}
-            urls={availableUrls}
-            percentAbsoluteDeltaThreshold={percentAbsoluteDeltaThreshold}
-            setPercentAbsoluteDeltaThreshold={setDiffThreshold}
-          />
-        )}
+        <BuildViewScoreAndUrl
+          build={props.build}
+          lhr={lhr}
+          baseLhr={baseLhr}
+          selectedUrl={selectedUrl}
+          selectedAuditId={selectedAuditId}
+          urls={availableUrls}
+          percentAbsoluteDeltaThreshold={percentAbsoluteDeltaThreshold}
+          setPercentAbsoluteDeltaThreshold={setDiffThreshold}
+        />
         <div className="container">
           <BuildViewWarnings
             build={props.build}

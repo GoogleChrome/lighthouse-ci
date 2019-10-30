@@ -62,11 +62,19 @@ describe('build-context.js', () => {
         'ec95bc8ad992c9d68845040d612fbbbe94ad7f13'
       );
     });
+
+    it('should return empty string when it fails', () => {
+      expect(buildContext.getAncestorHashForMaster('random' + Math.random())).toEqual('');
+    });
   });
 
   describe('#getAncestorHashForBranch()', () => {
     it('should work', () => {
       expect(buildContext.getAncestorHashForBranch(hash)).toEqual(hash);
+    });
+
+    it('should return empty string when it fails', () => {
+      expect(buildContext.getAncestorHashForMaster('random' + Math.random())).toEqual('');
     });
   });
 });

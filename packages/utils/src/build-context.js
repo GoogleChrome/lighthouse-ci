@@ -120,9 +120,9 @@ function getAvatarUrl(hash = 'HEAD') {
  */
 function getAncestorHashForMaster(hash = 'HEAD') {
   const result = childProcess.spawnSync('git', ['rev-parse', `${hash}^`], {encoding: 'utf8'});
-  if (result.status !== 0) {
-    throw new Error('Unable to determine ancestor hash with `git rev-parse HEAD^`');
-  }
+  // Ancestor hash is optional, so do not throw if it can't be computed.
+  // See https://github.com/GoogleChrome/lighthouse-ci/issues/36
+  if (result.status !== 0) return '';
 
   return result.stdout.trim();
 }
@@ -136,9 +136,9 @@ function getAncestorHashForBranch(hash = 'HEAD') {
     encoding: 'utf8',
   });
 
-  if (result.status !== 0) {
-    throw new Error('Unable to determine ancestor hash with `git merge-base HEAD master`');
-  }
+  // Ancestor hash is optional, so do not throw if it can't be computed.
+  // See https://github.com/GoogleChrome/lighthouse-ci/issues/36
+  if (result.status !== 0) return '';
 
   return result.stdout.trim();
 }

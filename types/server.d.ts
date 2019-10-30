@@ -36,9 +36,10 @@ declare global {
         author?: string;
         avatarUrl?: string;
         ancestorHash?: string;
+        committedAt?: string;
+        ancestorCommittedAt?: string;
         createdAt?: string;
         updatedAt?: string;
-        committedAt?: string;
       }
 
       export interface Run {

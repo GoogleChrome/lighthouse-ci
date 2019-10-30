@@ -83,17 +83,13 @@ function getCurrentHash() {
 }
 
 /**
- * @param {string} currentHash
+ * @param {string} hash
  * @return {string}
  */
-function getCommitTime(currentHash) {
-  const result = childProcess.spawnSync(
-    'git',
-    ['log', '-n1', '-pretty="format:%cI"', currentHash],
-    {
-      encoding: 'utf8',
-    }
-  );
+function getCommitTime(hash) {
+  const result = childProcess.spawnSync('git', ['log', '-n1', '--pretty="format:%cI"', hash], {
+    encoding: 'utf8',
+  });
   if (result.status !== 0) {
     throw new Error('Unable to retrieve committer timestamp from commit');
   }
@@ -194,7 +190,7 @@ function getAncestorHashForBranch() {
   });
 
   if (result.status !== 0) {
-    throw new Error('Unable to determine current hash with `git merge-base HEAD master`');
+    throw new Error('Unable to determine ancestor hash with `git merge-base HEAD master`');
   }
 
   return result.stdout.trim();
@@ -331,19 +327,22 @@ async function runLHCITarget(options) {
 
   const hash = getCurrentHash();
   const branch = getCurrentBranch();
+  const ancestorHash =
+    branch === 'master' ? getAncestorHashForMaster() : getAncestorHashForBranch();
 
   const build = await api.createBuild({
     projectId: project.id,
     lifecycle: 'unsealed',
     hash,
     branch,
+    ancestorHash,
     commitMessage: getCommitMessage(hash),
     author: getAuthor(hash),
-    committedAt: getCommitTime(hash),
     avatarUrl: getAvatarUrl(hash),
-    ancestorHash: branch === 'master' ? getAncestorHashForMaster() : getAncestorHashForBranch(),
     externalBuildUrl: getExternalBuildUrl(),
     runAt: new Date().toISOString(),
+    committedAt: getCommitTime(hash),
+    ancestorCommittedAt: getCommitTime(ancestorHash),
   });
 
   print(`Saving CI project ${project.name} (${project.id})\n`);

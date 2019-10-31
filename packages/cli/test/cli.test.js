@@ -116,10 +116,13 @@ describe('Lighthouse CI CLI', () => {
     });
 
     it('should fail when things are bad', async () => {
+      const LHCI_GITHUB_TOKEN = '';
+      const LHCI_TOKEN = projectToken;
+      const LHCI_SERVER_BASE_URL = `http://localhost:${server.port}`;
       let {stdout = '', stderr = '', status = -1} = spawnSync(
         CLI_PATH,
         ['healthcheck', `--rc-file=${rcFile}`, `--fatal`, '--checks=githubToken'],
-        {env: {...process.env, LHCI_GITHUB_TOKEN: ''}}
+        {env: {...process.env, LHCI_TOKEN, LHCI_GITHUB_TOKEN, LHCI_SERVER_BASE_URL}}
       );
 
       stdout = stdout.toString();
@@ -131,6 +134,8 @@ describe('Lighthouse CI CLI', () => {
         ✅  Ancestor hash determinable
         ❌  GitHub token set
         ✅  LHCI server reachable
+        ✅  LHCI server token valid
+        ✅  LHCI server unique build for this hash
         Healthcheck failed!
         "
       `);

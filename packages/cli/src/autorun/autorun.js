@@ -32,8 +32,9 @@ function buildCommand(yargs) {
   });
 }
 
-/** @param {string} rcFile @return {LHCI.LighthouseRc|undefined} */
+/** @param {string|undefined} rcFile @return {LHCI.LighthouseRc|undefined} */
 function readRcFile(rcFile) {
+  if (!rcFile) return undefined;
   const fullyResolvedPath = path.resolve(process.cwd(), rcFile);
   if (!fs.existsSync(fullyResolvedPath)) return undefined;
   return JSON.parse(fs.readFileSync(fullyResolvedPath, 'utf8'));

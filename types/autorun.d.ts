@@ -8,7 +8,7 @@ declare global {
   namespace LHCI {
     namespace AutorunCommand {
       export interface Options {
-        rcFile: string;
+        rcFile?: string;
       }
     }
   }

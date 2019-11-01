@@ -272,8 +272,18 @@ The existing setup will fail builds through your CI provider, but there's no dif
 
 Lighthouse CI supports GitHub status checks that add additional granularity to your build reporting and direct links to uploaded reports.
 
-![screenshot of GitHub status checks for Lighthouse CI](https://user-images.githubusercontent.com/2301202/66768920-64234f80-ee79-11e9-9dc0-0a6c85762078.png)
+![screenshot of GitHub status checks for Lighthouse CI](https://user-images.githubusercontent.com/2301202/68001177-0b9dd180-fc31-11e9-8091-ada8c6e50a9b.png)
 
-To enable GitHub status checks, [create a personal access token](https://github.com/settings/tokens/new) with the `repo:status` scope and [add it to your environment](https://docs.travis-ci.com/user/environment-variables/#defining-variables-in-repository-settings) as `LHCI_GITHUB_TOKEN`. The next time your `lhci upload` command runs it will also set the results as GitHub status checks!
+#### GitHub App Method (Recommended)
+
+To enable GitHub status checks via the official GitHub app, [install and authorize the app](https://github.com/apps/lighthouse-ci) with the owner of the target repo. If the repo is within an organization, organization approval might be necessary. Copy the token provided on the authorization confirmation page and [add it to your build environment](https://docs.travis-ci.com/user/environment-variables/#defining-variables-in-repository-settings) as `LHCI_GITHUB_APP_TOKEN`. The next time your `lhci upload` command runs it will also set the results as GitHub status checks!
+
+Be sure to keep this token secret. Anyone in possession of this token will be able to set status checks on your repository.
+
+#### Personal Access Token Method
+
+To enable GitHub status checks via personal access tokens, [create a token](https://github.com/settings/tokens/new) with the `repo:status` scope and [add it to your environment](https://docs.travis-ci.com/user/environment-variables/#defining-variables-in-repository-settings) as `LHCI_GITHUB_TOKEN`. The next time your `lhci upload` command runs it will also set the results as GitHub status checks!
+
+Be sure to keep this token secret. Anyone in possession of this token will be able to set status checks on your repository.
 
 ![screenshot of GitHub personal access token creation form](https://user-images.githubusercontent.com/2301202/66769194-2246d900-ee7a-11e9-9d6c-2b6f78190a63.png)

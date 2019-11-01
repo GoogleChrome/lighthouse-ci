@@ -123,6 +123,17 @@ export const NumericDiff = props => {
     );
   }
 
+  // We want to ensure there's ~10px per character of space for the delta label.
+  // The min-width of the bar is ~300px, so if the deltaLabel is going to take up more than
+  // the narrowCutoffThresholdInPercent we want to flip it over to the other side.
+  const deltaLabel = toDisplay(delta, {
+    asDelta: true,
+    withSuffix: true,
+    preventSecondsConversion: true,
+    unit,
+  });
+  const narrowCutoffThresholdInPercent = (deltaLabel.length * 10 * 100) / 300;
+
   return (
     <Fragment>
       <div className="audit-numeric-diff">
@@ -143,18 +154,13 @@ export const NumericDiff = props => {
             <div
               className={clsx('audit-numeric-diff__delta-label', {
                 'audit-numeric-diff__delta-label--narrow-left':
-                  deltaType === 'improvement' && boxLeft < 20,
+                  deltaType === 'improvement' && boxLeft < narrowCutoffThresholdInPercent,
                 'audit-numeric-diff__delta-label--narrow-right':
-                  deltaType === 'regression' && boxRight < 20,
+                  deltaType === 'regression' && boxRight < narrowCutoffThresholdInPercent,
               })}
               style={{[minValueIsCurrentValue ? 'right' : 'left']: '100%'}}
             >
-              {toDisplay(delta, {
-                asDelta: true,
-                withSuffix: true,
-                preventSecondsConversion: true,
-                unit,
-              })}
+              {deltaLabel}
             </div>
           </div>
         </div>

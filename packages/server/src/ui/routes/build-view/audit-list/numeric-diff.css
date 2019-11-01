@@ -14,9 +14,15 @@
 
 .audit-numeric-diff__bar {
   position: relative;
-  min-width: 200px;
+  min-width: 300px;
   background: var(--secondary-background-color);
   margin: 0 var(--base-spacing);
+}
+
+@media (max-width: 600px) {
+  .audit-numeric-diff__bar {
+    min-width: 200px;
+  }
 }
 
 .audit-numeric-diff__box {
@@ -27,7 +33,7 @@
 }
 
 .audit-numeric-diff__box--improvement {
-  color: var(--improvement-color);
+  color: var(--improvement-text-color);
   background: repeating-linear-gradient(
     60deg,
     var(--improvement-color),
@@ -37,7 +43,7 @@
   );
 }
 .audit-numeric-diff__box--regression {
-  color: var(--regression-color);
+  color: var(--regression-text-color);
   background: repeating-linear-gradient(
     60deg,
     var(--regression-color),
@@ -64,6 +70,9 @@
   line-height: var(--numeric-diff-bar-height);
   white-space: nowrap;
   font-weight: var(--medium-font-weight);
+  text-shadow: 1px 1px 0px var(--secondary-background-color),
+    -1px -1px 0px var(--secondary-background-color), -1px 1px 0px var(--secondary-background-color),
+    1px -1px 0px var(--secondary-background-color);
 
   display: flex;
   flex-direction: row;
@@ -73,17 +82,11 @@
 .audit-numeric-diff__delta-label--narrow-left {
   left: 2px;
   right: initial !important;
-
-  background: var(--secondary-background-color);
-  opacity: 0.8;
 }
 
 .audit-numeric-diff__delta-label--narrow-right {
   left: initial !important;
   right: 2px;
-
-  background: var(--secondary-background-color);
-  opacity: 0.8;
 }
 
 .audit-numeric-diff__left-label,

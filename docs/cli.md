@@ -45,6 +45,8 @@ Automatically run `collect`, `assert`, and `upload` with sensible defaults.
 
 ```bash
 lhci autorun --rc-file=./lighthouserc.json
+lhci autorun --rc-overrides.collect.numberOfRuns=5
+lhci autorun --rc-overrides.upload.target=temporary-public-storage
 ```
 
 ### `open`

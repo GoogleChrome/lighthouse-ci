@@ -9,6 +9,7 @@ declare global {
     namespace AutorunCommand {
       export interface Options {
         rcFile?: string;
+        rcOverrides?: LighthouseRc['ci'];
       }
     }
   }

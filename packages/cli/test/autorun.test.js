@@ -18,7 +18,7 @@ describe('Lighthouse CI autorun CLI', () => {
   it('should run all three steps', () => {
     let {stdout = '', stderr = '', status = -1} = spawnSync(
       CLI_PATH,
-      ['autorun', `--rc-file=${rcFile}`],
+      ['autorun', `--rc-file=${rcFile}`, '--rc-overrides.collect.numberOfRuns=2'],
       {cwd: autorunDir, env: {...process.env, LHCI_GITHUB_TOKEN: '', LHCI_GITHUB_APP_TOKEN: ''}}
     );
 
@@ -42,10 +42,9 @@ describe('Lighthouse CI autorun CLI', () => {
       Set it explicitly in lighthouserc.json if incorrect.
 
       Started a web server on port XXXX...
-      Running Lighthouse 3 time(s) on http://localhost:XXXX/good.html
+      Running Lighthouse 2 time(s) on http://localhost:XXXX/good.html
       Run #1...done.
       Run #2...done.
-      Run #3...done.
       Done running Lighthouse!
 
 
@@ -57,7 +56,7 @@ describe('Lighthouse CI autorun CLI', () => {
     `);
     expect(stderrClean).toMatchInlineSnapshot(`
       "
-      Checking assertions against 1 URL(s), 3 total run(s)
+      Checking assertions against 1 URL(s), 2 total run(s)
 
       1 result(s) for [1mhttp://localhost:XXXX/good.html[0m
 
@@ -67,7 +66,7 @@ describe('Lighthouse CI autorun CLI', () => {
 
               expected: >=[32m1[0m
                  found: [31m0[0m
-            [2mall values: 0, 0, 0[0m
+            [2mall values: 0, 0[0m
 
       Assertion failed. Exiting with status code 1.
 

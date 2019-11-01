@@ -8,6 +8,7 @@
 const fs = require('fs');
 const path = require('path');
 const childProcess = require('child_process');
+const _ = require('@lhci/utils/src/lodash.js');
 
 const BUILD_DIR_PRIORITY = [
   // explicitly a dist version of the site, highly likely to be production assets
@@ -29,6 +30,10 @@ function buildCommand(yargs) {
     rcFile: {
       description: 'The lighthouserc.json file preferences.',
     },
+    rcOverrides: {
+      description:
+        'Invididual flags to override the rc-file defaults. e.g. --rc-overrides.collect.numberOfRuns=5',
+    },
   });
 }
 
@@ -46,11 +51,11 @@ function readRcFile(rcFile) {
  * @return {{status: number}}
  */
 function runChildCommand(command, args = []) {
-  let {stdout = '', stderr = '', status = -1} = childProcess.spawnSync(process.argv[0], [
-    process.argv[1],
-    command,
-    ...args,
-  ]);
+  const combinedArgs = [process.argv[1], command, ...args, ...getOverrideArgsForCommand(command)];
+  let {stdout = '', stderr = '', status = -1} = childProcess.spawnSync(
+    process.argv[0],
+    combinedArgs
+  );
 
   stdout = stdout.toString();
   stderr = stderr.toString();
@@ -78,6 +83,16 @@ function findBuildDir() {
 
   throw new Error('Unable to determine `buildDir`; Set it explicitly in lighthouserc.json');
 }
+/**
+ * @param {'collect'|'assert'|'upload'|'healthcheck'} command
+ */
+function getOverrideArgsForCommand(command) {
+  const argRegex = /^--rc(-)?overrides\.(collect|assert|upload|healthcheck)\./;
+  return process.argv
+    .filter(arg => argRegex.test(arg))
+    .filter(arg => arg.includes(`verrides.${command}.`))
+    .map(arg => arg.replace(argRegex, '--'));
+}
 
 /**
  * @param {LHCI.AutorunCommand.Options} options
@@ -87,13 +102,17 @@ async function runCommand(options) {
   const rcFile = readRcFile(options.rcFile);
   if (rcFile && !rcFile.ci) throw new Error('RC file did not contain a root-level "ci" property');
   const ciConfiguration = (rcFile && rcFile.ci) || {};
+  _.merge(ciConfiguration, options.rcOverrides || {});
+
   const defaultFlags = rcFile ? [`--rc-file=${options.rcFile}`] : [];
   let hasFailure = false;
 
   const healthcheckStatus = runChildCommand('healthcheck', [...defaultFlags, '--fatal']).status;
   if (healthcheckStatus !== 0) process.exit(healthcheckStatus);
 
-  const collectArgs = ciConfiguration.collect ? [] : [`--build-dir=${findBuildDir()}`];
+  const collectHasUrlOrBuildDir =
+    ciConfiguration.collect && (ciConfiguration.collect.url || ciConfiguration.collect.buildDir);
+  const collectArgs = collectHasUrlOrBuildDir ? [] : [`--build-dir=${findBuildDir()}`];
   const collectStatus = runChildCommand('collect', [...defaultFlags, ...collectArgs]).status;
   if (collectStatus !== 0) process.exit(collectStatus);
 

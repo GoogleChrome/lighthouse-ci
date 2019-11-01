@@ -1,3 +1,0 @@
-# Server
-
-Documentation coming soon.

@@ -2,6 +2,8 @@
 
 ## Overview
 
+The LHCI server can be run in any node environment with persistent disk storage or network access to a postgres database. Docker can help encapsulate the server setup details for an instant custom server.
+
 ## Building Locally
 
 _NOTE: commands below were tested with Docker 18.09.2_

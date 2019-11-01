@@ -21,8 +21,7 @@ Lighthouse CI comes with an automatic setup that should work for many default we
 **.travis.yml**
 
 ```yaml
-sudo: required
-dist: xenial # use xenial or later
+dist: xenial # use xenial or later (enabled by default)
 language: node_js
 node_js:
   - 10 # use Node 10 LTS or later

@@ -36,6 +36,8 @@ const print = message => {
 
 const TEMPORARY_PUBLIC_STORAGE_URL =
   'https://us-central1-lighthouse-infrastructure.cloudfunctions.net/saveHtmlReport';
+const GITHUB_APP_STATUS_CHECK_URL =
+  'https://us-central1-lighthouse-infrastructure.cloudfunctions.net/githubAppPostStatusCheck';
 
 /**
  * @param {import('yargs').Argv} yargs
@@ -58,6 +60,10 @@ function buildCommand(yargs) {
       type: 'string',
       description: 'The GitHub token to use to apply a status check.',
     },
+    githubAppToken: {
+      type: 'string',
+      description: 'The LHCI GitHub App token to use to apply a status check.',
+    },
     serverBaseUrl: {
       description: 'The base URL of the server where results will be saved.',
       default: 'http://localhost:9001/',
@@ -74,17 +80,29 @@ function buildCommand(yargs) {
 }
 
 /**
- * @param {{slug: string, hash: string, state: 'failure'|'success', targetUrl: string, description: string, context: string, token: string}} options
+ * @param {{slug: string, hash: string, state: 'failure'|'success', targetUrl: string, description: string, context: string, githubToken?: string, githubAppToken?: string}} options
  */
 async function postStatusToGitHub(options) {
-  const {slug, hash, state, targetUrl, context, description, token} = options;
-  const url = `https://api.github.com/repos/${slug}/statuses/${hash}`;
-  const payload = {state, context, description, target_url: targetUrl};
-  const response = await fetch(url, {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json', Authorization: `token ${token}`},
-    body: JSON.stringify(payload),
-  });
+  const {slug, hash, state, targetUrl, context, description, githubToken, githubAppToken} = options;
+
+  let response;
+  if (githubAppToken) {
+    const url = GITHUB_APP_STATUS_CHECK_URL;
+    const payload = {...options, token: githubAppToken};
+    response = await fetch(url, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(payload),
+    });
+  } else {
+    const url = `https://api.github.com/repos/${slug}/statuses/${hash}`;
+    const payload = {state, context, description, target_url: targetUrl};
+    response = await fetch(url, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json', Authorization: `token ${githubToken}`},
+      body: JSON.stringify(payload),
+    });
+  }
 
   if (response.status === 201) {
     print(`GitHub accepted "${state}" status for "${context}".\n`);
@@ -115,8 +133,9 @@ function getUrlLabelForGithub(rawUrl, options) {
 async function runGithubStatusCheck(options, targetUrlMap) {
   const hash = getCurrentHash();
   const slug = getRepoSlug();
+  const {githubToken, githubAppToken} = options;
 
-  if (!options.githubToken) return print('No GitHub token set, skipping status check.\n');
+  if (!githubToken && !githubAppToken) return print('No GitHub token set, skipping.\n');
   print('GitHub token found, attempting to set status...\n');
   if (!slug || !slug.includes('/')) return print(`Invalid repo slug "${slug}", skipping.\n`);
   if (!hash) return print(`Invalid hash "${hash}"\n, skipping.`);
@@ -147,7 +166,8 @@ async function runGithubStatusCheck(options, targetUrlMap) {
         context,
         description,
         targetUrl,
-        token: options.githubToken,
+        githubToken,
+        githubAppToken,
       });
     }
   } else {
@@ -177,7 +197,8 @@ async function runGithubStatusCheck(options, targetUrlMap) {
         context,
         description,
         targetUrl,
-        token: options.githubToken,
+        githubToken,
+        githubAppToken,
       });
     }
   }

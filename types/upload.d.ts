@@ -12,7 +12,8 @@ declare global {
       export interface Options {
         target: UploadTarget;
         token: string;
-        githubToken: string;
+        githubToken?: string;
+        githubAppToken?: string;
         serverBaseUrl: string;
         urlReplacementPatterns: string[];
       }

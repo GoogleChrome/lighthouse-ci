@@ -46,7 +46,7 @@ const checks = [
     label: 'GitHub token set',
     // the test only makes sense if they've configured an upload target of some sort
     shouldTest: opts => !!opts.target || !!opts.serverBaseUrl,
-    test: opts => Boolean(opts.githubToken),
+    test: opts => Boolean(opts.githubToken || opts.githubAppToken),
   },
   {
     label: 'LHCI server reachable',

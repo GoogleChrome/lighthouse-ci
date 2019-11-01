@@ -51,7 +51,7 @@ describe('Lighthouse CI autorun CLI', () => {
 
       Uploading median LHR of http://localhost:XXXX/good.html...success!
       Open the report at <link>
-      No GitHub token set, skipping status check.
+      No GitHub token set, skipping.
 
       "
     `);

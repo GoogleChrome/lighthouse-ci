@@ -17,33 +17,17 @@ Lighthouse CI is a set of commands that make running, asserting, saving, and ret
 
 ## Quick Start
 
-Add Lighthouse CI to your devDependencies.
-
-```bash
-npm --save-dev @lhci/cli
-```
-
-**package.json**
-
-Add a `lhci` to your package.json scripts.
-
-```json
-{
-  "scripts": {
-    "lhci": "lhci autorun"
-  }
-}
-```
-
 **.travis.yml**
 
 ```yaml
 language: node_js
 node_js:
   - 10 # use Node 10 LTS or later
+before_install:
+  - npm install -g @lhci/cli
 script:
   - npm run build # build your site
-  - npm run lhci # run lighthouse CI
+  - lhci autorun # run lighthouse CI
 addons:
   chrome: stable # make sure you have Chrome available
 ```

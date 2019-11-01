@@ -20,6 +20,7 @@ describe('Lighthouse CI CLI', () => {
   const rcExtendedFile = path.join(__dirname, 'fixtures/lighthouserc-extended.json');
   const budgetsFile = path.join(__dirname, 'fixtures/budgets.json');
   const buildDir = path.join(__dirname, 'fixtures');
+  const cleanEnv = {...process.env, LHCI_GITHUB_TOKEN: '', LHCI_GITHUB_APP_TOKEN: ''};
 
   let server;
   let projectToken;
@@ -88,13 +89,12 @@ describe('Lighthouse CI CLI', () => {
 
   describe('healthcheck', () => {
     it('should pass when things are good', async () => {
-      const LHCI_GITHUB_TOKEN = '';
       const LHCI_TOKEN = projectToken;
       const LHCI_SERVER_BASE_URL = `http://localhost:${server.port}`;
       let {stdout = '', stderr = '', status = -1} = spawnSync(
         CLI_PATH,
         ['healthcheck', `--fatal`],
-        {env: {...process.env, LHCI_TOKEN, LHCI_GITHUB_TOKEN, LHCI_SERVER_BASE_URL}}
+        {env: {...cleanEnv, LHCI_TOKEN, LHCI_SERVER_BASE_URL}}
       );
 
       stdout = stdout.toString();
@@ -116,13 +116,12 @@ describe('Lighthouse CI CLI', () => {
     });
 
     it('should fail when things are bad', async () => {
-      const LHCI_GITHUB_TOKEN = '';
       const LHCI_TOKEN = projectToken;
       const LHCI_SERVER_BASE_URL = `http://localhost:${server.port}`;
       let {stdout = '', stderr = '', status = -1} = spawnSync(
         CLI_PATH,
         ['healthcheck', `--rc-file=${rcFile}`, `--fatal`, '--checks=githubToken'],
-        {env: {...process.env, LHCI_TOKEN, LHCI_GITHUB_TOKEN, LHCI_SERVER_BASE_URL}}
+        {env: {...cleanEnv, LHCI_TOKEN, LHCI_SERVER_BASE_URL}}
       );
 
       stdout = stdout.toString();
@@ -202,7 +201,7 @@ describe('Lighthouse CI CLI', () => {
       let {stdout = '', stderr = '', status = -1} = spawnSync(
         CLI_PATH,
         ['upload', `--serverBaseUrl=http://localhost:${server.port}`],
-        {env: {...process.env, LHCI_TOKEN: projectToken, LHCI_GITHUB_TOKEN: ''}}
+        {env: {...cleanEnv, LHCI_TOKEN: projectToken}}
       );
 
       stdout = stdout.toString();
@@ -259,7 +258,7 @@ describe('Lighthouse CI CLI', () => {
       let {stdout = '', stderr = '', status = -1} = spawnSync(
         CLI_PATH,
         ['upload', `--target=temporary-public-storage`],
-        {env: {...process.env, LHCI_GITHUB_TOKEN: ''}}
+        {env: {...cleanEnv}}
       );
 
       stdout = stdout.toString();
@@ -276,7 +275,7 @@ describe('Lighthouse CI CLI', () => {
       let {stdout = '', stderr = '', status = -1} = spawnSync(
         CLI_PATH,
         ['upload', `--serverBaseUrl=http://localhost:${server.port}`],
-        {env: {...process.env, LHCI_TOKEN: projectToken, LHCI_GITHUB_TOKEN: ''}}
+        {env: {...cleanEnv, LHCI_TOKEN: projectToken}}
       );
 
       stdout = stdout.toString();

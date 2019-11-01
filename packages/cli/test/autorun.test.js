@@ -19,7 +19,7 @@ describe('Lighthouse CI autorun CLI', () => {
     let {stdout = '', stderr = '', status = -1} = spawnSync(
       CLI_PATH,
       ['autorun', `--rc-file=${rcFile}`],
-      {cwd: autorunDir, env: {...process.env, LHCI_GITHUB_TOKEN: ''}}
+      {cwd: autorunDir, env: {...process.env, LHCI_GITHUB_TOKEN: '', LHCI_GITHUB_APP_TOKEN: ''}}
     );
 
     stdout = stdout.toString();

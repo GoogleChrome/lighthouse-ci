@@ -11,11 +11,12 @@
   height: var(--gauge-size);
   border-radius: calc(var(--gauge-size) / 2);
   line-height: var(--gauge-size);
-  font-size: calc(var(--gauge-size) / 3);
+  font-size: var(--gauge-number-font-size);
 
   background: var(--secondary-background-color);
 
   font-family: var(--monospace-font-family);
+  font-weight: var(--medium-font-weight);
   text-align: center;
 }
 

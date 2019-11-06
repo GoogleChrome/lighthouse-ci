@@ -16,20 +16,20 @@
   --color-gray-400: #bdbdbd;
   --color-gray-500: #9e9e9e;
   --color-gray-600: #757575;
-  --color-gray-700: #616161;
   --color-gray-800: #424242;
   --color-gray-900: #212121;
-  --color-red-a200: #ff5252;
-  --color-green-a700: #00c853;
-  --color-blue-100: #d4e0ff;
-  --color-blue-500: #376cff;
+  --color-red-500: #ff4e42;
+  --color-red-700: #eb0f00;
+  --color-green-500: #0cce6b;
+  --color-green-700: #018642;
+  --color-blue-200: #90caf9;
+  --color-blue-500: #2962ff;
   --color-cyan-500: #00bcd4;
-  --color-cyan-700: #0097a7;
-  --color-pink-a200: #ff4081;
-  --color-pink-600: #d81b60;
-  --color-orange-500: #ff9800;
-  --color-deep-orange-a200: #ff6e40;
-  --color-deep-purple-400: #7e57c2;
+  --color-cyan-700: #078190;
+  --color-magenta-500: #ff4081;
+  --color-magenta-700: #e31f62;
+  --color-orange-500: #ffa400;
+  --color-orange-700: #d04900;
 
   /** Themematic constants */
   --base-text-color: var(--color-gray-900);
@@ -46,31 +46,32 @@
   --strong-border-color: var(--color-gray-900);
   --inverted-border-color: var(--color-gray-800);
 
-  --pass-color: var(--color-green-a700);
+  --pass-color: var(--color-green-500);
   --average-color: var(--color-orange-500);
-  --fail-color: var(--color-red-a200);
+  --fail-color: var(--color-red-500);
 
   --improvement-color: var(--color-cyan-500);
   --improvement-text-color: var(--color-cyan-700);
   --neutral-color: var(--color-gray-800);
   --neutral-highlight-color: var(--color-gray-200);
-  --regression-color: var(--color-pink-a200);
-  --regression-text-color: var(--color-pink-600);
+  --regression-color: var(--color-magenta-500);
+  --regression-text-color: var(--color-magenta-700);
 
   --compare-color: var(--color-blue-500);
-  --compare-highlight-color: var(--color-blue-100);
+  --compare-highlight-color: var(--color-blue-200);
   --dev-branch-color: var(--color-gray-600);
   --master-branch-color: var(--color-gray-800);
 
-  --base-font-family: 'Roboto', sans-serif;
+  --base-font-family: 'Roboto', Arial, Helvetica, sans-serif;
   --base-font-weight: 400;
   --medium-font-weight: 500;
   --monospace-font-family: 'Roboto Mono', 'Menlo', 'dejavu sans mono', 'Consolas', 'Lucida Console',
     monospace;
 
-  --base-font-size: 14px;
+  --gauge-number-font-size: 24px;
+  --gauge-title-font-size: 18px; /* this is 20px in the spec, but simply does not look like the design at 20px */
   --header-font-size: 20px;
-  --title-font-size: 24px;
+  --base-font-size: 14px;
   --subtext-font-size: 12px;
 
   --base-icon-size: 14px;

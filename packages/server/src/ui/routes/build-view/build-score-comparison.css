@@ -23,6 +23,7 @@
 
 .build-score-comparison-item__label {
   margin-top: var(--base-spacing);
+  font-size: var(--gauge-title-font-size);
 }
 
 .build-score-comparison-item__delta {

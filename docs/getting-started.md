@@ -249,7 +249,19 @@ If you're using `autorun`, setting `ci.upload.target` to `temporary-public-stora
 
 ### Historical Reports & Diffing (Lighthouse CI Server)
 
-Historical reports and advanced report diffing is available on the Lighthouse CI server. For setup of the server itself, see [our server documentation](./server.md). Once the server is setup, you can configure your Lighthouse CI integration to upload reports to it.
+Historical reports and advanced report diffing is available on the Lighthouse CI server. For setup of the server itself, see [our server recipe](./recipes/README.md). Once the server is setup, you can use the wizard to create a project.
+
+```bash
+$ lhci wizard
+? Which wizard do you want to run? new-project
+? Which server would you like to use? http://url-of-your-lhci-server.com/
+? What would you like to name the project? My Favorite Project
+? Where is the project built? https://travis-ci.org/GoogleChrome/lighthouse-ci
+Created project My Favorite Project (XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX)!
+Use token XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX to connect.
+```
+
+With your token, you can configure your Lighthouse CI integration to upload reports to the server.
 
 ```bash
 #!/bin/bash

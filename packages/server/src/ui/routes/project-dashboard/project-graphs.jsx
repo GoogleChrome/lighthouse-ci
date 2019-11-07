@@ -62,8 +62,9 @@ const StatisticPlot = props => {
       loadingState={props.loadingState}
       asyncData={props.statistics}
       render={allStats => {
+        const noDataToDisplay = <Paper className="dashboard-graph">No data to display</Paper>;
         if (allStats.length === 0) {
-          return <Paper className="dashboard-graph">No data to display</Paper>;
+          return noDataToDisplay;
         }
 
         const urls = computeURLsFromStats(allStats);
@@ -83,6 +84,10 @@ const StatisticPlot = props => {
             ysForUrl.push(statsForUrl.find(stat => stat.buildId === build.id) || null);
           }
           ys.push(ysForUrl);
+        }
+
+        if (ys.length === 0) {
+          return noDataToDisplay;
         }
 
         const xs = ys[0].map((_, i) => i);

@@ -99,6 +99,7 @@ Options:
 
 ```
 lhci collect --numberOfRuns=5 --url=https://example.com
+lhci collect --start-server-command="yarn serve" --url=http://localhost:8080/
 lhci collect --buildDir=./dist
 lhci collect --url=https://example-1.com --url=https://example-2.com
 ```

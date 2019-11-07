@@ -1,0 +1,5 @@
+{
+  "scripts": {
+    "serve:lhci": "node autorun-server.js"
+  }
+}

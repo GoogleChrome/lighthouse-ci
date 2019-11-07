@@ -52,19 +52,12 @@ function readRcFile(rcFile) {
  */
 function runChildCommand(command, args = []) {
   const combinedArgs = [process.argv[1], command, ...args, ...getOverrideArgsForCommand(command)];
-  let {stdout = '', stderr = '', status = -1} = childProcess.spawnSync(
-    process.argv[0],
-    combinedArgs
-  );
+  const {status = -1} = childProcess.spawnSync(process.argv[0], combinedArgs.filter(Boolean), {
+    stdio: 'inherit',
+  });
 
-  stdout = stdout.toString();
-  stderr = stderr.toString();
-  status = status || 0;
-
-  if (stdout) process.stdout.write('\n' + stdout + '\n');
-  if (stderr) process.stderr.write('\n' + stderr + '\n');
-
-  return {status};
+  process.stdout.write('\n');
+  return {status: status || 0};
 }
 
 /** @return {string} */
@@ -76,21 +69,33 @@ function findBuildDir() {
     const contents = fs.readdirSync(fullDirPath);
     if (contents.some(file => file.endsWith('.html'))) {
       process.stdout.write(`Automatically determined ./${dir} as \`buildDir\`.\n`);
-      process.stdout.write(`Set it explicitly in lighthouserc.json if incorrect.\n`);
+      process.stdout.write(`Set it explicitly in lighthouserc.json if incorrect.\n\n`);
       return fullDirPath;
     }
   }
 
   throw new Error('Unable to determine `buildDir`; Set it explicitly in lighthouserc.json');
 }
+
+/** @return {string} */
+function getStartServerCommandFlag() {
+  const packagePath = path.join(process.cwd(), 'package.json');
+  if (!fs.existsSync(packagePath)) return '';
+
+  const packageJson = JSON.parse(fs.readFileSync(packagePath, 'utf8'));
+  const command = (packageJson.scripts && packageJson.scripts['serve:lhci']) || '';
+  if (!command) return '';
+  return `--start-server-command=${command}`;
+}
+
 /**
  * @param {'collect'|'assert'|'upload'|'healthcheck'} command
  */
 function getOverrideArgsForCommand(command) {
-  const argRegex = /^--rc(-)?overrides\.(collect|assert|upload|healthcheck)\./;
+  const argRegex = /^--rc(-)?overrides\.(collect|assert|upload|healthcheck)\./i;
   return process.argv
     .filter(arg => argRegex.test(arg))
-    .filter(arg => arg.includes(`verrides.${command}.`))
+    .filter(arg => arg.toLowerCase().includes(`overrides.${command}.`))
     .map(arg => arg.replace(argRegex, '--'));
 }
 
@@ -112,7 +117,9 @@ async function runCommand(options) {
 
   const collectHasUrlOrBuildDir =
     ciConfiguration.collect && (ciConfiguration.collect.url || ciConfiguration.collect.buildDir);
-  const collectArgs = collectHasUrlOrBuildDir ? [] : [`--build-dir=${findBuildDir()}`];
+  const collectArgs = collectHasUrlOrBuildDir
+    ? [getStartServerCommandFlag()]
+    : [`--build-dir=${findBuildDir()}`];
   const collectStatus = runChildCommand('collect', [...defaultFlags, ...collectArgs]).status;
   if (collectStatus !== 0) process.exit(collectStatus);
 

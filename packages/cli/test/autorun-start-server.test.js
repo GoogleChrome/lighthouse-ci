@@ -11,14 +11,18 @@ const path = require('path');
 const {spawnSync} = require('child_process');
 const {CLI_PATH} = require('./test-utils.js');
 
-describe('Lighthouse CI autorun CLI', () => {
-  const autorunDir = path.join(__dirname, 'fixtures/autorun');
-  const rcFile = path.join(autorunDir, 'lighthouserc-autorun.json');
+describe('Lighthouse CI autorun CLI with startServerCommand', () => {
+  const autorunDir = path.join(__dirname, 'fixtures/autorun-start-server');
 
   it('should run all three steps', () => {
     let {stdout = '', stderr = '', status = -1} = spawnSync(
       CLI_PATH,
-      ['autorun', `--rc-file=${rcFile}`, '--rc-overrides.collect.numberOfRuns=2'],
+      [
+        'autorun',
+        '--rc-overrides.collect.url=http://localhost:52425',
+        '--rc-overrides.collect.n=2',
+        '--rc-overrides.assert.assertions.viewport=error',
+      ],
       {cwd: autorunDir, env: {...process.env, LHCI_GITHUB_TOKEN: '', LHCI_GITHUB_APP_TOKEN: ''}}
     );
 
@@ -26,39 +30,26 @@ describe('Lighthouse CI autorun CLI', () => {
     stderr = stderr.toString();
     status = status || 0;
 
-    const stdoutClean = stdout
-      .replace(/:\d{4,6}/g, ':XXXX')
-      .replace(/port \d{4,6}/, 'port XXXX')
-      .replace(/Open the report at.*\n/, 'Open the report at <link>\n');
+    const stdoutClean = stdout.replace(/:\d{4,6}/g, ':XXXX').replace(/port \d{4,6}/, 'port XXXX');
     const stderrClean = stderr.replace(/:\d{4,6}/g, ':XXXX').replace(/port \d{4,6}/, 'port XXXX');
     expect(stdoutClean).toMatchInlineSnapshot(`
-      "
-      ✅  .lighthouseci/ directory writable
+      "✅  .lighthouseci/ directory writable
       ✅  Ancestor hash determinable
-      ⚠️   GitHub token set
       Healthcheck passed!
 
-      Automatically determined ./build as \`buildDir\`.
-      Set it explicitly in lighthouserc.json if incorrect.
-
-      Started a web server on port XXXX...
-      Running Lighthouse 2 time(s) on http://localhost:XXXX/good.html
+      Started a web server with \\"node autorun-server.js\\"...
+      Running Lighthouse 2 time(s) on http://localhost:XXXX
       Run #1...done.
       Run #2...done.
       Done running Lighthouse!
 
 
-      Uploading median LHR of http://localhost:XXXX/good.html...success!
-      Open the report at <link>
-      No GitHub token set, skipping.
-
       "
     `);
     expect(stderrClean).toMatchInlineSnapshot(`
-      "
-      Checking assertions against 1 URL(s), 2 total run(s)
+      "Checking assertions against 1 URL(s), 2 total run(s)
 
-      1 result(s) for [1mhttp://localhost:XXXX/good.html[0m
+      1 result(s) for [1mhttp://localhost:XXXX/[0m
 
         [31m✘[0m  [1mviewport[0m failure for [1mminScore[0m assertion
            Does not have a \`<meta name=\\"viewport\\">\` tag with \`width\` or \`initial-scale\`
@@ -69,7 +60,6 @@ describe('Lighthouse CI autorun CLI', () => {
             [2mall values: 0, 0[0m
 
       Assertion failed. Exiting with status code 1.
-
       assert command failed. Exiting with status code 1.
       "
     `);

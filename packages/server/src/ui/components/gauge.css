@@ -34,7 +34,7 @@
 }
 
 .gauge-arc__indicator {
-  --indicator-width: 6px;
+  --indicator-width: 3px;
   --indicator-height: 12px;
 
   position: absolute;

@@ -92,7 +92,8 @@ async function run() {
 }
 
 run().catch(err => {
-  if (err.stderr) process.stderr.write(err.stderr);
   process.stderr.write(err.stack);
+  if (err.stdout) process.stderr.write(err.stdout);
+  if (err.stderr) process.stderr.write(err.stderr);
   process.exit(1);
 });

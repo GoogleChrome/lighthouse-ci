@@ -72,7 +72,7 @@ export const BuildViewWarnings = props => {
   if (baseLhr && !auditGroups.length) {
     return (
       <Paper className="build-view__warning">
-        <i className="material-icons">sentiment_satisified_alt</i>
+        <i className="material-icons">sentiment_satisfied_alt</i>
         <div>
           Woah, no differences found! Switch base builds to explore other differences, or{' '}
           {lhrLinkEl}

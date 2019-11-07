@@ -62,23 +62,33 @@ function getCommitTime(hash) {
 /**
  * @return {string}
  */
-function getCurrentBranch() {
+function getCurrentBranchRaw_() {
   // Use Travis CI vars if available.
-  if (envVars.TRAVIS_PULL_REQUEST_BRANCH) return envVars.TRAVIS_PULL_REQUEST_BRANCH.slice(0, 40);
-  if (envVars.TRAVIS_BRANCH) return envVars.TRAVIS_BRANCH.slice(0, 40);
+  if (envVars.TRAVIS_PULL_REQUEST_BRANCH) return envVars.TRAVIS_PULL_REQUEST_BRANCH;
+  if (envVars.TRAVIS_BRANCH) return envVars.TRAVIS_BRANCH;
   // Use GitHub Actions vars if available. See https://github.com/GoogleChrome/lighthouse-ci/issues/43#issuecomment-551174778
-  if (envVars.GITHUB_HEAD_REF) return envVars.GITHUB_HEAD_REF.slice(0, 40);
+  if (envVars.GITHUB_HEAD_REF) return envVars.GITHUB_HEAD_REF;
+  if (envVars.GITHUB_REF) return envVars.GITHUB_REF;
 
   const result = childProcess.spawnSync('git', ['rev-parse', '--abbrev-ref', 'HEAD'], {
     encoding: 'utf8',
   });
 
-  const branch = result.stdout.trim().slice(0, 40);
+  const branch = result.stdout.trim();
   if (result.status !== 0 || branch === 'HEAD') {
     throw new Error('Unable to determine current branch with `git rev-parse --abbrev-ref HEAD`');
   }
 
   return branch;
+}
+
+/**
+ * @return {string}
+ */
+function getCurrentBranch() {
+  const branch = getCurrentBranchRaw_();
+  if (branch === 'HEAD') throw new Error('Unable to determine current branch');
+  return branch.replace('refs/heads/', '').slice(0, 40);
 }
 
 /**

@@ -70,6 +70,7 @@ describe('build-context.js', () => {
 
   describe('#getAncestorHashForBranch()', () => {
     it('should work', () => {
+      // the merge-base of master with itself is just itself.
       expect(buildContext.getAncestorHashForBranch(hash)).toEqual(hash);
     });
 

@@ -8,6 +8,23 @@
 const crypto = require('crypto');
 const childProcess = require('child_process');
 
+/**
+ * @param {Array<[string, ReadonlyArray<string>]>} commands
+ * @return {import('child_process').SpawnSyncReturns<string>}
+ */
+function runCommandsUntilFirstSuccess(commands) {
+  /** @type {import('child_process').SpawnSyncReturns<string>|undefined} */
+  let result;
+
+  for (const [command, args] of commands) {
+    result = childProcess.spawnSync(command, args, {encoding: 'utf8'});
+    if (result.status === 0) break;
+  }
+
+  if (!result) throw new Error('Must specify at least one command');
+  return result;
+}
+
 const envVars = process.env;
 
 /**
@@ -137,9 +154,10 @@ function getAncestorHashForMaster(hash = 'HEAD') {
  * @return {string}
  */
 function getAncestorHashForBranch(hash = 'HEAD') {
-  const result = childProcess.spawnSync('git', ['merge-base', hash, 'master'], {
-    encoding: 'utf8',
-  });
+  const result = runCommandsUntilFirstSuccess([
+    ['git', ['merge-base', hash, 'origin/master']],
+    ['git', ['merge-base', hash, 'master']],
+  ]);
 
   // Ancestor hash is optional, so do not throw if it can't be computed.
   // See https://github.com/GoogleChrome/lighthouse-ci/issues/36

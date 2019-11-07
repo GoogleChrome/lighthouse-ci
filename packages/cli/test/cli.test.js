@@ -13,13 +13,20 @@ const {spawn} = require('child_process');
 const fetch = require('isomorphic-fetch');
 const log = require('lighthouse-logger');
 const puppeteer = require('puppeteer');
-const {startServer, waitForCondition, CLI_PATH, runCLI} = require('./test-utils.js');
+const {
+  startServer,
+  waitForCondition,
+  getSqlFilePath,
+  runCLI,
+  CLI_PATH,
+} = require('./test-utils.js');
 
 describe('Lighthouse CI CLI', () => {
   const rcFile = path.join(__dirname, 'fixtures/lighthouserc.json');
   const rcExtendedFile = path.join(__dirname, 'fixtures/lighthouserc-extended.json');
   const budgetsFile = path.join(__dirname, 'fixtures/budgets.json');
   const buildDir = path.join(__dirname, 'fixtures');
+  const tmpSqlFilePath = getSqlFilePath();
 
   let server;
   let projectToken;
@@ -30,6 +37,8 @@ describe('Lighthouse CI CLI', () => {
       server.process.kill();
       if (fs.existsSync(server.sqlFile)) fs.unlinkSync(server.sqlFile);
     }
+
+    if (fs.existsSync(tmpSqlFilePath)) fs.unlinkSync(tmpSqlFilePath);
   });
 
   describe('server', () => {
@@ -154,6 +163,34 @@ describe('Lighthouse CI CLI', () => {
       expect(stderr.toString()).toMatchInlineSnapshot(`""`);
       expect(status).toEqual(0);
     }, 90000);
+
+    it('should collect results with a server command', () => {
+      const startCommand = `yarn start server -p=14927 --storage.sqlDatabasePath=${tmpSqlFilePath}`;
+      let {stdout = '', stderr = '', status = -1} = spawnSync(CLI_PATH, [
+        'collect',
+        `-n=1`,
+        `--rc-file=${rcFile}`,
+        `--start-server-command=${startCommand}`,
+        `--url=http://localhost:14927/app/`,
+      ]);
+
+      stdout = stdout.toString();
+      stderr = stderr.toString();
+      status = status || 0;
+
+      const stdoutClean = stdout
+        .replace(/:\d{4,6}/g, ':XXXX')
+        .replace(/sqlDatabasePath=.*?"/, 'sqlDatabasePath=<file>"');
+      expect(stdoutClean).toMatchInlineSnapshot(`
+        "Started a web server with \\"yarn start server -p=14927 --storage.sqlDatabasePath=<file>\\"...
+        Running Lighthouse 1 time(s) on http://localhost:XXXX/app/
+        Run #1...done.
+        Done running Lighthouse!
+        "
+      `);
+      expect(stderr.toString()).toMatchInlineSnapshot(`""`);
+      expect(status).toEqual(0);
+    }, 60000);
 
     it('should collect results from explicit urls', () => {
       const {stdout, stderr, status} = runCLI([

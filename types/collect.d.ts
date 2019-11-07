@@ -41,6 +41,7 @@ declare global {
       export interface Options {
         url?: string | string[];
         buildDir?: string;
+        startServerCommand?: string;
         method: 'node';
         numberOfRuns: number;
         headful: boolean;

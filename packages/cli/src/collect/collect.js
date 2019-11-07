@@ -9,6 +9,10 @@ const path = require('path');
 const FallbackServer = require('./fallback-server.js');
 const LighthouseRunner = require('./lighthouse-runner.js');
 const {saveLHR, clearSavedLHRs} = require('@lhci/utils/src/saved-reports.js');
+const {
+  runCommandAndWaitForPattern,
+  killProcessTree,
+} = require('@lhci/utils/src/child-process-helper.js');
 
 /**
  * @param {import('yargs').Argv} yargs
@@ -21,6 +25,9 @@ function buildCommand(yargs) {
     url: {description: 'The URL to run Lighthouse on.'},
     buildDir: {
       description: 'The build directory where your HTML files to run Lighthouse on are located.',
+    },
+    startServerCommand: {
+      description: 'The command to run to start the server.',
     },
     settings: {description: 'The Lighthouse settings and flags to use when collecting'},
     numberOfRuns: {
@@ -59,13 +66,20 @@ async function runOnUrl(url, options) {
 
 /**
  * @param {LHCI.CollectCommand.Options} options
- * @return {Promise<{urls: Array<string>, close: () => void}>}
+ * @return {Promise<{urls: Array<string>, close: () => Promise<void>}>}
  */
 async function determineUrls(options) {
   if (options.url) {
+    let close = async () => undefined;
+    if (options.startServerCommand) {
+      const {child} = await runCommandAndWaitForPattern(options.startServerCommand, /listen/);
+      process.stdout.write(`Started a web server with "${options.startServerCommand}"...\n`);
+      close = () => killProcessTree(child.pid);
+    }
+
     return {
       urls: Array.isArray(options.url) ? options.url : [options.url],
-      close: () => undefined,
+      close,
     };
   }
 
@@ -77,7 +91,7 @@ async function determineUrls(options) {
   process.stdout.write(`Started a web server on port ${server.port}...\n`);
 
   const urls = server.getAvailableUrls();
-  return {urls, close: () => server.close()};
+  return {urls, close: async () => server.close()};
 }
 
 /**
@@ -94,7 +108,7 @@ async function runCommand(options) {
       await runOnUrl(url, options);
     }
   } finally {
-    close();
+    await close();
   }
 
   process.stdout.write(`Done running Lighthouse!\n`);

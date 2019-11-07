@@ -33,25 +33,35 @@ async function runCommandAndWaitForPattern(command, pattern, opts = {}) {
     resolve = r1;
     reject = r2;
   });
+  const output = {stdout: '', stderr: ''};
 
   const child = childProcess.spawn(command, {stdio: 'pipe', shell: true});
-  /** @param {Buffer} chunk */
-  const stringListener = chunk => {
+  /** @param {'stdout'|'stderr'} channel @return {(chunk: Buffer) => void}  */
+  const stringListener = channel => chunk => {
+    const data = chunk.toString();
+    output[channel] += data;
     const match = chunk.toString().match(pattern);
     patternMatch = patternMatch || (match && match[0]);
     if (match) resolve();
   };
   /** @param {number|null} code */
   const exitListener = code => {
-    if (code !== 0) reject(new Error(`Command exited with code ${code}`));
+    if (code !== 0) {
+      const err = new Error(`Command exited with code ${code}`);
+      Object.assign(err, output);
+      reject(err);
+    }
   };
 
+  const stdoutListener = stringListener('stdout');
+  const stderrListener = stringListener('stderr');
+
   child.on('exit', exitListener);
-  child.stdout.on('data', stringListener);
-  child.stderr.on('data', stringListener);
+  child.stdout.on('data', stdoutListener);
+  child.stderr.on('data', stderrListener);
   await Promise.race([timeoutPromise, foundStringPromise]);
-  child.stdout.off('data', stringListener);
-  child.stderr.off('data', stringListener);
+  child.stdout.off('data', stdoutListener);
+  child.stderr.off('data', stderrListener);
   child.off('exit', exitListener);
 
   return {child, patternMatch};

@@ -11,9 +11,13 @@ const testingLibrary = require('@testing-library/dom');
 
 const CLI_PATH = path.join(__dirname, '../src/cli.js');
 
+function getSqlFilePath() {
+  return `cli-test-${Math.round(Math.random() * 1e9)}.tmp.sql`;
+}
+
 async function startServer(sqlFile) {
   if (!sqlFile) {
-    sqlFile = `cli-test-${Math.round(Math.random() * 1e9)}.tmp.sql`;
+    sqlFile = getSqlFilePath();
   }
 
   let stdout = '';
@@ -60,4 +64,5 @@ module.exports = {
   runCLI,
   startServer,
   waitForCondition,
+  getSqlFilePath,
 };

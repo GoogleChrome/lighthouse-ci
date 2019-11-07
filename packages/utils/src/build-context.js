@@ -132,7 +132,7 @@ function getAncestorHashForMaster(hash = 'HEAD') {
  * @return {string}
  */
 function getAncestorHashForBranch(hash = 'HEAD') {
-  const result = childProcess.spawnSync('git', ['merge-base', hash, 'master'], {
+  const result = childProcess.spawnSync('git', ['merge-base', hash, 'origin/master'], {
     encoding: 'utf8',
   });
 

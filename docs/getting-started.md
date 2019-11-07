@@ -16,7 +16,7 @@ In the examples that follow, use of GitHub and Travis CI are assumed but the sam
 
 ## Quick Start
 
-Lighthouse CI comes with an automatic setup that should work for many default web projects. If you build an API alongside your frontend or have any complicated moving parts, `autorun` might not work for you. Read up on the details in [the full setup guide](#setup).
+Lighthouse CI comes with an automatic setup that should work for many default web projects. If you have any complicated moving parts, `autorun` might not work for you. Read up on the details in [the full setup guide](#setup).
 
 **.travis.yml**
 
@@ -44,6 +44,25 @@ node_js:
   - '12'
 script:
   - 'if [ "${TRAVIS_NODE_VERSION}" = "8" ]; then lhci autorun ; fi' # only run LHCI on node 8
+```
+
+**NOTE: for sites with an API or other dynamic component, you'll need to tell LHCI how to start your server**
+
+With node in your `package.json`...
+
+```json
+{
+  "scripts": {
+    "serve:lhci": "node path/to/your/server.js"
+  }
+}
+```
+
+With another language in your CI script...
+
+```yaml
+script:
+  - lhci autorun --rc-overrides.collect.startServerCommand="rails server -e production"
 ```
 
 That's it! You're good to go. Check out the [Extra Goodies](#extra-goodies) section for additional features like uploading every report to public storage, GitHub status checks, and a historical diffing server.
@@ -141,7 +160,10 @@ Now that we have our environment ready, time to run Lighthouse CI. The `collect`
 # If you're already using node to manage your project, add it to your package.json `devDependencies` instead to skip this step.
 npm install -g @lhci/cli@next
 
-# Collect Lighthouse reports for our URL
+# Run a healthcheck to make sure everything looks good before we run collection.
+lhci healthcheck --fatal
+
+# Collect Lighthouse reports for our URL.
 lhci collect --url=http://localhost:9000/index.html
 
 # Assert that the reports look good, this step is configured in the next step.
@@ -168,6 +190,7 @@ fi
 npx http-server -p 9000 ./dist &
 
 npm install -g @lhci/cli@next
+lhci healthcheck --fatal
 lhci collect --url=http://localhost:9000/index.html
 lhci assert --preset="lighthouse:recommended"
 EXIT_CODE=$?

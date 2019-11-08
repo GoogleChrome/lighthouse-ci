@@ -9,6 +9,7 @@ import {useProjectList} from '../../hooks/use-api-data';
 import {AsyncLoader} from '../../components/async-loader';
 import {Link} from 'preact-router';
 import {Page} from '../../layout/page';
+import {DocumentTitle} from '../../components/document-title';
 
 /** @param {{projects: Array<LHCI.ServerCommand.Project>}} props */
 const ProjectList_ = ({projects}) => {
@@ -34,6 +35,7 @@ export const ProjectList = () => {
 
   return (
     <Page>
+      <DocumentTitle title="Projects" />
       <AsyncLoader
         loadingState={loadingState}
         asyncData={projects}

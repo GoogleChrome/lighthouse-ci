@@ -16,6 +16,7 @@ import {ProjectGraphs} from './project-graphs.jsx';
 
 import './project-dashboard.css';
 import {Pill} from '../../components/pill';
+import {DocumentTitle} from '../../components/document-title';
 
 /** @param {{project: LHCI.ServerCommand.Project, builds: Array<LHCI.ServerCommand.Build>, runUrl?: string, branch?: string}} props */
 const ProjectDashboard_ = props => {
@@ -23,6 +24,7 @@ const ProjectDashboard_ = props => {
 
   return (
     <div className="dashboard">
+      <DocumentTitle title={`${project.name} Dashboard`} />
       <Paper className="dashboard__recent-activity">
         <h2>Recent Activity</h2>
         <table className="dashboard__build-list">

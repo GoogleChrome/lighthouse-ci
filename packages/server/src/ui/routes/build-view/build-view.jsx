@@ -30,6 +30,7 @@ import {findAuditDiffs, getDiffSeverity} from '@lhci/utils/src/audit-diff-finder
 import {route} from 'preact-router';
 import {BuildViewOptions} from './build-view-options';
 import {BuildViewWarnings} from './build-view-warnings';
+import {DocumentTitle} from '../../components/document-title';
 
 /**
  * @param {LH.Result} lhr
@@ -224,6 +225,7 @@ const BuildView_ = props => {
         </Fragment>
       }
     >
+      <DocumentTitle title={`Compare "${props.build.commitMessage}"`} />
       {(openBuildHash && (
         <BuildHashSelector
           build={props.build}

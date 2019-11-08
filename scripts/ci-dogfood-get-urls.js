@@ -21,8 +21,8 @@ async function main() {
   process.stdout.write(
     [
       new URL(`/app`, rootURL),
-      new URL(`/app/projects/${project.id}`, rootURL),
-      new URL(`/app/projects/${project.id}/builds/${build.id}`, rootURL),
+      new URL(`/app/projects/${project.slug}`, rootURL),
+      new URL(`/app/projects/${project.slug}/compare/${build.id.split('-')[0]}`, rootURL),
     ].join('\n')
   );
 

@@ -65,7 +65,7 @@ module.exports = {
     'document-title': ['error', {}],
     'dom-size': ['error', {}],
     'duplicate-id': ['error', {}],
-    'errors-in-console': ['error', {}],
+    'errors-in-console': ['error', {maxLength: 0}],
     'external-anchors-use-rel-noopener': ['error', {}],
     'font-display': ['error', {}],
     'font-size': ['error', {}],

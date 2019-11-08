@@ -24,7 +24,7 @@ async function run() {
   const buildUrl = new URL(process.argv[3]);
   const remoteApi = new ApiClient({rootURL: buildUrl.origin});
 
-  const [_, projectId, buildId] = buildUrl.pathname.match(BUILD_URL_REGEX) || [];
+  const [_ = '', projectId = '', buildId = ''] = buildUrl.pathname.match(BUILD_URL_REGEX) || [];
   if (!projectId || !buildId) throw new Error(`Invalid build URL ${buildUrl.href}`);
 
   const sourceProject = await remoteApi.findProjectById(projectId);

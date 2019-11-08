@@ -241,16 +241,20 @@ function createAuditDiff(diff) {
  * @param {string} auditId
  * @param {DetailItemEntry} baseEntry
  * @param {DetailItemEntry} compareEntry
+ * @param {Array<{key: string}>} headings
  * @return {Array<LHCI.AuditDiff>}
  */
-function findAuditDetailItemKeyDiffs(auditId, baseEntry, compareEntry) {
+function findAuditDetailItemKeyDiffs(auditId, baseEntry, compareEntry, headings) {
   /** @type {Array<LHCI.AuditDiff>} */
   const diffs = [];
 
   for (const key of Object.keys(baseEntry.item)) {
     const baseValue = baseEntry.item[key];
     const compareValue = compareEntry.item[key];
+    // If these aren't numeric, comparable values, skip the key.
     if (typeof baseValue !== 'number' || typeof compareValue !== 'number') continue;
+    // If these aren't shown in the table, skip the key.
+    if (!headings.some(heading => heading.key === key)) continue;
 
     diffs.push(
       createAuditDiff({
@@ -432,15 +436,16 @@ function sortZippedBaseAndCompareItems(diffs, zippedItems) {
  * @param {string} auditId
  * @param {Array<Record<string, any>>} baseItems
  * @param {Array<Record<string, any>>} compareItems
+ * @param {Array<{key: string}>} headings
  * @return {Array<LHCI.AuditDiff>}
  */
-function findAuditDetailItemsDiffs(auditId, baseItems, compareItems) {
+function findAuditDetailItemsDiffs(auditId, baseItems, compareItems, headings) {
   /** @type {Array<LHCI.AuditDiff>} */
   const diffs = [];
 
   for (const {base, compare} of zipBaseAndCompareItems(baseItems, compareItems)) {
     if (base && compare) {
-      diffs.push(...findAuditDetailItemKeyDiffs(auditId, base, compare));
+      diffs.push(...findAuditDetailItemKeyDiffs(auditId, base, compare, headings));
     } else if (compare) {
       diffs.push({type: 'itemAddition', auditId, compareItemIndex: compare.index});
     } else if (base) {
@@ -498,9 +503,11 @@ function normalizeNumericValue(audit) {
 
 /**
  * @param {LH.AuditResult} audit
+ * @return {Required<Pick<Required<LH.AuditResult>['details'],'items'|'headings'>>}
  */
-function normalizeDetailsItems(audit) {
-  return (audit.details && audit.details.items) || [];
+function normalizeDetails(audit) {
+  if (!audit.details) return {items: [], headings: []};
+  return {items: audit.details.items || [], headings: audit.details.headings || []};
 }
 
 /**
@@ -549,12 +556,15 @@ function findAuditDiffs(baseAudit, compareAudit, options = {}) {
     });
   }
 
+  let hasItemDetails = false;
   if (
     (baseAudit.details && baseAudit.details.items) ||
     (compareAudit.details && compareAudit.details.items)
   ) {
-    const baseItems = normalizeDetailsItems(baseAudit);
-    const compareItems = normalizeDetailsItems(compareAudit);
+    hasItemDetails = true;
+    const {items: baseItems, headings: baseHeadings} = normalizeDetails(baseAudit);
+    const {items: compareItems, headings: compareHeadings} = normalizeDetails(compareAudit);
+    const headings = baseHeadings.concat(compareHeadings);
 
     diffs.push(
       createAuditDiff({
@@ -565,7 +575,7 @@ function findAuditDiffs(baseAudit, compareAudit, options = {}) {
       })
     );
 
-    diffs.push(...findAuditDetailItemsDiffs(auditId, baseItems, compareItems));
+    diffs.push(...findAuditDetailItemsDiffs(auditId, baseItems, compareItems, headings));
 
     if (options.synthesizeItemKeyDiffs) {
       diffs.push(...synthesizeItemKeyDiffs(diffs, baseItems, compareItems));
@@ -594,12 +604,12 @@ function findAuditDiffs(baseAudit, compareAudit, options = {}) {
   // our percentAbsoluteDeltaThreshold.
   if (filteredDiffs.length === 1 && filteredDiffs[0].type === 'displayValue') return [];
 
-  // If the only diff found was a numericValue/displayValue diff *AND* we were passing, skip it.
-  // This only happens on audits that have flaky
+  // If the only diff found was a numericValue/displayValue diff *AND* it seems like the result was flaky, skip it.
+  // The result is likely flaky if the audit passed *OR* it was supposed to have details but no details items changed.
+  const isAllPassing = compareAudit.score === 1 && baseAudit.score === 1;
   if (
     filteredDiffs.every(diff => diff.type === 'displayValue' || diff.type === 'numericValue') &&
-    compareAudit.score === 1 &&
-    baseAudit.score === 1
+    (isAllPassing || hasItemDetails)
   ) {
     return [];
   }

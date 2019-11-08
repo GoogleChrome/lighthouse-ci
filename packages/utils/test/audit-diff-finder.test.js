@@ -156,6 +156,14 @@ describe('#findAuditDiffs', () => {
     ]);
   });
 
+  it('should not find a numericValue diff for an audit with details but no details diff', () => {
+    const itemsA = [{url: 'a', wastedKb: 150}];
+    const itemsB = [{url: 'a', wastedKb: 150}];
+    const baseAudit = {id: 'audit', score: 0.4, numericValue: 200, details: {items: itemsA}};
+    const compareAudit = {id: 'audit', score: 0.4, numericValue: 100, details: {items: itemsB}};
+    expect(findAuditDiffs(baseAudit, compareAudit)).toEqual([]);
+  });
+
   it('should find a numericValue diff for not applicable', () => {
     const baseAudit = {id: 'audit', score: null, scoreDisplayMode: 'notApplicable'};
     const compareAudit = {id: 'audit', score: 0.7, numericValue: 1600};
@@ -313,13 +321,19 @@ describe('#findAuditDiffs', () => {
     const baseAudit = {
       id: 'audit',
       score: 0.5,
-      details: {items: [{...detailsItem, timeSpent: 1000, x: 50}]},
+      details: {
+        headings: [{key: 'timeSpent'}, {key: 'x'}],
+        items: [{...detailsItem, timeSpent: 1000, x: 50, debug: 200}],
+      },
     };
 
     const compareAudit = {
       id: 'audit',
       score: 0.5,
-      details: {items: [{...detailsItem, timeSpent: 2000, x: 51}]},
+      details: {
+        headings: [{key: 'timeSpent'}, {key: 'x'}],
+        items: [{...detailsItem, timeSpent: 2000, x: 51, debug: 100}],
+      },
     };
 
     expect(findAuditDiffs(baseAudit, compareAudit)).toEqual([
@@ -378,21 +392,30 @@ describe('#getDiffSeverity', () => {
       id: 'audit',
       score: 0.9,
       numericValue: 1000,
-      details: {items: [{url: 'urlA', wastedMs: 2000}, {url: 'urlB', wastedKb: 2000e3}]},
+      details: {
+        headings: [{key: 'wastedMs'}, {key: 'wastedKb'}],
+        items: [{url: 'urlA', wastedMs: 2000}, {url: 'urlB', wastedKb: 2000e3}],
+      },
     };
 
     const compareAuditA = {
       id: 'audit',
       score: 0.7,
       numericValue: 1100,
-      details: {items: [{url: 'urlA', wastedMs: 2500}, {url: 'urlD', wastedKb: 70e3}]},
+      details: {
+        headings: [{key: 'wastedMs'}, {key: 'wastedKb'}],
+        items: [{url: 'urlA', wastedMs: 2500}, {url: 'urlD', wastedKb: 70e3}],
+      },
     };
 
     const compareAuditB = {
       id: 'audit',
       score: 0.2,
       numericValue: 400,
-      details: {items: [{url: 'urlA', wastedMs: 1200}, {url: 'urlB', wastedKb: 1800e3}]},
+      details: {
+        headings: [{key: 'wastedMs'}, {key: 'wastedKb'}],
+        items: [{url: 'urlA', wastedMs: 1200}, {url: 'urlB', wastedKb: 1800e3}],
+      },
     };
 
     const diffs = [
@@ -647,8 +670,8 @@ describe('#zipBaseAndCompareItems', () => {
 describe('#sortZippedBaseAndCompareItems', () => {
   const getDiffs = (base, compare) => {
     return findAuditDiffs(
-      {score: 1, details: {items: base}},
-      {score: 1, details: {items: compare}}
+      {score: 1, details: {headings: Object.keys(base[0]).map(key => ({key})), items: base}},
+      {score: 1, details: {headings: Object.keys(compare[0]).map(key => ({key})), items: compare}}
     );
   };
 

@@ -43,7 +43,7 @@
 
   width: var(--indicator-width);
   height: var(--indicator-height);
-  border-radius: var(--indicator-width);
+  border-radius: 25%;
 
   background: var(--neutral-color);
 }

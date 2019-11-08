@@ -46,6 +46,13 @@ describe('PRandom', () => {
     ]);
   });
 
+  it('should generate deterministic alphanumeric characters', () => {
+    const random = new PRandom();
+    const numbers = [];
+    for (let i = 0; i < 10; i++) numbers[i] = PRandom.toAlphanumeric(random.next());
+    expect(numbers).toEqual(['z', 'c', 'k', 'z', 't', '5', 't', 't', '4', '2']);
+  });
+
   it('should reset the generator', () => {
     const random = new PRandom(137);
     expect(random.next()).toEqual(0.981050293892622);
@@ -60,5 +67,19 @@ describe('PRandom', () => {
     for (let i = 0; i < 10e6; i++) {
       random.next();
     }
+  });
+
+  it('should cover the entire alphanumeric set', () => {
+    const random = new PRandom();
+    const characters = new Set();
+    for (let i = 0; i < 10e3; i++) {
+      characters.add(PRandom.toAlphanumeric(random.next()));
+    }
+
+    expect(
+      Array.from(characters)
+        .sort()
+        .join('')
+    ).toEqual('0123456789abcdefghijklmnopqrstuvwxyz');
   });
 });

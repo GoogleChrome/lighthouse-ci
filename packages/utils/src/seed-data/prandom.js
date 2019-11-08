@@ -37,6 +37,17 @@ class PRandom {
     this.seed = (this.seed ^ 0xb55a4f09 ^ (this.seed >>> 16)) & 0xffffffff;
     return (this.seed & 0xfffffff) / 0x10000000;
   }
+
+  /**
+   * Returns a random character from the character class [a-z0-9].
+   * @param {number} input
+   * @return {string}
+   */
+  static toAlphanumeric(input) {
+    const valueOutOf36 = Math.round(input * 35);
+    if (valueOutOf36 < 10) return valueOutOf36.toString();
+    return String.fromCharCode(97 + valueOutOf36 - 10);
+  }
 }
 
 module.exports = PRandom;

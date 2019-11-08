@@ -55,7 +55,21 @@ export const SimpleDetails = props => {
       );
     }
     case 'thumbnail':
-      return <img style={{width: 48, height: 48, objectFit: 'cover'}} src={value} />;
+      return (
+        <img
+          style={{width: 48, height: 48, objectFit: 'cover'}}
+          src={'asdfasjdfoiasjdfosdj'}
+          onError={evt => {
+            const img = evt.srcElement;
+            if (!(img instanceof HTMLImageElement)) return;
+
+            // On failure just replace the image with a 1x1 transparent gif.
+            img.onerror = null;
+            img.src =
+              'data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==';
+          }}
+        />
+      );
     case 'url': {
       let display = value;
       let hostname = '';

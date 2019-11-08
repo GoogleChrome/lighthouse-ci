@@ -5,7 +5,7 @@
  */
 
 .page-sidebar {
-  position: absolute;
+  position: fixed;
   top: 0;
   left: calc(-1 * var(--page-sidebar-width));
   z-index: 15;

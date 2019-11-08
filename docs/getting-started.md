@@ -35,6 +35,8 @@ addons:
   chrome: stable # make sure you have Chrome available
 ```
 
+That's it! You're good to go. Check out the [Extra Goodies](#extra-goodies) section for additional features like uploading every report to public storage, GitHub status checks, and a historical diffing server.
+
 **NOTE: for matrix builds, you want to ensure LHCI is only run once! For example...**
 
 ```yaml
@@ -65,8 +67,6 @@ script:
   - lhci autorun --rc-overrides.collect.startServerCommand="rails server -e production"
 ```
 
-That's it! You're good to go. Check out the [Extra Goodies](#extra-goodies) section for additional features like uploading every report to public storage, GitHub status checks, and a historical diffing server.
-
 ## Setup
 
 Roughly a Lighthouse CI will follow these steps.
@@ -76,6 +76,28 @@ Roughly a Lighthouse CI will follow these steps.
 3. Collect Lighthouse results with Lighthouse CI.
 4. Assert that the results meet your expectations.
 5. (Optional) Upload the results for helpful debugging and historical analysis. (See [Extra Goodies](#extra-goodies))
+
+The complete script might look something like the below, but read on for the breakdown and explanations.
+
+```bash
+#!/bin/bash
+
+if [[ "$TRAVIS_NODE_VERSION" != "10" ]]; then
+  echo "Only run Lighthouse CI once per build, condititions did not match.";
+  exit 0;
+fi
+
+npm run deploy
+
+npm install -g @lhci/cli@next
+lhci healthcheck --fatal
+lhci collect --url=http://localhost:9000/index.html
+lhci assert --preset="lighthouse:recommended"
+EXIT_CODE=$?
+
+kill $!
+exit $EXIT_CODE
+```
 
 ### Configure CI Environment
 
@@ -90,7 +112,6 @@ In your Travis, this translates to...
 **.travis.yml**
 
 ```yaml
-sudo: required
 dist: xenial
 language: node_js
 node_js:
@@ -172,30 +193,6 @@ EXIT_CODE=$?
 
 # ... (kill server)
 
-exit $EXIT_CODE
-```
-
-#### Completed Script
-
-The complete script might look something like the below.
-
-```bash
-#!/bin/bash
-
-if [[ "$TRAVIS_NODE_VERSION" != "10" ]]; then
-  echo "Only run Lighthouse CI once per build, condititions did not match.";
-  exit 0;
-fi
-
-npx http-server -p 9000 ./dist &
-
-npm install -g @lhci/cli@next
-lhci healthcheck --fatal
-lhci collect --url=http://localhost:9000/index.html
-lhci assert --preset="lighthouse:recommended"
-EXIT_CODE=$?
-
-kill $!
 exit $EXIT_CODE
 ```
 

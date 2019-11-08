@@ -31,13 +31,33 @@ function clone(o) {
 
 /**
  * @param {string|undefined} id
+ * @return {boolean}
+ */
+function isUuid(id) {
+  return (
+    typeof id === 'string' &&
+    !!id.match(/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/)
+  );
+}
+
+/**
+ * @param {string|undefined} id
  */
 function validateUuidOrEmpty(id) {
   if (typeof id !== 'string') return undefined;
-  if (id.match(/^\w{8}-\w{4}-\w{4}-\w{4}-\w{12}$/)) return id;
+  if (isUuid(id)) return id;
   // Valid v4 UUID's always have the third segment start with 4, so this will never match, but passes
   // as a UUID to postgres.
   return `11111111-1111-1111-1111-111111111111`;
+}
+
+/**
+ * @param {string|undefined} id
+ */
+function validatePartialUuidOrUndefined(id) {
+  if (typeof id !== 'string') return undefined;
+  if (id.match(/^[a-f0-9-]+$/)) return id;
+  return undefined;
 }
 
 /**
@@ -222,8 +242,9 @@ class SqlStorageMethod {
    */
   async findProjectBySlug(slug) {
     const {projectModel} = this._sql();
-    const project = await this._findAll(projectModel, {where: {slug}});
-    return clone(project[0] || undefined);
+    const projects = await this._findAll(projectModel, {where: {slug}});
+    if (projects.length !== 1) return undefined;
+    return clone(projects[0] || undefined);
   }
 
   /**
@@ -240,6 +261,7 @@ class SqlStorageMethod {
    */
   async _createProject(unsavedProject) {
     const {projectModel} = this._sql();
+    if (unsavedProject.name.length < 4) throw new E422('Project name too short');
     const project = await projectModel.create({...unsavedProject, token: uuid.v4(), id: uuid.v4()});
     return clone(project);
   }
@@ -335,9 +357,15 @@ class SqlStorageMethod {
    */
   async findBuildById(projectId, buildId) {
     const {buildModel} = this._sql();
-    const build = await this._findByPk(buildModel, buildId);
-    if (build && build.projectId !== projectId) return undefined;
-    return clone(build || undefined);
+    if (!validatePartialUuidOrUndefined(buildId)) return undefined;
+    const idMatch = isUuid(buildId) ? buildId : {[Sequelize.Op.like]: `${buildId}%`};
+    const builds = await buildModel.findAll({
+      where: {id: idMatch, projectId},
+      limit: 2,
+    });
+
+    if (builds.length !== 1) return undefined;
+    return clone(builds[0]);
   }
 
   /**

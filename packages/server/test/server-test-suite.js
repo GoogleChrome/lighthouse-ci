@@ -217,14 +217,49 @@ function runTests(state) {
       expect(builds).toEqual([]);
     });
 
-    it('should find a specific build', async () => {
+    it('should find a specific build by full id', async () => {
       const build = await client.findBuildById(buildA.projectId, buildA.id);
+      expect(build).toEqual(buildA);
+    });
+
+    it('should find a specific build by partial id', async () => {
+      const build = await client.findBuildById(buildA.projectId, buildA.id.split('-')[0]);
       expect(build).toEqual(buildA);
     });
 
     it('should not find a missing build', async () => {
       const build = await client.findBuildById('MISSING', 'MISSING');
       expect(build).toEqual(undefined);
+    });
+
+    it('should handle partial id ambiguity', async () => {
+      const dummyProject = await client.createProject({name: 'dummy', externalUrl: ''});
+      const builds = [];
+      const findAmbiguity = () => {
+        for (const a of builds) {
+          for (const b of builds) {
+            if (a === b) continue;
+            if (a.id[0] === b.id[0]) return a.id[0];
+          }
+        }
+      };
+
+      while (!findAmbiguity()) {
+        builds.push(
+          await client.createBuild({
+            ...buildA,
+            hash: Math.random().toString(),
+            projectId: dummyProject.id,
+          })
+        );
+      }
+
+      const ambiguousPrefix = findAmbiguity();
+      const buildWithAmbiguousPrefix = builds.find(b => b.id.startsWith(ambiguousPrefix));
+      expect(await client.findBuildById(dummyProject.id, ambiguousPrefix)).toEqual(undefined);
+      expect(await client.findBuildById(dummyProject.id, buildWithAmbiguousPrefix.id)).toEqual(
+        buildWithAmbiguousPrefix
+      );
     });
   });
 
@@ -611,6 +646,14 @@ function runTests(state) {
       expect(await client.findProjectBySlug('missing')).toBeUndefined();
       expect(await client.findProjectByToken('missing')).toBeUndefined();
       expect(await client.findBuildById('missing', 'missing')).toBeUndefined();
+    });
+
+    it('should fail to create a project with empty', async () => {
+      const payload = {name: '', externalUrl: ''};
+      await expect(client.createProject(payload)).rejects.toMatchObject({
+        status: 422,
+        body: '{"message":"Project name too short"}',
+      });
     });
 
     it('should fail to create a sealed build', async () => {

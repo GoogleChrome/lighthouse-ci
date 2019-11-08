@@ -31,7 +31,7 @@ describe('Lighthouse CI autorun CLI', () => {
       ⚠️   GitHub token set
       Healthcheck passed!
 
-      Automatically determined ./build as \`buildDir\`.
+      Automatically determined ./build as \`staticDistDir\`.
       Set it explicitly in lighthouserc.json if incorrect.
 
       Started a web server on port XXXX...

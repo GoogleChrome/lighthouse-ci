@@ -40,7 +40,7 @@ declare global {
 
       export interface Options {
         url?: string | string[];
-        buildDir?: string;
+        staticDistDir?: string;
         startServerCommand?: string;
         method: 'node';
         numberOfRuns: number;

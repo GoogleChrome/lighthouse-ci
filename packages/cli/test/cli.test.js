@@ -26,7 +26,7 @@ describe('Lighthouse CI CLI', () => {
   const rcMatrixFile = path.join(__dirname, 'fixtures/lighthouserc-matrix.json');
   const rcExtendedFile = path.join(__dirname, 'fixtures/lighthouserc-extended.json');
   const budgetsFile = path.join(__dirname, 'fixtures/budgets.json');
-  const buildDir = path.join(__dirname, 'fixtures');
+  const staticDistDir = path.join(__dirname, 'fixtures');
   const tmpSqlFilePath = getSqlFilePath();
 
   let server;
@@ -142,11 +142,11 @@ describe('Lighthouse CI CLI', () => {
   });
 
   describe('collect', () => {
-    it('should collect results from buildDir', () => {
+    it('should collect results from staticDistDir', () => {
       const {stdout, stderr, status} = runCLI([
         'collect',
         `--rc-file=${rcFile}`,
-        `--build-dir=${buildDir}`,
+        `--static-dist-dir=${staticDistDir}`,
       ]);
 
       const stdoutClean = stdout.replace(/:\d{4,6}/g, ':XXXX').replace(/port \d{4,6}/, 'port XXXX');

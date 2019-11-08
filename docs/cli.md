@@ -86,7 +86,7 @@ Options:
   --headful           Run with a headful Chrome                        [boolean]
   --additive          Skips clearing of previous collect data          [boolean]
   --url               The URL to run Lighthouse on.
-  --buildDir          The build directory where your HTML files to run
+  --staticDistDir     The build directory where your HTML files to run
                       Lighthouse on are located.
   --settings          The Lighthouse settings and flags to use when collecting
   --numberOfRuns, -n  The number of times to run Lighthouse.
@@ -100,7 +100,7 @@ Options:
 ```
 lhci collect --numberOfRuns=5 --url=https://example.com
 lhci collect --start-server-command="yarn serve" --url=http://localhost:8080/
-lhci collect --buildDir=./dist
+lhci collect --staticDistDir=./dist
 lhci collect --url=https://example-1.com --url=https://example-2.com
 ```
 

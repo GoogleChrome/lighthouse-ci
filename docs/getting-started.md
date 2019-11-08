@@ -149,7 +149,7 @@ fi
 
 #### Deploy Your Code
 
-To run Lighthouse CI, the code you'd like to test with Lighthouse needs to be available on a server. You can either use the built-in Lighthouse CI server, a custom local development server, or deploy to a public/intranet location. For this example, we'll assume your site is already built in a local directory called `./dist`, and we'll use the the `http-server` node package as an example custom server implementation (do not follow this structure just to use `http-server`, it is less fully featured than `lhci collect --build-dir=./dist`, see [Run Lighthouse CI](#run-lighthouse-ci) for more).
+To run Lighthouse CI, the code you'd like to test with Lighthouse needs to be available on a server. You can either use the built-in Lighthouse CI server, a custom local development server, or deploy to a public/intranet location. For this example, we'll assume your site is already built in a local directory called `./dist`, and we'll use the the `http-server` node package as an example custom server implementation (do not follow this structure just to use `http-server`, it is less fully featured than `lhci collect --static-dist-dir=./dist`, see [Run Lighthouse CI](#run-lighthouse-ci) for more).
 
 ```bash
 #!/bin/bash

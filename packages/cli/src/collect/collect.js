@@ -23,7 +23,7 @@ function buildCommand(yargs) {
     headful: {type: 'boolean', description: 'Run with a headful Chrome'},
     additive: {type: 'boolean', description: 'Skips clearing of previous collect data'},
     url: {description: 'The URL to run Lighthouse on.'},
-    buildDir: {
+    staticDistDir: {
       description: 'The build directory where your HTML files to run Lighthouse on are located.',
     },
     startServerCommand: {
@@ -83,9 +83,9 @@ async function determineUrls(options) {
     };
   }
 
-  if (!options.buildDir) throw new Error('Either url or buildDir required');
+  if (!options.staticDistDir) throw new Error('Either url or staticDistDir required');
 
-  const pathToBuildDir = path.resolve(process.cwd(), options.buildDir);
+  const pathToBuildDir = path.resolve(process.cwd(), options.staticDistDir);
   const server = new FallbackServer(pathToBuildDir);
   await server.listen();
   process.stdout.write(`Started a web server on port ${server.port}...\n`);

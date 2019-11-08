@@ -68,13 +68,13 @@ function findBuildDir() {
     if (!fs.statSync(fullDirPath).isDirectory()) continue;
     const contents = fs.readdirSync(fullDirPath);
     if (contents.some(file => file.endsWith('.html'))) {
-      process.stdout.write(`Automatically determined ./${dir} as \`buildDir\`.\n`);
+      process.stdout.write(`Automatically determined ./${dir} as \`staticDistDir\`.\n`);
       process.stdout.write(`Set it explicitly in lighthouserc.json if incorrect.\n\n`);
       return fullDirPath;
     }
   }
 
-  throw new Error('Unable to determine `buildDir`; Set it explicitly in lighthouserc.json');
+  throw new Error('Unable to determine `staticDistDir`; Set it explicitly in lighthouserc.json');
 }
 
 /** @return {string} */
@@ -116,10 +116,11 @@ async function runCommand(options) {
   if (healthcheckStatus !== 0) process.exit(healthcheckStatus);
 
   const collectHasUrlOrBuildDir =
-    ciConfiguration.collect && (ciConfiguration.collect.url || ciConfiguration.collect.buildDir);
+    ciConfiguration.collect &&
+    (ciConfiguration.collect.url || ciConfiguration.collect.staticDistDir);
   const collectArgs = collectHasUrlOrBuildDir
     ? [getStartServerCommandFlag()]
-    : [`--build-dir=${findBuildDir()}`];
+    : [`--static-dist-dir=${findBuildDir()}`];
   const collectStatus = runChildCommand('collect', [...defaultFlags, ...collectArgs]).status;
   if (collectStatus !== 0) process.exit(collectStatus);
 

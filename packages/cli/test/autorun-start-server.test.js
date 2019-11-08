@@ -8,27 +8,21 @@
 /* eslint-env jest */
 
 const path = require('path');
-const {spawnSync} = require('child_process');
-const {CLI_PATH} = require('./test-utils.js');
+const {runCLI} = require('./test-utils.js');
 
 describe('Lighthouse CI autorun CLI with startServerCommand', () => {
   const autorunDir = path.join(__dirname, 'fixtures/autorun-start-server');
 
   it('should run all three steps', () => {
-    let {stdout = '', stderr = '', status = -1} = spawnSync(
-      CLI_PATH,
+    const {stdout, stderr, status} = runCLI(
       [
         'autorun',
         '--rc-overrides.collect.url=http://localhost:52425',
         '--rc-overrides.collect.n=2',
         '--rc-overrides.assert.assertions.viewport=error',
       ],
-      {cwd: autorunDir, env: {...process.env, LHCI_GITHUB_TOKEN: '', LHCI_GITHUB_APP_TOKEN: ''}}
+      {cwd: autorunDir}
     );
-
-    stdout = stdout.toString();
-    stderr = stderr.toString();
-    status = status || 0;
 
     const stdoutClean = stdout.replace(/:\d{4,6}/g, ':XXXX').replace(/port \d{4,6}/, 'port XXXX');
     const stderrClean = stderr.replace(/:\d{4,6}/g, ':XXXX').replace(/port \d{4,6}/, 'port XXXX');

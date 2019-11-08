@@ -162,6 +162,14 @@ class ApiClient {
   }
 
   /**
+   * @param {string} slug
+   * @return {Promise<LHCI.ServerCommand.Project | undefined>}
+   */
+  async findProjectBySlug(slug) {
+    return this._convert404ToUndefined(this._get(`/v1/projects/slug:${slug}`));
+  }
+
+  /**
    * @param {StrictOmit<LHCI.ServerCommand.Project, 'id'|'token'>} unsavedProject
    * @return {Promise<LHCI.ServerCommand.Project>}
    */
@@ -259,6 +267,16 @@ class ApiClient {
    */
   async getStatistics(projectId, buildId) {
     return this._get(`/v1/projects/${projectId}/builds/${buildId}/statistics`);
+  }
+
+  /**
+   * @protected
+   * @param {StrictOmit<LHCI.ServerCommand.Project, 'id'|'token'>} unsavedProject
+   * @return {Promise<LHCI.ServerCommand.Project>}
+   */
+  // eslint-disable-next-line no-unused-vars
+  async _createProject(unsavedProject) {
+    throw new Error('Unimplemented');
   }
 
   /**

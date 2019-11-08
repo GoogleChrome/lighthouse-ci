@@ -33,7 +33,7 @@ function clone(o) {
  * @param {string|undefined} id
  */
 function validateUuidOrEmpty(id) {
-  if (typeof id === 'undefined') return undefined;
+  if (typeof id !== 'string') return undefined;
   if (id.match(/^\w{8}-\w{4}-\w{4}-\w{4}-\w{12}$/)) return id;
   // Valid v4 UUID's always have the third segment start with 4, so this will never match, but passes
   // as a UUID to postgres.
@@ -217,10 +217,28 @@ class SqlStorageMethod {
   }
 
   /**
+   * @param {string} slug
+   * @return {Promise<LHCI.ServerCommand.Project | undefined>}
+   */
+  async findProjectBySlug(slug) {
+    const {projectModel} = this._sql();
+    const project = await this._findAll(projectModel, {where: {slug}});
+    return clone(project[0] || undefined);
+  }
+
+  /**
    * @param {StrictOmit<LHCI.ServerCommand.Project, 'id'|'token'>} unsavedProject
    * @return {Promise<LHCI.ServerCommand.Project>}
    */
   async createProject(unsavedProject) {
+    return StorageMethod.createProjectWithUniqueSlug(this, unsavedProject);
+  }
+
+  /**
+   * @param {StrictOmit<LHCI.ServerCommand.Project, 'id'|'token'>} unsavedProject
+   * @return {Promise<LHCI.ServerCommand.Project>}
+   */
+  async _createProject(unsavedProject) {
     const {projectModel} = this._sql();
     const project = await projectModel.create({...unsavedProject, token: uuid.v4(), id: uuid.v4()});
     return clone(project);

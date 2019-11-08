@@ -45,6 +45,16 @@ function createRouter(context) {
     })
   );
 
+  // GET /projects/slug::id
+  router.get(
+    '/slug::projectSlug',
+    handleAsyncError(async (req, res) => {
+      const project = await context.storageMethod.findProjectBySlug(req.params.projectSlug);
+      if (!project) return res.sendStatus(404);
+      res.json({...project, token: ''});
+    })
+  );
+
   // GET /projects/:id
   router.get(
     '/:projectId',

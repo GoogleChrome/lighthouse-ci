@@ -192,12 +192,14 @@ function createDefaultDataset() {
         name: 'Lighthouse Viewer',
         externalUrl: 'https://travis-ci.org/GoogleChrome/lighthouse',
         token: '',
+        slug: '',
       },
       {
         id: '',
         name: 'Lighthouse Dashboard',
         externalUrl: 'https://travis-ci.org/GoogleChrome/lighthouse-ci',
         token: '',
+        slug: '',
       },
     ],
     builds: [
@@ -449,7 +451,13 @@ function createDefaultDataset() {
 function createLoadTestDataset() {
   const sourceLhr = fs.readFileSync(path.join(__dirname, 'sample-report.json'), 'utf8');
 
-  const project = {id: '0', name: 'Example', externalUrl: 'https://www.example.com', token: ''};
+  const project = {
+    id: '0',
+    name: 'Example',
+    externalUrl: 'https://www.example.com',
+    token: '',
+    slug: '',
+  };
   /** @type {Array<LHCI.ServerCommand.Build>} */
   const builds = [];
   /** @type {Array<LHCI.ServerCommand.Run>} */

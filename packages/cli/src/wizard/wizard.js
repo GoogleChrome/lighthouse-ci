@@ -47,6 +47,7 @@ async function runNewProjectWizard(options) {
   const project = await api.createProject({
     name: responses.projectName,
     externalUrl: responses.projectExternalUrl,
+    slug: '', // this property is dynamically generated server-side
   });
 
   const token = project.token;

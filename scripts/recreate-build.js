@@ -41,6 +41,7 @@ async function run() {
   const project = {
     id: '',
     name: `Created from ${sourceProject.name}, ${baseBuild.commitMessage}`,
+    slug: '',
     externalUrl: '',
     token: '',
   };

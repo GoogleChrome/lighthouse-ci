@@ -6,6 +6,7 @@
 'use strict';
 
 const _ = require('@lhci/utils/src/lodash.js');
+const PRandom = require('@lhci/utils/src/seed-data/prandom.js');
 const {computeRepresentativeRuns} = require('@lhci/utils/src/representative-runs.js');
 const statisticDefinitions = require('../statistic-definitions.js');
 
@@ -46,6 +47,15 @@ class StorageMethod {
    */
   // eslint-disable-next-line no-unused-vars
   async findProjectById(projectId) {
+    throw new Error('Unimplemented');
+  }
+
+  /**
+   * @param {string} slug
+   * @return {Promise<LHCI.ServerCommand.Project | undefined>}
+   */
+  // eslint-disable-next-line no-unused-vars
+  async findProjectBySlug(slug) {
     throw new Error('Unimplemented');
   }
 
@@ -157,6 +167,15 @@ class StorageMethod {
   }
 
   /**
+   * @param {StrictOmit<LHCI.ServerCommand.Project, 'id'|'token'>} project
+   * @return {Promise<LHCI.ServerCommand.Project>}
+   */
+  // eslint-disable-next-line no-unused-vars
+  async _createProject(project) {
+    throw new Error('Unimplemented');
+  }
+
+  /**
    * @protected
    * @param {StrictOmit<LHCI.ServerCommand.Statistic, 'id'>} unsavedStatistic
    * @param {*} [extras]
@@ -249,6 +268,48 @@ class StorageMethod {
       statistics: statistics.reduce((a, b) => a.concat(b)),
       representativeRuns: computeRepresentativeRuns(runsByUrl),
     };
+  }
+
+  /**
+   * @param {string} base
+   * @param {{randomLength?: number, maxLength?: number, prandom?: import('@lhci/utils/src/seed-data/prandom')}} [options]
+   */
+  static generateSlug(base, options = {}) {
+    const {maxLength = 40, randomLength = 0, prandom} = options;
+    if (maxLength <= randomLength + 1) throw new Error('Random length is too long');
+
+    let slug = base
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9.]+/g, '-');
+    const baseLength = randomLength ? maxLength - randomLength - 1 : maxLength;
+    slug = slug.slice(0, baseLength);
+
+    if (randomLength) slug += '-';
+    for (let i = 0; i < randomLength; i++) {
+      slug += PRandom.toAlphanumeric(prandom ? prandom.next() : Math.random());
+    }
+
+    return slug;
+  }
+
+  /**
+   * @param {StorageMethod} storageMethod
+   * @param {StrictOmit<LHCI.ServerCommand.Project, 'id'|'token'>} unsavedProject
+   */
+  static async createProjectWithUniqueSlug(storageMethod, unsavedProject) {
+    const maxLength = 40;
+    let randomLength = 0;
+    let slug = StorageMethod.generateSlug(unsavedProject.name, {maxLength, randomLength});
+    let existingProject = await storageMethod.findProjectBySlug(slug);
+    while (existingProject && randomLength < maxLength - 10) {
+      randomLength++;
+      slug = StorageMethod.generateSlug(unsavedProject.name, {maxLength, randomLength});
+      existingProject = await storageMethod.findProjectBySlug(slug);
+    }
+
+    if (existingProject) throw new Error('Unable to generate unique slug');
+    return storageMethod._createProject({...unsavedProject, slug});
   }
 
   /**

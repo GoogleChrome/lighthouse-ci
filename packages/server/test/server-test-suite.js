@@ -44,6 +44,7 @@ function runTests(state) {
       projectAToken = projectA.token;
       expect(projectA).toHaveProperty('id');
       expect(projectA).toHaveProperty('token');
+      expect(projectA).toHaveProperty('slug', 'lighthouse');
       expect(projectA).toMatchObject(payload);
       expect(projectAToken).toMatch(/^\w{8}-\w{4}/);
     });
@@ -53,6 +54,7 @@ function runTests(state) {
       projectB = await client.createProject(payload);
       expect(projectB.id).not.toEqual(projectA.id);
       expect(projectB).toHaveProperty('id');
+      expect(projectB).toHaveProperty('slug', 'lighthouse-2');
       expect(projectB).toMatchObject(payload);
     });
 
@@ -69,6 +71,25 @@ function runTests(state) {
     it('should fetch a project by ID', async () => {
       const project = await client.findProjectById(projectA.id);
       expect(project).toEqual({...projectA, token: ''});
+    });
+
+    it('should fetch a project by slug', async () => {
+      const project = await client.findProjectBySlug('lighthouse');
+      expect(project).toEqual({...projectA, token: ''});
+    });
+
+    describe('slugs', () => {
+      it('should create lots of unique slugs', async () => {
+        const payload = {name: 'Lighthouse', externalUrl: 'https://github.com/lighthouse'};
+        const slugs = new Set([projectA.slug]);
+        for (let i = 0; i < 50; i++) {
+          const project = await client.createProject(payload);
+          expect(project).toHaveProperty('slug');
+          expect(slugs).not.toContain(project.slug);
+          expect(await client.findProjectBySlug(project.slug)).toEqual({...project, token: ''});
+          slugs.add(project.slug);
+        }
+      });
     });
   });
 
@@ -575,13 +596,19 @@ function runTests(state) {
   });
 
   describe('error handling', () => {
-    it('should return 404 in the case of missing data', async () => {
+    it('should return 404 in the case of missing data by id', async () => {
       const response = await fetch(`${rootURL}/v1/projects/missing`);
+      expect(response.status).toEqual(404);
+    });
+
+    it('should return 404 in the case of missing data by slug', async () => {
+      const response = await fetch(`${rootURL}/v1/projects/slug:missing`);
       expect(response.status).toEqual(404);
     });
 
     it('should return undefined to the client', async () => {
       expect(await client.findProjectById('missing')).toBeUndefined();
+      expect(await client.findProjectBySlug('missing')).toBeUndefined();
       expect(await client.findProjectByToken('missing')).toBeUndefined();
       expect(await client.findBuildById('missing', 'missing')).toBeUndefined();
     });

@@ -8,23 +8,17 @@
 /* eslint-env jest */
 
 const path = require('path');
-const {spawnSync} = require('child_process');
-const {CLI_PATH} = require('./test-utils.js');
+const {runCLI} = require('./test-utils.js');
 
 describe('Lighthouse CI autorun CLI', () => {
   const autorunDir = path.join(__dirname, 'fixtures/autorun-static-dir');
   const rcFile = path.join(autorunDir, 'lighthouserc-autorun.json');
 
   it('should run all three steps', () => {
-    let {stdout = '', stderr = '', status = -1} = spawnSync(
-      CLI_PATH,
+    const {stdout, stderr, status} = runCLI(
       ['autorun', `--rc-file=${rcFile}`, '--rc-overrides.collect.numberOfRuns=2'],
-      {cwd: autorunDir, env: {...process.env, LHCI_GITHUB_TOKEN: '', LHCI_GITHUB_APP_TOKEN: ''}}
+      {cwd: autorunDir}
     );
-
-    stdout = stdout.toString();
-    stderr = stderr.toString();
-    status = status || 0;
 
     const stdoutClean = stdout
       .replace(/:\d{4,6}/g, ':XXXX')

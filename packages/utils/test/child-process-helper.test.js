@@ -11,7 +11,23 @@ const childProcess = require('child_process');
 const childProcessHelper = require('../src/child-process-helper.js');
 
 function wait() {
-  return new Promise(r => setTimeout(r, 50));
+  return new Promise(r => setTimeout(r, 100));
+}
+
+async function tryUntilPasses(fn, timeout = 5000) {
+  const startedAt = Date.now();
+  let lastError;
+  while (Date.now() - startedAt < timeout) {
+    try {
+      await fn();
+      return;
+    } catch (err) {
+      lastError = error;
+      await wait();
+    }
+  }
+
+  throw lastError;
 }
 
 describe('child-process-helper.js', () => {
@@ -22,27 +38,32 @@ describe('child-process-helper.js', () => {
       const child = childProcess.spawn(command, {shell: true});
       await wait();
 
-      expect(childProcessHelper.getListOfRunningCommands()).toContain(command);
+      await tryUntilPasses(() =>
+        expect(childProcessHelper.getListOfRunningCommands()).toContain(command)
+      );
 
       await childProcessHelper.killProcessTree(child.pid);
-      await wait();
 
-      expect(childProcessHelper.getListOfRunningCommands()).not.toContain(command);
+      await tryUntilPasses(() => {
+        expect(childProcessHelper.getListOfRunningCommands()).not.toContain(command);
+      });
     });
 
     it('should kill the grandchild process', async () => {
       const command = 'sleep 9653';
       expect(childProcessHelper.getListOfRunningCommands()).not.toContain(command);
       const child = childProcess.spawn(`${command} &\n${command}`, {shell: true});
-      await wait();
 
-      const matching = childProcessHelper.getListOfRunningCommands().filter(c => c === command);
-      expect(matching).toHaveLength(2);
+      await tryUntilPasses(() => {
+        const matching = childProcessHelper.getListOfRunningCommands().filter(c => c === command);
+        expect(matching).toHaveLength(2);
+      });
 
       await childProcessHelper.killProcessTree(child.pid);
-      await wait();
 
-      expect(childProcessHelper.getListOfRunningCommands()).not.toContain(command);
+      await tryUntilPasses(() => {
+        expect(childProcessHelper.getListOfRunningCommands()).not.toContain(command);
+      });
     });
   });
 

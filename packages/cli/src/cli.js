@@ -7,8 +7,8 @@
 'use strict';
 
 const yargs = require('yargs');
+const updateNotifier = require('update-notifier');
 const loadAndParseRcFile = require('@lhci/utils/src/lighthouserc.js').loadAndParseRcFile;
-const getVersion = require('@lhci/utils/src/version.js').getVersion;
 const assertCmd = require('./assert/assert.js');
 const autorunCmd = require('./autorun/autorun.js');
 const healthcheckCmd = require('./healthcheck/healthcheck.js');
@@ -17,12 +17,15 @@ const collectCmd = require('./collect/collect.js');
 const serverCmd = require('./server/server.js');
 const wizardCmd = require('./wizard/wizard.js');
 const openCmd = require('./open/open.js');
+const pkg = require('../package.json');
+
+updateNotifier({pkg}).notify({defer: false});
 
 async function run() {
   /** @type {any} */
   const argv = yargs
     .help('help')
-    .version(getVersion())
+    .version(pkg.version)
     .usage('lhci <command> <options>')
     .env('LHCI')
     .config('rc-file', loadAndParseRcFile)

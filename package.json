@@ -41,6 +41,7 @@
     "@types/sequelize": "^4.27.34",
     "@types/tmp": "^0.1.0",
     "@types/umzug": "^2.2.2",
+    "@types/update-notifier": "^2.5.0",
     "@types/uuid": "^3.4.4",
     "@types/yargs": "^12.0.8",
     "babel-eslint": "^10.0.2",

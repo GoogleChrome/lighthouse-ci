@@ -9,18 +9,17 @@
 
 const fs = require('fs');
 const path = require('path');
-const {spawn, spawnSync} = require('child_process');
+const {spawn} = require('child_process');
 const fetch = require('isomorphic-fetch');
 const log = require('lighthouse-logger');
 const puppeteer = require('puppeteer');
-const {startServer, waitForCondition, CLI_PATH} = require('./test-utils.js');
+const {startServer, waitForCondition, CLI_PATH, runCLI} = require('./test-utils.js');
 
 describe('Lighthouse CI CLI', () => {
   const rcFile = path.join(__dirname, 'fixtures/lighthouserc.json');
   const rcExtendedFile = path.join(__dirname, 'fixtures/lighthouserc-extended.json');
   const budgetsFile = path.join(__dirname, 'fixtures/budgets.json');
   const buildDir = path.join(__dirname, 'fixtures');
-  const cleanEnv = {...process.env, LHCI_GITHUB_TOKEN: '', LHCI_GITHUB_APP_TOKEN: ''};
 
   let server;
   let projectToken;
@@ -91,15 +90,9 @@ describe('Lighthouse CI CLI', () => {
     it('should pass when things are good', async () => {
       const LHCI_TOKEN = projectToken;
       const LHCI_SERVER_BASE_URL = `http://localhost:${server.port}`;
-      let {stdout = '', stderr = '', status = -1} = spawnSync(
-        CLI_PATH,
-        ['healthcheck', `--fatal`],
-        {env: {...cleanEnv, LHCI_TOKEN, LHCI_SERVER_BASE_URL}}
-      );
-
-      stdout = stdout.toString();
-      stderr = stderr.toString();
-      status = status || 0;
+      const {stdout, stderr, status} = runCLI(['healthcheck', `--fatal`], {
+        env: {LHCI_TOKEN, LHCI_SERVER_BASE_URL},
+      });
 
       expect(stdout).toMatchInlineSnapshot(`
         "✅  .lighthouseci/ directory writable
@@ -118,15 +111,10 @@ describe('Lighthouse CI CLI', () => {
     it('should fail when things are bad', async () => {
       const LHCI_TOKEN = projectToken;
       const LHCI_SERVER_BASE_URL = `http://localhost:${server.port}`;
-      let {stdout = '', stderr = '', status = -1} = spawnSync(
-        CLI_PATH,
+      const {stdout, stderr, status} = runCLI(
         ['healthcheck', `--rc-file=${rcFile}`, `--fatal`, '--checks=githubToken'],
-        {env: {...cleanEnv, LHCI_TOKEN, LHCI_SERVER_BASE_URL}}
+        {env: {LHCI_TOKEN, LHCI_SERVER_BASE_URL}}
       );
-
-      stdout = stdout.toString();
-      stderr = stderr.toString();
-      status = status || 0;
 
       expect(stdout).toMatchInlineSnapshot(`
         "✅  .lighthouseci/ directory writable
@@ -145,15 +133,11 @@ describe('Lighthouse CI CLI', () => {
 
   describe('collect', () => {
     it('should collect results from buildDir', () => {
-      let {stdout = '', stderr = '', status = -1} = spawnSync(CLI_PATH, [
+      const {stdout, stderr, status} = runCLI([
         'collect',
         `--rc-file=${rcFile}`,
         `--build-dir=${buildDir}`,
       ]);
-
-      stdout = stdout.toString();
-      stderr = stderr.toString();
-      status = status || 0;
 
       const stdoutClean = stdout.replace(/:\d{4,6}/g, ':XXXX').replace(/port \d{4,6}/, 'port XXXX');
       expect(stdoutClean).toMatchInlineSnapshot(`
@@ -172,15 +156,11 @@ describe('Lighthouse CI CLI', () => {
     }, 90000);
 
     it('should collect results from explicit urls', () => {
-      let {stdout = '', stderr = '', status = -1} = spawnSync(CLI_PATH, [
+      const {stdout, stderr, status} = runCLI([
         'collect',
         `--rc-file=${rcFile}`,
         `--url=${urlToCollect}`,
       ]);
-
-      stdout = stdout.toString();
-      stderr = stderr.toString();
-      status = status || 0;
 
       const stdoutClean = stdout.replace(/:\d{4,6}/g, ':XXXX');
       expect(stdoutClean).toMatchInlineSnapshot(`
@@ -198,15 +178,10 @@ describe('Lighthouse CI CLI', () => {
   describe('upload', () => {
     let uuids;
     it('should read LHRs from folders', () => {
-      let {stdout = '', stderr = '', status = -1} = spawnSync(
-        CLI_PATH,
+      const {stdout, stderr, status} = runCLI(
         ['upload', `--serverBaseUrl=http://localhost:${server.port}`],
-        {env: {...cleanEnv, LHCI_TOKEN: projectToken}}
+        {env: {LHCI_TOKEN: projectToken}}
       );
-
-      stdout = stdout.toString();
-      stderr = stderr.toString();
-      status = status || 0;
 
       const UUID_REGEX = /[0-9a-f-]{36}/gi;
       uuids = stdout.match(UUID_REGEX);
@@ -255,15 +230,7 @@ describe('Lighthouse CI CLI', () => {
     });
 
     it('should support target=temporary-public-storage', async () => {
-      let {stdout = '', stderr = '', status = -1} = spawnSync(
-        CLI_PATH,
-        ['upload', `--target=temporary-public-storage`],
-        {env: {...cleanEnv}}
-      );
-
-      stdout = stdout.toString();
-      stderr = stderr.toString();
-      status = status || 0;
+      const {stdout, stderr, status} = runCLI(['upload', `--target=temporary-public-storage`]);
 
       expect(stdout).toContain('...success!');
       expect(stdout).toContain('Open the report at');
@@ -272,15 +239,10 @@ describe('Lighthouse CI CLI', () => {
     });
 
     it('should fail repeated attempts', () => {
-      let {stdout = '', stderr = '', status = -1} = spawnSync(
-        CLI_PATH,
+      const {stdout, stderr, status} = runCLI(
         ['upload', `--serverBaseUrl=http://localhost:${server.port}`],
-        {env: {...cleanEnv, LHCI_TOKEN: projectToken}}
+        {env: {LHCI_TOKEN: projectToken}}
       );
-
-      stdout = stdout.toString();
-      stderr = stderr.toString();
-      status = status || 0;
 
       expect(stdout).toEqual('');
       expect(stderr).toContain('Unexpected status code 422');
@@ -291,14 +253,7 @@ describe('Lighthouse CI CLI', () => {
 
   describe('assert', () => {
     it('should assert failures', () => {
-      let {stdout = '', stderr = '', status = -1} = spawnSync(CLI_PATH, [
-        'assert',
-        `--assertions.works-offline=error`,
-      ]);
-
-      stdout = stdout.toString();
-      stderr = stderr.toString();
-      status = status || 0;
+      const {stdout, stderr, status} = runCLI(['assert', `--assertions.works-offline=error`]);
 
       const stderrClean = stderr.replace(/:\d{4,6}/g, ':XXXX');
       expect(stdout).toMatchInlineSnapshot(`""`);
@@ -322,17 +277,13 @@ describe('Lighthouse CI CLI', () => {
     });
 
     it('should assert failures from an rcfile', () => {
-      let {stdout = '', stderr = '', status = -1} = spawnSync(CLI_PATH, [
+      const {stdout, stderr, status} = runCLI([
         'assert',
         `--assertions.first-contentful-paint=off`,
         `--assertions.speed-index=off`,
         `--assertions.interactive=off`,
         `--rc-file=${rcFile}`,
       ]);
-
-      stdout = stdout.toString();
-      stderr = stderr.toString();
-      status = status || 0;
 
       const stderrClean = stderr.replace(/\d{4,8}(\.\d{1,8})?/g, 'XXXX');
       expect(stdout).toMatchInlineSnapshot(`""`);
@@ -356,16 +307,12 @@ describe('Lighthouse CI CLI', () => {
     });
 
     it('should assert failures from an extended rcfile', () => {
-      let {stdout = '', stderr = '', status = -1} = spawnSync(CLI_PATH, [
+      const {stdout, stderr, status} = runCLI([
         'assert',
         `--assertions.speed-index=off`,
         `--assertions.interactive=off`,
         `--rc-file=${rcExtendedFile}`,
       ]);
-
-      stdout = stdout.toString();
-      stderr = stderr.toString();
-      status = status || 0;
 
       const stderrClean = stderr.replace(/\d{4,}(\.\d{1,})?/g, 'XXXX');
       expect(stdout).toMatchInlineSnapshot(`""`);
@@ -398,14 +345,7 @@ describe('Lighthouse CI CLI', () => {
     });
 
     it('should assert failures from a budgets file', () => {
-      let {stdout = '', stderr = '', status = -1} = spawnSync(CLI_PATH, [
-        'assert',
-        `--budgets-file=${budgetsFile}`,
-      ]);
-
-      stdout = stdout.toString();
-      stderr = stderr.toString();
-      status = status || 0;
+      const {stdout, stderr, status} = runCLI(['assert', `--budgets-file=${budgetsFile}`]);
 
       const stderrClean = stderr.replace(/\d{4,}(\.\d{1,})?/g, 'XXXX');
       expect(stdout).toMatchInlineSnapshot(`""`);

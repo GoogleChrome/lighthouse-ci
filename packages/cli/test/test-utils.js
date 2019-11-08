@@ -6,7 +6,7 @@
 'use strict';
 
 const path = require('path');
-const {spawn} = require('child_process');
+const {spawn, spawnSync} = require('child_process');
 const testingLibrary = require('@testing-library/dom');
 
 const CLI_PATH = path.join(__dirname, '../src/cli.js');
@@ -32,8 +32,32 @@ function waitForCondition(fn, label) {
   });
 }
 
+/**
+ * @param {string[]} args
+ * @param {{cwd?: string, env?: Record<string, string>}} [overrides]
+ * @return {{stdout: string, stderr: string, status: number}}
+ */
+function runCLI(args, overrides = {}) {
+  const {env: extraEnvVars, ...options} = overrides;
+  const cleanEnv = {
+    ...process.env,
+    LHCI_GITHUB_TOKEN: '',
+    LHCI_GITHUB_APP_TOKEN: '',
+    NO_UPDATE_NOTIFIER: '1',
+  };
+  const env = {...cleanEnv, ...extraEnvVars};
+  let {stdout = '', stderr = '', status = -1} = spawnSync(CLI_PATH, args, {...options, env});
+
+  stdout = stdout.toString();
+  stderr = stderr.toString();
+  status = status || 0;
+
+  return {stdout, stderr, status};
+}
+
 module.exports = {
   CLI_PATH,
+  runCLI,
   startServer,
   waitForCondition,
 };

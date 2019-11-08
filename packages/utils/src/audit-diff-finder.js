@@ -321,10 +321,18 @@ function synthesizeItemKeyDiffs(diffs, baseItems, compareItems) {
 
 /** @param {string} s */
 function replaceNondeterministicStrings(s) {
-  return s
-    .replace(/\b[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\b/gi, 'UUID')
-    .replace(/:[0-9]{3,5}\//, ':PORT/')
-    .replace(/\.[0-9a-f]{8}\.(js|css|woff|html|png|jpeg|jpg|svg)/, '.HASH.$1');
+  return (
+    s
+      // YouTube Embeds
+      .replace(/www-embed-player-[0-9a-z]+/i, 'www-embed-player')
+      .replace(/player_ias-[0-9a-z]+/i, 'player_ias')
+      // UUIDs
+      .replace(/\b[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\b/gi, 'UUID')
+      // localhost Ports
+      .replace(/:[0-9]{3,5}\//, ':PORT/')
+      // Hash components embedded in filenames
+      .replace(/(\.|-)[0-9a-f]{8}\.(js|css|woff|html|png|jpeg|jpg|svg)/i, '$1HASH.$2')
+  );
 }
 
 /** @param {Record<string, any>} item @return {string} */

@@ -891,9 +891,19 @@ describe('#replaceNondeterministicStrings', () => {
     );
   });
 
+  it('should replace YouTube embeds', () => {
+    expect(
+      replaceNondeterministicStrings('/yts/jsbin/www-embed-player-vfl7uF46t/www-embed-player.js')
+    ).toEqual('/yts/jsbin/www-embed-player/www-embed-player.js');
+    expect(replaceNondeterministicStrings('/yts/jsbin/player_ias-vflyrg3IP/en_US/base.js')).toEqual(
+      '/yts/jsbin/player_ias/en_US/base.js'
+    );
+  });
+
   it('should replace hash parts', () => {
     expect(replaceNondeterministicStrings('foo.12345678.js')).toEqual('foo.HASH.js');
-    expect(replaceNondeterministicStrings('foo.abcdef12.js')).toEqual('foo.HASH.js');
+    expect(replaceNondeterministicStrings('foo.abcdef12.woff2')).toEqual('foo.HASH.woff2');
+    expect(replaceNondeterministicStrings('foo-abcdef12.css')).toEqual('foo-HASH.css');
   });
 
   it('should replace ports', () => {

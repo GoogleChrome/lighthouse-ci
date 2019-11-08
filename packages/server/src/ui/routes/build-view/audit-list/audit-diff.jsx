@@ -10,6 +10,36 @@ import {ScoreWord} from '../../../components/score-icon';
 import {NumericDiff} from './numeric-diff';
 import {getDiffLabel, getRowLabelForIndex} from '@lhci/utils/src/audit-diff-finder';
 
+/** @type {Record<string, string>} */
+const ICONS_BY_AUDIT_ID = {
+  'font-display': 'font_download',
+  'uses-rel-preconnect': 'language',
+
+  'user-timings': 'timer',
+  'bootup-time': 'speed',
+  'mainthread-work-breakdown': 'speed',
+
+  'third-party-summary': 'language',
+
+  deprecations: 'error',
+  'errors-in-console': 'error',
+  'font-sizes': 'format_size',
+};
+
+/** @param {{audit: LH.AuditResult, groupId: string}} props */
+const IconForAuditItems = props => {
+  const auditId = props.audit.id || '';
+  const groupId = props.groupId || '';
+
+  let icon = '';
+  if (groupId.includes('opportunities')) icon = 'cloud_download';
+  if (groupId.includes('a11y')) icon = 'code';
+  if (auditId.includes('image')) icon = 'photo';
+  icon = ICONS_BY_AUDIT_ID[auditId] || icon || 'list_alt';
+
+  return <i className="material-icons">{icon}</i>;
+};
+
 /** @param {{diff: LHCI.AuditDiff, audit: LH.AuditResult, baseAudit: LH.AuditResult}} props */
 const ScoreDiff = props => {
   return (
@@ -72,9 +102,9 @@ function getUniqueBaseCompareIndexPairs(diffs) {
   );
 }
 
-/** @param {{diffs: Array<LHCI.AuditDiff>, audit: LH.AuditResult, baseAudit: LH.AuditResult, showAsNarrow?: boolean}} props */
+/** @param {{diffs: Array<LHCI.AuditDiff>, audit: LH.AuditResult, baseAudit: LH.AuditResult, groupId: string, showAsNarrow?: boolean}} props */
 export const ItemDiff = props => {
-  const {diffs, baseAudit} = props;
+  const {diffs, baseAudit, groupId} = props;
   if (!baseAudit.details || !baseAudit.details.items) return null;
 
   const rowIndexes = getUniqueBaseCompareIndexPairs(diffs);
@@ -88,7 +118,7 @@ export const ItemDiff = props => {
   const baseElements = (
     <Fragment>
       <div className="audit-group__diff-badge-group">
-        <i className="material-icons">list</i>
+        <IconForAuditItems audit={props.audit} groupId={groupId} />
         <div className="audit-group__diff-badges">
           <span className="audit-group__diff-badge">{baseAudit.details.items.length}</span>
         </div>
@@ -107,7 +137,7 @@ export const ItemDiff = props => {
     <Fragment>
       {props.showAsNarrow ? <Fragment /> : baseElements}
       <div className="audit-group__diff-badge-group">
-        <i className="material-icons">list</i>
+        <IconForAuditItems audit={props.audit} groupId={groupId} />
         <div className="audit-group__diff-badges">
           {regressionCount ? (
             <span className="audit-group__diff-badge audit-group__diff-badge--regression">
@@ -155,6 +185,7 @@ export const AuditDiff = props => {
         diffs={diffs}
         audit={audit}
         baseAudit={baseAudit}
+        groupId={group.id}
         showAsNarrow={props.showAsNarrow}
       />
     );

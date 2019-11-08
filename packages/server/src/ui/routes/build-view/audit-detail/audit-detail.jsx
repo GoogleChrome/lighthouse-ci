@@ -44,7 +44,9 @@ const Details = props => {
 
   if (type === 'table' || type === 'opportunity') {
     tableDetails = <TableDetails pair={pair} />;
-    if (pair.baseAudit) itemDiff = <ItemDiff {...pair} baseAudit={pair.baseAudit} />;
+    if (pair.baseAudit) {
+      itemDiff = <ItemDiff {...pair} baseAudit={pair.baseAudit} groupId={pair.group.id} />;
+    }
   }
 
   const numericDiff = pair.diffs.find(diff => diff.type === 'numericValue');

@@ -72,7 +72,10 @@ function getListOfRunningCommands() {
     .spawnSync('ps', ['aux'])
     .stdout.toString()
     .split('\n')
-    .map(line => line.split(/\d+:\d+\.\d+/)[1])
+    .map(line => {
+      const matches = line.split(/\s+\d+:\d+(\.\d+)?/g);
+      return matches && matches[matches.length - 1];
+    })
     .filter(Boolean)
     .map(command => command.trim());
 }

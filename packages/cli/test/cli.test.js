@@ -166,17 +166,13 @@ describe('Lighthouse CI CLI', () => {
 
     it('should collect results with a server command', () => {
       const startCommand = `yarn start server -p=14927 --storage.sqlDatabasePath=${tmpSqlFilePath}`;
-      let {stdout = '', stderr = '', status = -1} = spawnSync(CLI_PATH, [
+      const {stdout, stderr, status} = runCLI([
         'collect',
         `-n=1`,
         `--rc-file=${rcFile}`,
         `--start-server-command=${startCommand}`,
         `--url=http://localhost:14927/app/`,
       ]);
-
-      stdout = stdout.toString();
-      stderr = stderr.toString();
-      status = status || 0;
 
       const stdoutClean = stdout
         .replace(/:\d{4,6}/g, ':XXXX')

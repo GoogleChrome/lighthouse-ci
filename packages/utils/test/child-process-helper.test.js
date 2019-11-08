@@ -22,7 +22,7 @@ async function tryUntilPasses(fn, timeout = 5000) {
       await fn();
       return;
     } catch (err) {
-      lastError = error;
+      lastError = err;
       await wait();
     }
   }
@@ -32,17 +32,24 @@ async function tryUntilPasses(fn, timeout = 5000) {
 
 describe('child-process-helper.js', () => {
   describe('#killProcessTree()', () => {
+    let pid;
+
+    afterEach(async () => {
+      if (pid) await childProcessHelper.killProcessTree(pid);
+    });
+
     it('should kill the child process', async () => {
       const command = 'sleep 11532';
       expect(childProcessHelper.getListOfRunningCommands()).not.toContain(command);
       const child = childProcess.spawn(command, {shell: true});
-      await wait();
+      pid = child.pid;
 
       await tryUntilPasses(() =>
         expect(childProcessHelper.getListOfRunningCommands()).toContain(command)
       );
 
       await childProcessHelper.killProcessTree(child.pid);
+      pid = undefined;
 
       await tryUntilPasses(() => {
         expect(childProcessHelper.getListOfRunningCommands()).not.toContain(command);
@@ -53,6 +60,7 @@ describe('child-process-helper.js', () => {
       const command = 'sleep 9653';
       expect(childProcessHelper.getListOfRunningCommands()).not.toContain(command);
       const child = childProcess.spawn(`${command} &\n${command}`, {shell: true});
+      pid = child.pid;
 
       await tryUntilPasses(() => {
         const matching = childProcessHelper.getListOfRunningCommands().filter(c => c === command);
@@ -60,6 +68,7 @@ describe('child-process-helper.js', () => {
       });
 
       await childProcessHelper.killProcessTree(child.pid);
+      pid = undefined;
 
       await tryUntilPasses(() => {
         expect(childProcessHelper.getListOfRunningCommands()).not.toContain(command);

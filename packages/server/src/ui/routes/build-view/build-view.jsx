@@ -6,7 +6,7 @@
 
 import {h, Fragment} from 'preact';
 import _ from '@lhci/utils/src/lodash';
-import {useState, useMemo, useCallback} from 'preact/hooks';
+import {useState, useMemo, useCallback, useEffect} from 'preact/hooks';
 import {AsyncLoader, combineLoadingStates, combineAsyncData} from '../../components/async-loader';
 import {Dropdown} from '../../components/dropdown';
 import {
@@ -180,6 +180,14 @@ const BuildView_ = props => {
   } catch (err) {
     lhrError = err;
   }
+
+  // Attach the LHRs to the window for easy debugging.
+  useEffect(() => {
+    // @ts-ignore
+    window.__LHR__ = lhr;
+    // @ts-ignore
+    window.__BASE_LHR__ = baseLhr;
+  }, [lhr, baseLhr]);
 
   if (!run || !lhr) {
     return (

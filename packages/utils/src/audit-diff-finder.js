@@ -335,6 +335,8 @@ function getItemKey(item) {
   if (typeof item.label === 'string') return item.label;
   // For the pre-grouped audits like mainthread-work-breakdown
   if (typeof item.groupLabel === 'string') return item.groupLabel;
+  // For user-timings
+  if (typeof item.name === 'string') return item.name;
   // For dom-size
   if (typeof item.statistic === 'string') return item.statistic;
   // For third-party-summary

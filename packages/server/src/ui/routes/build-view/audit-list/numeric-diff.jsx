@@ -51,7 +51,7 @@ const toDisplay = (x, options) => {
   if (unit === 'ms') {
     suffix = ' ms';
 
-    if (Math.abs(value) >= 500 && !options.preventSecondsConversion) {
+    if (Math.abs(value) >= 1000 && !options.preventSecondsConversion) {
       value /= 1000;
       fractionDigits = 1;
       suffix = ' s';

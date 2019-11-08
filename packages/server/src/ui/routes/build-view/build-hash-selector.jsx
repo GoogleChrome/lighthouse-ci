@@ -51,6 +51,37 @@ const LabelLineItem = props => {
   );
 };
 
+/** @param {{build: LHCI.ServerCommand.Build}} props */
+const BuildLink = props => {
+  return props.build.externalBuildUrl ? (
+    <a href={props.build.externalBuildUrl} target="_blank" rel="noopener noreferrer">
+      View Build
+    </a>
+  ) : (
+    <Fragment />
+  );
+};
+
+/** @param {{build: LHCI.ServerCommand.Build}} props */
+const GitHubLink = props => {
+  try {
+    const externalBuildUrl = new URL(props.build.externalBuildUrl);
+    if (!externalBuildUrl.host.includes('travis-ci')) return <Fragment />;
+    const [org, repo] = externalBuildUrl.pathname.split('/').filter(Boolean);
+    return (
+      <a
+        href={`https://github.com/${org}/${repo}/commit/${props.build.hash}`}
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        GitHub
+      </a>
+    );
+  } catch (err) {
+    return <Fragment />;
+  }
+};
+
 /** @param {{build: LHCI.ServerCommand.Build, compareBuild: LHCI.ServerCommand.Build, baseBuild: LHCI.ServerCommand.Build | null | undefined, selector: 'base'|'compare', withDevBranchArc: boolean, withDevLine: boolean, key: string}} props */
 const BuildLineItem = props => {
   const {build, compareBuild, baseBuild, selector} = props;
@@ -107,7 +138,8 @@ const BuildLineItem = props => {
         </Pill>{' '}
         <span className="build-hash-selector__commit">{build.commitMessage}</span>
         <span className="build-hash-selector__links">
-          {build.externalBuildUrl ? <a href={build.externalBuildUrl}>View Build</a> : <Fragment />}
+          <BuildLink build={build} />
+          <GitHubLink build={build} />
         </span>
       </div>
       {isSelected ? (

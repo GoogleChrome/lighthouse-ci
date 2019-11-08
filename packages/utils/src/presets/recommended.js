@@ -17,6 +17,7 @@ module.exports = {
     'speed-index': ['warn', {minScore: 0.9}],
     'max-potential-fid': ['warn', {minScore: 0.9}],
     'load-fast-enough-for-pwa': ['warn', {}],
+    'uses-rel-preload': ['warn', {minScore: 1}],
     // Not useful diagnostic audits (off)
     'critical-request-chains': ['off', {}],
     'final-screenshot': ['off', {}],
@@ -37,7 +38,6 @@ module.exports = {
     'unused-css-rules': ['error', {maxLength: 0}],
     'uses-optimized-images': ['error', {maxLength: 0}],
     'uses-rel-preconnect': ['error', {maxLength: 0}],
-    'uses-rel-preload': ['error', {maxLength: 0}],
     'uses-responsive-images': ['error', {maxLength: 0}],
     'uses-text-compression': ['error', {maxLength: 0}],
     // Audits that don't typically apply in dev environments or are more opinionated (warn)

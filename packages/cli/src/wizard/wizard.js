@@ -38,8 +38,8 @@ async function runNewProjectWizard(options) {
     {
       type: 'input',
       name: 'projectExternalUrl',
-      message: 'Where is the project built?',
-      default: 'https://travis-ci.org/<org>/<repo>',
+      message: "Where is the project's code hosted?",
+      default: 'https://github.com/<org>/<repo>',
     },
   ]);
 

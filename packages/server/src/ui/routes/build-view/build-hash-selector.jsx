@@ -28,7 +28,7 @@ const GitViz = props => {
   );
 };
 
-/** @param {{branch: string, withDevLine: boolean}} props */
+/** @param {{branch: string, withDevLine: boolean, withDevBranchArc?: boolean}} props */
 const LabelLineItem = props => {
   const variant = props.branch === 'master' ? 'master-branch' : 'dev-branch';
   return (
@@ -38,7 +38,7 @@ const LabelLineItem = props => {
         <GitViz
           branch={props.branch}
           withNode={false}
-          withDevBranchArc={false}
+          withDevBranchArc={props.withDevBranchArc || false}
           withDevLine={props.withDevLine}
         />
         <span
@@ -172,8 +172,11 @@ const BuildHashSelector_ = props => {
           {index === indexOfFirstDev && build.branch !== 'master' ? (
             <LabelLineItem branch={build.branch} withDevLine={true} />
           ) : null}
+          {indexOfFirstDev === builds.length - 1 && index === indexOfFirstDev ? (
+            <LabelLineItem branch="" withDevLine={false} withDevBranchArc={true} />
+          ) : null}
           {index === builds.length - 1 ? (
-            <LabelLineItem branch={build.branch} withDevLine={false} />
+            <LabelLineItem branch="master" withDevLine={false} />
           ) : null}
         </Fragment>
       ))}
@@ -186,7 +189,7 @@ const BuildHashSelector_ = props => {
  */
 export const BuildHashSelector = props => {
   const branchLoadingData = useBranchBuilds(props.build.projectId, props.build.branch, {limit: 10});
-  const baseLoadingData = useBranchBuilds(props.build.projectId, 'master', {limit: 5});
+  const baseLoadingData = useBranchBuilds(props.build.projectId, 'master', {limit: 10});
   return (
     <div className="build-hash-selector">
       <AsyncLoader

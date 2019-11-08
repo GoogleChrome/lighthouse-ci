@@ -750,5 +750,10 @@ describe('getAllAssertionResults', () => {
       const options = {assertMatrix: [], matchingUrlPattern: '', assertions: {}};
       expect(() => getAllAssertionResults(options, [])).toThrow();
     });
+
+    it('should not throw when trying to use assertMatrix with other unrelated options', () => {
+      const options = {assertMatrix: [], rcFile: 'path/to/file', serverBaseUrl: ''};
+      expect(() => getAllAssertionResults(options, [])).not.toThrow();
+    });
   });
 });

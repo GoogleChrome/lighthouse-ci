@@ -1,0 +1,20 @@
+{
+  "ci": {
+    "assert": {
+      "assertMatrix": [
+        {
+          "matchingUrlPattern": "app",
+          "assertions": {
+            "works-offline": "error"
+          }
+        },
+        {
+          "matchingUrlPattern": "non-matching",
+          "assertions": {
+            "first-contentful-paint": ["error", {"maxNumericValue": 1}]
+          }
+        }
+      ]
+    }
+  }
+}

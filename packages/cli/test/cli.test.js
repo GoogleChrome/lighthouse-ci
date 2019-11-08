@@ -23,6 +23,7 @@ const {
 
 describe('Lighthouse CI CLI', () => {
   const rcFile = path.join(__dirname, 'fixtures/lighthouserc.json');
+  const rcMatrixFile = path.join(__dirname, 'fixtures/lighthouserc-matrix.json');
   const rcExtendedFile = path.join(__dirname, 'fixtures/lighthouserc-extended.json');
   const budgetsFile = path.join(__dirname, 'fixtures/budgets.json');
   const buildDir = path.join(__dirname, 'fixtures');
@@ -332,6 +333,30 @@ describe('Lighthouse CI CLI', () => {
                 expected: <=[32mXXXX[0m
                    found: [31mXXXX[0m
               [2mall values: XXXX[0m
+
+        Assertion failed. Exiting with status code 1.
+        "
+      `);
+      expect(status).toEqual(1);
+    });
+
+    it('should assert failures from a matrix rcfile', () => {
+      const {stdout, stderr, status} = runCLI(['assert', `--rc-file=${rcMatrixFile}`]);
+
+      const stderrClean = stderr.replace(/:\d{4,6}/g, ':XXXX');
+      expect(stdout).toMatchInlineSnapshot(`""`);
+      expect(stderrClean).toMatchInlineSnapshot(`
+        "Checking assertions against 1 URL(s), 2 total run(s)
+
+        1 result(s) for [1mhttp://localhost:XXXX/app/[0m
+
+          [31m✘[0m  [1mworks-offline[0m failure for [1mminScore[0m assertion
+             Current page does not respond with a 200 when offline
+             Documentation: https://web.dev/works-offline
+
+                expected: >=[32m1[0m
+                   found: [31m0[0m
+              [2mall values: 0, 0[0m
 
         Assertion failed. Exiting with status code 1.
         "

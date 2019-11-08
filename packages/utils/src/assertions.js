@@ -426,12 +426,11 @@ function getAllAssertionResults(options, lhrs) {
   /** @type {LHCI.AssertCommand.BaseOptions[]} */
   let arrayOfOptions = [options];
   if (options.assertMatrix) {
-    const {assertMatrix, ...restOptions} = options;
-    if (Object.keys(restOptions).length) {
+    if (options.assertions || options.preset || options.budgetsFile || options.aggregationMethod) {
       throw new Error('Cannot use assertMatrix with other options');
     }
 
-    arrayOfOptions = assertMatrix;
+    arrayOfOptions = options.assertMatrix;
   }
 
   /** @type {AssertionResult[]} */

@@ -108,6 +108,15 @@ module.exports = {
     return `${padding.repeat(length)}${s}`.slice(-length);
   },
   /**
+   * @param {string} s
+   * @param {number} length
+   * @param {string} [padding]
+   */
+  padEnd(s, length, padding = ' ') {
+    if (s.length >= length) return s;
+    return `${s}${padding.repeat(length)}`.slice(0, length);
+  },
+  /**
    * Deep clones an object via JSON.parse/JSON.stringify.
    * @template T
    * @param {T} o

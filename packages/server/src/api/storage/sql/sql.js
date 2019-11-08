@@ -9,7 +9,7 @@ const path = require('path');
 const uuid = require('uuid');
 const Umzug = require('umzug');
 const Sequelize = require('sequelize');
-const {omit} = require('@lhci/utils/src/lodash.js');
+const {omit, padEnd} = require('@lhci/utils/src/lodash.js');
 const {E422} = require('../../express-utils.js');
 const StorageMethod = require('../storage-method.js');
 const projectModelDefn = require('./project-model.js');
@@ -38,6 +38,17 @@ function isUuid(id) {
     typeof id === 'string' &&
     !!id.match(/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/)
   );
+}
+
+/**
+ * @param {string} uuid
+ * @param {string} filler
+ */
+function formatAsUuid(uuid, filler = '0') {
+  const parts = padEnd(uuid, 32, filler).match(/\w{4}/g);
+  if (!parts || parts.length !== 8) throw new Error('Invalid UUID');
+  const [p1, p2, p3, p4, p5, p6, p7, p8] = parts;
+  return `${p1}${p2}-${p3}-${p4}-${p5}-${p6}${p7}${p8}`;
 }
 
 /**
@@ -357,10 +368,26 @@ class SqlStorageMethod {
    */
   async findBuildById(projectId, buildId) {
     const {buildModel} = this._sql();
+    if (isUuid(buildId)) {
+      const build = await this._findByPk(buildModel, buildId);
+      if (build && build.projectId !== projectId) return undefined;
+      return clone(build || undefined);
+    }
+
     if (!validatePartialUuidOrUndefined(buildId)) return undefined;
-    const idMatch = isUuid(buildId) ? buildId : {[Sequelize.Op.like]: `${buildId}%`};
+
+    // Postgres stores UUIDs as numbers so it's impossible to do a pattern match.
+    // Instead we'll do a range check which works whether the UUID is treated as a string or a
+    // number. For example...
+    //
+    // Given the prefix `a82fb732` we can look for all UUIDs that are...
+    //      >= a82fb732-0000-0000-0000-000000000000
+    //      <= a82fb732-ffff-ffff-ffff-ffffffffffff
+    const numericValue = parseInt(buildId.replace(/-/g, ''), 16);
+    const lowerUuid = formatAsUuid(numericValue.toString(16), '0');
+    const upperUuid = formatAsUuid(numericValue.toString(16), 'f');
     const builds = await buildModel.findAll({
-      where: {id: idMatch, projectId},
+      where: {id: {[Sequelize.Op.gte]: lowerUuid, [Sequelize.Op.lte]: upperUuid}, projectId},
       limit: 2,
     });
 

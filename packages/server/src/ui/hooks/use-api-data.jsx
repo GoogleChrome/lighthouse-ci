@@ -79,12 +79,20 @@ export function useProject(projectId) {
 }
 
 /**
- * @param {string} projectId
+ * @param {string|undefined} projectSlug
+ * @return {[LoadingState, LHCI.ServerCommand.Project | undefined]}
+ */
+export function useProjectBySlug(projectSlug) {
+  return useApiData('findProjectBySlug', projectSlug ? [projectSlug] : undefined);
+}
+
+/**
+ * @param {string|undefined} projectId
  * @return {[LoadingState, Array<LHCI.ServerCommand.Build> | undefined]}
  */
 export function useProjectBuilds(projectId) {
   const options = useMemo(() => ({limit: 20}), []);
-  return useApiData('getBuilds', [projectId, options]);
+  return useApiData('getBuilds', projectId ? [projectId, options] : undefined);
 }
 
 /**

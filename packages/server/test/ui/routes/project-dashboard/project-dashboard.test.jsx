@@ -27,10 +27,10 @@ describe('ProjectDashboard', () => {
   });
 
   it('should render a message when no builds available', async () => {
-    fetchMock.mockResponseOnce(JSON.stringify({name: 'My Project'}));
+    fetchMock.mockResponseOnce(JSON.stringify({id: '1', name: 'My Project'}));
     fetchMock.mockResponseOnce(JSON.stringify([]));
 
-    const {container, getAllByText} = render(<ProjectDashboard projectId={'abcd'} />);
+    const {container, getAllByText} = render(<ProjectDashboard projectSlug={'abcd'} />);
     await wait(() => getAllByText(/No build/));
     expect(snapshotDOM(container)).toMatchInlineSnapshot(`
             "<div>
@@ -44,7 +44,7 @@ describe('ProjectDashboard', () => {
   });
 
   it('should render the dashboard', async () => {
-    fetchMock.mockResponseOnce(JSON.stringify({name: 'My Project'}));
+    fetchMock.mockResponseOnce(JSON.stringify({id: '1', name: 'My Project'}));
     fetchMock.mockResponseOnce(
       JSON.stringify([
         {
@@ -64,7 +64,7 @@ describe('ProjectDashboard', () => {
       ])
     );
 
-    const {getAllByText} = render(<ProjectDashboard projectId={'abcd'} />);
+    const {getAllByText} = render(<ProjectDashboard projectSlug={'abcd'} />);
     await wait(() => getAllByText(/feature_branch/));
   });
 });

@@ -14,7 +14,7 @@ import {useRouteParams} from '../hooks/use-route-params';
 
 /** @param {{isOpen: boolean, setIsOpen: (value: boolean) => void}} props */
 export const PageSidebar = props => {
-  const {projectId} = useRouteParams();
+  const {projectSlug} = useRouteParams();
   const [loadingState, projects] = useProjectList();
 
   return (
@@ -38,9 +38,10 @@ export const PageSidebar = props => {
                   <li key={project.id}>
                     <Link
                       className={clsx({
-                        active: project.id === projectId,
+                        active: project.slug === projectSlug,
                       })}
-                      href={`/app/projects/${project.id}`}
+                      href={`/app/projects/${project.slug}`}
+                      onClick={() => props.setIsOpen(false)}
                     >
                       {project.name}
                     </Link>

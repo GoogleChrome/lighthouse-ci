@@ -43,8 +43,8 @@ describe('ProjectList', () => {
   it('should render the projects', async () => {
     fetchMock.mockResponse(
       JSON.stringify([
-        {id: '1', name: 'Project A', externalUrl: 'http://localhost:1337/builds/a/'},
-        {id: '2', name: 'Project B', externalUrl: 'http://localhost:1337/builds/b/'},
+        {slug: '1', name: 'Project A', externalUrl: 'http://localhost:1337/builds/a/'},
+        {slug: '2', name: 'Project B', externalUrl: 'http://localhost:1337/builds/b/'},
       ])
     );
 

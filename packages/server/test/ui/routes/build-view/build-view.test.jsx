@@ -27,28 +27,39 @@ describe('BuildView', () => {
   });
 
   it('should render the build and missing comparison build', async () => {
-    fetchMock.mockResponseOnce(JSON.stringify({name: 'My Project'})); // getProject
-    fetchMock.mockResponseOnce(JSON.stringify({hash: 'abcd', commitMessage: 'write some tests'})); // getBuild
+    fetchMock.mockResponseOnce(JSON.stringify({id: '1', name: 'My Project'})); // getProject
+    fetchMock.mockResponseOnce(
+      JSON.stringify({
+        id: '2',
+        hash: 'abcd',
+        commitMessage: 'write some tests',
+      })
+    ); // getBuild
     fetchMock.mockResponseOnce('null', {status: 404}); // findAncestor
     fetchMock.mockResponseOnce(JSON.stringify([])); // getBuilds - ancestors
     fetchMock.mockResponseOnce(JSON.stringify([])); // getRuns - compare
     fetchMock.mockResponseOnce(JSON.stringify([])); // getRuns - base
 
-    const {getAllByText} = render(<BuildView projectId="1" buildId="2" />);
+    const {getAllByText} = render(<BuildView projectSlug="1" partialBuildId="2" />);
     await wait(() => getAllByText(/write some tests/));
   });
 
   it('should render the build and the comparison build', async () => {
-    fetchMock.mockResponseOnce(JSON.stringify({name: 'My Project'})); // getProject
+    fetchMock.mockResponseOnce(JSON.stringify({id: '1', name: 'My Project'})); // getProject
     fetchMock.mockResponseOnce(
-      JSON.stringify({hash: 'abcd', commitMessage: 'test: write some tests', ancestorHash: '1234'})
+      JSON.stringify({
+        id: '1',
+        hash: 'abcd',
+        commitMessage: 'test: write some tests',
+        ancestorHash: '1234',
+      })
     ); // getBuild
     fetchMock.mockResponseOnce(JSON.stringify({id: 'a', hash: '1234', commitMessage: 'fix it'})); // findAncestor
     fetchMock.mockResponseOnce(JSON.stringify([])); // getBuilds - ancestors
     fetchMock.mockResponseOnce(JSON.stringify([])); // getRuns - compare
     fetchMock.mockResponseOnce(JSON.stringify([])); // getRuns - base
 
-    const {getAllByText} = render(<BuildView projectId="1" buildId="2" />);
+    const {getAllByText} = render(<BuildView projectSlug="1" partialBuildId="2" />);
     await wait(() => getAllByText(/write some tests/));
   });
 });

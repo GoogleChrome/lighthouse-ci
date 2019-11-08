@@ -29,7 +29,7 @@ export const App = () => {
           }
         />
         <LazyRoute
-          path="/app/projects/:projectId"
+          path="/app/projects/:projectSlug"
           loading={() => (
             <Page>
               <Loader />
@@ -40,7 +40,7 @@ export const App = () => {
           }
         />
         <LazyRoute
-          path="/app/projects/:projectId/builds/:buildId"
+          path="/app/projects/:projectSlug/compare/:partialBuildId"
           loading={() => (
             <Page>
               <Loader />

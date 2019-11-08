@@ -7,14 +7,14 @@
 import {h, VNode} from 'preact';
 import clsx from 'clsx';
 import './page-header.css';
-import {useProject} from '../hooks/use-api-data';
+import {useProjectBySlug} from '../hooks/use-api-data';
 import {Link} from 'preact-router';
 import {useRouteParams} from '../hooks/use-route-params';
 
 /** @param {{children?: Array<VNode> | VNode, setIsSidebarOpen: (isOpen: boolean) => void}} props */
 export const PageHeader = props => {
-  const {projectId} = useRouteParams();
-  const [_, selectedProject] = useProject(projectId);
+  const {projectSlug} = useRouteParams();
+  const [_, selectedProject] = useProjectBySlug(projectSlug);
 
   return (
     <div className={clsx('page-header')}>
@@ -27,7 +27,7 @@ export const PageHeader = props => {
           <i className="material-icons">menu</i>
         </div>
         <div className="page-header__current-project">
-          <Link href={selectedProject ? `/app/projects/${selectedProject.id}` : '#'}>
+          <Link href={selectedProject ? `/app/projects/${selectedProject.slug}` : '#'}>
             {(selectedProject && selectedProject.name) || 'Lighthouse CI'}
           </Link>
         </div>

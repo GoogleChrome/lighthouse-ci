@@ -20,7 +20,7 @@ const ProjectList_ = ({projects}) => {
     <ul>
       {projects.map(project => (
         <li key={project.id}>
-          <Link href={`/app/projects/${project.id}`}>
+          <Link href={`/app/projects/${project.slug}`}>
             {project.name} ({project.externalUrl})
           </Link>
         </li>

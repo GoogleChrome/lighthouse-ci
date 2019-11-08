@@ -7,7 +7,7 @@
 import {h} from 'preact';
 import {route} from 'preact-router';
 import _ from '@lhci/utils/src/lodash.js';
-import {useProjectBuilds, useProject} from '../../hooks/use-api-data';
+import {useProjectBuilds, useProjectBySlug} from '../../hooks/use-api-data';
 import {AsyncLoader, combineLoadingStates, combineAsyncData} from '../../components/async-loader';
 import {Paper} from '../../components/paper.jsx';
 import {ProjectGettingStarted} from './getting-started.jsx';
@@ -30,7 +30,9 @@ const ProjectDashboard_ = props => {
             return (
               <tr
                 key={build.id}
-                onClick={() => route(`/app/projects/${project.id}/builds/${build.id}`)}
+                onClick={() =>
+                  route(`/app/projects/${project.slug}/compare/${build.id.split('-')[0]}`)
+                }
               >
                 <td className="build-list__hash" data-tooltip={build.author}>
                   <Pill avatar={build}>{build.hash.slice(0, 8)}</Pill>
@@ -56,10 +58,11 @@ const ProjectDashboard_ = props => {
   );
 };
 
-/** @param {{projectId: string, runUrl?: string, branch?: string}} props */
+/** @param {{projectSlug: string, runUrl?: string, branch?: string}} props */
 export const ProjectDashboard = props => {
-  const projectApiData = useProject(props.projectId);
-  const projectBuildData = useProjectBuilds(props.projectId);
+  const projectApiData = useProjectBySlug(props.projectSlug);
+  const projectId = projectApiData[1] && projectApiData[1].id;
+  const projectBuildData = useProjectBuilds(projectId);
 
   return (
     <Page>

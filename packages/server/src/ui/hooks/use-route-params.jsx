@@ -10,11 +10,11 @@
  * Although not technically a hook at this point in time, if preact-router were to stop being buggy
  * (double renders child contents in unclear situations) we could move this to use the built-in hooks.
  *
- * @return {{projectId: string | undefined}}
+ * @return {{projectSlug: string | undefined}}
  */
 export function useRouteParams() {
-  const projectId = window.location.pathname.match(/\/app\/projects\/([a-f0-9-]+)/);
+  const projectSlug = window.location.pathname.match(/\/app\/projects\/([^/]+)/);
   return {
-    projectId: (projectId && projectId[1]) || undefined,
+    projectSlug: (projectSlug && projectSlug[1]) || undefined,
   };
 }

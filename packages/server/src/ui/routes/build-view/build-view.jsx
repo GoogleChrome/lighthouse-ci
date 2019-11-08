@@ -10,11 +10,11 @@ import {useState, useMemo, useCallback, useEffect} from 'preact/hooks';
 import {AsyncLoader, combineLoadingStates, combineAsyncData} from '../../components/async-loader';
 import {Dropdown} from '../../components/dropdown';
 import {
-  useProject,
   useBuild,
   useOptionalBuildByHash,
   useOptionalBuildRepresentativeRuns,
   useAncestorBuild,
+  useProjectBySlug,
 } from '../../hooks/use-api-data';
 import {BuildHashSelector} from './build-hash-selector';
 import {BuildSelectorPill} from './build-selector-pill';
@@ -294,14 +294,16 @@ const BuildView_ = props => {
   );
 };
 
-/** @param {{projectId: string, buildId: string, baseHash?: string, compareUrl?: string}} props */
+/** @param {{projectSlug: string, partialBuildId: string, baseHash?: string, compareUrl?: string}} props */
 export const BuildView = props => {
-  const projectLoadingData = useProject(props.projectId);
-  const buildLoadingData = useBuild(props.projectId, props.buildId);
-  const ancestorBuildData = useAncestorBuild(props.projectId, props.buildId);
+  const projectLoadingData = useProjectBySlug(props.projectSlug);
+  const projectId = projectLoadingData[1] && projectLoadingData[1].id;
+  const buildLoadingData = useBuild(projectId, props.partialBuildId);
+  const buildId = buildLoadingData[1] && buildLoadingData[1].id;
+  const ancestorBuildData = useAncestorBuild(projectId, buildId);
 
   const baseOverrideOptions = props.baseHash ? {ancestorHash: props.baseHash} : buildLoadingData[1];
-  const baseOverrideData = useOptionalBuildByHash(props.projectId, baseOverrideOptions);
+  const baseOverrideData = useOptionalBuildByHash(projectId, baseOverrideOptions);
 
   const baseBuildData =
     props.baseHash || (ancestorBuildData[0] === 'loaded' && !ancestorBuildData[1])
@@ -309,10 +311,10 @@ export const BuildView = props => {
       : ancestorBuildData;
   const baseBuildId = baseBuildData[1] && baseBuildData[1].id;
 
-  const runData = useOptionalBuildRepresentativeRuns(props.projectId, props.buildId, null);
+  const runData = useOptionalBuildRepresentativeRuns(projectId, buildId, null);
 
   const baseRunData = useOptionalBuildRepresentativeRuns(
-    props.projectId,
+    projectId,
     baseBuildId === null ? 'EMPTY_QUERY' : baseBuildId,
     null
   );

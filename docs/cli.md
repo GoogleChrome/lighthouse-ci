@@ -39,7 +39,7 @@ lhci healthcheck --fatal --checks=githubToken
 
 ### `autorun`
 
-Automatically run `collect`, `assert`, and `upload` with sensible defaults.
+Automatically run `collect` and `assert` with sensible defaults, and optionally `upload`.
 
 **Examples**
 
@@ -61,7 +61,7 @@ lhci open
 
 ### `wizard`
 
-Runs an interactive step-by-step wizard to accomplish certain Lighthouse CI tasks. Currently used to create a new project on the LHCI server.
+Runs an interactive step-by-step wizard to create a new project on the LHCI server.
 
 **Examples**
 

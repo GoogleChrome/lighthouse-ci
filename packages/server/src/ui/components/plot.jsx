@@ -79,6 +79,7 @@ const updateEvents = [
  * @prop {boolean} [debug]
  * @prop {boolean} [debug]
  * @prop {boolean} [useResizeHandler]
+ * @prop {(...args: any[]) => any} [onClick]
  * @prop {(...args: any[]) => any} [onUpdate]
  * @prop {(...args: any[]) => any} [onUpdate]
  * @prop {(...args: any[]) => any} [onPurge]

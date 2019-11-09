@@ -96,6 +96,12 @@ const StatisticPlot = props => {
             <h3 className="dashboard-graph__title">{props.title}</h3>
             <Plot
               useResizeHandler
+              onClick={({points}) => {
+                const currentUrl = new URL(window.location.href);
+                const x = points[0].x;
+                const to = `${currentUrl.pathname}/compare/${builds[x].id.split('-')[0]}`;
+                route(to);
+              }}
               data={ys.map((yVals, i) => ({
                 x: xs.filter((_, i) => yVals[i]),
                 y: yVals.filter(Boolean).map(stat => (stat ? Math.round(stat.value * 100) : 0)),

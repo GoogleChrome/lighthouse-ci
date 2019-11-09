@@ -97,8 +97,8 @@ const StatisticPlot = props => {
             <Plot
               useResizeHandler
               data={ys.map((yVals, i) => ({
-                x: xs,
-                y: yVals.map(stat => (stat ? Math.round(stat.value * 100) : 0)),
+                x: xs.filter((_, i) => yVals[i]),
+                y: yVals.filter(Boolean).map(stat => (stat ? Math.round(stat.value * 100) : 0)),
                 type: 'scatter',
                 mode: 'lines+markers',
                 marker: {color: COLORS[i]},

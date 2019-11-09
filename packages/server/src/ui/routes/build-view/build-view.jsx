@@ -28,7 +28,6 @@ import {BuildViewLegend} from './build-view-legend';
 import clsx from 'clsx';
 import {findAuditDiffs, getDiffSeverity} from '@lhci/utils/src/audit-diff-finder';
 import {route, Link} from 'preact-router';
-import {BuildViewOptions} from './build-view-options';
 import {BuildViewWarnings} from './build-view-warnings';
 import {DocumentTitle} from '../../components/document-title';
 
@@ -288,7 +287,6 @@ const BuildView_ = props => {
               ) : (
                 <div className="build-view__legend-and-options">
                   <BuildViewLegend />
-                  <BuildViewOptions compareLhr={lhr} baseLhr={baseLhr} />
                 </div>
               )}
               <AuditGroups

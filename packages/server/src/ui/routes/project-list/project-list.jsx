@@ -22,10 +22,10 @@ const NoProjects = () => {
   return (
     <Fragment>
       <div className="project-list__confetti-background">
-        <img src={CONFETTI_PATH} />
+        <img src={CONFETTI_PATH} alt="Lighthouse CI background image" />
       </div>
       <Paper className="no-projects">
-        <img src={LH_LOGO_PATH} />
+        <img src={LH_LOGO_PATH} alt="Lighthouse CI Logo" />
         <h2>
           Welcome to Lighthouse CI! <br /> Run <pre>lhci wizard</pre> to setup your first project.
         </h2>
@@ -42,7 +42,7 @@ const ProjectList_ = ({projects}) => {
 
   return (
     <Paper>
-      <img src={LH_LOGO_PATH} />
+      <img src={LH_LOGO_PATH} alt="Lighthouse CI Logo" />
       <ul>
         {projects.map(project => (
           <li key={project.id}>

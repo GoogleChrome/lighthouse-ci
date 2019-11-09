@@ -383,9 +383,10 @@ class SqlStorageMethod {
     // Given the prefix `a82fb732` we can look for all UUIDs that are...
     //      >= a82fb732-0000-0000-0000-000000000000
     //      <= a82fb732-ffff-ffff-ffff-ffffffffffff
+    const [leadingZeros = ''] = buildId.match(/^0+/) || [];
     const numericValue = parseInt(buildId.replace(/-/g, ''), 16);
-    const lowerUuid = formatAsUuid(numericValue.toString(16), '0');
-    const upperUuid = formatAsUuid(numericValue.toString(16), 'f');
+    const lowerUuid = formatAsUuid(leadingZeros + numericValue.toString(16), '0');
+    const upperUuid = formatAsUuid(leadingZeros + numericValue.toString(16), 'f');
     const builds = await buildModel.findAll({
       where: {id: {[Sequelize.Op.gte]: lowerUuid, [Sequelize.Op.lte]: upperUuid}, projectId},
       limit: 2,

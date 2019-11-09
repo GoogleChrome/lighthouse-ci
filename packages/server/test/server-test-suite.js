@@ -261,6 +261,28 @@ function runTests(state) {
         buildWithAmbiguousPrefix
       );
     });
+
+    it('should handle UUIDs that start with 0', async () => {
+      const dummyProject = await client.createProject({name: 'dummy', externalUrl: ''});
+      const builds = [];
+      const findBuildWith0 = () => {
+        return builds.find(build => build.id.startsWith('0'));
+      };
+
+      while (!findBuildWith0()) {
+        builds.push(
+          await client.createBuild({
+            ...buildA,
+            hash: Math.random().toString(),
+            projectId: dummyProject.id,
+          })
+        );
+      }
+
+      const build = findBuildWith0();
+      const buildPrefix = build.id.split('-')[0];
+      expect(await client.findBuildById(dummyProject.id, buildPrefix)).toEqual(build);
+    });
   });
 
   describe('/:projectId/branches', () => {

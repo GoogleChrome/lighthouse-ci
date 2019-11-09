@@ -11,7 +11,7 @@ const path = require('path');
 const {runCLI} = require('./test-utils.js');
 
 describe('Lighthouse CI healthcheck CLI', () => {
-  const fixtureDir = path.join(__dirname, 'fixtures');
+  const fixtureDir = path.join(__dirname, 'fixtures/autorun-static-dir');
   const rcFile = path.join(fixtureDir, 'lighthouserc.json');
 
   describe('configuration', () => {
@@ -23,7 +23,6 @@ describe('Lighthouse CI healthcheck CLI', () => {
         ✅  Ancestor hash determinable
         ✅  Configuration file found
         ⚠️   GitHub token set
-        ✅  LHCI server reachable
         Healthcheck passed!
         "
       `);
@@ -42,7 +41,6 @@ describe('Lighthouse CI healthcheck CLI', () => {
         ✅  Ancestor hash determinable
         ✅  Configuration file found
         ⚠️   GitHub token set
-        ✅  LHCI server reachable
         Healthcheck passed!
         "
       `);

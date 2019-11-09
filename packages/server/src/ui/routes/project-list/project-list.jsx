@@ -4,7 +4,7 @@
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
  */
 
-import {h} from 'preact';
+import {h, Fragment} from 'preact';
 import {useProjectList} from '../../hooks/use-api-data';
 import {AsyncLoader} from '../../components/async-loader';
 import {Link} from 'preact-router';
@@ -15,9 +15,23 @@ import {Paper} from '../../components/paper';
 
 // @ts-ignore - tsc doesn't get parcel :)
 const LH_LOGO_PATH = require('../../logo.svg');
+// @ts-ignore - tsc doesn't get parcel :)
+const CONFETTI_PATH = require('./confetti.svg');
 
 const NoProjects = () => {
-  return <span>No projects yet, create one by running `lhci wizard`</span>;
+  return (
+    <Fragment>
+      <div className="project-list__confetti-background">
+        <img src={CONFETTI_PATH} />
+      </div>
+      <Paper className="no-projects">
+        <img src={LH_LOGO_PATH} />
+        <h2>
+          Welcome to Lighthouse CI! <br /> Run <pre>lhci wizard</pre> to setup your first project.
+        </h2>
+      </Paper>
+    </Fragment>
+  );
 };
 
 /** @param {{projects: Array<LHCI.ServerCommand.Project>}} props */

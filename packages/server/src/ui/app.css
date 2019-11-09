@@ -73,6 +73,7 @@
 
   --gauge-number-font-size: 24px;
   --gauge-title-font-size: 18px; /* this is 20px in the spec, but simply does not look like the design at 20px */
+  --title-font-size: 24px;
   --header-font-size: 20px;
   --base-font-size: 14px;
   --subtext-font-size: 12px;

@@ -22,7 +22,9 @@ function buildCommand(yargs) {
     method: {type: 'string', choices: ['node'], default: 'node'},
     headful: {type: 'boolean', description: 'Run with a headful Chrome'},
     additive: {type: 'boolean', description: 'Skips clearing of previous collect data'},
-    url: {description: 'The URL to run Lighthouse on.'},
+    url: {
+      description: 'A URL to run Lighthouse on.  You can evaluate multiple URLs by adding this flag multiple times.'
+    },
     staticDistDir: {
       description: 'The build directory where your HTML files to run Lighthouse on are located.',
     },

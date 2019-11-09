@@ -18,7 +18,6 @@ Runs diagnostics to ensure a valid configuration, useful when setting up Lightho
 
 ```bash
 lhci healthcheck --help
-cli.js healthcheck
 
 Run diagnostics to ensure a valid configuration
 
@@ -37,6 +36,8 @@ Options:
 lhci healthcheck --fatal --checks=githubToken
 ```
 
+---
+
 ### `autorun`
 
 Automatically run `collect` and `assert` with sensible defaults, and optionally `upload`.
@@ -49,6 +50,26 @@ lhci autorun --rc-overrides.collect.numberOfRuns=5
 lhci autorun --rc-overrides.upload.target=temporary-public-storage
 ```
 
+#### Starting a webserver
+
+To allow autorun to start your own webserver, add an npm script named `serve:lhci`. autorun will execute this script before collection.
+
+example `package.json` excerpt:
+
+```json
+  "scripts": {
+    "serve:lhci": "NODE_ENV=production npm run server"
+  }
+```
+
+You can also supply a custom server initalization command directly as a flag to `autorun`:
+
+```bash
+lhci autorun --rc-overrides.collect.startServerCommand="rails server -e production"
+```
+
+---
+
 ### `open`
 
 Open a local lighthouse report that has been created using `collect`.
@@ -58,6 +79,8 @@ Open a local lighthouse report that has been created using `collect`.
 ```bash
 lhci open
 ```
+
+---
 
 ### `wizard`
 
@@ -69,32 +92,33 @@ Runs an interactive step-by-step wizard to create a new project on the LHCI serv
 lhci wizard
 ```
 
+---
+
 ### `collect`
 
 Runs Lighthouse n times and stores the LHRs in a local `.lighthouseci/` folder.
 
 ```bash
 lhci collect --help
-cli.js collect
 
 Run Lighthouse and save the results to a local folder
 
 Options:
-  --help              Show help                                        [boolean]
-  --version           Show version number                              [boolean]
-  --config            Path to JSON config file
-  --headful           Run with a headful Chrome                        [boolean]
-  --additive          Skips clearing of previous collect data          [boolean]
-  --url               A URL to run Lighthouse on.  You can evaluate multiple
-                      URLs by adding this flag multiple times.
-  --staticDistDir     The build directory where your HTML files to run
-                      Lighthouse on are located.
-  --settings          The Lighthouse settings and flags to use when collecting
-  --numberOfRuns, -n  The number of times to run Lighthouse.
+  --help                Show help                                      [boolean]
+  --version             Show version number                            [boolean]
+  --config              Path to JSON config file
+  --method                          [string] [choices: "node"] [default: "node"]
+  --headful             Run with a headful Chrome                      [boolean]
+  --additive            Skips clearing of previous collect data        [boolean]
+  --url                 A URL to run Lighthouse on.  You can evaluate multiple
+                        URLs by adding this flag multiple times.
+  --staticDistDir       The build directory where your HTML files to run
+                        Lighthouse on are located.
+  --startServerCommand  The command to run to start the server.
+  --settings            The Lighthouse settings and flags to use when collecting
+  --numberOfRuns, -n    The number of times to run Lighthouse.
                                                            [number] [default: 3]
 ```
-
----
 
 **Examples**
 
@@ -105,13 +129,14 @@ lhci collect --staticDistDir=./dist
 lhci collect --url=https://example-1.com --url=https://example-2.com
 ```
 
+---
+
 ### `upload`
 
 Saves the runs in the `.lighthouseci/` folder to desired target and sets a GitHub status check when token is available.
 
 ```bash
 lhci upload --help
-cli.js upload
 
 Save the results to the server
 
@@ -145,13 +170,14 @@ lhci upload --target=temporary-public-storage
 lhci upload --serverBaseUrl=http://lhci.my-custom-domain.com/
 ```
 
+---
+
 ### `assert`
 
 Asserts the conditions in the Lighthouse CI config and exits with the appropriate status code if there were any failures. See the [assertion docs](./docs/assertions.md) for more.
 
 ```bash
 lhci assert
-cli.js assert
 
 Assert that the latest results meet expectations
 
@@ -172,12 +198,13 @@ lhci assert --config=./lighthouserc.json
 lhci assert --preset=lighthouse:recommended --assertions.speed-index=off
 ```
 
+---
+
 ### `server`
 
 Starts the LHCI server. This command is unique in that it is likely run on infrastructure rather than in your build process. Learn more about the [LHCI server](./server.md) and how to setup your personal LHCI server accessible over the internet.
 
 ```bash
-cli.js server
 
 Run Lighthouse CI server
 

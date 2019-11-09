@@ -23,7 +23,8 @@ function buildCommand(yargs) {
     headful: {type: 'boolean', description: 'Run with a headful Chrome'},
     additive: {type: 'boolean', description: 'Skips clearing of previous collect data'},
     url: {
-      description: 'A URL to run Lighthouse on.  You can evaluate multiple URLs by adding this flag multiple times.'
+      description:
+        'A URL to run Lighthouse on. Use this flag multiple times to evaluate multiple URLs.',
     },
     staticDistDir: {
       description: 'The build directory where your HTML files to run Lighthouse on are located.',

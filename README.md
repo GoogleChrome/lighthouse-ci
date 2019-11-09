@@ -15,6 +15,8 @@ Lighthouse CI is a set of commands that make running, asserting, saving, and ret
 - [Assertions Documentation](./docs/assertions.md)
 - [Server Documentation](./docs/recipes/docker-server/README.md)
 
+<img src="https://user-images.githubusercontent.com/39191/68522269-7917b680-025e-11ea-8d96-2774c0a0b04c.png" width="48%">
+
 ## Quick Start
 
 **.travis.yml**

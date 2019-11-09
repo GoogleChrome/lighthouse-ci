@@ -31,7 +31,7 @@ node_js:
 addons:
   chrome: stable # make sure to have Chrome available
 before_install:
-  - npm install -g @lhci/cli@next # install LHCI
+  - npm install -g @lhci/cli@0.3.0-alpha.0 # install LHCI
 script:
   - npm run build # build your site
   - npm test # run your normal tests
@@ -66,7 +66,7 @@ fi
 
 npm run deploy
 
-npm install -g @lhci/cli@next
+npm install -g @lhci/cli@0.3.0-alpha.0
 lhci healthcheck --fatal
 lhci collect --url=http://localhost:9000/index.html
 lhci assert --preset="lighthouse:recommended"
@@ -158,7 +158,7 @@ Now that we have our environment ready, time to run Lighthouse CI. The `collect`
 
 # Install Lighthouse CI
 # If you're already using node to manage your project, add it to your package.json `devDependencies` instead to skip this step.
-npm install -g @lhci/cli@next
+npm install -g @lhci/cli@0.3.0-alpha.0
 
 # Run a healthcheck to make sure everything looks good before we run collection.
 lhci healthcheck --fatal
@@ -221,7 +221,7 @@ If you're using `autorun`, setting `ci.upload.target` to `temporary-public-stora
 
 <img src="https://user-images.githubusercontent.com/39191/68522781-496bad00-0264-11ea-800a-ed86dbb04366.png" width="48%"> <img src="https://user-images.githubusercontent.com/39191/68522269-7917b680-025e-11ea-8d96-2774c0a0b04c.png" width="48%">
 
-Historical reports and advanced report diffing is available with the Lighthouse CI server. For setup of the server itself, see [our server recipe](./recipes/README.md).
+Historical reports and advanced report diffing is available with the Lighthouse CI server. For setup of the server itself, see [our server recipe](./recipes/docker-server/README.md).
 
 Once the server is set up, create a a new project with the lhci wizard:
 

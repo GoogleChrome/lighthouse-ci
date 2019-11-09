@@ -8,6 +8,10 @@
   width: 40%;
 }
 
+.build-view--with-lhr-link-hover .build-view__scores-and-url .dropdown--url {
+  background: var(--compare-secondary-highlight-color);
+}
+
 .build-view__scores-and-url {
   height: 260px;
   width: calc(100% + 2 * var(--base-spacing));

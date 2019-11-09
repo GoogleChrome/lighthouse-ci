@@ -22,8 +22,9 @@
   --color-red-700: #eb0f00;
   --color-green-500: #0cce6b;
   --color-green-700: #018642;
-  --color-blue-200: #90caf9;
-  --color-blue-500: #2962ff;
+  --color-blue-100: #eaefff;
+  --color-blue-200: #d4e0ff;
+  --color-blue-500: #3e72ff;
   --color-cyan-500: #00bcd4;
   --color-cyan-700: #078190;
   --color-magenta-500: #ff4081;
@@ -54,11 +55,13 @@
   --improvement-text-color: var(--color-cyan-700);
   --neutral-color: var(--color-gray-800);
   --neutral-highlight-color: var(--color-gray-200);
+  --neutral-secondary-highlight-color: var(--color-gray-100);
   --regression-color: var(--color-magenta-500);
   --regression-text-color: var(--color-magenta-700);
 
   --compare-color: var(--color-blue-500);
   --compare-highlight-color: var(--color-blue-200);
+  --compare-secondary-highlight-color: var(--color-blue-100);
   --dev-branch-color: var(--color-gray-600);
   --master-branch-color: var(--color-gray-800);
 
@@ -157,4 +160,8 @@ h6 {
 
 .text--regression {
   color: var(--regression-color);
+}
+
+a .material-icons {
+  color: var(--base-text-color);
 }

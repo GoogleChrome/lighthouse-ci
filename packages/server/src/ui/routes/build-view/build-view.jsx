@@ -96,6 +96,7 @@ const BuildViewScoreAndUrl = props => {
         <div className="build-view__dropdowns">
           <Dropdown
             label="URL"
+            className="dropdown--url"
             value={props.selectedUrl}
             setValue={url => {
               const to = new URL(window.location.href);
@@ -152,6 +153,7 @@ const BuildView_ = props => {
   const [percentAbsoluteDeltaThreshold, setDiffThreshold] = useState(0.05);
   const [openBuildHash, setOpenBuild] = useState(/** @type {null|'base'|'compare'} */ (null));
   const [selectedAuditId, setAuditId] = useState(/** @type {string|null} */ (null));
+  const [isOpenLhrLinkHovered, setLhrLinkHover] = useState(false);
   const selectedUrl = props.compareUrl || (props.runs[0] && props.runs[0].url);
   const buildHashSelectorCloseFn = useCallback(() => setOpenBuild(null), [setOpenBuild]);
 
@@ -211,15 +213,19 @@ const BuildView_ = props => {
           <BuildSelectorHeaderSection
             build={props.ancestorBuild}
             variant="base"
+            lhr={baseLhr}
             isDimmed={openBuildHash === 'compare'}
             isOpen={openBuildHash === 'base'}
+            setLhrLinkHover={setLhrLinkHover}
             onClick={() => setOpenBuild(openBuildHash === 'base' ? null : 'base')}
           />
           <BuildSelectorHeaderSection
             build={props.build}
             variant="compare"
+            lhr={lhr}
             isDimmed={openBuildHash === 'base'}
             isOpen={openBuildHash === 'compare'}
+            setLhrLinkHover={setLhrLinkHover}
             onClick={() => setOpenBuild(openBuildHash === 'compare' ? null : 'compare')}
           />
         </Fragment>
@@ -253,6 +259,7 @@ const BuildView_ = props => {
       <div
         className={clsx('build-view', {
           'build-view--with-audit-selection': !!selectedAuditId,
+          'build-view--with-lhr-link-hover': isOpenLhrLinkHovered,
         })}
       >
         <BuildViewScoreAndUrl

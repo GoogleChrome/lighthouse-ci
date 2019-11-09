@@ -34,7 +34,9 @@ export const Dropdown = props => {
           })}
         </select>
       </label>
-      <div className="dropdown__chevron" />
+      <div className="dropdown__chevron">
+        <i className="material-icons">keyboard_arrow_down</i>
+      </div>
     </div>
   );
 };

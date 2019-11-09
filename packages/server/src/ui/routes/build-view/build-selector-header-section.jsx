@@ -8,6 +8,7 @@ import {h, Fragment} from 'preact';
 import './build-selector-header-section.css';
 import clsx from 'clsx';
 import {Pill} from '../../components/pill';
+import {LhrViewerButton} from '../../components/lhr-viewer-button';
 
 /**
  *
@@ -17,16 +18,16 @@ const Selection = props => {
   const {hash, commitMessage = 'unknown commit'} = props.build;
   return (
     <Fragment>
-      <Pill className="build-selector-pill__hash" variant={props.variant} solid>
+      <Pill className="build-selector-header-section__hash" variant={props.variant} solid>
         {hash.slice(0, 8)}
       </Pill>
-      <span className="build-selector-pill__message">{commitMessage}</span>
+      <span className="build-selector-header-section__message">{commitMessage}</span>
     </Fragment>
   );
 };
 
 /**
- * @param {{build: LHCI.ServerCommand.Build | null, variant: 'base'|'compare', isOpen?: boolean, isDimmed?: boolean, onClick?: () => void}} props
+ * @param {{build: LHCI.ServerCommand.Build | null, lhr?: LH.Result, variant: 'base'|'compare', isOpen?: boolean, isDimmed?: boolean, setLhrLinkHover: (v: boolean) => void, onClick?: () => void}} props
  */
 export const BuildSelectorHeaderSection = props => {
   return (
@@ -43,9 +44,16 @@ export const BuildSelectorHeaderSection = props => {
       {props.build ? (
         <Selection build={props.build} variant={props.variant} />
       ) : (
-        <span className="build-selector-pill__message">None</span>
+        <span className="build-selector-header-section__message">None</span>
       )}
-      <div className="build-selector-pill__variant-label">{props.variant}</div>
+      <div
+        className="build-selector-header-section__lhr-link"
+        onMouseEnter={() => props.setLhrLinkHover(true)}
+        onMouseLeave={() => props.setLhrLinkHover(false)}
+      >
+        {props.lhr ? <LhrViewerButton lhr={props.lhr} /> : <Fragment />}
+      </div>
+      <div className="build-selector-header-section__variant-label">{props.variant}</div>
     </div>
   );
 };

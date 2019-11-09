@@ -4,40 +4,25 @@
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
  */
 
-.dropdown {
-  border-bottom: 1px solid var(--strong-border-color);
+.lhr-viewer-button {
+  background: var(--highlighted-background-color);
+  border-radius: 3px;
   padding: calc(var(--base-spacing) / 2);
+  padding-right: var(--base-spacing);
+  margin-right: var(--base-spacing);
 
-  font-family: var(--base-font-family);
-  font-size: var(--base-font-size);
-  font-weight: var(--medium-font-weight);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
 }
 
-.dropdown__label {
-  color: var(--secondary-text-color);
+.lhr-viewer-button img {
+  height: 20px;
   margin-right: calc(var(--base-spacing) / 2);
 }
 
-.dropdown select {
-  position: relative;
-  background: none;
-  border: none;
-  border-radius: 0;
-  -webkit-appearance: none;
-
-  padding-right: 20px;
-  cursor: pointer;
-  z-index: 2;
-
-  font-family: var(--base-font-family);
-  font-size: var(--base-font-size);
+.lhr-viewer-button {
+  color: var(--base-text-color);
   font-weight: var(--medium-font-weight);
-}
-
-.dropdown__chevron {
-  position: absolute;
-  top: calc((30px - 24px) / 2);
-  right: calc(var(--base-spacing) / 4);
-
-  z-index: 1;
 }

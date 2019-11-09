@@ -27,6 +27,13 @@
         "themed-omnibox": "off",
         "works-offline": "off"
       }
+    },
+    "upload": {
+      "urlReplacementPatterns": [
+        "s/[0-9a-f]{8}$/HASH/",
+        "s#:[0-9]{3,5}/#:PORT/#",
+        "s/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/UUID/ig"
+      ]
     }
   }
 }

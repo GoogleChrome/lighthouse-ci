@@ -10,23 +10,33 @@ import {AsyncLoader} from '../../components/async-loader';
 import {Link} from 'preact-router';
 import {Page} from '../../layout/page';
 import {DocumentTitle} from '../../components/document-title';
+import './project-list.css';
+import {Paper} from '../../components/paper';
+
+// @ts-ignore - tsc doesn't get parcel :)
+const LH_LOGO_PATH = require('../../logo.svg');
+
+const NoProjects = () => {
+  return <span>No projects yet, create one by running `lhci wizard`</span>;
+};
 
 /** @param {{projects: Array<LHCI.ServerCommand.Project>}} props */
 const ProjectList_ = ({projects}) => {
   if (!projects.length) {
-    return <span>No projects yet, create one by running `lhci wizard`</span>;
+    return <NoProjects />;
   }
 
   return (
-    <ul>
-      {projects.map(project => (
-        <li key={project.id}>
-          <Link href={`/app/projects/${project.slug}`}>
-            {project.name} ({project.externalUrl})
-          </Link>
-        </li>
-      ))}
-    </ul>
+    <Paper>
+      <img src={LH_LOGO_PATH} />
+      <ul>
+        {projects.map(project => (
+          <li key={project.id}>
+            <Link href={`/app/projects/${project.slug}`}>{project.name}</Link>
+          </li>
+        ))}
+      </ul>
+    </Paper>
   );
 };
 
@@ -36,11 +46,13 @@ export const ProjectList = () => {
   return (
     <Page>
       <DocumentTitle title="Projects" />
-      <AsyncLoader
-        loadingState={loadingState}
-        asyncData={projects}
-        render={projects => <ProjectList_ projects={projects} />}
-      />
+      <div className="project-list">
+        <AsyncLoader
+          loadingState={loadingState}
+          asyncData={projects}
+          render={projects => <ProjectList_ projects={projects} />}
+        />
+      </div>
     </Page>
   );
 };

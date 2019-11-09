@@ -7,7 +7,7 @@
 import {h} from 'preact';
 import {api} from '../../../../src/ui/hooks/use-api-data.jsx';
 import {ProjectList} from '../../../../src/ui/routes/project-list/project-list.jsx';
-import {render, cleanup, wait, snapshotDOM} from '../../../test-utils.js';
+import {render, cleanup, wait} from '../../../test-utils.js';
 
 jest.mock('../../../../src/ui/layout/page');
 
@@ -29,15 +29,8 @@ describe('ProjectList', () => {
   it('should render a message when no projects available', async () => {
     fetchMock.mockResponse(JSON.stringify([]));
 
-    const {container, getAllByText} = render(<ProjectList />);
-    await wait(() => getAllByText(/No projects/));
-    expect(snapshotDOM(container)).toMatchInlineSnapshot(`
-      "<div>
-        <span>
-          No projects yet, create one by running \`lhci wizard\`
-        </span>
-      </div>"
-    `);
+    const {getAllByText} = render(<ProjectList />);
+    await wait(() => getAllByText(/Welcome to Lighthouse CI/));
   });
 
   it('should render the projects', async () => {
@@ -48,33 +41,7 @@ describe('ProjectList', () => {
       ])
     );
 
-    const {container, getAllByText} = render(<ProjectList />);
+    const {getAllByText} = render(<ProjectList />);
     await wait(() => getAllByText(/Project A/));
-    expect(snapshotDOM(container)).toMatchInlineSnapshot(`
-      "<div>
-        <ul>
-          <li>
-            <a
-              href=\\"/app/projects/1\\"
-            >
-              Project A
-               (
-              http://localhost:1337/builds/a/
-              )
-            </a>
-          </li>
-          <li>
-            <a
-              href=\\"/app/projects/2\\"
-            >
-              Project B
-               (
-              http://localhost:1337/builds/b/
-              )
-            </a>
-          </li>
-        </ul>
-      </div>"
-    `);
   });
 });

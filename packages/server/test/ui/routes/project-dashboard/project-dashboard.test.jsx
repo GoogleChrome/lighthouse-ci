@@ -7,7 +7,7 @@
 import {h} from 'preact';
 import {api} from '../../../../src/ui/hooks/use-api-data.jsx';
 import {ProjectDashboard} from '../../../../src/ui/routes/project-dashboard/project-dashboard.jsx';
-import {render, cleanup, wait, snapshotDOM} from '../../../test-utils.js';
+import {render, cleanup, wait} from '../../../test-utils.js';
 
 jest.mock('../../../../src/ui/layout/page');
 
@@ -30,17 +30,8 @@ describe('ProjectDashboard', () => {
     fetchMock.mockResponseOnce(JSON.stringify({id: '1', name: 'My Project'}));
     fetchMock.mockResponseOnce(JSON.stringify([]));
 
-    const {container, getAllByText} = render(<ProjectDashboard projectSlug={'abcd'} />);
+    const {getAllByText} = render(<ProjectDashboard projectSlug={'abcd'} />);
     await wait(() => getAllByText(/No build/));
-    expect(snapshotDOM(container)).toMatchInlineSnapshot(`
-            "<div>
-              <h2>
-                No build data yet for 
-                My Project
-                !
-              </h2>
-            </div>"
-        `);
   });
 
   it('should render the dashboard', async () => {

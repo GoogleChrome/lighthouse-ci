@@ -222,7 +222,7 @@ The setup so far will automatically assert the Lighthouse team's recommended set
 # ...
 script:
   - ...
-  - lhci autorun --rc-file=lighthouserc.json
+  - lhci autorun --config=lighthouserc.json
 # ...
 ```
 
@@ -236,7 +236,7 @@ OR
 # ...
 
 # Change the assertion command to use our rc file.
-lhci assert --rc-file=lighthouserc.json
+lhci assert --config=lighthouserc.json
 EXIT_CODE=$?
 
 # ...
@@ -257,7 +257,7 @@ There's a free service that provides temporary public storage of your Lighthouse
 
 # ...
 
-lhci assert --rc-file=lighthouserc.json
+lhci assert --config=lighthouserc.json
 EXIT_CODE=$?
 
 lhci upload --target=temporary-public-storage
@@ -288,7 +288,7 @@ With your token, you can configure your Lighthouse CI integration to upload repo
 
 # ...
 
-lhci assert --rc-file=lighthouserc.json
+lhci assert --config=lighthouserc.json
 EXIT_CODE=$?
 
 lhci upload --serverBaseUrl="https://your-lhci-server-url.com" --token="$LHCI_SERVER_TOKEN"

@@ -27,7 +27,7 @@ const BUILD_DIR_PRIORITY = [
  */
 function buildCommand(yargs) {
   return yargs.options({
-    rcFile: {
+    config: {
       description: 'The lighthouserc.json file preferences.',
     },
     rcOverrides: {
@@ -104,12 +104,12 @@ function getOverrideArgsForCommand(command) {
  * @return {Promise<void>}
  */
 async function runCommand(options) {
-  const rcFile = readRcFile(options.rcFile);
+  const rcFile = readRcFile(options.config);
   if (rcFile && !rcFile.ci) throw new Error('RC file did not contain a root-level "ci" property');
   const ciConfiguration = (rcFile && rcFile.ci) || {};
   _.merge(ciConfiguration, options.rcOverrides || {});
 
-  const defaultFlags = rcFile ? [`--rc-file=${options.rcFile}`] : [];
+  const defaultFlags = rcFile ? [`--config=${options.config}`] : [];
   let hasFailure = false;
 
   const healthcheckStatus = runChildCommand('healthcheck', [...defaultFlags, '--fatal']).status;

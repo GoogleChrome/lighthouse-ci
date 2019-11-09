@@ -752,7 +752,7 @@ describe('getAllAssertionResults', () => {
     });
 
     it('should not throw when trying to use assertMatrix with other unrelated options', () => {
-      const options = {assertMatrix: [], rcFile: 'path/to/file', serverBaseUrl: ''};
+      const options = {assertMatrix: [], config: 'path/to/file', serverBaseUrl: ''};
       expect(() => getAllAssertionResults(options, [])).not.toThrow();
     });
   });

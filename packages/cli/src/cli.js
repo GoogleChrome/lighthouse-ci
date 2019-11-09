@@ -28,7 +28,7 @@ async function run() {
     .version(pkg.version)
     .usage('lhci <command> <options>')
     .env('LHCI')
-    .config('rc-file', loadAndParseRcFile)
+    .config('config', loadAndParseRcFile)
     .demand(1)
     .command('collect', 'Run Lighthouse and save the results to a local folder', commandYargs =>
       collectCmd.buildCommand(commandYargs)

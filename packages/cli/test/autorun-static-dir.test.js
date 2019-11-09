@@ -16,7 +16,7 @@ describe('Lighthouse CI autorun CLI', () => {
 
   it('should run all three steps', () => {
     const {stdout, stderr, status} = runCLI(
-      ['autorun', `--rc-file=${rcFile}`, '--rc-overrides.collect.numberOfRuns=2'],
+      ['autorun', `--config=${rcFile}`, '--rc-overrides.collect.numberOfRuns=2'],
       {cwd: autorunDir}
     );
 

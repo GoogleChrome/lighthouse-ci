@@ -122,7 +122,7 @@ describe('Lighthouse CI CLI', () => {
       const LHCI_TOKEN = projectToken;
       const LHCI_SERVER_BASE_URL = `http://localhost:${server.port}`;
       const {stdout, stderr, status} = runCLI(
-        ['healthcheck', `--rc-file=${rcFile}`, `--fatal`, '--checks=githubToken'],
+        ['healthcheck', `--config=${rcFile}`, `--fatal`, '--checks=githubToken'],
         {env: {LHCI_TOKEN, LHCI_SERVER_BASE_URL}}
       );
 
@@ -145,7 +145,7 @@ describe('Lighthouse CI CLI', () => {
     it('should collect results from staticDistDir', () => {
       const {stdout, stderr, status} = runCLI([
         'collect',
-        `--rc-file=${rcFile}`,
+        `--config=${rcFile}`,
         `--static-dist-dir=${staticDistDir}`,
       ]);
 
@@ -170,7 +170,7 @@ describe('Lighthouse CI CLI', () => {
       const {stdout, stderr, status} = runCLI([
         'collect',
         `-n=1`,
-        `--rc-file=${rcFile}`,
+        `--config=${rcFile}`,
         `--start-server-command=${startCommand}`,
         `--url=http://localhost:14927/app/`,
       ]);
@@ -192,7 +192,7 @@ describe('Lighthouse CI CLI', () => {
     it('should collect results from explicit urls', () => {
       const {stdout, stderr, status} = runCLI([
         'collect',
-        `--rc-file=${rcFile}`,
+        `--config=${rcFile}`,
         `--url=${urlToCollect}`,
       ]);
 
@@ -316,7 +316,7 @@ describe('Lighthouse CI CLI', () => {
         `--assertions.first-contentful-paint=off`,
         `--assertions.speed-index=off`,
         `--assertions.interactive=off`,
-        `--rc-file=${rcFile}`,
+        `--config=${rcFile}`,
       ]);
 
       const stderrClean = stderr.replace(/\d{4,8}(\.\d{1,8})?/g, 'XXXX');
@@ -341,7 +341,7 @@ describe('Lighthouse CI CLI', () => {
     });
 
     it('should assert failures from a matrix rcfile', () => {
-      const {stdout, stderr, status} = runCLI(['assert', `--rc-file=${rcMatrixFile}`]);
+      const {stdout, stderr, status} = runCLI(['assert', `--config=${rcMatrixFile}`]);
 
       const stderrClean = stderr.replace(/:\d{4,6}/g, ':XXXX');
       expect(stdout).toMatchInlineSnapshot(`""`);
@@ -369,7 +369,7 @@ describe('Lighthouse CI CLI', () => {
         'assert',
         `--assertions.speed-index=off`,
         `--assertions.interactive=off`,
-        `--rc-file=${rcExtendedFile}`,
+        `--config=${rcExtendedFile}`,
       ]);
 
       const stderrClean = stderr.replace(/\d{4,}(\.\d{1,})?/g, 'XXXX');

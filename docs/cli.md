@@ -10,7 +10,7 @@ npm install -g @lhci/cli
 
 ## Commands
 
-All commands support configuration via a JSON rc file passed in via `--rc-file=./path/to/`. Any argument on the CLI can also be passed in via environment variable. For example, `--rc-file=foo` can be replaced with `LH_RC_FILE=foo`. Learn more about [configuration](#configuration).
+All commands support configuration via a JSON rc file passed in via `--config=./path/to/`. Any argument on the CLI can also be passed in via environment variable. For example, `--config=foo` can be replaced with `LH_RC_FILE=foo`. Learn more about [configuration](#configuration).
 
 ### `healthcheck`
 
@@ -25,7 +25,7 @@ Run diagnostics to ensure a valid configuration
 Options:
   --help     Show help                                                 [boolean]
   --version  Show version number                                       [boolean]
-  --rc-file  Path to JSON config file
+  --config   Path to JSON config file
   --fatal    Exit with a non-zero status code when a component fails the status
              check.                                                    [boolean]
   --checks   The list of opt-in checks to include in the fatality check. [array]
@@ -44,7 +44,7 @@ Automatically run `collect`, `assert`, and `upload` with sensible defaults.
 **Examples**
 
 ```bash
-lhci autorun --rc-file=./lighthouserc.json
+lhci autorun --config=./lighthouserc.json
 lhci autorun --rc-overrides.collect.numberOfRuns=5
 lhci autorun --rc-overrides.upload.target=temporary-public-storage
 ```
@@ -82,7 +82,7 @@ Run Lighthouse and save the results to a local folder
 Options:
   --help              Show help                                        [boolean]
   --version           Show version number                              [boolean]
-  --rc-file           Path to JSON config file
+  --config            Path to JSON config file
   --headful           Run with a headful Chrome                        [boolean]
   --additive          Skips clearing of previous collect data          [boolean]
   --url               The URL to run Lighthouse on.
@@ -117,7 +117,7 @@ Save the results to the server
 Options:
   --help                    Show help                                  [boolean]
   --version                 Show version number                        [boolean]
-  --rc-file                 Path to JSON config file
+  --config                  Path to JSON config file
   --target                  The type of target to upload the data to. If set to
                             anything other than "lhci", some of the options will
                             not apply.
@@ -139,7 +139,7 @@ Options:
 **Examples**
 
 ```bash
-lhci upload --rc-file=./lighthouserc.json
+lhci upload --config=./lighthouserc.json
 lhci upload --target=temporary-public-storage
 lhci upload --serverBaseUrl=http://lhci.my-custom-domain.com/
 ```
@@ -157,7 +157,7 @@ Assert that the latest results meet expectations
 Options:
   --help         Show help                                             [boolean]
   --version      Show version number                                   [boolean]
-  --rc-file      Path to JSON config file
+  --config       Path to JSON config file
   --preset       The assertions preset to extend
                            [choices: "lighthouse:all", "lighthouse:recommended"]
   --assertions   The assertions to use.
@@ -167,7 +167,7 @@ Options:
 **Examples**
 
 ```bash
-lhci assert --rc-file=./lighthouserc.json
+lhci assert --config=./lighthouserc.json
 lhci assert --preset=lighthouse:recommended --assertions.speed-index=off
 ```
 
@@ -183,7 +183,7 @@ Run Lighthouse CI server
 Options:
   --help                                 Show help                     [boolean]
   --version                              Show version number           [boolean]
-  --rc-file                              Path to JSON config file
+  --config                               Path to JSON config file
   --logLevel        [string] [choices: "silent", "verbose"] [default: "verbose"]
   --port, -p                                            [number] [default: 9001]
   --storage.sqlDialect
@@ -218,7 +218,7 @@ export LHCI_RC_FILE=path/to/rc/file
 lhci <command>
 
 # Specify an rc file via command-line flag
-lhci --rc-file=path/to/different/rc/file <command>
+lhci --config=path/to/different/rc/file <command>
 ```
 
 **Example Project RC File**

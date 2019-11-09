@@ -12,7 +12,7 @@
     "start": "./packages/cli/src/cli.js",
     "start:seed-data-in-viewer": "node ./scripts/open-seed-report-in-viewer.js",
     "start:seed-database": "node ./scripts/seed-database.js ./packages/cli/test/fixtures/lighthouserc.json",
-    "start:server": "./packages/cli/src/cli.js server --rc-file=./packages/cli/test/fixtures/lighthouserc.json",
+    "start:server": "./packages/cli/src/cli.js server --config=./packages/cli/test/fixtures/lighthouserc.json",
     "update:fixture-seed-data": "node ./scripts/update-seed-fixtures.js",
     "test:fixture-seed-data": "jest '--testMatch=**/scripts/diff-seed-fixture.js'",
     "test": "npm run test:typecheck && npm run test:lint && npm run test:unit",

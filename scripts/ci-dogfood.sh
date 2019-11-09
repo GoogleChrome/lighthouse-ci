@@ -23,7 +23,7 @@ for url in $(LHCI_ROOT_URL=http://localhost:9009 node ./scripts/ci-dogfood-get-u
 done
 
 # Assert our results, but don't fail the build yet.
-yarn start assert --rc-file=lighthouserc.json
+yarn start assert --config=lighthouserc.json
 EXIT_CODE=$?
 
 if [[ -n "$LHCI_CANARY_SERVER_URL" ]]; then

@@ -25,7 +25,6 @@ export const PageSidebar = props => {
     >
       <div className="page-sidebar__header" onClick={() => props.setIsOpen(false)}>
         <div className="page-sidebar__logo" />
-        Lighthouse CI
       </div>
       <div className="page-sidebar__content">
         <AsyncLoader

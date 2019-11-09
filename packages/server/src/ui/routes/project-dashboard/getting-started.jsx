@@ -5,10 +5,33 @@
  */
 
 import {h} from 'preact';
+import {Paper} from '../../components/paper';
+import './getting-started.css';
+
+// @ts-ignore - tsc doesn't get parcel :)
+const LH_LOGO_PATH = require('../../logo.svg');
 
 /**
  * @param {{project: LHCI.ServerCommand.Project}} props
  */
 export const ProjectGettingStarted = props => {
-  return <h2>No build data yet for {props.project.name}!</h2>;
+  return (
+    <div className="getting-started">
+      <Paper>
+        <img src={LH_LOGO_PATH} />
+        <h2>
+          No build data yet for {props.project.name}! Add the <pre>@lhci/cli</pre> package to your
+          continuous integration to{' '}
+          <a
+            href="https://github.com/GoogleChrome/lighthouse-ci/blob/master/docs/getting-started.md"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            get started
+          </a>
+          .
+        </h2>
+      </Paper>
+    </div>
+  );
 };

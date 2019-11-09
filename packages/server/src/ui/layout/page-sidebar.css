@@ -28,9 +28,6 @@
   height: var(--page-header-height);
   width: 100%;
   padding: var(--page-header-vertical-padding) var(--page-header-horizontal-padding);
-
-  border-bottom: 1px solid var(--inverted-border-color);
-
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -49,7 +46,7 @@
 }
 
 .page-sidebar__content {
-  padding: var(--page-header-vertical-padding) var(--page-header-horizontal-padding);
+  padding: 0 var(--page-header-horizontal-padding);
 }
 
 .page-sidebar__content ul {

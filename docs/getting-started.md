@@ -6,36 +6,39 @@ Estimated Time: ~15 minutes
 
 ## Prerequisites
 
-Before you can start using this guide, your project should already meet the following requirements:
+Your project should meet the following requirements:
 
 1. Source code is managed with git (GitHub, GitLab, Bitbucket, etc).
-2. Branches/pull requests are gated on the results of a continuous integration build process (Travis CI, CircleCI, Azure Pipelines, AppVeyor, etc).
+2. Branches/pull requests are gated on the results of a continuous integration build process (Travis CI, CircleCI, Azure Pipelines, AppVeyor, GitHub Actions, etc).
 3. Your CI process can build your project into production assets (typically provided as an `npm run build` command by most frameworks).
+4. Your project either A) has a command that runs a production-equivalent web server, or B) is a static site.
 
 In the examples that follow, use of GitHub and Travis CI are assumed but the same concepts apply to other providers. Refer to your specific provider's documentation for how to accomplish each setup step.
 
 ## Quick Start
 
-Lighthouse CI comes with an automatic setup that should work for many default web projects. If you have any complicated moving parts, `autorun` might not work for you. Read up on the details in [the full setup guide](#setup).
+Lighthouse CI comes with an automatic pipeline, called `autorun`, that should work for many web projects. If you have any complicated moving parts, `autorun` might not work for you. Read up on the details in [the full setup guide](#setup).
 
 **.travis.yml**
 
 ```yaml
-dist: xenial # use xenial or later (enabled by default)
+# xenial (the default) or newer required
 language: node_js
 node_js:
-  - 10 # use Node 10 LTS or later
+  - 10 # Node 10 LTS or later required
+addons:
+  chrome: stable # make sure to have Chrome available
 before_install:
   - npm install -g @lhci/cli@next # install LHCI
 script:
   - npm run build # build your site
-  - npm test # run your normal tests
-  - lhci autorun # run lighthouse CI
-addons:
-  chrome: stable # make sure you have Chrome available
+  - npm test      # run your normal tests
+  - lhci autorun  # run lighthouse CI
 ```
 
-That's it! You're good to go. Check out the [Extra Goodies](#extra-goodies) section for additional features like uploading every report to public storage, GitHub status checks, and a historical diffing server.
+That's it! With this in place, you'll have Lighthouse reports collected and uploaded for later viewing.
+
+If you're Check out the [Extra Goodies](#extra-goodies) section for additional features like uploading every report to public storage, GitHub status checks, and a historical diffing server.
 
 **NOTE: for matrix builds, you want to ensure LHCI is only run once! For example...**
 

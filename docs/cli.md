@@ -85,7 +85,8 @@ Options:
   --config            Path to JSON config file
   --headful           Run with a headful Chrome                        [boolean]
   --additive          Skips clearing of previous collect data          [boolean]
-  --url               The URL to run Lighthouse on.
+  --url               A URL to run Lighthouse on.  You can evaluate multiple
+                      URLs by adding this flag multiple times.
   --staticDistDir     The build directory where your HTML files to run
                       Lighthouse on are located.
   --settings          The Lighthouse settings and flags to use when collecting

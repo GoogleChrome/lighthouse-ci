@@ -6,76 +6,53 @@ Estimated Time: ~15 minutes
 
 ## Prerequisites
 
-Before you can start using this guide, your project should already meet the following requirements:
+Your project should meet the following requirements:
 
 1. Source code is managed with git (GitHub, GitLab, Bitbucket, etc).
-2. Branches/pull requests are gated on the results of a continuous integration build process (Travis CI, CircleCI, Azure Pipelines, AppVeyor, etc).
+2. Branches/pull requests are gated on the results of a continuous integration build process (Travis CI, CircleCI, Azure Pipelines, AppVeyor, GitHub Actions, etc).
 3. Your CI process can build your project into production assets (typically provided as an `npm run build` command by most frameworks).
+4. Your project either:
+   A) has a command that runs a production-equivalent web server.
+   B) is a static site.
 
 In the examples that follow, use of GitHub and Travis CI are assumed but the same concepts apply to other providers. Refer to your specific provider's documentation for how to accomplish each setup step.
 
 ## Quick Start
 
-Lighthouse CI comes with an automatic setup that should work for many default web projects. If you have any complicated moving parts, `autorun` might not work for you. Read up on the details in [the full setup guide](#setup).
+Lighthouse CI comes with an automatic pipeline, called `autorun`, that should work for many web projects. If you have any complicated moving parts, `autorun` might not work for you. Read up on the details in [the full setup guide](#setup).
 
 **.travis.yml**
 
 ```yaml
-dist: xenial # use xenial or later (enabled by default)
+# xenial (the default) or newer required
 language: node_js
 node_js:
-  - 10 # use Node 10 LTS or later
+  - 10 # Node 10 LTS or later required
+addons:
+  chrome: stable # make sure to have Chrome available
 before_install:
   - npm install -g @lhci/cli@next # install LHCI
 script:
   - npm run build # build your site
   - npm test # run your normal tests
-  - lhci autorun # run lighthouse CI
-addons:
-  chrome: stable # make sure you have Chrome available
+  - lhci autorun # run lighthouse CI against your static site
 ```
 
-That's it! You're good to go. Check out the [Extra Goodies](#extra-goodies) section for additional features like uploading every report to public storage, GitHub status checks, and a historical diffing server.
+That's it! With this in place, you'll have Lighthouse reports collected and and asserted.
 
-**NOTE: for matrix builds, you want to ensure LHCI is only run once! For example...**
+See the [autorun docs](./cli#autorun) for more including running your own webserver and uploading the reports for later viewing.
 
-```yaml
-node_js:
-  - '8'
-  - '10'
-  - '12'
-script:
-  - 'if [ "${TRAVIS_NODE_VERSION}" = "8" ]; then lhci autorun ; fi' # only run LHCI on node 8
-```
+You can also run a [Lighthouse CI server](#the-lighthouse-ci-server) for report diffs and timeseries charts. Or alternatively, just [upload the reports](#saving-reports-to-temporary-public-storage) for easy viewing. [GitHub Status checks](#github-status-checks) can also be enabled easily.
 
-**NOTE: for sites with an API or other dynamic component, you'll need to tell LHCI how to start your server**
+## Complete Setup
 
-With node in your `package.json`...
-
-```json
-{
-  "scripts": {
-    "serve:lhci": "node path/to/your/server.js"
-  }
-}
-```
-
-With another language in your CI script...
-
-```yaml
-script:
-  - lhci autorun --rc-overrides.collect.startServerCommand="rails server -e production"
-```
-
-## Setup
-
-Roughly a Lighthouse CI will follow these steps.
+A Lighthouse CI run will roughly follow these steps.
 
 1. Configure CI environment.
-2. Deploy your code to a development server.
+2. Serve your site locally or deploy to a development server.
 3. Collect Lighthouse results with Lighthouse CI.
 4. Assert that the results meet your expectations.
-5. (Optional) Upload the results for helpful debugging and historical analysis. (See [Extra Goodies](#extra-goodies))
+5. (Optional) Upload the results for helpful debugging and historical analysis. (See [Storing Reports](#storing-reports))
 
 The complete script might look something like the below, but read on for the breakdown and explanations.
 
@@ -120,9 +97,9 @@ addons:
   chrome: stable
 ```
 
-### Run Lighthouse CI Script
+### Create a run-lhci script
 
-To contain all the steps necessary for Lighthouse CI, we'll create a file located at `scripts/run-lighthouse-ci.sh` that should run as part of the build process. Make sure that this script is only run once per build or it will lead to confusing upload artifacts. For example, if you have a matrix build of several node versions, only run Lighthouse CI on one of them. In Travis, this translates to...
+To contain all the steps necessary for Lighthouse CI, we'll create a file located at `scripts/run-lhci.sh` that should run as part of the build process. Make sure that this script is only run once per build or it will lead to confusing upload artifacts. For example, if you have a matrix build of several node versions, only run Lighthouse CI on one of them. In Travis, this translates to...
 
 **.travis.yml**
 
@@ -130,10 +107,10 @@ To contain all the steps necessary for Lighthouse CI, we'll create a file locate
 script:
   - npm run build # build your site
   - npm test # run normal tests
-  - ./scripts/run-lighthouse-ci.sh # run lighthouse
+  - ./scripts/run-lhci.sh # run lighthouse ci
 ```
 
-**scripts/run-lighthouse-ci.sh**
+**scripts/run-lhci.sh**
 
 ```bash
 #!/bin/bash
@@ -147,24 +124,26 @@ fi
 # ...
 ```
 
-#### Deploy Your Code
+#### Serve Your Site
 
-To run Lighthouse CI, the code you'd like to test with Lighthouse needs to be available on a server. You can either use the built-in Lighthouse CI server, a custom local development server, or deploy to a public/intranet location. For this example, we'll assume your site is already built in a local directory called `./dist`, and we'll use the the `http-server` node package as an example custom server implementation (do not follow this structure just to use `http-server`, it is less fully featured than `lhci collect --static-dist-dir=./dist`, see [Run Lighthouse CI](#run-lighthouse-ci) for more).
+To run Lighthouse CI, the built site you'd like to test with Lighthouse needs to be available on a server. You can either use the built-in Lighthouse CI static server, a custom local development server, or deploy to a staging location that's accessible to your CI.
+
+For this example, we'll assume your site is already built in a local directory called `./dist`, and we'll use the the `http-server` node package as an example custom server implementation (do not follow this structure just to use `http-server`, it is less fully featured than `lhci collect --static-dist-dir=./dist`, see [Run Lighthouse CI](#run-lighthouse-ci) for more).
 
 ```bash
 #!/bin/bash
 
-# ... (build condition check)
-
-# Start a custom local development server to host our files
-# Protip: deploy your code to a web-accessible staging server here instead for more realistic performance metrics
+# Start a custom local development server (in a background process)
+# Protip: deploy your code to a web-accessible staging server instead for more realistic performance metrics
 npx http-server -p 9000 ./dist &
 
 # ... (run lighthouse ci)
 
-# Cleanup the development server when we're done
+# Clean up the development server
 kill $!
 ```
+
+You can also automate the backgrounding and clean up with [`lhci collect`'s `startServerCommand` flag](./cli#collect).
 
 #### Run Lighthouse CI
 
@@ -216,91 +195,58 @@ The setup so far will automatically assert the Lighthouse team's recommended set
 }
 ```
 
-**.travis.yml**
-
-```yaml
-# ...
-script:
-  - ...
-  - lhci autorun --config=lighthouserc.json
-# ...
-```
-
-OR
-
-**scripts/run-lighthouse-ci.sh**
-
 ```bash
-#!/bin/bash
-
-# ...
-
-# Change the assertion command to use our rc file.
 lhci assert --config=lighthouserc.json
 EXIT_CODE=$?
-
-# ...
 ```
 
-## Extra Goodies
+## Storing Reports
 
-### Saving Reports to Public Storage
+You have two options for storing the collected Lighthouse reports for later viewing.
 
-The existing setup will fail builds, print failing audits, and keep your project in line, but what happens when something goes wrong? You want to see the Lighthouse report!
+### Saving Reports to Temporary Public Storage
 
-There's a free service that provides temporary public storage of your Lighthouse reports so you can examine the HTML report of any build without tokens or extra infrastructure. Just add a single `lhci upload` command _after_ `lhci assert`.
+While the Lighthouse CI server offers the complete LHCI experience, you do have to host it yourself. If you'd like basic storage so you can just get a URL for each report, we offer a free service that provides temporary public storage.
 
-**NOTE: as the name implies this is _temporary_ and _public_ storage, do not use if you're uncomfortable with the idea of your Lighthouse reports being stored on a public URL on Google Infrastructure. Reports are automatically deleted 7 days after upload.**
+**NOTE: as the name implies this is _temporary_ and _public_ storage, do not use if you're uncomfortable with the idea of your Lighthouse reports being stored on a public URL on Google Cloud infrastructure. Reports are automatically deleted 7 days after upload.**
 
 ```bash
-#!/bin/bash
-
-# ...
-
-lhci assert --config=lighthouserc.json
-EXIT_CODE=$?
-
+# If you use `lhci assert`, upload must follow after it.
 lhci upload --target=temporary-public-storage
-
-# ...
 ```
 
 If you're using `autorun`, setting `ci.upload.target` to `temporary-public-storage` in your `lighthouserc.json` is all that's necessary. The upload step will happen automatically.
 
-### Historical Reports & Diffing (Lighthouse CI Server)
+### The Lighthouse CI Server
 
-Historical reports and advanced report diffing is available on the Lighthouse CI server. For setup of the server itself, see [our server recipe](./recipes/README.md). Once the server is setup, you can use the wizard to create a project.
+<img src="https://user-images.githubusercontent.com/39191/68522781-496bad00-0264-11ea-800a-ed86dbb04366.png" width="48%"> <img src="https://user-images.githubusercontent.com/39191/68522269-7917b680-025e-11ea-8d96-2774c0a0b04c.png" width="48%">
+
+Historical reports and advanced report diffing is available with the Lighthouse CI server. For setup of the server itself, see [our server recipe](./recipes/README.md).
+
+Once the server is set up, create a a new project with the lhci wizard:
 
 ```bash
 $ lhci wizard
 ? Which wizard do you want to run? new-project
 ? Which server would you like to use? http://url-of-your-lhci-server.com/
 ? What would you like to name the project? My Favorite Project
-? Where is the project built? https://travis-ci.org/GoogleChrome/lighthouse-ci
+? Where is the project's code hosted? https://github.com/GoogleChrome/lighthouse-ci
+
 Created project My Favorite Project (XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX)!
 Use token XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX to connect.
 ```
 
-With your token, you can configure your Lighthouse CI integration to upload reports to the server.
+Add your token to your CI with the environment variable `LHCI_TOKEN`. Alternatively, you can pass it to `upload` with the `--token` flag:
 
-```bash
-#!/bin/bash
-
-# ...
-
-lhci assert --config=lighthouserc.json
-EXIT_CODE=$?
-
-lhci upload --serverBaseUrl="https://your-lhci-server-url.com" --token="$LHCI_SERVER_TOKEN"
-
-# ...
 ```
-
-If you're using `autorun`, setting `ci.upload.serverBaseUrl` to your URL in your `lighthouserc.json` and including `LHCI_TOKEN` in your environment is all that's necessary. The upload step will happen automatically.
+lhci upload --serverBaseUrl="https://your-lhci-server-url.com" --token="$LHCI_SERVER_TOKEN"
+```
 
 ### GitHub Status Checks
 
-The existing setup will fail builds through your CI provider, but there's no differentiation between the build failing because of Lighthouse CI and the build failing for your other tests.
+<!-- todo: move above Storing Reports section -->
+
+The existing setup will fail builds through your CI provider, but there's no differentiation between the build failing because of Lighthouse CI versus your other tests.
 
 Lighthouse CI supports GitHub status checks that add additional granularity to your build reporting and direct links to uploaded reports.
 
@@ -312,10 +258,6 @@ To enable GitHub status checks via the official GitHub app, [install and authori
 
 Be sure to keep this token secret. Anyone in possession of this token will be able to set status checks on your repository.
 
-#### Personal Access Token Method
+#### Alternative: Personal Access Token Method
 
-To enable GitHub status checks via personal access tokens, [create a token](https://github.com/settings/tokens/new) with the `repo:status` scope and [add it to your environment](https://docs.travis-ci.com/user/environment-variables/#defining-variables-in-repository-settings) as `LHCI_GITHUB_TOKEN`. The next time your `lhci upload` command runs it will also set the results as GitHub status checks!
-
-Be sure to keep this token secret. Anyone in possession of this token will be able to set status checks on your repository.
-
-![screenshot of GitHub personal access token creation form](https://user-images.githubusercontent.com/2301202/66769194-2246d900-ee7a-11e9-9d6c-2b6f78190a63.png)
+If you don't want to use the Github App, you can enable this via a personal access token. The only difference is that your user account (and its avatar) will post a status check. [Create a token](https://github.com/settings/tokens/new) with the `repo:status` scope and [add it to your environment](https://docs.travis-ci.com/user/environment-variables/#defining-variables-in-repository-settings) as `LHCI_GITHUB_TOKEN`.

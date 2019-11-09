@@ -9,6 +9,7 @@ const fs = require('fs');
 const path = require('path');
 const childProcess = require('child_process');
 const _ = require('@lhci/utils/src/lodash.js');
+const {loadRcFile, resolveRcFilePath} = require('@lhci/utils/src/lighthouserc.js');
 
 const BUILD_DIR_PRIORITY = [
   // explicitly a dist version of the site, highly likely to be production assets
@@ -35,14 +36,6 @@ function buildCommand(yargs) {
         'Invididual flags to override the rc-file defaults. e.g. --rc-overrides.collect.numberOfRuns=5',
     },
   });
-}
-
-/** @param {string|undefined} rcFile @return {LHCI.LighthouseRc|undefined} */
-function readRcFile(rcFile) {
-  if (!rcFile) return undefined;
-  const fullyResolvedPath = path.resolve(process.cwd(), rcFile);
-  if (!fs.existsSync(fullyResolvedPath)) return undefined;
-  return JSON.parse(fs.readFileSync(fullyResolvedPath, 'utf8'));
 }
 
 /**
@@ -104,12 +97,13 @@ function getOverrideArgsForCommand(command) {
  * @return {Promise<void>}
  */
 async function runCommand(options) {
-  const rcFile = readRcFile(options.config);
+  const rcFilePath = resolveRcFilePath(options.config);
+  const rcFile = rcFilePath && loadRcFile(rcFilePath);
   if (rcFile && !rcFile.ci) throw new Error('RC file did not contain a root-level "ci" property');
   const ciConfiguration = (rcFile && rcFile.ci) || {};
   _.merge(ciConfiguration, options.rcOverrides || {});
 
-  const defaultFlags = rcFile ? [`--config=${options.config}`] : [];
+  const defaultFlags = options.config ? [`--config=${options.config}`] : [];
   let hasFailure = false;
 
   const healthcheckStatus = runChildCommand('healthcheck', [...defaultFlags, '--fatal']).status;

@@ -6,6 +6,7 @@
 'use strict';
 
 const ApiClient = require('@lhci/utils/src/api-client.js');
+const {loadAndParseRcFile, resolveRcFilePath} = require('@lhci/utils/src/lighthouserc.js');
 const {getCurrentHash, getAncestorHash} = require('@lhci/utils/src/build-context.js');
 const {loadSavedLHRs} = require('@lhci/utils/src/saved-reports.js');
 
@@ -40,6 +41,16 @@ const checks = [
     label: 'Ancestor hash determinable',
     shouldTest: () => true,
     test: () => getAncestorHash().length > 0,
+  },
+  {
+    id: 'rcFile',
+    label: 'Configuration file found',
+    shouldTest: () => true,
+    test: opts => {
+      const rcFile = resolveRcFilePath(opts.config);
+      if (!rcFile) return false;
+      return Boolean(loadAndParseRcFile(rcFile));
+    },
   },
   {
     id: 'githubToken',

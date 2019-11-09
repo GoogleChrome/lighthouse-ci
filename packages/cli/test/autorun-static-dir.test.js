@@ -12,13 +12,12 @@ const {runCLI} = require('./test-utils.js');
 
 describe('Lighthouse CI autorun CLI', () => {
   const autorunDir = path.join(__dirname, 'fixtures/autorun-static-dir');
-  const rcFile = path.join(autorunDir, 'lighthouserc-autorun.json');
 
   it('should run all three steps', () => {
-    const {stdout, stderr, status} = runCLI(
-      ['autorun', `--config=${rcFile}`, '--rc-overrides.collect.numberOfRuns=2'],
-      {cwd: autorunDir}
-    );
+    const {stdout, stderr, status} = runCLI(['autorun', '--rc-overrides.collect.numberOfRuns=2'], {
+      cwd: autorunDir,
+      env: {LHCI_NO_LIGHTHOUSERC: undefined},
+    });
 
     const stdoutClean = stdout
       .replace(/:\d{4,6}/g, ':XXXX')
@@ -28,6 +27,7 @@ describe('Lighthouse CI autorun CLI', () => {
     expect(stdoutClean).toMatchInlineSnapshot(`
       "✅  .lighthouseci/ directory writable
       ✅  Ancestor hash determinable
+      ✅  Configuration file found
       ⚠️   GitHub token set
       Healthcheck passed!
 

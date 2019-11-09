@@ -48,6 +48,7 @@ function runCLI(args, overrides = {}) {
     LHCI_GITHUB_TOKEN: '',
     LHCI_GITHUB_APP_TOKEN: '',
     NO_UPDATE_NOTIFIER: '1',
+    LHCI_NO_LIGHTHOUSERC: '1',
   };
   const env = {...cleanEnv, ...extraEnvVars};
   let {stdout = '', stderr = '', status = -1} = spawnSync(CLI_PATH, args, {...options, env});

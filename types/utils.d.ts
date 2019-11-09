@@ -7,7 +7,7 @@
 declare global {
   namespace LHCI {
     export type YargsOptions = Partial<
-      {extends?: string | undefined} & AssertCommand.Options &
+      {extends?: string | undefined; config?: string} & AssertCommand.Options &
         CollectCommand.Options &
         HealthcheckCommand.Options &
         OpenCommand.Options &

@@ -7,8 +7,13 @@
 'use strict';
 
 const yargs = require('yargs');
+const yargsParser = require('yargs-parser');
 const updateNotifier = require('update-notifier');
-const loadAndParseRcFile = require('@lhci/utils/src/lighthouserc.js').loadAndParseRcFile;
+const {
+  loadAndParseRcFile,
+  hasOptedOutOfRcDetection,
+  findRcFile,
+} = require('@lhci/utils/src/lighthouserc.js');
 const assertCmd = require('./assert/assert.js');
 const autorunCmd = require('./autorun/autorun.js');
 const healthcheckCmd = require('./healthcheck/healthcheck.js');
@@ -21,6 +26,19 @@ const pkg = require('../package.json');
 
 updateNotifier({pkg}).notify({defer: false});
 
+/** @return {[string, (path: string) => LHCI.YargsOptions]|[LHCI.YargsOptions]} */
+function createYargsConfigArguments() {
+  const simpleArgv = yargsParser(process.argv.slice(2), {envPrefix: 'LHCI'});
+  /** @type {[string, (path: string) => LHCI.YargsOptions]} */
+  const configOption = ['config', loadAndParseRcFile];
+  // If they're using the config option or opting out of auto-detection, use the config option.
+  if (simpleArgv.config || hasOptedOutOfRcDetection()) return configOption;
+  const rcFile = findRcFile();
+  // If they don't currently have an rc file, use the config option for awareness.
+  if (!rcFile) return configOption;
+  return [loadAndParseRcFile(rcFile)];
+}
+
 async function run() {
   /** @type {any} */
   const argv = yargs
@@ -28,7 +46,6 @@ async function run() {
     .version(pkg.version)
     .usage('lhci <command> <options>')
     .env('LHCI')
-    .config('config', loadAndParseRcFile)
     .demand(1)
     .command('collect', 'Run Lighthouse and save the results to a local folder', commandYargs =>
       collectCmd.buildCommand(commandYargs)
@@ -53,7 +70,14 @@ async function run() {
     )
     .command('server', 'Run Lighthouse CI server', commandYargs =>
       serverCmd.buildCommand(commandYargs)
-    ).argv;
+    )
+    .option('no-lighthouserc', {
+      type: 'boolean',
+      description: 'Disables automatic usage of a .lighthouserc file.',
+    })
+    // This must appear last because we lose the type of yargs once we do the `ts-ignore`
+    // @ts-ignore - yargs types won't accept our bifurcated type
+    .config(...createYargsConfigArguments()).argv;
 
   switch (argv._[0]) {
     case 'collect':

@@ -178,8 +178,8 @@ const BuildHashSelector_ = props => {
       if (!(target instanceof HTMLElement)) return;
       // Click was within the BuildHashSelector, don't close it.
       if (target.closest('.build-hash-selector')) return;
-      // Click was on a BuildSelectorPill, don't close it.
-      if (target.closest('.build-selector-pill')) return;
+      // Click was on a BuildSelectorHeaderSection, don't close it.
+      if (target.closest('.build-selector-header-section')) return;
       // Click was outside our target area, close it.
       props.close();
     };

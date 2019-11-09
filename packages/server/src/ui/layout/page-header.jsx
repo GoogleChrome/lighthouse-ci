@@ -7,15 +7,9 @@
 import {h, VNode} from 'preact';
 import clsx from 'clsx';
 import './page-header.css';
-import {useProjectBySlug} from '../hooks/use-api-data';
-import {Link} from 'preact-router';
-import {useRouteParams} from '../hooks/use-route-params';
 
-/** @param {{children?: Array<VNode> | VNode, setIsSidebarOpen: (isOpen: boolean) => void}} props */
+/** @param {{children?: Array<VNode> | VNode, childrenRight?: Array<VNode>| VNode, setIsSidebarOpen: (isOpen: boolean) => void}} props */
 export const PageHeader = props => {
-  const {projectSlug} = useRouteParams();
-  const [_, selectedProject] = useProjectBySlug(projectSlug);
-
   return (
     <div className={clsx('page-header')}>
       <div className="page-header__left">
@@ -26,15 +20,14 @@ export const PageHeader = props => {
         >
           <i className="material-icons">menu</i>
         </div>
-        <div className="page-header__current-project">
-          <Link href={selectedProject ? `/app/projects/${selectedProject.slug}` : '#'}>
-            {(selectedProject && selectedProject.name) || 'Lighthouse CI'}
-          </Link>
-        </div>
       </div>
       <div className="page-header__center">{props.children}</div>
-      <div className="page-header__right">
-        <span />
+      <div
+        className={clsx('page-header__right', {
+          'page-header__right--with-content': !!props.childrenRight,
+        })}
+      >
+        {props.childrenRight}
       </div>
     </div>
   );

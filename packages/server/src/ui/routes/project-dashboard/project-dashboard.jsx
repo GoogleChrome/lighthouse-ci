@@ -26,7 +26,7 @@ const ProjectDashboard_ = props => {
     <div className="dashboard">
       <DocumentTitle title={`${project.name} Dashboard`} />
       <Paper className="dashboard__recent-activity">
-        <h2>Recent Activity</h2>
+        <h2>{project.name}</h2>
         <table className="dashboard__build-list">
           {builds.slice(0, 5).map(build => {
             return (

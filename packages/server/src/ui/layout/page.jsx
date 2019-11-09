@@ -11,7 +11,7 @@ import {useState, useEffect} from 'preact/hooks';
 import {PageBody} from './page-body.jsx';
 
 /**
- * @param {{header?: Array<VNode> | VNode, children: VNode | Array<VNode>}} props
+ * @param {{header?: Array<VNode> | VNode, headerRight?: Array<VNode> | VNode, children: VNode | Array<VNode>}} props
  */
 export const Page = props => {
   const [isOpen, setIsOpen] = useState(false);
@@ -34,7 +34,9 @@ export const Page = props => {
 
   return (
     <Fragment>
-      <PageHeader setIsSidebarOpen={setIsOpen}>{props.header}</PageHeader>
+      <PageHeader setIsSidebarOpen={setIsOpen} childrenRight={props.headerRight}>
+        {props.header}
+      </PageHeader>
       <PageSidebar isOpen={isOpen} setIsOpen={setIsOpen} />
       <PageBody>{props.children}</PageBody>
     </Fragment>

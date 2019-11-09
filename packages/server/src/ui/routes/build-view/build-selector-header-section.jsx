@@ -5,7 +5,7 @@
  */
 
 import {h, Fragment} from 'preact';
-import './build-selector-pill.css';
+import './build-selector-header-section.css';
 import clsx from 'clsx';
 import {Pill} from '../../components/pill';
 
@@ -28,13 +28,16 @@ const Selection = props => {
 /**
  * @param {{build: LHCI.ServerCommand.Build | null, variant: 'base'|'compare', isOpen?: boolean, isDimmed?: boolean, onClick?: () => void}} props
  */
-export const BuildSelectorPill = props => {
+export const BuildSelectorHeaderSection = props => {
   return (
     <div
-      className={clsx(`build-selector-pill build-selector-pill--${props.variant}`, {
-        'build-selector-pill--open': props.isOpen,
-        'build-selector-pill--dim': props.isDimmed,
-      })}
+      className={clsx(
+        `build-selector-header-section build-selector-header-section--${props.variant}`,
+        {
+          'build-selector-header-section--open': props.isOpen,
+          'build-selector-header-section--dim': props.isDimmed,
+        }
+      )}
       onClick={props.onClick}
     >
       {props.build ? (

@@ -17,7 +17,7 @@ import {
   useProjectBySlug,
 } from '../../hooks/use-api-data';
 import {BuildHashSelector} from './build-hash-selector';
-import {BuildSelectorPill} from './build-selector-pill';
+import {BuildSelectorHeaderSection} from './build-selector-header-section';
 import {AuditDetailPane} from './audit-detail/audit-detail-pane';
 import {Page} from '../../layout/page';
 import {BuildScoreComparison} from './build-score-comparison';
@@ -27,7 +27,7 @@ import './build-view.css';
 import {BuildViewLegend} from './build-view-legend';
 import clsx from 'clsx';
 import {findAuditDiffs, getDiffSeverity} from '@lhci/utils/src/audit-diff-finder';
-import {route} from 'preact-router';
+import {route, Link} from 'preact-router';
 import {BuildViewOptions} from './build-view-options';
 import {BuildViewWarnings} from './build-view-warnings';
 import {DocumentTitle} from '../../components/document-title';
@@ -208,14 +208,14 @@ const BuildView_ = props => {
     <Page
       header={
         <Fragment>
-          <BuildSelectorPill
+          <BuildSelectorHeaderSection
             build={props.ancestorBuild}
             variant="base"
             isDimmed={openBuildHash === 'compare'}
             isOpen={openBuildHash === 'base'}
             onClick={() => setOpenBuild(openBuildHash === 'base' ? null : 'base')}
           />
-          <BuildSelectorPill
+          <BuildSelectorHeaderSection
             build={props.build}
             variant="compare"
             isDimmed={openBuildHash === 'base'}
@@ -223,6 +223,11 @@ const BuildView_ = props => {
             onClick={() => setOpenBuild(openBuildHash === 'compare' ? null : 'compare')}
           />
         </Fragment>
+      }
+      headerRight={
+        <Link href={`/app/projects/${props.project.slug}`}>
+          <i className="material-icons">show_chart</i>
+        </Link>
       }
     >
       <DocumentTitle title={`Compare "${props.build.commitMessage}"`} />

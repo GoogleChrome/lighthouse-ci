@@ -57,6 +57,7 @@ declare global {
       id: string;
       score: number;
       title: string;
+      description?: string;
       auditRefs: Array<{id: string; weight: number; group?: string}>;
     }
 

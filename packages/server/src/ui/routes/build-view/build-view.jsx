@@ -38,15 +38,19 @@ import {LoadingSpinner} from '../../components/loading-spinner';
  * @param {{percentAbsoluteDeltaThreshold: number}} options
  * @return {Array<AuditGroupDef>}
  */
-function computeAuditGroups(lhr, baseLhr, options) {
+export function computeAuditGroups(lhr, baseLhr, options) {
   /** @type {Array<IntermediateAuditGroupDef|undefined>} */
-  const rawAuditGroups = Object.values(lhr.categories)
-    .map(category => {
+  const rawAuditGroups = Object.entries(lhr.categories)
+    .map(([categoryId, category]) => {
       const auditRefsGroupedByGroup = _.groupBy(category.auditRefs, ref => ref.group);
       return auditRefsGroupedByGroup.map(auditRefGroup => {
-        const groupId = auditRefGroup[0].group || '';
-        const group = lhr.categoryGroups && lhr.categoryGroups[groupId];
-        if (!group) return;
+        let groupId = auditRefGroup[0].group || '';
+        let group = lhr.categoryGroups && lhr.categoryGroups[groupId];
+        if (!group) {
+          if (auditRefsGroupedByGroup.length !== 1) return;
+          groupId = `category:${categoryId}`;
+          group = {title: category.title, description: category.description};
+        }
 
         const audits = auditRefGroup
           .map(ref => ({...lhr.audits[ref.id], id: ref.id}))

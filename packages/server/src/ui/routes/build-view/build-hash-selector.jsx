@@ -164,12 +164,14 @@ const BuildHashSelector_ = props => {
   );
 
   const indexOfFirstDev =
-    builds.length -
-    1 -
-    builds
-      .slice()
-      .reverse()
-      .findIndex(build => build.branch === props.build.branch);
+    props.build.branch === 'master'
+      ? -10
+      : builds.length -
+        1 -
+        builds
+          .slice()
+          .reverse()
+          .findIndex(build => build.branch === props.build.branch);
 
   useEffect(() => {
     /** @param {MouseEvent} evt */

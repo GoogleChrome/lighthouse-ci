@@ -182,36 +182,18 @@ export function useAncestorBuild(projectId, buildId) {
 
 /**
  * @param {string|undefined} projectId
- * @param {{ancestorHash?: string} | undefined} build
+ * @param {string|null|undefined} buildId
  * @return {[LoadingState, LHCI.ServerCommand.Build | null | undefined]}
  */
-export function useOptionalBuildByHash(projectId, build) {
-  // Construct this options object in a `useMemo` to prevent infinitely re-requesting.
-  const getBuildsOptions = useMemo(() => build && {hash: build.ancestorHash}, [
-    build && build.ancestorHash,
-  ]);
-  const [apiLoadingState, builds] = useApiData(
-    'getBuilds',
-    projectId && build && build.ancestorHash ? [projectId, getBuildsOptions] : undefined
+export function useOptionalBuildById(projectId, buildId) {
+  const buildData = useApiData(
+    'findBuildById',
+    projectId && buildId ? [projectId, buildId] : undefined
   );
 
-  let loadingState = apiLoadingState;
-  /** @type {LHCI.ServerCommand.Build | null | undefined} */
-  let ancestorBuild = undefined;
-  // If there was no hash to lookup in the first place or there were no matching builds...
-  // Then it's "loaded" and the result is just `null`.
-  if ((build && !build.ancestorHash) || (builds && !builds.length)) {
-    ancestorBuild = null;
-    loadingState = 'loaded';
-  }
-  // If there were matching builds,
-  // Then it's "loaded" and the result is the first matched build (which would be the most recent in default API sorting)
-  if (builds && builds.length) {
-    ancestorBuild = builds[0];
-    loadingState = 'loaded';
-  }
-
-  return [loadingState, ancestorBuild];
+  // If there was no id to lookup in the first place then it's just loaded.
+  if (buildId === null) return ['loaded', null];
+  return buildData;
 }
 
 /**

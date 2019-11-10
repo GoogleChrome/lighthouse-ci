@@ -11,7 +11,7 @@ import {AsyncLoader, combineLoadingStates, combineAsyncData} from '../../compone
 import {Dropdown} from '../../components/dropdown';
 import {
   useBuild,
-  useOptionalBuildByHash,
+  useOptionalBuildById,
   useOptionalBuildRepresentativeRuns,
   useAncestorBuild,
   useProjectBySlug,
@@ -307,7 +307,7 @@ const BuildView_ = props => {
   );
 };
 
-/** @param {{projectSlug: string, partialBuildId: string, baseHash?: string, compareUrl?: string}} props */
+/** @param {{projectSlug: string, partialBuildId: string, baseBuild?: string, compareUrl?: string}} props */
 export const BuildView = props => {
   const projectLoadingData = useProjectBySlug(props.projectSlug);
   const projectId = projectLoadingData[1] && projectLoadingData[1].id;
@@ -315,13 +315,10 @@ export const BuildView = props => {
   const buildId = buildLoadingData[1] && buildLoadingData[1].id;
   const ancestorBuildData = useAncestorBuild(projectId, buildId);
 
-  const baseOverrideOptions = props.baseHash ? {ancestorHash: props.baseHash} : buildLoadingData[1];
-  const baseOverrideData = useOptionalBuildByHash(projectId, baseOverrideOptions);
+  const baseOverrideOptions = props.baseBuild ? props.baseBuild : null;
+  const baseOverrideData = useOptionalBuildById(projectId, baseOverrideOptions);
 
-  const baseBuildData =
-    props.baseHash || (ancestorBuildData[0] === 'loaded' && !ancestorBuildData[1])
-      ? baseOverrideData
-      : ancestorBuildData;
+  const baseBuildData = props.baseBuild ? baseOverrideData : ancestorBuildData;
   const baseBuildId = baseBuildData[1] && baseBuildData[1].id;
 
   const runData = useOptionalBuildRepresentativeRuns(projectId, buildId, null);
@@ -360,7 +357,7 @@ export const BuildView = props => {
           compareUrl={props.compareUrl}
           ancestorBuild={ancestorBuild}
           runs={runs.concat(baseRuns)}
-          hasBaseOverride={!!props.baseHash}
+          hasBaseOverride={!!props.baseBuild}
         />
       )}
     />

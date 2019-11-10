@@ -104,11 +104,11 @@ const BuildLineItem = props => {
         const url = new URL(window.location.href);
 
         if (selector === 'base') {
-          url.searchParams.set('baseHash', build.hash);
+          url.searchParams.set('baseBuild', build.id);
         } else {
-          url.searchParams.delete('baseHash');
-          if (baseBuild) url.searchParams.set('baseHash', baseBuild.hash);
-          url.pathname = url.pathname.replace(compareBuild.id, build.id);
+          url.searchParams.delete('baseBuild');
+          if (baseBuild) url.searchParams.set('baseBuild', baseBuild.id);
+          url.pathname = url.pathname.replace(/compare\/\w+$/, `compare/${build.id.split('-')[0]}`);
         }
 
         window.location.href = url.href;

@@ -185,7 +185,7 @@ export const ProjectGraphs = props => {
         .filter(build => build.branch === branch)
         .sort((a, b) => new Date(b.runAt).getTime() - new Date(a.runAt).getTime())
         .map(build => build.id)
-        .slice(0, 8),
+        .slice(0, 20),
     [builds, branch]
   );
   const [loadingState, stats] = useBuildStatistics(project.id, buildIds);

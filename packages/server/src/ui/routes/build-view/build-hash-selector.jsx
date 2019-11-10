@@ -220,8 +220,8 @@ const BuildHashSelector_ = props => {
  * @param {{build: LHCI.ServerCommand.Build, ancestorBuild?: LHCI.ServerCommand.Build | null, selector: 'base'|'compare', lhr: LH.Result, baseLhr?: LH.Result, close: () => void}} props
  */
 export const BuildHashSelector = props => {
-  const branchLoadingData = useBranchBuilds(props.build.projectId, props.build.branch, {limit: 10});
-  const baseLoadingData = useBranchBuilds(props.build.projectId, 'master', {limit: 10});
+  const branchLoadingData = useBranchBuilds(props.build.projectId, props.build.branch, {limit: 100});
+  const baseLoadingData = useBranchBuilds(props.build.projectId, 'master', {limit: 100});
   return (
     <div className="build-hash-selector">
       <AsyncLoader

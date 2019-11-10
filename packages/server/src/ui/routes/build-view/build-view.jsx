@@ -30,6 +30,7 @@ import {findAuditDiffs, getDiffSeverity} from '@lhci/utils/src/audit-diff-finder
 import {route, Link} from 'preact-router';
 import {BuildViewWarnings} from './build-view-warnings';
 import {DocumentTitle} from '../../components/document-title';
+import {LoadingSpinner} from '../../components/loading-spinner';
 
 /**
  * @param {LH.Result} lhr
@@ -349,7 +350,7 @@ export const BuildView = props => {
       )}
       renderLoading={() => (
         <Page>
-          <h1>Loading...</h1>
+          <LoadingSpinner />
         </Page>
       )}
       render={([project, build, ancestorBuild, runs, baseRuns]) => (

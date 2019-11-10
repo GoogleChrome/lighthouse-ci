@@ -6,6 +6,7 @@
 
 import {h} from 'preact';
 import {Redirect} from './redirect.jsx';
+import {LoadingSpinner} from './loading-spinner.jsx';
 
 /** @typedef {import('../hooks/use-api-data').LoadingState} LoadingState */
 
@@ -20,7 +21,7 @@ export const AsyncLoader = props => {
   } else if (loadingState === 'error') {
     return <h1>Lighthouse Error</h1>;
   } else if (loadingState === 'loading') {
-    return renderLoading ? renderLoading() : <h1>Loading...</h1>;
+    return renderLoading ? renderLoading() : <LoadingSpinner />;
   }
 
   return null;

@@ -25,6 +25,7 @@
 }
 
 .getting-started img {
+  height: 80px;
   width: 80px;
   margin-bottom: calc(var(--base-spacing) * 2);
 }

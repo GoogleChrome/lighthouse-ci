@@ -60,6 +60,9 @@
 }
 
 .pill__avatar {
+  height: var(--pill-content-height);
+  width: var(--pill-content-height);
+
   border-radius: 100%;
   margin-left: -5px;
   margin-right: calc(var(--base-spacing) / 2);

@@ -10,8 +10,7 @@ import LazyRoute from 'preact-async-route';
 import {Redirect} from './components/redirect.jsx';
 import './app.css';
 import {Page} from './layout/page.jsx';
-
-const Loader = () => <h1>Loading route...</h1>;
+import {LoadingSpinner} from './components/loading-spinner.jsx';
 
 export const App = () => {
   return (
@@ -21,7 +20,7 @@ export const App = () => {
           path="/app/projects"
           loading={() => (
             <Page>
-              <Loader />
+              <LoadingSpinner />
             </Page>
           )}
           getComponent={() =>
@@ -32,7 +31,7 @@ export const App = () => {
           path="/app/projects/:projectSlug"
           loading={() => (
             <Page>
-              <Loader />
+              <LoadingSpinner />
             </Page>
           )}
           getComponent={() =>
@@ -43,7 +42,7 @@ export const App = () => {
           path="/app/projects/:projectSlug/compare/:partialBuildId"
           loading={() => (
             <Page>
-              <Loader />
+              <LoadingSpinner />
             </Page>
           )}
           getComponent={() => import('./routes/build-view/build-view.jsx').then(m => m.BuildView)}

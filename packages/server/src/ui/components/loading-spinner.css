@@ -4,28 +4,17 @@
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
  */
 
-.lhr-viewer-button {
-  background: var(--highlighted-background-color);
-  border-radius: 3px;
-  padding: calc(var(--base-spacing) / 2);
-  padding-right: var(--base-spacing);
-  margin-right: var(--base-spacing);
+.loading-spinner--container {
+  width: 100%;
+  min-height: 300px;
 
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
 }
 
-.lhr-viewer-button img {
-  height: 20px;
-  width: 20px;
-  margin-right: calc(var(--base-spacing) / 2);
-}
-
-.lhr-viewer-button {
-  color: var(--base-text-color);
-  font-weight: var(--medium-font-weight);
-  overflow: hidden;
-  white-space: nowrap;
+.loading-spinner svg {
+  width: 100px;
+  height: 100px;
 }

@@ -15,6 +15,7 @@ import {Plot} from '../../components/plot.jsx';
 import './project-graphs.css';
 import {Dropdown} from '../../components/dropdown';
 import {route} from 'preact-router';
+import {LoadingSpinner} from '../../components/loading-spinner';
 
 const COLORS = ['#4587f4', '#f44587', '#87f445'];
 
@@ -61,6 +62,11 @@ const StatisticPlot = props => {
     <AsyncLoader
       loadingState={props.loadingState}
       asyncData={props.statistics}
+      renderLoading={() => (
+        <Paper className="dashboard-graph">
+          <LoadingSpinner />
+        </Paper>
+      )}
       render={allStats => {
         const noDataToDisplay = <Paper className="dashboard-graph">No data to display</Paper>;
         if (allStats.length === 0) {

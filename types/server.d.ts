@@ -68,6 +68,7 @@ declare global {
         id: string;
         projectId: string;
         buildId: string;
+        version: number;
         url: string;
         name: StatisticName;
         value: number;

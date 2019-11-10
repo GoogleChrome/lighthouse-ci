@@ -8,7 +8,10 @@
 const _ = require('@lhci/utils/src/lodash.js');
 const PRandom = require('@lhci/utils/src/seed-data/prandom.js');
 const {computeRepresentativeRuns} = require('@lhci/utils/src/representative-runs.js');
-const statisticDefinitions = require('../statistic-definitions.js');
+const {
+  definitions: statisticDefinitions,
+  VERSION: STATISTIC_VERSION,
+} = require('../statistic-definitions.js');
 
 class StorageMethod {
   /**
@@ -254,6 +257,7 @@ class StorageMethod {
                 projectId,
                 buildId,
                 url,
+                version: STATISTIC_VERSION,
                 name,
                 value,
               },

@@ -184,6 +184,8 @@ class SqlStorageMethod {
     if (!buildModelDefn.attributes.projectId.references) throw new Error('Invalid buildModel');
     if (!runModelDefn.attributes.projectId.references) throw new Error('Invalid runModel');
     if (!runModelDefn.attributes.buildId.references) throw new Error('Invalid runModel');
+    if (!statisticModelDefn.attributes.projectId.references) throw new Error('Invalid runModel');
+    if (!statisticModelDefn.attributes.buildId.references) throw new Error('Invalid runModel');
 
     const sequelize = createSequelize(options);
 

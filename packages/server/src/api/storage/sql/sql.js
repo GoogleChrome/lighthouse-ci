@@ -317,7 +317,11 @@ class SqlStorageMethod {
     const {buildModel} = this._sql();
     if (unsavedBuild.lifecycle !== 'unsealed') throw new E422('Invalid lifecycle value');
 
-    const existingWhere = {projectId: unsavedBuild.projectId, hash: unsavedBuild.hash};
+    const existingWhere = {
+      projectId: unsavedBuild.projectId,
+      branch: unsavedBuild.branch,
+      hash: unsavedBuild.hash,
+    };
     const existingForHash = await buildModel.findOne({where: existingWhere});
     if (existingForHash) throw new E422(`Build already exists for hash "${unsavedBuild.hash}"`);
 
@@ -408,7 +412,7 @@ class SqlStorageMethod {
 
     if (build.ancestorHash) {
       const ancestorsByHash = await this._findAll(buildModel, {
-        where: {projectId: build.projectId, hash: build.ancestorHash},
+        where: {projectId: build.projectId, branch: 'master', hash: build.ancestorHash},
         limit: 1,
       });
 

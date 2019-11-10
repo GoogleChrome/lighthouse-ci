@@ -378,6 +378,42 @@ function runTests(state) {
       ancestor = await client.findAncestorBuildById(project.id, implicitPriorAncestorBuild.id);
       expect(ancestor).toEqual(undefined);
     });
+
+    it('should find a build with an ancestor hash duplicate of branch hash', async () => {
+      const project = await client.createProject(projectA);
+      const branchBuild = await client.createBuild({
+        ...buildA,
+        hash: 'hash-1',
+        commitMessage: 'Merge commit - branch PR build',
+        projectId: project.id,
+        branch: 'feature_branch',
+        runAt: new Date('2019-09-02').toISOString(),
+      });
+      const masterBuild = await client.createBuild({
+        ...buildA,
+        hash: 'hash-1',
+        commitMessage: 'Merge commit - master build',
+        projectId: project.id,
+        branch: 'master',
+        runAt: new Date('2019-09-01').toISOString(),
+      });
+      const newBranchBuild = await client.createBuild({
+        ...buildA,
+        hash: 'hash-2',
+        ancestorHash: 'hash-1',
+        commitMessage: 'Branch commit',
+        projectId: project.id,
+        branch: 'feature_branch_2',
+        runAt: new Date('2019-09-03').toISOString(),
+      });
+
+      let ancestor = await client.findAncestorBuildById(project.id, branchBuild.id);
+      expect(ancestor).toEqual(masterBuild);
+      ancestor = await client.findAncestorBuildById(project.id, masterBuild.id);
+      expect(ancestor).toEqual(undefined);
+      ancestor = await client.findAncestorBuildById(project.id, newBranchBuild.id);
+      expect(ancestor).toEqual(masterBuild);
+    });
   });
 
   describe('/:projectId/builds/:buildId/runs', () => {

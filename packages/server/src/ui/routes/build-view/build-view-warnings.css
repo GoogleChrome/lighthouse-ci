@@ -24,6 +24,5 @@
 
 .build-view-warning__lhr-link {
   cursor: pointer;
-  text-align: center;
   color: var(--improvement-color);
 }

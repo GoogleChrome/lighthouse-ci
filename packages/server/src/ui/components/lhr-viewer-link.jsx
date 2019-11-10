@@ -5,13 +5,14 @@
  */
 
 import {h} from 'preact';
+import clsx from 'clsx';
 
 /** @param {{children: string|JSX.Element|JSX.Element[], lhr: LH.Result, className?: string}} props */
 export const LhrViewerLink = props => {
   const {children, lhr} = props;
   return (
     <span
-      className={props.className}
+      className={clsx('lhr-viewer-link', props.className)}
       onClick={evt => {
         evt.preventDefault();
         evt.stopImmediatePropagation();

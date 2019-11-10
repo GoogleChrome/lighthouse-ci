@@ -15,7 +15,7 @@ export const BuildViewWarnings = props => {
 
   const lhrLinkEl = (
     <Fragment>
-      <LhrViewerLink className="build-view-empty__lhr-link" lhr={props.lhr}>
+      <LhrViewerLink className="build-view-warning__lhr-link" lhr={props.lhr}>
         jump straight to the Lighthouse report.
       </LhrViewerLink>
     </Fragment>

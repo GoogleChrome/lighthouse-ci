@@ -134,7 +134,7 @@ const BuildLineItem = props => {
           withDevLine={props.withDevLine}
         />
         <Pill variant={variant} avatar={build}>
-          <span className="build-hash-selector__hash">{build.hash.slice(0, 8)}</span>
+          <span className="build-hash-selector__hash">{build.hash.slice(0, 7)}</span>
         </Pill>{' '}
         <span className="build-hash-selector__commit">{build.commitMessage}</span>
         <span className="build-hash-selector__links">

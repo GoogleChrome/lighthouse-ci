@@ -234,7 +234,7 @@ describe('Lighthouse CI CLI', () => {
       `);
       expect(stderr).toMatchInlineSnapshot(`""`);
       expect(status).toEqual(0);
-      expect(uuids).toHaveLength(6);
+      expect(uuids).toHaveLength(5);
     });
 
     it('should have saved lhrs to the API', async () => {

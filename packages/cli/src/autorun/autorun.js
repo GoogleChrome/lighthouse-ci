@@ -128,7 +128,7 @@ async function runCommand(options) {
   // We'll run upload only if they've configured the upload command
   if (ciConfiguration.upload) {
     const uploadStatus = runChildCommand('upload', defaultFlags).status;
-    if (uploadStatus !== 0) process.exit(uploadStatus);
+    if (uploadStatus !== 0) process.stderr.write(`WARNING: upload command failed.\n`);
   }
 
   if (hasFailure) {
@@ -136,7 +136,7 @@ async function runCommand(options) {
     process.exit(1);
   }
 
-  process.stderr.write(`Done running autorun.\n`);
+  process.stdout.write(`Done running autorun.\n`);
 }
 
 module.exports = {buildCommand, runCommand};

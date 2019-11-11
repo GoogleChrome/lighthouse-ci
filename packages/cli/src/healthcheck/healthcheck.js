@@ -7,7 +7,11 @@
 
 const ApiClient = require('@lhci/utils/src/api-client.js');
 const {loadAndParseRcFile, resolveRcFilePath} = require('@lhci/utils/src/lighthouserc.js');
-const {getCurrentHash, getAncestorHash} = require('@lhci/utils/src/build-context.js');
+const {
+  getCurrentHash,
+  getAncestorHash,
+  getCurrentBranch,
+} = require('@lhci/utils/src/build-context.js');
 const {loadSavedLHRs} = require('@lhci/utils/src/saved-reports.js');
 
 const PASS_ICON = '✅';
@@ -60,6 +64,7 @@ const checks = [
     test: opts => Boolean(opts.githubToken || opts.githubAppToken),
   },
   {
+    id: 'lhciServer',
     label: 'LHCI server reachable',
     // the test only makes sense if they've configured an LHCI server
     shouldTest: opts => !!opts.serverBaseUrl,
@@ -67,6 +72,7 @@ const checks = [
       (await new ApiClient({rootURL: serverBaseUrl}).getVersion()).length > 0,
   },
   {
+    id: 'lhciServer',
     label: 'LHCI server token valid',
     // the test only makes sense if they've configured an LHCI server
     shouldTest: opts => Boolean(opts.serverBaseUrl && opts.token),
@@ -77,6 +83,7 @@ const checks = [
     },
   },
   {
+    id: 'lhciServer',
     label: 'LHCI server unique build for this hash',
     // the test only makes sense if they've configured an LHCI server
     shouldTest: opts => Boolean(opts.serverBaseUrl && opts.token),
@@ -84,7 +91,10 @@ const checks = [
       const client = new ApiClient({rootURL: serverBaseUrl});
       const project = await client.findProjectByToken(token);
       if (!project) return true;
-      const builds = await client.getBuilds(project.id, {hash: getCurrentHash()});
+      const builds = await client.getBuilds(project.id, {
+        branch: getCurrentBranch(),
+        hash: getCurrentHash(),
+      });
       return builds.length === 0;
     },
   },

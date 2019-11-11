@@ -105,7 +105,7 @@ const StatisticPlot = props => {
               onClick={({points}) => {
                 const currentUrl = new URL(window.location.href);
                 const x = points[0].x;
-                const to = `${currentUrl.pathname}/compare/${builds[x].id.split('-')[0]}`;
+                const to = `${currentUrl.pathname}/compare/${_.shortId(builds[x].id)}`;
                 route(to);
               }}
               data={ys.map((yVals, i) => ({

@@ -108,7 +108,7 @@ const BuildLineItem = props => {
         } else {
           url.searchParams.delete('baseBuild');
           if (baseBuild) url.searchParams.set('baseBuild', baseBuild.id);
-          url.pathname = url.pathname.replace(/compare\/\w+$/, `compare/${build.id.split('-')[0]}`);
+          url.pathname = url.pathname.replace(/compare\/\w+$/, `compare/${_.shortId(build.id)}`);
         }
 
         window.location.href = url.href;

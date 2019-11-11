@@ -33,7 +33,7 @@ const ProjectDashboard_ = props => {
               <tr
                 key={build.id}
                 onClick={() =>
-                  route(`/app/projects/${project.slug}/compare/${build.id.split('-')[0]}`)
+                  route(`/app/projects/${project.slug}/compare/${_.shortId(build.id)}`)
                 }
               >
                 <td className="build-list__hash" data-tooltip={build.author}>

@@ -179,4 +179,8 @@ module.exports = {
 
     return out;
   },
+  /** @param {string} uuid */
+  shortId(uuid) {
+    return uuid.replace(/-/g, '').slice(0, 12);
+  },
 };

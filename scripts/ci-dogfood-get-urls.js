@@ -5,6 +5,7 @@
  */
 'use strict';
 
+const _ = require('@lhci/utils/src/lodash.js');
 const ApiClient = require('@lhci/utils/src/api-client.js');
 
 async function main() {
@@ -22,7 +23,7 @@ async function main() {
     [
       new URL(`/app`, rootURL),
       new URL(`/app/projects/${project.slug}`, rootURL),
-      new URL(`/app/projects/${project.slug}/compare/${build.id.split('-')[0]}`, rootURL),
+      new URL(`/app/projects/${project.slug}/compare/${_.shortId(build.id)}`, rootURL),
     ].join('\n')
   );
 

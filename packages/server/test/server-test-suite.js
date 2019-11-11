@@ -7,6 +7,7 @@
 
 /* eslint-env jest */
 
+const _ = require('@lhci/utils/src/lodash.js');
 const ApiClient = require('@lhci/utils/src/api-client.js');
 const fetch = require('isomorphic-fetch');
 
@@ -223,7 +224,7 @@ function runTests(state) {
     });
 
     it('should find a specific build by partial id', async () => {
-      const build = await client.findBuildById(buildA.projectId, buildA.id.split('-')[0]);
+      const build = await client.findBuildById(buildA.projectId, _.shortId(buildA.id));
       expect(build).toEqual(buildA);
     });
 
@@ -280,7 +281,7 @@ function runTests(state) {
       }
 
       const build = findBuildWith0();
-      const buildPrefix = build.id.split('-')[0];
+      const buildPrefix = _.shortId(build.id);
       expect(await client.findBuildById(dummyProject.id, buildPrefix)).toEqual(build);
     });
   });

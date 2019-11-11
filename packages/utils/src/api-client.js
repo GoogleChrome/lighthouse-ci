@@ -299,6 +299,16 @@ class ApiClient {
     throw new Error('Unimplemented');
   }
 
+  /**
+   * @param {string} projectId
+   * @param {string} buildId
+   * @return {Promise<void>}
+   */
+  // eslint-disable-next-line no-unused-vars
+  async _invalidateStatistics(projectId, buildId) {
+    throw new Error('Unimplemented');
+  }
+
   async close() {}
 }
 

@@ -23,7 +23,7 @@ describe('sqlite server', () => {
   beforeAll(async () => {
     if (fs.existsSync(dbPath)) fs.unlinkSync(dbPath);
 
-    const {port, close} = await runServer({
+    const {port, close, storageMethod} = await runServer({
       logLevel: 'silent',
       port: 0,
       storage: {
@@ -35,6 +35,7 @@ describe('sqlite server', () => {
 
     state.port = port;
     state.closeServer = close;
+    state.storageMethod = storageMethod;
   });
 
   afterAll(() => {

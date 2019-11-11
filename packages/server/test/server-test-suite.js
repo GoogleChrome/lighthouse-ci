@@ -666,6 +666,30 @@ function runTests(state) {
         },
       ]);
     });
+
+    it('should not recompute on every call', async () => {
+      const stat1 = await client.getStatistics(projectA.id, buildA.id);
+      const stat2 = await client.getStatistics(projectA.id, buildA.id);
+
+      for (const pre of stat1) {
+        const post = stat2.find(stat => stat.url === pre.url && stat.name === pre.name);
+        expect(post).toEqual(pre); // ensure that updatedAt has not changed
+      }
+    });
+
+    it('should invalidate statistics and get updated statistics', async () => {
+      const preInvalidated = await client.getStatistics(projectA.id, buildA.id);
+      await state.storageMethod._invalidateStatistics(projectA.id, buildA.id);
+      const postInvalidated = await client.getStatistics(projectA.id, buildA.id);
+
+      for (const pre of preInvalidated) {
+        const post = postInvalidated.find(stat => stat.url === pre.url && stat.name === pre.name);
+        expect({...post, updatedAt: ''}).toEqual({...pre, updatedAt: ''});
+        expect(new Date(post.updatedAt).getTime()).toBeGreaterThan(
+          new Date(pre.updatedAt).getTime()
+        );
+      }
+    });
   });
 
   describe('/:projectId/urls', () => {

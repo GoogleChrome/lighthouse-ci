@@ -200,6 +200,16 @@ class StorageMethod {
   }
 
   /**
+   * @param {string} projectId
+   * @param {string} buildId
+   * @return {Promise<void>}
+   */
+  // eslint-disable-next-line no-unused-vars
+  async _invalidateStatistics(projectId, buildId) {
+    throw new Error('Unimplemented');
+  }
+
+  /**
    * @param {StorageMethod} storageMethod
    * @param {string} projectId
    * @param {string} buildId
@@ -214,7 +224,10 @@ class StorageMethod {
     const urls = await storageMethod.getUrls(projectId, buildId);
     const statisicDefinitionEntries = Object.entries(statisticDefinitions);
     const existingStatistics = await storageMethod._getStatistics(projectId, buildId);
-    if (existingStatistics.length === urls.length * statisicDefinitionEntries.length) {
+    if (
+      existingStatistics.length === urls.length * statisicDefinitionEntries.length &&
+      existingStatistics.every(stat => stat.version === STATISTIC_VERSION)
+    ) {
       return existingStatistics;
     }
 
@@ -250,7 +263,7 @@ class StorageMethod {
             const existing = existingStatistics.find(
               s => s.name === name && s.value === value && s.url === url
             );
-            if (existing) return existing;
+            if (existing && existing.version === STATISTIC_VERSION) return existing;
 
             return storageMethod._createOrUpdateStatistic(
               {

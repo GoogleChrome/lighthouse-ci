@@ -114,6 +114,14 @@ function createUmzug(sequelize, options) {
   });
 }
 
+/**
+ * @param {LHCI.ServerCommand.Statistic} statistic
+ * @return {LHCI.ServerCommand.Statistic}
+ */
+function normalizeStatistic(statistic) {
+  return {...statistic, version: Number(statistic.version), value: Number(statistic.value)};
+}
+
 /** @typedef {LHCI.ServerCommand.TableAttributes<LHCI.ServerCommand.Project>} ProjectAttrs */
 /** @typedef {LHCI.ServerCommand.TableAttributes<LHCI.ServerCommand.Build>} BuildAttrs */
 /** @typedef {LHCI.ServerCommand.TableAttributes<LHCI.ServerCommand.Run>} RunAttrs */
@@ -534,7 +542,7 @@ class SqlStorageMethod {
       statistic = await statisticModel.create({...unsavedStatistic, id: uuid.v4()}, {transaction});
     }
 
-    return clone(statistic);
+    return normalizeStatistic(clone(statistic));
   }
 
   /**
@@ -545,7 +553,17 @@ class SqlStorageMethod {
   async _getStatistics(projectId, buildId) {
     const {statisticModel} = this._sql();
     const statistics = await this._findAll(statisticModel, {where: {projectId, buildId}, order});
-    return clone(statistics);
+    return clone(statistics).map(normalizeStatistic);
+  }
+
+  /**
+   * @param {string} projectId
+   * @param {string} buildId
+   * @return {Promise<void>}
+   */
+  async _invalidateStatistics(projectId, buildId) {
+    const {statisticModel} = this._sql();
+    await statisticModel.update({version: 0}, {where: {projectId, buildId}});
   }
 }
 

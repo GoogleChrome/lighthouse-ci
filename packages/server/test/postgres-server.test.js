@@ -22,7 +22,7 @@ describe('postgres server', () => {
   };
 
   beforeAll(async () => {
-    const {port, close} = await runServer({
+    const {port, close, storageMethod} = await runServer({
       logLevel: 'silent',
       port: 0,
       storage: {
@@ -36,6 +36,7 @@ describe('postgres server', () => {
 
     state.port = port;
     state.closeServer = close;
+    state.storageMethod = storageMethod;
   });
 
   afterAll(() => {

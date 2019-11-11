@@ -246,7 +246,7 @@ async function runLHCITarget(options) {
   const targetUrlMap = new Map();
 
   const buildViewUrl = new URL(
-    `/app/projects/${build.projectId}/builds/${build.id}`,
+    `/app/projects/${project.slug}/compare/${build.id}`,
     options.serverBaseUrl
   );
 

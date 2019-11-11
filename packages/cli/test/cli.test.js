@@ -228,7 +228,7 @@ describe('Lighthouse CI CLI', () => {
         Saved LHR to http://localhost<PORT> (<UUID>)
         Saved LHR to http://localhost<PORT> (<UUID>)
         Done saving build results to Lighthouse CI
-        View build diff at http://localhost<PORT>/app/projects/<UUID>/builds/<UUID>
+        View build diff at http://localhost<PORT>/app/projects/awesomeciprojectname/builds/<UUID>
         No GitHub token set, skipping.
         "
       `);

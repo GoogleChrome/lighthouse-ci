@@ -228,7 +228,7 @@ Once the server is set up, create a a new project with the lhci wizard:
 ```bash
 $ lhci wizard
 ? Which wizard do you want to run? new-project
-? What is the URL of your LHCI server? http://url-of-your-lhci-server.com/
+? What is the URL of your LHCI server? https://your-lhci-server.example.com/
 ? What would you like to name the project? My Favorite Project
 ? Where is the project's code hosted? https://github.com/GoogleChrome/lighthouse-ci
 

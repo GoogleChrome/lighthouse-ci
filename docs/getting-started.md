@@ -31,7 +31,7 @@ node_js:
 addons:
   chrome: stable # make sure to have Chrome available
 before_install:
-  - npm install -g @lhci/cli@0.3.0-alpha.0 # install LHCI
+  - npm install -g @lhci/cli@0.3.x # install LHCI
 script:
   - npm run build # build your site
   - npm test # run your normal tests
@@ -66,7 +66,7 @@ fi
 
 npm run deploy
 
-npm install -g @lhci/cli@0.3.0-alpha.0
+npm install -g @lhci/cli@0.3.x
 lhci healthcheck --fatal
 lhci collect --url=http://localhost:9000/index.html
 lhci assert --preset="lighthouse:recommended"
@@ -158,7 +158,7 @@ Now that we have our environment ready, time to run Lighthouse CI. The `collect`
 
 # Install Lighthouse CI
 # If you're already using node to manage your project, add it to your package.json `devDependencies` instead to skip this step.
-npm install -g @lhci/cli@0.3.0-alpha.0
+npm install -g @lhci/cli@0.3.x
 
 # Run a healthcheck to make sure everything looks good before we run collection.
 lhci healthcheck --fatal

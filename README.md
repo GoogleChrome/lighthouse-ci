@@ -28,7 +28,7 @@ language: node_js
 node_js:
   - 10 # use Node 10 LTS or later
 before_install:
-  - npm install -g @lhci/cli@0.3.0-alpha.0
+  - npm install -g @lhci/cli@0.3.x
 script:
   - npm run build # build your site
   - lhci autorun # run lighthouse CI

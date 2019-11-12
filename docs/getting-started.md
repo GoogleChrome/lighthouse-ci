@@ -59,8 +59,9 @@ The complete script might look something like the below, but read on for the bre
 ```bash
 #!/bin/bash
 
+# NOTE: This step only required for matrix builds, see "Create a run-lhci script" for more details.
 if [[ "$TRAVIS_NODE_VERSION" != "10" ]]; then
-  echo "Only run Lighthouse CI once per build, condititions did not match.";
+  echo "Only run Lighthouse CI once per build, node version is not the selected version.";
   exit 0;
 fi
 
@@ -99,7 +100,9 @@ addons:
 
 ### Create a run-lhci script
 
-To contain all the steps necessary for Lighthouse CI, we'll create a file located at `scripts/run-lhci.sh` that should run as part of the build process. Make sure that this script is only run once per build or it will lead to confusing upload artifacts. For example, if you have a matrix build of several node versions, only run Lighthouse CI on one of them. In Travis, this translates to...
+To contain all the steps necessary for Lighthouse CI, we'll create a file located at `scripts/run-lhci.sh` that should run as part of the build process. In Travis, this translates to...
+
+**NOTE:** Make sure that this script is only run once per build or it will lead to confusing upload artifacts. For example, if you have a matrix build of several node versions, only run Lighthouse CI on one of them.
 
 **.travis.yml**
 
@@ -115,9 +118,12 @@ script:
 ```bash
 #!/bin/bash
 
-# example if only running lighthouse on node 10
+# Example if your travis build runs a matrix like...
+# matrix:
+#   - 12
+#   - 10
 if [[ "$TRAVIS_NODE_VERSION" != "10" ]]; then
-  echo "Only run Lighthouse CI once per build, condititions did not match.";
+  echo "Only run Lighthouse CI once per build, node version is not the selected version.";
   exit 0;
 fi
 

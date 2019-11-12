@@ -187,8 +187,11 @@ function getAncestorHash(hash = 'HEAD') {
 }
 
 function getRepoSlug() {
+  // Support Travis CI
   if (envVars.TRAVIS_PULL_REQUEST_SLUG) return envVars.TRAVIS_PULL_REQUEST_SLUG;
   if (envVars.TRAVIS_REPO_SLUG) return envVars.TRAVIS_REPO_SLUG;
+  // Support GitHub Actions
+  if (envVars.GITHUB_REPOSITORY) return envVars.GITHUB_REPOSITORY;
 }
 
 module.exports = {

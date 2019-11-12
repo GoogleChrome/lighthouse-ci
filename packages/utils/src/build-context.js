@@ -33,6 +33,7 @@ const envVars = process.env;
 function getCurrentHash() {
   if (envVars.TRAVIS_PULL_REQUEST_SHA) return envVars.TRAVIS_PULL_REQUEST_SHA;
   if (envVars.TRAVIS_COMMIT) return envVars.TRAVIS_COMMIT;
+  if (envVars.CIRCLE_SHA1) return envVars.CIRCLE_SHA1;
 
   const result = childProcess.spawnSync('git', ['rev-list', '--no-merges', '-n1', 'HEAD'], {
     encoding: 'utf8',
@@ -70,6 +71,9 @@ function getCurrentBranchRaw_() {
   if (envVars.GITHUB_HEAD_REF) return envVars.GITHUB_HEAD_REF;
   if (envVars.GITHUB_REF) return envVars.GITHUB_REF;
 
+  // Use CircleCI vars if available.
+  if (envVars.CIRCLE_BRANCH) return envVars.CIRCLE_BRANCH;
+
   const result = childProcess.spawnSync('git', ['rev-parse', '--abbrev-ref', 'HEAD'], {
     encoding: 'utf8',
   });
@@ -95,7 +99,9 @@ function getCurrentBranch() {
  * @return {string}
  */
 function getExternalBuildUrl() {
-  return envVars.TRAVIS_BUILD_WEB_URL || '';
+  if (envVars.TRAVIS_BUILD_WEB_URL) return envVars.TRAVIS_BUILD_WEB_URL;
+  if (envVars.CIRCLE_BUILD_URL) return envVars.CIRCLE_BUILD_URL;
+  return '';
 }
 
 /**
@@ -192,6 +198,10 @@ function getRepoSlug() {
   if (envVars.TRAVIS_REPO_SLUG) return envVars.TRAVIS_REPO_SLUG;
   // Support GitHub Actions
   if (envVars.GITHUB_REPOSITORY) return envVars.GITHUB_REPOSITORY;
+  // Support CircleCI
+  if (envVars.CIRCLE_PROJECT_USERNAME && envVars.CIRCLE_PROJECT_REPONAME) {
+    return `${envVars.CIRCLE_PROJECT_USERNAME}/${envVars.CIRCLE_PROJECT_REPONAME}`;
+  }
 }
 
 module.exports = {

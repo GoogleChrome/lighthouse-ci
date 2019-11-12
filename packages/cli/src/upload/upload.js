@@ -235,7 +235,7 @@ async function runLHCITarget(options) {
     externalBuildUrl: getExternalBuildUrl(),
     runAt: new Date().toISOString(),
     committedAt: getCommitTime(hash),
-    ancestorCommittedAt: getCommitTime(ancestorHash),
+    ancestorCommittedAt: ancestorHash ? getCommitTime(ancestorHash) : undefined,
   });
 
   print(`Saving CI project ${project.name} (${project.id})\n`);

@@ -28,13 +28,10 @@ const BUILD_DIR_PRIORITY = [
  */
 function buildCommand(yargs) {
   return yargs.options({
-    config: {
-      description: 'The lighthouserc.json file preferences.',
-    },
-    rcOverrides: {
-      description:
-        'Invididual flags to override the rc-file defaults. e.g. --rc-overrides.collect.numberOfRuns=5',
-    },
+    config: {description: 'The lighthouserc.json file preferences.'},
+    collect: {description: 'Overrides for the collect command. e.g. --collect.numberOfRuns=5'},
+    assert: {description: 'Overrides for the assert command. e.g. --assert.preset=lighthouse:all'},
+    upload: {description: 'Overrides for the upload command. e.g. --upload.token=$TOKEN'},
   });
 }
 
@@ -85,11 +82,10 @@ function getStartServerCommandFlag() {
  * @param {'collect'|'assert'|'upload'|'healthcheck'} command
  */
 function getOverrideArgsForCommand(command) {
-  const argRegex = /^--rc(-)?overrides\.(collect|assert|upload|healthcheck)\./i;
+  const argPrefix = `--${command}.`;
   return process.argv
-    .filter(arg => argRegex.test(arg))
-    .filter(arg => arg.toLowerCase().includes(`overrides.${command}.`))
-    .map(arg => arg.replace(argRegex, '--'));
+    .filter(arg => arg.startsWith(argPrefix))
+    .map(arg => arg.replace(argPrefix, '--'));
 }
 
 /**
@@ -101,7 +97,7 @@ async function runCommand(options) {
   const rcFile = rcFilePath && loadRcFile(rcFilePath);
   if (rcFile && !rcFile.ci) throw new Error('RC file did not contain a root-level "ci" property');
   const ciConfiguration = (rcFile && rcFile.ci) || {};
-  _.merge(ciConfiguration, options.rcOverrides || {});
+  _.merge(ciConfiguration, _.pick(options, ['assert', 'collect', 'upload']));
 
   const defaultFlags = options.config ? [`--config=${options.config}`] : [];
   let hasFailure = false;

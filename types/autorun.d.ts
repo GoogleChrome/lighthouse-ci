@@ -9,7 +9,9 @@ declare global {
     namespace AutorunCommand {
       export interface Options {
         config?: string;
-        rcOverrides?: LighthouseRc['ci'];
+        collect?: CollectCommand.Options;
+        assert?: AssertCommand.Options;
+        upload?: UploadCommand.Options;
       }
     }
   }

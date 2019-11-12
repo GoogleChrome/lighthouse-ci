@@ -14,7 +14,7 @@ describe('Lighthouse CI autorun CLI', () => {
   const autorunDir = path.join(__dirname, 'fixtures/autorun-static-dir');
 
   it('should run all three steps', () => {
-    const {stdout, stderr, status} = runCLI(['autorun', '--rc-overrides.collect.numberOfRuns=2'], {
+    const {stdout, stderr, status} = runCLI(['autorun', '--collect.numberOfRuns=2'], {
       cwd: autorunDir,
       env: {LHCI_NO_LIGHTHOUSERC: undefined},
     });

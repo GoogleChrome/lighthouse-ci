@@ -46,8 +46,8 @@ Automatically run `collect` and `assert` with sensible defaults, and optionally 
 
 ```bash
 lhci autorun --config=./lighthouserc.json
-lhci autorun --rc-overrides.collect.numberOfRuns=5
-lhci autorun --rc-overrides.upload.target=temporary-public-storage
+lhci autorun --collect.numberOfRuns=5
+lhci autorun --upload.target=temporary-public-storage
 ```
 
 #### Starting a webserver
@@ -65,7 +65,7 @@ example `package.json` excerpt:
 You can also supply a custom server initalization command directly as a flag to `autorun`:
 
 ```bash
-lhci autorun --rc-overrides.collect.startServerCommand="rails server -e production"
+lhci autorun --collect.startServerCommand="rails server -e production"
 ```
 
 ---

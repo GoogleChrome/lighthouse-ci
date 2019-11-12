@@ -17,9 +17,9 @@ describe('Lighthouse CI autorun CLI with startServerCommand', () => {
     const {stdout, stderr, status} = runCLI(
       [
         'autorun',
-        '--rc-overrides.collect.url=http://localhost:52425',
-        '--rc-overrides.collect.n=2',
-        '--rc-overrides.assert.assertions.viewport=error',
+        '--collect.url=http://localhost:52425',
+        '--collect.n=2',
+        '--assert.assertions.viewport=error',
       ],
       {cwd: autorunDir}
     );

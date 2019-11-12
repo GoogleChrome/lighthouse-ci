@@ -38,8 +38,8 @@ The score of any category in Lighthouse can also be asserted. Assertions are key
 ```json
 {
   "assertions": {
-    "categories.pwa": "off",
-    "categories.accessibility": ["error", {"this-is-an-options-object": true}]
+    "categories:pwa": "off",
+    "categories:accessibility": ["error", {"this-is-an-options-object": true}]
   }
 }
 ```
@@ -128,16 +128,16 @@ Instead of configuring using Lighthouse CI assertions against Lighthouse audits,
 }
 ```
 
-If you'd like to consolidate multiple assertion configuration files and avoid multiple calls to `lhci assert`, you can also configure your budgets alongside your other Lighthouse CI assertions instead. Budget assertions follow the form `resource-summary.<resourceType>.(size|count)`.
+If you'd like to consolidate multiple assertion configuration files and avoid multiple calls to `lhci assert`, you can also configure your budgets alongside your other Lighthouse CI assertions instead. Budget assertions follow the form `resource-summary:<resourceType>:(size|count)`.
 
 ```json
 {
   "assertions": {
     "audit-id-1": ["warn", {"maxNumericValue": 4000}],
     "audit-id-2": ["error", {"minScore": 0.8}],
-    "resource-summary.document.size": ["error", {"maxNumericValue": 400}],
-    "resource-summary.font.count": ["warn", {"maxNumericValue": 1}],
-    "resource-summary.third-party.count": ["warn", {"maxNumericValue": 5}]
+    "resource-summary:document:size": ["error", {"maxNumericValue": 400}],
+    "resource-summary:font:count": ["warn", {"maxNumericValue": 1}],
+    "resource-summary:third-party:count": ["warn", {"maxNumericValue": 5}]
   }
 }
 ```

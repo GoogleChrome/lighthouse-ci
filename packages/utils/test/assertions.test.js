@@ -18,7 +18,7 @@ describe('getAllAssertionResults', () => {
     lhrs = [
       {
         finalUrl: 'http://page-1.com',
-        categories: {pwa: {score: 0.5}},
+        categories: {pwa: {score: 0.5}, perf: {score: 0.1}},
         audits: {
           'first-contentful-paint': {
             score: 0.6,
@@ -34,7 +34,7 @@ describe('getAllAssertionResults', () => {
       },
       {
         finalUrl: 'http://page-1.com',
-        categories: {pwa: {score: 0.8}},
+        categories: {pwa: {score: 0.8}, perf: {score: 0.1}},
         audits: {
           'first-contentful-paint': {
             score: 0.8,
@@ -123,6 +123,7 @@ describe('getAllAssertionResults', () => {
   it('should assert category failures', () => {
     const assertions = {
       'categories.pwa': 'warn',
+      'categories:perf': 'error',
     };
 
     const results = getAllAssertionResults({assertions}, lhrs);
@@ -137,6 +138,17 @@ describe('getAllAssertionResults', () => {
         name: 'minScore',
         operator: '>=',
         values: [0.5, 0.8],
+      },
+      {
+        url: 'http://page-1.com',
+        actual: 0.1,
+        auditId: 'categories',
+        auditProperty: 'perf',
+        expected: 1,
+        level: 'error',
+        name: 'minScore',
+        operator: '>=',
+        values: [0.1, 0.1],
       },
     ]);
   });
@@ -596,8 +608,8 @@ describe('getAllAssertionResults', () => {
     it('should assert budgets after the fact', () => {
       const assertions = {
         'resource-summary.document.size': ['error', {maxNumericValue: 400}],
-        'resource-summary.font.count': ['warn', {maxNumericValue: 1}],
-        'resource-summary.third-party.count': ['warn', {maxNumericValue: 5}],
+        'resource-summary:font.count': ['warn', {maxNumericValue: 1}],
+        'resource-summary:third-party.count': ['warn', {maxNumericValue: 5}],
       };
 
       const lhrs = [lhrWithResourceSummary, lhrWithResourceSummary];

@@ -340,7 +340,7 @@ function resolveAssertionOptionsAndLhrs(baseOptions, unfilteredLhrs) {
 
   const auditsToAssert = [...new Set(Object.keys(assertions).map(_.kebabCase))].map(
     assertionKey => {
-      const [auditId, ...rest] = assertionKey.split('.');
+      const [auditId, ...rest] = assertionKey.split(/\.|:/g).filter(Boolean);
       const auditInstances = lhrs.map(lhr => lhr.audits[auditId]).filter(Boolean);
       const failedAudit = auditInstances.find(audit => audit.score !== 1);
       const audit = failedAudit || auditInstances[0] || {};

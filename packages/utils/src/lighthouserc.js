@@ -16,6 +16,24 @@ const RC_FILE_NAMES = [
 ];
 
 /**
+ * Yargs will treat any key with a `.` in the name as a specifier for an object subpath.
+ * This isn't the behavior we want when using the `config` file, just the CLI arguments, so we rename.
+ * Anything that has `.` to `:` and avoid using any keys with `.` in the name throughout LHCI.
+ * This fixes a bug where assertions used `.` in the name but now optionally use `:` as well.
+ * @see https://github.com/GoogleChrome/lighthouse-ci/issues/64
+ * @param {any} object
+ */
+function recursivelyReplaceDotInKeyName(object) {
+  if (typeof object !== 'object' || !object) return;
+  for (const [key, value] of Object.entries(object)) {
+    recursivelyReplaceDotInKeyName(value);
+    if (!key.includes('.')) continue;
+    delete object[key];
+    object[key.replace(/\./g, ':')] = value;
+  }
+}
+
+/**
  * @param {string} pathToRcFile
  * @return {LHCI.YargsOptions}
  */
@@ -28,8 +46,11 @@ function loadAndParseRcFile(pathToRcFile) {
  * @return {LHCI.LighthouseRc}
  */
 function loadRcFile(pathToRcFile) {
+  // Load the JSON and convert all `.` in key names to `:`
   const contents = fs.readFileSync(pathToRcFile, 'utf8');
-  return JSON.parse(contents);
+  const rc = JSON.parse(contents);
+  recursivelyReplaceDotInKeyName(rc);
+  return rc;
 }
 
 /**

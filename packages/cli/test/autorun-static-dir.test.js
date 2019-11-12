@@ -26,7 +26,6 @@ describe('Lighthouse CI autorun CLI', () => {
     const stderrClean = stderr.replace(/:\d{4,6}/g, ':XXXX').replace(/port \d{4,6}/, 'port XXXX');
     expect(stdoutClean).toMatchInlineSnapshot(`
       "✅  .lighthouseci/ directory writable
-      ✅  Ancestor hash determinable
       ✅  Configuration file found
       ⚠️   GitHub token set
       Healthcheck passed!

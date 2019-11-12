@@ -42,11 +42,6 @@ const checks = [
     test: () => loadSavedLHRs().length >= 0,
   },
   {
-    label: 'Ancestor hash determinable',
-    shouldTest: () => true,
-    test: () => getAncestorHash().length > 0,
-  },
-  {
     id: 'rcFile',
     label: 'Configuration file found',
     shouldTest: () => true,
@@ -65,9 +60,16 @@ const checks = [
   },
   {
     id: 'lhciServer',
+    label: 'Ancestor hash determinable',
+    // the test only makes sense if they've configured an LHCI server
+    shouldTest: opts => Boolean(opts.serverBaseUrl && opts.token),
+    test: () => getAncestorHash().length > 0,
+  },
+  {
+    id: 'lhciServer',
     label: 'LHCI server reachable',
     // the test only makes sense if they've configured an LHCI server
-    shouldTest: opts => !!opts.serverBaseUrl,
+    shouldTest: opts => Boolean(opts.serverBaseUrl && opts.token),
     test: async ({serverBaseUrl = ''}) =>
       (await new ApiClient({rootURL: serverBaseUrl}).getVersion()).length > 0,
   },

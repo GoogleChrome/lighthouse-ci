@@ -40,7 +40,7 @@ script:
 
 That's it! With this in place, you'll have Lighthouse reports collected and and asserted.
 
-See the [autorun docs](./cli#autorun) for more including running your own webserver and uploading the reports for later viewing.
+See the [autorun docs](./cli.md#autorun) for more including running your own webserver and uploading the reports for later viewing.
 
 You can also run a [Lighthouse CI server](#the-lighthouse-ci-server) for report diffs and timeseries charts. Or alternatively, just [upload the reports](#saving-reports-to-temporary-public-storage) for easy viewing. [GitHub Status checks](#github-status-checks) can also be enabled easily.
 

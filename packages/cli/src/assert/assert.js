@@ -20,7 +20,7 @@ function buildCommand(yargs) {
   return yargs.options({
     preset: {
       description: 'The assertions preset to extend',
-      choices: ['lighthouse:all', 'lighthouse:recommended'],
+      choices: ['lighthouse:all', 'lighthouse:recommended', 'lighthouse:no-pwa'],
     },
     assertions: {
       description: 'The assertions to use.',

@@ -95,7 +95,7 @@
   font-size: var(--subtext-font-size);
   text-align: center;
 
-  background: var(--secondary-background-color);
+  background: var(--neutral-highlight-color);
   color: var(--secondary-text-color);
 }
 

@@ -36,7 +36,7 @@
 
 .dropdown__chevron {
   position: absolute;
-  top: calc((30px - 24px) / 2);
+  top: 5px;
   right: calc(var(--base-spacing) / 4);
 
   z-index: 1;

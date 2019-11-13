@@ -30,3 +30,7 @@ script:
 addons:
   chrome: stable # make sure you have Chrome available
 ```
+
+## Related Projects
+
+- [Lighthouse CI GitHub Action](https://github.com/treosh/lighthouse-ci-action) - Audit URLs using Lighthouse and monitor performance with Lighthouse CI.

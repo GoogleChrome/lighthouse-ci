@@ -9,6 +9,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const rimraf = require('rimraf');
 const fullPreset = require('@lhci/utils/src/presets/all.js');
 const {runCLI} = require('./test-utils.js');
 
@@ -28,6 +29,7 @@ describe('Lighthouse CI assert CLI', () => {
 
   beforeAll(() => {
     const lighthouseciDir = path.join(fixtureDir, '.lighthouseci');
+    if (fs.existsSync(lighthouseciDir)) rimraf.sync(lighthouseciDir);
     if (!fs.existsSync(lighthouseciDir)) fs.mkdirSync(lighthouseciDir, {recursive: true});
     const fakeLhrPath = path.join(lighthouseciDir, 'lhr-12345.json');
     const fakeLhr = {categories: {}, audits: {}};
@@ -43,8 +45,8 @@ describe('Lighthouse CI assert CLI', () => {
   it('should run the recommended preset', () => {
     const result = run([`--preset=lighthouse:recommended`]);
     expect(result.status).toEqual(1);
-    expect(result.warnings).toHaveLength(19);
-    expect(result.failures).toHaveLength(91);
+    expect(result.warnings).toHaveLength(17);
+    expect(result.failures).toHaveLength(79);
     expect(result.failures).toContain('deprecations failure');
     expect(result.failures).toContain('viewport failure');
   });
@@ -52,8 +54,8 @@ describe('Lighthouse CI assert CLI', () => {
   it('should run the no-pwa preset', () => {
     const result = run([`--preset=lighthouse:no-pwa`]);
     expect(result.status).toEqual(1);
-    expect(result.warnings).toHaveLength(15);
-    expect(result.failures).toHaveLength(74);
+    expect(result.warnings).toHaveLength(14);
+    expect(result.failures).toHaveLength(70);
     expect(result.failures).toContain('deprecations failure');
     expect(result.failures).not.toContain('viewport failure');
   });

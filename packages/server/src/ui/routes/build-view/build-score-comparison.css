@@ -24,6 +24,9 @@
 .build-score-comparison-item__label {
   margin-top: var(--base-spacing);
   font-size: var(--gauge-title-font-size);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .build-score-comparison-item__delta {

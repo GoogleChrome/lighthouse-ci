@@ -100,6 +100,17 @@
   color: var(--secondary-text-color);
 }
 
+.audit-group__diff-badge-group--multiple .audit-group__diff-badge:first-child {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  margin-right: 0;
+}
+
+.audit-group__diff-badge-group--multiple .audit-group__diff-badge:last-child {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
 .audit-group__diff-badge--regression {
   background: var(--regression-color);
   color: var(--inverted-text-color);

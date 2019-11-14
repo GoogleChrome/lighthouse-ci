@@ -9,6 +9,7 @@ import {h, Fragment} from 'preact';
 import {ScoreWord} from '../../../components/score-icon';
 import {NumericDiff} from './numeric-diff';
 import {getDiffLabel, getRowLabelForIndex} from '@lhci/utils/src/audit-diff-finder';
+import clsx from 'clsx';
 
 /** @type {Record<string, string>} */
 const ICONS_BY_AUDIT_ID = {
@@ -32,7 +33,7 @@ const IconForAuditItems = props => {
   const groupId = props.groupId || '';
 
   let icon = '';
-  if (groupId.includes('opportunities')) icon = 'cloud_download';
+  if (groupId.includes('opportunities')) icon = 'web_asset';
   if (groupId.includes('a11y')) icon = 'code';
   if (auditId.includes('image')) icon = 'photo';
   icon = ICONS_BY_AUDIT_ID[auditId] || icon || 'list_alt';
@@ -136,9 +137,13 @@ export const ItemDiff = props => {
   return (
     <Fragment>
       {props.showAsNarrow ? <Fragment /> : baseElements}
-      <div className="audit-group__diff-badge-group">
+      <div className={clsx(`audit-group__diff-badge-group`)}>
         <IconForAuditItems audit={props.audit} groupId={groupId} />
-        <div className="audit-group__diff-badges">
+        <div
+          className={clsx('audit-group__diff-badges', {
+            'audit-group__diff-badge-group--multiple': Boolean(regressionCount && improvementCount),
+          })}
+        >
           {regressionCount ? (
             <span className="audit-group__diff-badge audit-group__diff-badge--regression">
               {regressionCount}

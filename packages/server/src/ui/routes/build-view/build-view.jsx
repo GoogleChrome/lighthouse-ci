@@ -214,7 +214,7 @@ const BuildView_ = props => {
     <Page
       headerLeft={
         <Link href={`/app/projects/${props.project.slug}`}>
-          <i className="material-icons">arrow_backward</i>
+          <i className="material-icons">arrow_back</i>
         </Link>
       }
       header={

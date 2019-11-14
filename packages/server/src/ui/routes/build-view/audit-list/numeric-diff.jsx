@@ -7,6 +7,7 @@
 import {h, Fragment} from 'preact';
 import {getDeltaLabel} from '@lhci/utils/src/audit-diff-finder';
 import clsx from 'clsx';
+import {Nbsp} from '../../../components/nbsp';
 import './numeric-diff.css';
 
 /** @param {number} x @param {'up'|'down'} direction */
@@ -46,26 +47,26 @@ const toDisplay = (x, options) => {
   const {asDelta = false, withSuffix = false, unit = 'none'} = options;
   let value = Math.round(x);
   let fractionDigits = 0;
-  let suffix = '';
+  let suffixUnit = '';
 
   if (unit === 'ms') {
-    suffix = ' ms';
+    suffixUnit = 'ms';
 
     if (Math.abs(value) >= 1000 && !options.preventSecondsConversion) {
       value /= 1000;
       fractionDigits = 1;
-      suffix = ' s';
+      suffixUnit = 's';
     }
   }
 
   if (unit === 'bytes') {
-    suffix = ' KB';
+    suffixUnit = 'KB';
     value /= 1024;
 
     if (Math.abs(value) >= 500) {
       value /= 1024;
       fractionDigits = 1;
-      suffix = ' MB';
+      suffixUnit = 'MB';
     }
   }
 
@@ -73,7 +74,7 @@ const toDisplay = (x, options) => {
     if (Math.abs(value) >= 50) {
       value /= 1000;
       fractionDigits = 1;
-      suffix = 'K';
+      suffixUnit = 'K';
     }
   }
 
@@ -82,7 +83,26 @@ const toDisplay = (x, options) => {
     maximumFractionDigits: fractionDigits,
   });
 
-  return `${asDelta && value >= 0 ? '+' : ''}${string}${withSuffix ? suffix : ''}`;
+  const numericSign = asDelta && value >= 0 ? '+' : '';
+  const resultStr = numericSign + string + (withSuffix ? suffixUnit : '');
+  return {
+    element: (
+      <span>
+        {numericSign}
+        {string}
+        {withSuffix ? (
+          <Fragment>
+            <Nbsp />
+            {suffixUnit}
+          </Fragment>
+        ) : (
+          ''
+        )}
+      </span>
+    ),
+    string: resultStr,
+    length: resultStr.length,
+  };
 };
 
 /** @param {{diff: LHCI.NumericAuditDiff, audit?: LH.AuditResult, groupId?: string, showAsNarrow?: boolean}} props */
@@ -107,18 +127,20 @@ export const NumericDiff = props => {
   const boxRight = 100 - (100 * (maxValue - lowerLimit)) / range;
   const deltaType = getDeltaLabel(delta, 'audit');
   const minValueIsCurrentValue = minValue === currentNumericValue;
-  const hoverDisplay = `${toDisplay(baseNumericValue, {unit, withSuffix: true})} to ${toDisplay(
-    currentNumericValue,
-    {
+  const hoverDisplay = `${toDisplay(baseNumericValue, {unit, withSuffix: true}).string} to ${
+    toDisplay(currentNumericValue, {
       withSuffix: true,
       unit,
-    }
-  )}`;
+    }).string
+  }`;
 
   if (props.showAsNarrow) {
     return (
       <div className={clsx('audit-numeric-diff', `text--${deltaType}`)} data-tooltip={hoverDisplay}>
-        {toDisplay(delta, {asDelta: true, withSuffix: true, preventSecondsConversion: true, unit})}
+        {
+          toDisplay(delta, {asDelta: true, withSuffix: true, preventSecondsConversion: true, unit})
+            .element
+        }
       </div>
     );
   }
@@ -126,18 +148,20 @@ export const NumericDiff = props => {
   // We want to ensure there's ~10px per character of space for the delta label.
   // The min-width of the bar is ~300px, so if the deltaLabel is going to take up more than
   // the narrowCutoffThresholdInPercent we want to flip it over to the other side.
-  const deltaLabel = toDisplay(delta, {
+  const {element: deltaLabel, length: deltaLabelLength} = toDisplay(delta, {
     asDelta: true,
     withSuffix: true,
     preventSecondsConversion: true,
     unit,
   });
-  const narrowCutoffThresholdInPercent = (deltaLabel.length * 10 * 100) / 300;
+  const narrowCutoffThresholdInPercent = (deltaLabelLength * 10 * 100) / 300;
 
   return (
     <Fragment>
       <div className="audit-numeric-diff">
-        <div className="audit-numeric-diff__left-label">{toDisplay(lowerLimit, {unit})}</div>
+        <div className="audit-numeric-diff__left-label">
+          {toDisplay(lowerLimit, {unit}).element}
+        </div>
         <div className="audit-numeric-diff__bar">
           <div
             className={clsx('audit-numeric-diff__box', {
@@ -164,7 +188,9 @@ export const NumericDiff = props => {
             </div>
           </div>
         </div>
-        <div className="audit-numeric-diff__right-label">{toDisplay(upperLimit, {unit})}</div>
+        <div className="audit-numeric-diff__right-label">
+          {toDisplay(upperLimit, {unit}).element}
+        </div>
       </div>
     </Fragment>
   );

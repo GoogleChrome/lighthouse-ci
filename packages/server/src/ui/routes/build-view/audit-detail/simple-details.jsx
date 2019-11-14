@@ -5,6 +5,7 @@
  */
 
 import {h} from 'preact';
+import {Nbsp} from '../../../components/nbsp';
 import './simple-details.css';
 import {getDiffLabel, getDeltaStats} from '@lhci/utils/src/audit-diff-finder.js';
 
@@ -38,7 +39,9 @@ export const SimpleDetails = props => {
       return (
         <pre className={`simple-details--${label}`} data-tooltip={numericTitle}>
           {numericCompare >= numericBase ? '+' : '-'}
-          {kb.toLocaleString(undefined, {maximumFractionDigits: Math.abs(kb) < 1 ? 1 : 0})} KB
+          {kb.toLocaleString(undefined, {maximumFractionDigits: Math.abs(kb) < 1 ? 1 : 0})}
+          <Nbsp />
+          KB
           {deltaPercent}
         </pre>
       );
@@ -49,7 +52,9 @@ export const SimpleDetails = props => {
       return (
         <pre className={`simple-details--${label}`} data-tooltip={numericTitle}>
           {numericCompare >= numericBase ? '+' : '-'}
-          {ms.toLocaleString()} ms
+          {ms.toLocaleString()}
+          <Nbsp />
+          ms
           {deltaPercent}
         </pre>
       );

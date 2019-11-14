@@ -10,6 +10,10 @@ Most CI systems prevent secrets from leaking into the environment of untrusted p
 
 If your LHCI server is already publicly accessible and you don't mind allowing contributors to potentially spam data into it, then you can safely make the `LHCI_TOKEN` public as well. It is an additive-write-only credential that cannot destroy historical data.
 
+## I lost the LHCI_GITHUB_APP_TOKEN. How do I get it back?
+
+While it's not possible retrieve a lost GitHub App token, you can uninstall and [reinstall the app](https://github.com/apps/lighthouse-ci) to get a fresh token.
+
 ## LHCI server isn't finding the correct base branch ancestor.
 
 Some CI systems download a shallow copy of the repository to improve cloning time, but this prevents contextual information like the shared base ancestor commit from being picked up by Lighthouse CI. Ensure you configure your provider's git depth to a value large enough to cover most of your feature branches.

@@ -64,3 +64,5 @@ kubectl get service
 # kubernetes    ClusterIP      10.X.X.X       <none>         443/TCP        9m
 # lhci-server   LoadBalancer   10.X.X.X       X.X.X.X        80:XXXXX/TCP   2m
 ```
+
+Note that the server has no authentication mechanisms and that anyone with HTTP access to the server will be able to view and create data. If your server contains sensitive information, consider protecting it within a firewall that is only accessible to your internal network.

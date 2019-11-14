@@ -12,7 +12,7 @@ Your project should meet the following requirements:
 2. Branches/pull requests are gated on the results of a continuous integration build process (Travis CI, CircleCI, Azure Pipelines, AppVeyor, GitHub Actions, etc).
 3. Your CI process can build your project into production assets (typically provided as an `npm run build` command by most frameworks).
 4. Your project either:
-   A) has a command that runs a production-equivalent web server.
+   A) has a command that runs a web server with production-like assets.
    B) is a static site.
 
 In the examples that follow, use of GitHub and Travis CI are assumed but the same concepts apply to other providers. Refer to your specific provider's documentation for how to accomplish each setup step.
@@ -48,7 +48,7 @@ You can also run a [Lighthouse CI server](#the-lighthouse-ci-server) for report 
 
 A Lighthouse CI run will roughly follow these steps.
 
-1. Configure CI environment.
+1. Setup CI environment.
 2. Serve your site locally or deploy to a development server.
 3. Collect Lighthouse results with Lighthouse CI.
 4. Assert that the results meet your expectations.
@@ -77,7 +77,7 @@ kill $!
 exit $EXIT_CODE
 ```
 
-### Configure CI Environment
+### Setup CI Environment
 
 To run Lighthouse CI, you'll need...
 
@@ -183,7 +183,7 @@ exit $EXIT_CODE
 
 ### Configuration
 
-The setup so far will automatically assert the Lighthouse team's recommended set of audits, but your project might have a bit of work to go before hitting straight 100s. Lucky for you the assertions are completely configurable! Read more about what's possible with [the assertions format](./assertions.md).
+The setup so far will automatically assert the Lighthouse team's recommended set of audits, but your project might have a bit of work to go before hitting straight 100s! Lucky for you the assertions are completely configurable! Read more about what's possible with [the assertions format](./assertions.md).
 
 **lighthouserc.json**
 
@@ -248,11 +248,11 @@ Add your token to your CI with the environment variable `LHCI_TOKEN`. Alternativ
 lhci upload --serverBaseUrl="https://your-lhci-server-url.com" --token="$LHCI_SERVER_TOKEN"
 ```
 
-### GitHub Status Checks
+Note that this token is only semi-secret. Anyone with HTTP access to the server will already be able to view and create data on the server as it is unauthenticated but by masking the token.
 
-<!-- todo: move above Storing Reports section -->
+## GitHub Status Checks
 
-The existing setup will fail builds through your CI provider, but there's no differentiation between the build failing because of Lighthouse CI versus your other tests.
+The setup so far will fail builds through your CI provider, but there's no differentiation between the build failing because of Lighthouse CI versus your other tests.
 
 Lighthouse CI supports GitHub status checks that add additional granularity to your build reporting and direct links to uploaded reports.
 
@@ -267,3 +267,5 @@ Be sure to keep this token secret. Anyone in possession of this token will be ab
 #### Alternative: Personal Access Token Method
 
 If you don't want to use the Github App, you can enable this via a personal access token. The only difference is that your user account (and its avatar) will post a status check. [Create a token](https://github.com/settings/tokens/new) with the `repo:status` scope and [add it to your environment](https://docs.travis-ci.com/user/environment-variables/#defining-variables-in-repository-settings) as `LHCI_GITHUB_TOKEN`.
+
+Be sure to keep this token secret. Anyone in possession of this token will be able to set status checks on your repository.

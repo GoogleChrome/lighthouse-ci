@@ -89,4 +89,5 @@
   flex-direction: row;
   align-items: center;
   font-family: var(--monospace-font-family);
+  font-size: var(--monospace-font-size);
 }

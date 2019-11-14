@@ -97,6 +97,7 @@
 .build-hash-selector__hash {
   color: var(--base-text-color);
   font-family: var(--monospace-font-family);
+  font-size: var(--monospace-font-size);
 }
 
 .build-hash-selector__commit {
@@ -122,6 +123,7 @@
 
 .build-hash-selector__branch-label {
   font-family: var(--monospace-font-family);
+  font-size: var(--monospace-font-size);
   margin-left: calc(var(--base-spacing) / 2);
   margin-top: calc(var(--base-spacing) * -1);
 }

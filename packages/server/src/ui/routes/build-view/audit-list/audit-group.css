@@ -10,7 +10,7 @@
 
 .audit-group__title {
   font-size: var(--header-font-size);
-  margin-bottom: var(--base-spacing);
+  margin-bottom: calc(var(--base-spacing) / 2);
 }
 
 .audit-group__audit {
@@ -46,11 +46,12 @@
   justify-content: flex-end;
   align-items: center;
   font-family: var(--monospace-font-family);
+  font-size: var(--monospace-font-size);
 }
 
 .audit-group__diff-arrow {
   color: var(--secondary-text-color);
-  font-size: var(--base-icon-size);
+  font-size: var(--arrow-icon-size);
   line-height: var(--large-icon-size);
   margin: 0 var(--base-spacing);
 }

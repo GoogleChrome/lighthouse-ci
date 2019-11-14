@@ -35,6 +35,7 @@
 
 .build-selector-header-section__hash {
   font-family: var(--monospace-font-family);
+  font-size: var(--monospace-font-size);
   margin-left: calc(var(--pill-spacing) / 2);
 }
 

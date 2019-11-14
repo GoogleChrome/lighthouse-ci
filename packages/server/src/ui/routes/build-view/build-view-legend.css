@@ -20,6 +20,7 @@
 
 .build-view-legend__label {
   font-family: var(--monospace-font-family);
+  font-size: var(--monospace-font-size);
   margin-left: calc(var(--base-spacing) / 2);
   margin-right: calc(var(--base-spacing) * 1.5);
 }

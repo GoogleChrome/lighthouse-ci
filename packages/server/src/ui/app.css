@@ -75,14 +75,16 @@
   --gauge-title-font-size: 18px; /* this is 20px in the spec, but simply does not look like the design at 20px */
   --title-font-size: 24px;
   --header-font-size: 20px;
-  --base-font-size: 14px;
+  --base-font-size: 16px;
+  --monospace-font-size: 15px;
   --subtext-font-size: 12px;
 
   --base-icon-size: 14px;
+  --arrow-icon-size: 20px;
   --large-icon-size: 24px;
 
   --base-spacing: 12px;
-  --large-spacing: 20px;
+  --paper-padding: 16px;
 
   /** Element-specific constants */
   --page-header-height: 56px;
@@ -92,18 +94,18 @@
     var(--page-header-height) - 2 * var(--page-header-vertical-padding)
   );
 
-  --page-sidebar-width: 350px;
+  --page-sidebar-width: 260px;
   --page-sidebar-nav-item-height: 24px;
 
   --gauge-size: 82px;
   --gauge-stroke-width: 7px;
   --build-score-delta-badge-height: 24px;
-  --pill-height: 22px;
-  --pill-content-height: calc(var(--pill-height) - 4px);
+  --pill-height: 26px;
+  --pill-content-height: calc(var(--pill-height) - 6px);
   --pill-spacing: calc(var(--base-spacing) / 2);
   --avatar-image-size: 25px;
 
-  --audit-group-audit-height: 32px;
+  --audit-group-audit-height: 36px;
 
   --paper-min-width: 200px;
   --dashboard-graph-min-height: 300px;
@@ -121,6 +123,8 @@ body {
 * {
   box-sizing: border-box;
   margin: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 .lhci {
@@ -161,6 +165,10 @@ h6 {
 
 .text--regression {
   color: var(--regression-color);
+}
+
+a {
+  text-decoration: none;
 }
 
 a .material-icons {

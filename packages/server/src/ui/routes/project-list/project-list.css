@@ -25,13 +25,14 @@
 
 .project-list .paper {
   max-width: 50vw;
-  padding: calc(var(--base-spacing) * 2);
+  padding: calc(var(--paper-padding) * 2);
+  z-index: 2;
 }
 
 .project-list img {
   height: 80px;
   width: 80px;
-  margin-bottom: calc(var(--base-spacing) * 2);
+  margin-bottom: var(--base-spacing);
 }
 
 .project-list ul {
@@ -67,10 +68,6 @@
   height: var(--project-list-height);
   width: var(--project-list-width);
   object-fit: cover;
-}
-
-.no-projects {
-  z-index: 2;
 }
 
 .no-projects h2 {

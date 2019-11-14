@@ -41,6 +41,7 @@
   color: var(--inverted-text-color);
 
   font-family: var(--monospace-font-family);
+  font-size: var(--monospace-font-size);
   text-align: center;
 }
 

@@ -20,17 +20,12 @@ const CONFETTI_PATH = require('./confetti.svg');
 
 const NoProjects = () => {
   return (
-    <Fragment>
-      <div className="project-list__confetti-background">
-        <img src={CONFETTI_PATH} alt="Lighthouse CI background image" />
-      </div>
-      <Paper className="no-projects">
-        <img src={LH_LOGO_PATH} alt="Lighthouse CI Logo" />
-        <h2>
-          Welcome to Lighthouse CI! <br /> Run <pre>lhci wizard</pre> to setup your first project.
-        </h2>
-      </Paper>
-    </Fragment>
+    <Paper className="no-projects">
+      <img src={LH_LOGO_PATH} alt="Lighthouse CI Logo" />
+      <h2>
+        Welcome to Lighthouse CI! <br /> Run <pre>lhci wizard</pre> to setup your first project.
+      </h2>
+    </Paper>
   );
 };
 
@@ -61,6 +56,9 @@ export const ProjectList = () => {
     <Page>
       <DocumentTitle title="Projects" />
       <div className="project-list">
+        <div className="project-list__confetti-background">
+          <img src={CONFETTI_PATH} alt="Lighthouse CI background image" />
+        </div>
         <AsyncLoader
           loadingState={loadingState}
           asyncData={projects}

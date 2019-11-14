@@ -5,11 +5,11 @@
  */
 
 .simple-details--improvement {
-  color: var(--improvement-color);
+  color: var(--improvement-text-color);
 }
 
 .simple-details--regression {
-  color: var(--regression-color);
+  color: var(--regression-text-color);
 }
 
 .simple-details__url-hostname {

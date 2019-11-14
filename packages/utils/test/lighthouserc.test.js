@@ -7,11 +7,25 @@
 
 /* eslint-env jest */
 
+const fs = require('fs');
 const path = require('path');
 const rc = require('../src/lighthouserc.js');
 
 describe('lighthouserc.js', () => {
   describe('#loadAndParseRcFile', () => {
+    let tmpFile;
+    function writeFile(json) {
+      fs.writeFileSync(tmpFile, JSON.stringify(json));
+    }
+
+    beforeEach(() => {
+      tmpFile = path.join(__dirname, `fixtures/rc-${Math.random()}.tmp.json`);
+    });
+
+    afterEach(() => {
+      if (fs.existsSync(tmpFile)) fs.unlinkSync(tmpFile);
+    });
+
     it('should load a basic json file', () => {
       const rcFile = path.join(__dirname, 'fixtures/lighthouserc-fixture.json');
       expect(rc.loadAndParseRcFile(rcFile)).toEqual({
@@ -23,6 +37,30 @@ describe('lighthouserc.js', () => {
         storage: {
           sqlDatabasePath: 'cli-test-fixtures.tmp.sql',
         },
+      });
+    });
+
+    it('should convert keys with . in them', () => {
+      const assertions = {'resource-summary.script.size': 'off'};
+      writeFile({ci: {assert: {assertions}}});
+      expect(rc.loadAndParseRcFile(tmpFile)).toEqual({
+        assertions: {
+          'resource-summary:script:size': 'off',
+        },
+      });
+    });
+
+    it('should load and flatten other properties', () => {
+      writeFile({
+        ci: {assert: {x: 1}},
+        'ci:client': {collect: {y: 2}, server: {ignored: true}},
+        'ci:server': {collect: {ignored: true}, server: {z: 3}},
+      });
+
+      expect(rc.loadAndParseRcFile(tmpFile)).toEqual({
+        x: 1,
+        y: 2,
+        z: 3,
       });
     });
   });

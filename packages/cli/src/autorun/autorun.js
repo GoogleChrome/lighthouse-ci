@@ -9,7 +9,11 @@ const fs = require('fs');
 const path = require('path');
 const childProcess = require('child_process');
 const _ = require('@lhci/utils/src/lodash.js');
-const {loadRcFile, resolveRcFilePath} = require('@lhci/utils/src/lighthouserc.js');
+const {
+  loadRcFile,
+  flattenRcToConfig,
+  resolveRcFilePath,
+} = require('@lhci/utils/src/lighthouserc.js');
 
 const BUILD_DIR_PRIORITY = [
   // explicitly a dist version of the site, highly likely to be production assets
@@ -95,8 +99,7 @@ function getOverrideArgsForCommand(command) {
 async function runCommand(options) {
   const rcFilePath = resolveRcFilePath(options.config);
   const rcFile = rcFilePath && loadRcFile(rcFilePath);
-  if (rcFile && !rcFile.ci) throw new Error('RC file did not contain a root-level "ci" property');
-  const ciConfiguration = (rcFile && rcFile.ci) || {};
+  const ciConfiguration = rcFile ? flattenRcToConfig(rcFile) : {};
   _.merge(ciConfiguration, _.pick(options, ['assert', 'collect', 'upload']));
 
   const defaultFlags = options.config ? [`--config=${options.config}`] : [];

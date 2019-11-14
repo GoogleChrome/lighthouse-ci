@@ -33,4 +33,4 @@ addons:
 
 ## Related Projects
 
-- [Lighthouse CI GitHub Action](https://github.com/treosh/lighthouse-ci-action) - Audit URLs using Lighthouse and monitor performance with Lighthouse CI.
+- [Lighthouse CI GitHub Action](https://github.com/treosh/lighthouse-ci-action) - Automatically run Lighthouse CI on every PR with GitHub Actions, no infrastructure required.

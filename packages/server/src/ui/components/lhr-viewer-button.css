@@ -8,24 +8,34 @@
   background: var(--highlighted-background-color);
   border-radius: 3px;
   padding: calc(var(--base-spacing) / 2);
-  padding-right: var(--base-spacing);
   margin-right: var(--base-spacing);
 
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: center;
+
+  color: var(--base-text-color);
+  font-weight: var(--medium-font-weight);
+  overflow: hidden;
+  white-space: nowrap;
 }
 
 .lhr-viewer-button img {
   height: 20px;
   width: 20px;
-  margin-right: calc(var(--base-spacing) / 2);
 }
 
-.lhr-viewer-button {
-  color: var(--base-text-color);
-  font-weight: var(--medium-font-weight);
-  overflow: hidden;
-  white-space: nowrap;
+.lhr-viewer-button span {
+  margin-left: calc(var(--base-spacing) / 2);
+  padding-right: calc(var(--base-spacing) / 2);
+}
+
+@media (max-width: 1000px) {
+  .lhr-viewer-button {
+    border-radius: 100%;
+  }
+  .lhr-viewer-button span {
+    display: none;
+  }
 }

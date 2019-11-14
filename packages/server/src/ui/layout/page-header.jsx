@@ -8,18 +8,22 @@ import {h, VNode} from 'preact';
 import clsx from 'clsx';
 import './page-header.css';
 
-/** @param {{children?: Array<VNode> | VNode, childrenRight?: Array<VNode>| VNode, setIsSidebarOpen: (isOpen: boolean) => void}} props */
+/** @param {{children?: Array<VNode> | VNode, childrenLeft?: Array<VNode>| VNode, childrenRight?: Array<VNode>| VNode, setIsSidebarOpen: (isOpen: boolean) => void}} props */
 export const PageHeader = props => {
   return (
     <div className={clsx('page-header')}>
       <div className="page-header__left">
-        <div
-          className="page-header__sidebar-button"
-          role="button"
-          onClick={() => props.setIsSidebarOpen(true)}
-        >
-          <i className="material-icons">menu</i>
-        </div>
+        {props.childrenLeft ? (
+          props.childrenLeft
+        ) : (
+          <div
+            className="page-header__sidebar-button"
+            role="button"
+            onClick={() => props.setIsSidebarOpen(true)}
+          >
+            <i className="material-icons">menu</i>
+          </div>
+        )}
       </div>
       <div className="page-header__center">{props.children}</div>
       <div

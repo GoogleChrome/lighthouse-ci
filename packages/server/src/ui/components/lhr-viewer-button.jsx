@@ -17,7 +17,7 @@ export const LhrViewerButton = props => {
   return (
     <LhrViewerLink lhr={lhr}>
       <div className="lhr-viewer-button" role="button">
-        <img src={LH_ICON_PATH} /> Open Report
+        <img src={LH_ICON_PATH} /> <span>Open Report</span>
       </div>
     </LhrViewerLink>
   );

@@ -12,6 +12,11 @@
   background: var(--compare-secondary-highlight-color);
 }
 
+.build-view--with-lhr-link-hover .build-view__scores-and-url .dropdown--url .dropdown__label {
+  padding-left: calc(var(--base-spacing) / 4);
+  margin-right: calc(var(--base-spacing) / 4);
+}
+
 .build-view__scores-and-url {
   height: 260px;
   width: calc(100% + 2 * var(--base-spacing));

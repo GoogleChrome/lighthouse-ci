@@ -9,15 +9,31 @@
   flex-direction: column;
 }
 
+.dashboard__recent-activity {
+  width: 100vw;
+  margin-top: calc(var(--base-spacing) * -1);
+  margin-left: calc(var(--base-spacing) * -1);
+  margin-bottom: var(--base-spacing);
+  padding: calc(var(--base-spacing) * 2);
+  padding-bottom: calc(var(--base-spacing) * 2);
+
+  background: var(--highlighted-background-color);
+}
+
+.dashboard__build-list-scroll-container {
+  width: 100%;
+  max-height: 300px;
+  overflow: auto;
+}
+
 .dashboard__recent-activity h2 {
   font-size: var(--header-font-size);
-  padding: var(--base-spacing);
+  margin-bottom: calc(var(--base-spacing) * 2);
 }
 
 .dashboard__build-list {
-  width: calc(100% - var(--base-spacing) * 2);
-  max-width: calc(100% - var(--base-spacing) * 2);
-  margin-left: var(--base-spacing);
+  width: 100%;
+  max-width: 100%;
 }
 
 .dashboard__build-list {
@@ -41,6 +57,13 @@
   margin: 0 calc(var(--base-spacing) / 2);
 }
 
+.build-list__commit {
+  max-width: 30vw;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
 .build-list__commit,
 .build-list__branch {
   font-weight: var(--medium-font-weight);
@@ -49,6 +72,10 @@
 .build-list__date {
   color: var(--secondary-text-color);
   white-space: nowrap;
+}
+
+.build-list__hash {
+  width: 145px;
 }
 
 .build-list__hash .pill {

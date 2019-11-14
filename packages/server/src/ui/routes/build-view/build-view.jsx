@@ -212,6 +212,11 @@ const BuildView_ = props => {
 
   return (
     <Page
+      headerLeft={
+        <Link href={`/app/projects/${props.project.slug}`}>
+          <i className="material-icons">arrow_backward</i>
+        </Link>
+      }
       header={
         <Fragment>
           <BuildSelectorHeaderSection
@@ -235,9 +240,13 @@ const BuildView_ = props => {
         </Fragment>
       }
       headerRight={
-        <Link href={`/app/projects/${props.project.slug}`}>
-          <i className="material-icons">show_chart</i>
-        </Link>
+        <a
+          href="https://github.com/GoogleChrome/lighthouse-ci"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <i className="material-icons">info</i>
+        </a>
       }
     >
       <DocumentTitle title={`Compare "${props.build.commitMessage}"`} />

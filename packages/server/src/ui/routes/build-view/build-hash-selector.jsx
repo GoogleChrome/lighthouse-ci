@@ -226,14 +226,17 @@ export const BuildHashSelector = props => {
   const branchLoadingData = useBranchBuilds(build.projectId, build.branch, {limit: 100});
   const baseLoadingData = useBranchBuilds(build.projectId, 'master', {limit: 100});
   return (
-    <div className="build-hash-selector">
-      <AsyncLoader
-        loadingState={combineLoadingStates(branchLoadingData, baseLoadingData)}
-        asyncData={combineAsyncData(branchLoadingData, baseLoadingData)}
-        render={([branchBuilds, baseBuilds]) => (
-          <BuildHashSelector_ {...props} branchBuilds={branchBuilds} baseBuilds={baseBuilds} />
-        )}
-      />
-    </div>
+    <Fragment>
+      <div className="build-hash-selector-obscure-background" />
+      <div className="build-hash-selector">
+        <AsyncLoader
+          loadingState={combineLoadingStates(branchLoadingData, baseLoadingData)}
+          asyncData={combineAsyncData(branchLoadingData, baseLoadingData)}
+          render={([branchBuilds, baseBuilds]) => (
+            <BuildHashSelector_ {...props} branchBuilds={branchBuilds} baseBuilds={baseBuilds} />
+          )}
+        />
+      </div>
+    </Fragment>
   );
 };

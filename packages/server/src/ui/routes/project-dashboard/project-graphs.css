@@ -22,6 +22,16 @@
   justify-content: center;
 }
 
+.dashboard-graphs__legend-items {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+
+  margin-right: var(--base-spacing);
+}
+
 .legend-item {
   margin: 0 var(--base-spacing);
 
@@ -37,6 +47,11 @@
   margin-right: calc(var(--base-spacing) / 2);
 }
 
+.dashboard-graphs__branch-select,
+.dashboard-graphs__branch-select select {
+  max-width: 200px;
+}
+
 .dashboard-graph {
   width: calc(50% - 2 * var(--base-spacing));
   /* Note this value must be set in JavaScript as well for the Plot height. */
@@ -46,4 +61,12 @@
 .dashboard-graph__title {
   margin-top: var(--base-spacing);
   margin-left: var(--base-spacing);
+}
+
+.dashboard-graph__plot {
+  /*
+   * Plots have the x-axis on the right which creates weird empty space on the left.
+   * This adjusts for it by removing margin and shifting the element outside the paper.
+   */
+  margin-left: calc(var(--paper-padding) * -2);
 }

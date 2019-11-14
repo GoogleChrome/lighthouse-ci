@@ -32,16 +32,18 @@ const Legend = props => {
   const branches = Array.from(new Set(props.builds.map(build => build.branch)));
   return (
     <div className="dashboard-graphs__legend">
-      {urls.map((url, i) => {
-        return (
-          <div className="legend-item" key={url}>
-            <div className="legend-item__color-chip" style={{backgroundColor: COLORS[i]}} />
-            <span>{url}</span>
-          </div>
-        );
-      })}
+      <div className="dashboard-graphs__legend-items">
+        {urls.map((url, i) => {
+          return (
+            <div className="legend-item" key={url}>
+              <div className="legend-item__color-chip" style={{backgroundColor: COLORS[i]}} />
+              <span>{url}</span>
+            </div>
+          );
+        })}
+      </div>
       <Dropdown
-        label="Branch"
+        className="dashboard-graphs__branch-select"
         options={branches.map(branch => ({value: branch, label: branch}))}
         value={props.branch}
         setValue={value => {
@@ -101,6 +103,7 @@ const StatisticPlot = props => {
           <Paper className="dashboard-graph">
             <h3 className="dashboard-graph__title">{props.title}</h3>
             <Plot
+              className="dashboard-graph__plot"
               useResizeHandler
               onClick={({points}) => {
                 const currentUrl = new URL(window.location.href);
@@ -125,11 +128,7 @@ const StatisticPlot = props => {
                 xaxis: {
                   tickfont: {color: '#888'},
                   tickvals: xs,
-                  ticktext: xs.map(i => {
-                    const build = builds[i];
-                    if (!build) return 'Unknown';
-                    return build.hash.slice(0, 8);
-                  }),
+                  ticktext: xs.map(() => ''), // force no ticktext
                   showgrid: false,
                   fixedrange: true,
                   zeroline: false,
@@ -140,6 +139,8 @@ const StatisticPlot = props => {
                   spikesnap: 'cursor',
                 },
                 yaxis: {
+                  automargin: true,
+                  side: 'right',
                   tickfont: {color: '#888'},
                   fixedrange: true,
                   range: [0, 100],

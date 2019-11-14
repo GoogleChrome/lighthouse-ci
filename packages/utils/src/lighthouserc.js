@@ -100,7 +100,7 @@ function hasOptedOutOfRcDetection(argv = process.argv, env = process.env) {
  * @return {LHCI.YargsOptions}
  */
 function convertRcFileToYargsOptions(rcFile, pathToRcFile) {
-  const {ci = {}} = rcFile;
+  const ci = flattenRcToConfig(rcFile);
   /** @type {LHCI.YargsOptions} */
   let merged = {...ci.assert, ...ci.collect, ...ci.upload, ...ci.server};
   if (ci.extends) {
@@ -110,6 +110,20 @@ function convertRcFileToYargsOptions(rcFile, pathToRcFile) {
   }
 
   return merged;
+}
+
+/**
+ *
+ * @param {LHCI.LighthouseRc} rc
+ * @return {LHCI.LighthouseCiConfig}
+ */
+function flattenRcToConfig(rc) {
+  return {
+    ...(rc.ci || {}),
+    ...(rc.lhci || {}),
+    ..._.omit(rc['ci:client'] || {}, ['server']),
+    ..._.pick(rc['ci:server'] || {}, ['server']),
+  };
 }
 
 /** @param {string|undefined} pathToRcFile */
@@ -123,5 +137,6 @@ module.exports = {
   loadAndParseRcFile,
   findRcFile,
   resolveRcFilePath,
+  flattenRcToConfig,
   hasOptedOutOfRcDetection,
 };

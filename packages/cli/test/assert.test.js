@@ -28,7 +28,7 @@ describe('Lighthouse CI assert CLI', () => {
 
   beforeAll(() => {
     const lighthouseciDir = path.join(fixtureDir, '.lighthouseci');
-    if (!fs.existsSync(lighthouseciDir)) fs.mkdirSync(lighthouseciDir);
+    if (!fs.existsSync(lighthouseciDir)) fs.mkdirSync(lighthouseciDir, {recursive: true});
     const fakeLhrPath = path.join(lighthouseciDir, 'lhr-12345.json');
     const fakeLhr = {categories: {}, audits: {}};
     fakeLhr.categories.pwa = {score: 0};

@@ -6,14 +6,19 @@
 
 declare global {
   namespace LHCI {
+    export interface LighthouseCiConfig {
+      extends?: string;
+      assert?: Partial<AssertCommand.Options>;
+      collect?: Partial<CollectCommand.Options>;
+      upload?: Partial<UploadCommand.Options>;
+      server?: Partial<ServerCommand.Options>;
+    }
+
     export interface LighthouseRc {
-      ci?: {
-        extends?: string;
-        assert?: Partial<AssertCommand.Options>;
-        collect?: Partial<CollectCommand.Options>;
-        upload?: Partial<UploadCommand.Options>;
-        server?: Partial<ServerCommand.Options>;
-      };
+      ci?: LighthouseCiConfig;
+      lhci?: LighthouseCiConfig;
+      'ci:client'?: LighthouseCiConfig;
+      'ci:server'?: LighthouseCiConfig;
     }
   }
 }

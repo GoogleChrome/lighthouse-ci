@@ -38,6 +38,42 @@ script:
   - lhci autorun # run lighthouse CI against your static site
 ```
 
+
+<details>
+<summary>Github Actions</summary>
+<br />
+   
+```yaml
+name: Build project + run Lighthouse CI
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [10.x]
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}
+    - name: npm install, build
+      run: |
+        npm install
+        npm run build
+      run: |
+          npm install -g @lhci/cli@0.3.x
+          lhci autorun --config=./lighthouse/lighthouserc.json
+      env:
+        LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
+
+```
+</details>
+
 That's it! With this in place, you'll have Lighthouse reports collected and and asserted.
 
 See the [autorun docs](./cli.md#autorun) for more including running your own webserver and uploading the reports for later viewing.

@@ -29,7 +29,6 @@ jobs:
       before_install:
         - export LHCI_GITHUB_TOKEN="" # prevent any accidental leaking of the token
         - choco install googlechrome
-        - npm install -g jest-circus
     - <<: *base-test
       os: linux
       before_script:

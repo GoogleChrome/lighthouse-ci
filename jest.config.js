@@ -6,6 +6,7 @@
 'use strict';
 
 module.exports = {
+  testRunner: require.resolve('jest-circus/runner'),
   transform: {
     '.*jsx$': 'babel-jest',
   },

@@ -21,7 +21,7 @@
     "test:lint": "npm run test:lint:js && npm run test:lint:jsx",
     "test:lint:js": "eslint ./packages/*/src ./packages/*/test",
     "test:lint:jsx": "eslint -c ./.eslintrc.ui.js --ext jsx ./packages/server/src/ui",
-    "test:unit": "jest --maxWorkers=2 --testRunner='./node_modules/jest-circus/runner.js'"
+    "test:unit": "jest --maxWorkers=2 --testRunner='jest-circus/runner.js'"
   },
   "devDependencies": {
     "@babel/core": "^7.4.5",

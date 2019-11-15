@@ -67,7 +67,7 @@ The `score`, `details.items.length`, and `numericValue` properties of audit resu
 }
 ```
 
-### Aggregation Strategies
+### Aggregation Methods
 
 When checking the results of multiple Lighthouse runs, there are multiple strategies for aggregating the results before asserting the threshold.
 

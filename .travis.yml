@@ -29,6 +29,10 @@ jobs:
       before_install:
         - export LHCI_GITHUB_TOKEN="" # prevent any accidental leaking of the token
         - choco install googlechrome
+      before_script:
+        - ps -W | sort
+      after_script:
+        - ps -W | sort
     - <<: *base-test
       os: linux
       before_script:

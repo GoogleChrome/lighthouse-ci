@@ -5,6 +5,8 @@
  */
 'use strict';
 
+jest.retryTimes(3);
+
 /* eslint-env jest */
 
 const path = require('path');

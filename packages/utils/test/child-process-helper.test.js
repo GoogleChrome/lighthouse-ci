@@ -45,10 +45,9 @@ function getListOfRunningCommands() {
     .map(line => {
       if (line.includes('PID') && line.includes('COMMAND')) return '';
 
-      const matches = line.split(/\s+\d+:\d+(\.\d+)?/g);
+      const matches = line.split(/\s+\d+:\d+(\.\d+|:\d+)?/g);
       const match = matches[matches.length - 1];
-      if (IS_WINDOWS) return match;
-      return match.replace(/^:\d+\s+/, '');
+      return match.trim();
     })
     .filter(Boolean)
     .map(command => command.trim());

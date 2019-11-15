@@ -19,6 +19,7 @@ function getSqlFilePath() {
 function cleanStdOutput(output) {
   return output
     .replace(/✘/g, 'X')
+    .replace(/×/g, 'X')
     .replace(/[0-9a-f-]{36}/gi, '<UUID>')
     .replace(/:\d{4,6}/g, ':XXXX')
     .replace(/port \d{4,6}/, 'port XXXX')

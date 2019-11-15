@@ -5,7 +5,6 @@
  */
 'use strict';
 
-const os = require('os');
 const treeKill = require('tree-kill');
 const childProcess = require('child_process');
 
@@ -18,7 +17,7 @@ async function killProcessTree(pid) {
  * @param {string} command
  * @param {RegExp} pattern
  * @param {{timeout?: number}} [opts]
- * @return {Promise<{child: import('child_process').ChildProcess, patternMatch: string|null}>}
+ * @return {Promise<{child: import('child_process').ChildProcess, patternMatch: string|null, stdout: string, stderr: string}>}
  */
 async function runCommandAndWaitForPattern(command, pattern, opts = {}) {
   const {timeout = 5000} = opts;
@@ -65,30 +64,10 @@ async function runCommandAndWaitForPattern(command, pattern, opts = {}) {
   child.stderr.off('data', stderrListener);
   child.off('exit', exitListener);
 
-  return {child, patternMatch};
-}
-
-function getListOfRunningCommands() {
-  const psLines = childProcess
-    .spawnSync('ps', ['aux'])
-    .stdout.toString()
-    .split('\n');
-
-  return psLines
-    .map(line => {
-      if (line.includes('PID') && line.includes('COMMAND')) return '';
-
-      const matches = line.split(/\s+\d+:\d+(\.\d+)?/g);
-      const match = matches[matches.length - 1];
-      if (os.platform() !== 'win32') return match;
-      return match.replace(/^:\d+\s+/, '');
-    })
-    .filter(Boolean)
-    .map(command => command.trim());
+  return {child, patternMatch, ...output};
 }
 
 module.exports = {
   killProcessTree,
-  getListOfRunningCommands,
   runCommandAndWaitForPattern,
 };

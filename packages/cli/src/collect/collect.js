@@ -75,9 +75,19 @@ async function determineUrls(options) {
   if (options.url) {
     let close = async () => undefined;
     if (options.startServerCommand) {
-      const {child} = await runCommandAndWaitForPattern(options.startServerCommand, /listen/);
+      const {child, patternMatch, stdout, stderr} = await runCommandAndWaitForPattern(
+        options.startServerCommand,
+        /(listen|ready)/,
+        {timeout: 10000}
+      );
       process.stdout.write(`Started a web server with "${options.startServerCommand}"...\n`);
       close = () => killProcessTree(child.pid);
+
+      if (!patternMatch) {
+        process.stdout.write(`WARNING: Timed out waiting for the server to start listening.\n`);
+        process.stdout.write(`         Ensure the server prints "listening" when it is ready.\n`);
+        if (process.env.CI) process.stderr.write(`\n${stdout}\n${stderr}\n`);
+      }
     }
 
     return {

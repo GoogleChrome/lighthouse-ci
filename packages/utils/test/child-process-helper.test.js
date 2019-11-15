@@ -11,6 +11,8 @@ const os = require('os');
 const childProcess = require('child_process');
 const childProcessHelper = require('../src/child-process-helper.js');
 
+const IS_WINDOWS = os.platform() === 'win32';
+
 function wait() {
   return new Promise(r => setTimeout(r, 100));
 }
@@ -31,7 +33,26 @@ async function tryUntilPasses(fn, timeout = 5000) {
   throw lastError;
 }
 
-const IS_WINDOWS = os.platform() === 'win32';
+function getListOfRunningCommands() {
+  const psLines = childProcess
+    .spawnSync('ps', ['aux'])
+    .stdout.toString()
+    .split('\n');
+
+  console.log(psLines);
+
+  return psLines
+    .map(line => {
+      if (line.includes('PID') && line.includes('COMMAND')) return '';
+
+      const matches = line.split(/\s+\d+:\d+(\.\d+)?/g);
+      const match = matches[matches.length - 1];
+      if (IS_WINDOWS) return match;
+      return match.replace(/^:\d+\s+/, '');
+    })
+    .filter(Boolean)
+    .map(command => command.trim());
+}
 
 describe('child-process-helper.js', () => {
   describe('#killProcessTree()', () => {

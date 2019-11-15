@@ -104,9 +104,6 @@ describe('child-process-helper.js', () => {
 
   describe('#runCommandAndWaitForPattern()', () => {
     it('should run the command and resolve on pattern', async () => {
-      // FIXME: for some inexplicable reason this test cannot pass in Travis Windows
-      if (os.platform() === 'win32') return;
-
       const command = 'sleep 1 && echo Hello, World!';
       const pattern = 'Hello, World';
       const {child, patternMatch} = await childProcessHelper.runCommandAndWaitForPattern(

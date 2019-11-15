@@ -24,9 +24,7 @@ describe('Lighthouse CI autorun CLI with startServerCommand', () => {
       {cwd: autorunDir}
     );
 
-    const stdoutClean = stdout.replace(/:\d{4,6}/g, ':XXXX').replace(/port \d{4,6}/, 'port XXXX');
-    const stderrClean = stderr.replace(/:\d{4,6}/g, ':XXXX').replace(/port \d{4,6}/, 'port XXXX');
-    expect(stdoutClean).toMatchInlineSnapshot(`
+    expect(stdout).toMatchInlineSnapshot(`
       "✅  .lighthouseci/ directory writable
       ⚠️   Configuration file found
       Healthcheck passed!
@@ -40,12 +38,12 @@ describe('Lighthouse CI autorun CLI with startServerCommand', () => {
 
       "
     `);
-    expect(stderrClean).toMatchInlineSnapshot(`
+    expect(stderr).toMatchInlineSnapshot(`
       "Checking assertions against 1 URL(s), 2 total run(s)
 
       1 result(s) for [1mhttp://localhost:XXXX/[0m
 
-        [31m✘[0m  [1mviewport[0m failure for [1mminScore[0m assertion
+        [31mX[0m  [1mviewport[0m failure for [1mminScore[0m assertion
            Does not have a \`<meta name=\\"viewport\\">\` tag with \`width\` or \`initial-scale\`
            Documentation: https://web.dev/viewport
 

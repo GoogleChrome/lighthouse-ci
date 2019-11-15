@@ -77,7 +77,7 @@ async function determineUrls(options) {
     if (options.startServerCommand) {
       const {child, patternMatch, stdout, stderr} = await runCommandAndWaitForPattern(
         options.startServerCommand,
-        /(listen|ready)/,
+        /(listen|ready)/i,
         {timeout: 10000}
       );
       process.stdout.write(`Started a web server with "${options.startServerCommand}"...\n`);
@@ -86,7 +86,7 @@ async function determineUrls(options) {
       if (!patternMatch) {
         process.stdout.write(`WARNING: Timed out waiting for the server to start listening.\n`);
         process.stdout.write(`         Ensure the server prints "listening" when it is ready.\n`);
-        if (process.env.CI) process.stderr.write(`\n${stdout}\n${stderr}\n`);
+        if (process.env.CI) process.stderr.write(`\nServer Output:\n${stdout}\n${stderr}\n`);
       }
     }
 

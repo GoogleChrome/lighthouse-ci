@@ -65,31 +65,29 @@ describe('child-process-helper.js', () => {
     it('should kill the child process', async () => {
       const command = 'sleep 11532';
       const commandPs = IS_WINDOWS ? '/usr/bin/sleep' : command;
-      expect(childProcessHelper.getListOfRunningCommands()).not.toContain(commandPs);
+      expect(getListOfRunningCommands()).not.toContain(commandPs);
       const child = childProcess.spawn(command, {shell: true});
       pid = child.pid;
 
-      await tryUntilPasses(() =>
-        expect(childProcessHelper.getListOfRunningCommands()).toContain(commandPs)
-      );
+      await tryUntilPasses(() => expect(getListOfRunningCommands()).toContain(commandPs));
 
       await childProcessHelper.killProcessTree(child.pid);
       pid = undefined;
 
       await tryUntilPasses(() => {
-        expect(childProcessHelper.getListOfRunningCommands()).not.toContain(commandPs);
+        expect(getListOfRunningCommands()).not.toContain(commandPs);
       });
     });
 
     it('should kill the grandchild process', async () => {
       const command = 'sleep 9653';
       const commandPs = IS_WINDOWS ? '/usr/bin/sleep' : command;
-      expect(childProcessHelper.getListOfRunningCommands()).not.toContain(commandPs);
+      expect(getListOfRunningCommands()).not.toContain(commandPs);
       const child = childProcess.spawn(`${command} &\n${command}`, {shell: true});
       pid = child.pid;
 
       await tryUntilPasses(() => {
-        const matching = childProcessHelper.getListOfRunningCommands().filter(c => c === command);
+        const matching = getListOfRunningCommands().filter(c => c === command);
         expect(matching).toHaveLength(2);
       });
 
@@ -97,7 +95,7 @@ describe('child-process-helper.js', () => {
       pid = undefined;
 
       await tryUntilPasses(() => {
-        expect(childProcessHelper.getListOfRunningCommands()).not.toContain(commandPs);
+        expect(getListOfRunningCommands()).not.toContain(commandPs);
       });
     });
   });

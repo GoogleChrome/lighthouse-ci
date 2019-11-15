@@ -7,8 +7,9 @@
 
 /* eslint-env jest */
 
+jest.retryTimes(3);
+
 const os = require('os');
-const fs = require('fs');
 const path = require('path');
 const {spawn} = require('child_process');
 const fetch = require('isomorphic-fetch');

@@ -10,7 +10,7 @@ const childProcess = require('child_process');
 
 /** @param {number} pid */
 async function killProcessTree(pid) {
-  return new Promise((resolve, reject) => treeKill(pid, err => (err ? reject(err) : resolve())));
+  return new Promise(resolve => treeKill(pid, resolve));
 }
 
 /**

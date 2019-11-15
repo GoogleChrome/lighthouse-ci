@@ -15,7 +15,7 @@ Introducing performance measurement to a project for the first time can have a f
 Your project should meet the following requirements:
 
 1. Source code is managed with git (GitHub, GitLab, Bitbucket, etc).
-2. Branches/pull requests are gated on the results of a continuous integration build process (Travis CI, CircleCI, Azure Pipelines, AppVeyor, GitHub Actions, etc). If you aren't using a build process yet, [Travis CI](https://www.travis-ci.org) offers free continuous integration for open-source projects.
+2. Branches/pull requests are gated on the results of a continuous integration build process (Travis CI, CircleCI, Jenkins, AppVeyor, GitHub Actions, etc). If you aren't using a build process yet, [Travis CI](https://www.travis-ci.org) offers free continuous integration for open-source projects.
 3. Your CI process can build your project into production assets (typically provided as an `npm run build` command by most JavaScript frameworks).
 4. Your project either:
    A) has a command that runs a web server with production-like assets.
@@ -45,47 +45,63 @@ after_success:
   - lhci autorun --upload.target=temporary-public-storage # run lighthouse CI against your static site
 ```
 
-
 <details>
 <summary>Github Actions</summary>
 <br />
-   
+
 ```yaml
-name: Build project + run Lighthouse CI
-
+name: Build project and Run Lighthouse CI
 on: [push]
+jobs:
+  lhci:
+    name: Lighthouse CI
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: Use Node.js 10.x
+        uses: actions/setup-node@v1
+        with:
+          node-version: 10.x
+      - name: npm install, build
+        run: |
+          npm install
+          npm run build
+      - name: run Lighthouse CI
+        run: |
+          npm install -g @lhci/cli@0.3.x
+          lhci autorun --upload.target=temporary-public-storage || echo "LHCI failed!"
+```
 
+</details>
+
+<details>
+<summary>Circle CI</summary>
+<br />
+
+```yaml
+version: 2.1
 jobs:
   build:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: [10.x]
-
+    docker:
+      - image: circleci/node:10.16-browsers
+    working_directory: ~/your-project
     steps:
-    - uses: actions/checkout@v1
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v1
-      with:
-        node-version: ${{ matrix.node-version }}
-    - name: npm install, build
-      run: |
-        npm install
-        npm run build
-      run: |
-          npm install -g @lhci/cli@0.3.x
-          lhci autorun --config=./lighthouse/lighthouserc.json
-      env:
-        LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
-
+      - checkout
+      - run: npm install
+      - run: npm run build
+      - run: sudo npm install -g @lhci/cli@0.3.x
+      - run:
+          name: lhci autorun
+          command: lhci autorun --upload.target=temporary-public-storage || echo "LHCI failed!"
 ```
+
 </details>
 
 That's it! With this in place, you'll have Lighthouse reports collected and uploaded with links to each report.
 
-If your site isn't static or requires a custom webserver of some sort, refer to the [autorun docs](./cli.md#autorun) for more on how to configure LHCI to integrate with your server.
+Temporary public storage provides access to individual reports, but not historical data, report diffing, or build failures. Read on to find out how to [add assertions](#add-assertions), configure the [Lighthouse CI server](#the-lighthouse-ci-server) for report diffs and timeseries charts, and enable [GitHub status checks](#github-status-checks).
 
-Read on to find out how to [add assertions](#add-assertions), configure the [Lighthouse CI server](#the-lighthouse-ci-server) for report diffs and timeseries charts, and enable [GitHub status checks](#github-status-checks).
+**NOTE:** If your site isn't static or requires a custom webserver of some sort, refer to the [autorun docs](./cli.md#autorun) for more on how to configure LHCI to integrate with your server.
 
 ## Add Assertions
 
@@ -100,7 +116,7 @@ script:
   - lhci autorun --assert.preset=lighthouse:recommended # run Lighthouse CI on your static site and assert the recommended preset
 ```
 
-**NOTE:** the `lhci autorun` command moved from `after_success` to `script` in this example because we'd like the exit code of `lhci` to fail the build.
+**NOTE:** the `lhci autorun` command moved from `after_success` to `script` in this example because we'd like the exit code of `lhci` to fail the build. If you're using another CI provider you can remove the `|| echo "LHCI failed!"`.
 
 The setup so far will automatically assert the Lighthouse team's recommended set of audits, but your project might have a bit of work to go before hitting straight 100s! Fear not, the assertions are completely configurable and you can disable as many audits as you need. Read more about what's possible in [configuration](./configuration.md) with [the assertions format](./assertions.md).
 
@@ -155,8 +171,6 @@ Be sure to keep this token secret. Anyone in possession of this token will be ab
 If you don't want to use the Github App, you can enable this via a personal access token. The only difference is that your user account (and its avatar) will post a status check. [Create a token](https://github.com/settings/tokens/new) with the `repo:status` scope and [add it to your environment](https://docs.travis-ci.com/user/environment-variables/#defining-variables-in-repository-settings) as `LHCI_GITHUB_TOKEN`.
 
 Be sure to keep this token secret. Anyone in possession of this token will be able to set status checks on your repository.
-
-> Diffing between runs isn't available from `temporary-public-storage`, you have to run a LHCI server and setup your build to upload files there in order to get it. See [Lighthouse CI Server docs](#the-lighthouse-ci-server) for details.
 
 ### The Lighthouse CI Server
 

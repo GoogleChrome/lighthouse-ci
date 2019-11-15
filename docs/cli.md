@@ -10,7 +10,7 @@ npm install -g @lhci/cli
 
 ## Commands
 
-All commands support configuration via a JSON rc file passed in via `--config=./path/to/`. Any argument on the CLI can also be passed in via environment variable. For example, `--config=foo` can be replaced with `LH_RC_FILE=foo`. Learn more about [configuration](#configuration).
+All commands support configuration via a JSON file passed in via `--config=./path/to/`. Any argument on the CLI can also be passed in via environment variable. For example, `--config=foo` can be replaced with `LH_RC_FILE=foo`. Learn more about [configuration](./configuration.md).
 
 ### `healthcheck`
 
@@ -40,7 +40,7 @@ lhci healthcheck --fatal --checks=githubToken
 
 ### `autorun`
 
-Automatically run `collect` and `assert` with sensible defaults, and optionally `upload`.
+Automatically run `collect` with sensible defaults and `assert` or `upload` as specified. Options for individual commands can be set by prefixing the option with the command name.
 
 **Examples**
 
@@ -52,7 +52,7 @@ lhci autorun --upload.target=temporary-public-storage
 
 #### Starting a webserver
 
-To allow autorun to start your own webserver, add an npm script named `serve:lhci`. autorun will execute this script before collection.
+To allow autorun to automatically start your own webserver, add an npm script named `serve:lhci`. autorun will execute this script before collection.
 
 example `package.json` excerpt:
 
@@ -62,7 +62,7 @@ example `package.json` excerpt:
   }
 ```
 
-You can also supply a custom server initalization command directly as a flag to `autorun`:
+You can also supply the custom server initalization command from `collect` as a flag directly to `autorun`:
 
 ```bash
 lhci autorun --collect.startServerCommand="rails server -e production"
@@ -236,36 +236,35 @@ lhci server --storage.sqlDialect=postgres --storage.sqlConnectionUrl="postgres:/
 
 ## Configuration
 
-Configuring settings for Lighthouse CI is most easily done through a `lighthouserc.json` file. The file supports configuration for the four major commands, `collect`, `upload`, `assert`, and `server`. Note that `server` is typically run in a different context from the rest of your project and will likely require a separate rc file.
+Configuring settings for Lighthouse CI is most easily done through a `lighthouserc.json` file. The file supports configuration for the four major commands, `collect`, `upload`, `assert`, and `server`. Learn more about [configuration](./configuration.md).
 
 **Usage**
 
 ```bash
-# Specify an rc file via environment variable
-export LHCI_RC_FILE=path/to/rc/file
+# Your config file is at `./lighthouserc.json` and will be picked up automatically
 lhci <command>
 
-# Specify an rc file via command-line flag
-lhci --config=path/to/different/rc/file <command>
+# Specify a config file via command-line flag
+lhci <command> --config=path/to/different/rc/file
 ```
 
-**Example Project RC File**
+**Example Project Config File**
 
 ```json
 {
   "ci": {
+    "collect": {
+      "numberOfRuns": 5
+    },
     "assert": {
+      "preset": "lighthouse:recommended",
       "assertions": {
-        "first-contentful-paint": ["error", {"minScore": 0.8}],
-        "speed-index": ["error", {"minScore": 0.8}],
-        "interactive": ["error", {"minScore": 0.8}]
+        "offscreen-images": "off",
+        "uses-webp-images": "off"
       }
     },
-    "collect": {
-      "numberOfRuns": 2
-    },
     "upload": {
-      "serverBaseUrl": "http://my-custom-lhci-server.com/"
+      "serverBaseUrl": "http://my-custom-lhci-server.example.com/"
     }
   }
 }

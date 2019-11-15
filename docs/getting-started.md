@@ -41,6 +41,7 @@ before_install:
 script:
   - npm run build # build your site
   - npm test # run your normal tests
+after_success:
   - lhci autorun --upload.target=temporary-public-storage # run lighthouse CI against your static site
 ```
 
@@ -56,22 +57,35 @@ Read on to find out how to [add assertions](#add-assertions), configure the [Lig
 
 While Lighthouse reports at your fingertips is great, failing the build based on the audit results is even better! Add an assertion preset option to get started with assertions.
 
-```bash
-lhci autorun --assert.preset=lighthouse:recommended
+```yaml
+script:
+  - npm run build # build your site
+  - npm test # run your normal tests
+  - lhci autorun --assert.preset=lighthouse:recommended # run Lighthouse CI on your static site and assert the recommended preset
 ```
+
+**NOTE:** the `lhci autorun` command moved from `after_success` to `script` in this example because we'd like the exit code of `lhci` to fail the build.
 
 The setup so far will automatically assert the Lighthouse team's recommended set of audits, but your project might have a bit of work to go before hitting straight 100s! Fear not, the assertions are completely configurable and you can disable as many audits as you need. Read more about what's possible in [configuration](./configuration.md) with [the assertions format](./assertions.md).
 
 ## Configuration
 
-Lighthouse CI uses a `lighthouserc.json` file to configure all the core commands used.
+Lighthouse CI uses a `lighthouserc.json` file to configure all the core commands used. You can replace the options on the command-line we've seen so far with the following configuration file. Read more about how to configure Lighthouse CI [in our docs](./configuration.md).
+
+```bash
+# no need to pass explicit options
+# lighthouserc.json will be automatically picked up if it's in the cwd
+lhci autorun
+```
 
 **lighthouserc.json**
 
 ```json
 {
   "ci": {
-    "collect": {}, // collect options would go here
+    "collect": {
+      "numberOfRuns": 3
+    },
     "assert": {
       "preset": "lighthouse:recommended",
       "assertions": {

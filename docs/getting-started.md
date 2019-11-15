@@ -156,7 +156,7 @@ If you don't want to use the Github App, you can enable this via a personal acce
 
 Be sure to keep this token secret. Anyone in possession of this token will be able to set status checks on your repository.
 
-> Diffing between runs isn't available from `temporary-public-storage`, you have to run a LHCI server and setup your build to upload files there in order to get it. See [Lighthouse CI Server docs](the-lighthouse-ci-server) for details.
+> Diffing between runs isn't available from `temporary-public-storage`, you have to run a LHCI server and setup your build to upload files there in order to get it. See [Lighthouse CI Server docs](#the-lighthouse-ci-server) for details.
 
 ### The Lighthouse CI Server
 

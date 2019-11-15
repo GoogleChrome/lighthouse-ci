@@ -72,7 +72,7 @@ describe('Lighthouse CI CLI', () => {
     }
 
     it('should create a new project', async () => {
-      const wizardProcess = spawn(CLI_PATH, ['wizard']);
+      const wizardProcess = spawn('node', [CLI_PATH, 'wizard']);
       wizardProcess.stdoutMemory = '';
       wizardProcess.stderrMemory = '';
       wizardProcess.stdout.on('data', chunk => (wizardProcess.stdoutMemory += chunk.toString()));

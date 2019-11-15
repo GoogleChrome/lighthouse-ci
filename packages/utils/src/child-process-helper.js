@@ -5,6 +5,7 @@
  */
 'use strict';
 
+const os = require('os');
 const treeKill = require('tree-kill');
 const childProcess = require('child_process');
 
@@ -68,13 +69,19 @@ async function runCommandAndWaitForPattern(command, pattern, opts = {}) {
 }
 
 function getListOfRunningCommands() {
-  return childProcess
+  const psLines = childProcess
     .spawnSync('ps', ['aux'])
     .stdout.toString()
-    .split('\n')
+    .split('\n');
+
+  return psLines
     .map(line => {
+      if (line.includes('PID') && line.includes('COMMAND')) return '';
+
       const matches = line.split(/\s+\d+:\d+(\.\d+)?/g);
-      return matches && matches[matches.length - 1];
+      const match = matches[matches.length - 1];
+      if (os.platform() !== 'win32') return match;
+      return match.replace(/^:\d+\s+/, '');
     })
     .filter(Boolean)
     .map(command => command.trim());

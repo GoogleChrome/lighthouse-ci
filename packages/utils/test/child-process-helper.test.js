@@ -7,6 +7,7 @@
 
 /* eslint-env jest */
 
+const os = require('os');
 const childProcess = require('child_process');
 const childProcessHelper = require('../src/child-process-helper.js');
 
@@ -30,6 +31,8 @@ async function tryUntilPasses(fn, timeout = 5000) {
   throw lastError;
 }
 
+const IS_WINDOWS = os.platform() === 'win32';
+
 describe('child-process-helper.js', () => {
   describe('#killProcessTree()', () => {
     let pid;
@@ -40,25 +43,27 @@ describe('child-process-helper.js', () => {
 
     it('should kill the child process', async () => {
       const command = 'sleep 11532';
-      expect(childProcessHelper.getListOfRunningCommands()).not.toContain(command);
+      const commandPs = IS_WINDOWS ? '/usr/bin/sleep' : command;
+      expect(childProcessHelper.getListOfRunningCommands()).not.toContain(commandPs);
       const child = childProcess.spawn(command, {shell: true});
       pid = child.pid;
 
       await tryUntilPasses(() =>
-        expect(childProcessHelper.getListOfRunningCommands()).toContain(command)
+        expect(childProcessHelper.getListOfRunningCommands()).toContain(commandPs)
       );
 
       await childProcessHelper.killProcessTree(child.pid);
       pid = undefined;
 
       await tryUntilPasses(() => {
-        expect(childProcessHelper.getListOfRunningCommands()).not.toContain(command);
+        expect(childProcessHelper.getListOfRunningCommands()).not.toContain(commandPs);
       });
     });
 
     it('should kill the grandchild process', async () => {
       const command = 'sleep 9653';
-      expect(childProcessHelper.getListOfRunningCommands()).not.toContain(command);
+      const commandPs = IS_WINDOWS ? '/usr/bin/sleep' : command;
+      expect(childProcessHelper.getListOfRunningCommands()).not.toContain(commandPs);
       const child = childProcess.spawn(`${command} &\n${command}`, {shell: true});
       pid = child.pid;
 
@@ -71,7 +76,7 @@ describe('child-process-helper.js', () => {
       pid = undefined;
 
       await tryUntilPasses(() => {
-        expect(childProcessHelper.getListOfRunningCommands()).not.toContain(command);
+        expect(childProcessHelper.getListOfRunningCommands()).not.toContain(commandPs);
       });
     });
   });

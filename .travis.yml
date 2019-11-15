@@ -26,7 +26,9 @@ jobs:
         chrome: stable
     - <<: *base-test
       os: windows
-      before_install: export LHCI_GITHUB_TOKEN="" # prevent any accidental leaking of the token
+      before_install:
+        - export LHCI_GITHUB_TOKEN="" # prevent any accidental leaking of the token
+        - choco install googlechrome
     - <<: *base-test
       os: linux
       before_script:

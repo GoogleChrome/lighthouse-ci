@@ -21,7 +21,12 @@ async function startServer(sqlFile) {
   }
 
   let stdout = '';
-  const serverProcess = spawn(CLI_PATH, ['server', '-p=0', `--storage.sqlDatabasePath=${sqlFile}`]);
+  const serverProcess = spawn('node', [
+    CLI_PATH,
+    'server',
+    '-p=0',
+    `--storage.sqlDatabasePath=${sqlFile}`,
+  ]);
   serverProcess.stdout.on('data', chunk => (stdout += chunk.toString()));
 
   await waitForCondition(() => stdout.includes('listening'));
@@ -51,7 +56,10 @@ function runCLI(args, overrides = {}) {
     LHCI_NO_LIGHTHOUSERC: '1',
   };
   const env = {...cleanEnv, ...extraEnvVars};
-  let {stdout = '', stderr = '', status = -1} = spawnSync(CLI_PATH, args, {...options, env});
+  let {stdout = '', stderr = '', status = -1} = spawnSync('node', [CLI_PATH, ...args], {
+    ...options,
+    env,
+  });
 
   stdout = stdout.toString();
   stderr = stderr.toString();

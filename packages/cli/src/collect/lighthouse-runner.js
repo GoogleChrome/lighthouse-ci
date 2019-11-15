@@ -69,7 +69,7 @@ class LighthouseRunner {
     let stderr = '';
 
     const {args, cleanupFn} = LighthouseRunner.computeArgumentsAndCleanup(url, options);
-    const process = childProcess.spawn(LH_CLI_PATH, args);
+    const process = childProcess.spawn('node', [LH_CLI_PATH, ...args]);
 
     process.stdout.on('data', chunk => (stdout += chunk.toString()));
     process.stderr.on('data', chunk => (stderr += chunk.toString()));

@@ -223,7 +223,7 @@ lhci upload --target=temporary-public-storage
 
 If you're using `autorun`, setting `ci.upload.target` to `temporary-public-storage` in your `lighthouserc.json` is all that's necessary. The upload step will happen automatically.
 
-> The historical reports and diffing are available only with the Lighthouse CI server. Lighthouse mainteners are working on a Lighthouse CI server hosted on their side with free plan. 
+> Diffing between runs isn't available from temporary-public-storage; you have to run a LHCI server and setup your build to upload files there in order to get it. See [Lighthouse CI Server docs](the-lighthouse-ci-server) for details.
 
 ### The Lighthouse CI Server
 

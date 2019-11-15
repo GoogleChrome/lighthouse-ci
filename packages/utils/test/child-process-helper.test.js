@@ -13,6 +13,8 @@ const childProcessHelper = require('../src/child-process-helper.js');
 
 const IS_WINDOWS = os.platform() === 'win32';
 
+jest.retryTimes(3);
+
 function wait() {
   return new Promise(r => setTimeout(r, 100));
 }
@@ -38,8 +40,6 @@ function getListOfRunningCommands() {
     .spawnSync('ps', ['aux'])
     .stdout.toString()
     .split('\n');
-
-  console.log(psLines);
 
   return psLines
     .map(line => {
@@ -76,7 +76,7 @@ describe('child-process-helper.js', () => {
       await tryUntilPasses(() => {
         expect(getListOfRunningCommands()).not.toContain(commandPs);
       });
-    });
+    }, 15000);
 
     it('should kill the grandchild process', async () => {
       const command = 'sleep 9653';
@@ -96,23 +96,32 @@ describe('child-process-helper.js', () => {
       await tryUntilPasses(() => {
         expect(getListOfRunningCommands()).not.toContain(commandPs);
       });
-    });
+    }, 15000);
   });
 
   describe('#runCommandAndWaitForPattern()', () => {
     it('should run the command and resolve on pattern', async () => {
-      const command = 'sleep 1 && echo "Hello, World!"';
+      const command = 'sleep 1 && echo Hello, World!';
       const pattern = 'Hello, World';
-      const {child} = await childProcessHelper.runCommandAndWaitForPattern(command, pattern);
+      const {child, patternMatch} = await childProcessHelper.runCommandAndWaitForPattern(
+        command,
+        pattern
+      );
       await childProcessHelper.killProcessTree(child.pid);
+      expect(patternMatch).toBeTruthy();
     });
 
     it('should run the command and resolve on timeout', async () => {
       const command = 'sleep 5 && echo "Hello, World!"';
       const pattern = 'Hello, World';
       const opts = {timeout: 1000};
-      const {child} = await childProcessHelper.runCommandAndWaitForPattern(command, pattern, opts);
+      const {child, patternMatch} = await childProcessHelper.runCommandAndWaitForPattern(
+        command,
+        pattern,
+        opts
+      );
       await childProcessHelper.killProcessTree(child.pid);
+      expect(patternMatch).toBeFalsy();
     }, 4000);
 
     it('should run the command and reject on failure', async () => {

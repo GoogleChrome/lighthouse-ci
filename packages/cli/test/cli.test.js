@@ -18,6 +18,7 @@ const {
   startServer,
   waitForCondition,
   getSqlFilePath,
+  safeDeleteFile,
   runCLI,
   CLI_PATH,
 } = require('./test-utils.js');
@@ -34,13 +35,13 @@ describe('Lighthouse CI CLI', () => {
   let projectToken;
   let urlToCollect;
 
-  afterAll(() => {
+  afterAll(async () => {
     if (server) {
       server.process.kill();
-      if (fs.existsSync(server.sqlFile)) fs.unlinkSync(server.sqlFile);
+      await safeDeleteFile(server.sqlFile);
     }
 
-    if (fs.existsSync(tmpSqlFilePath)) fs.unlinkSync(tmpSqlFilePath);
+    await safeDeleteFile(tmpSqlFilePath);
   });
 
   describe('server', () => {

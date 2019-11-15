@@ -5,6 +5,7 @@
  */
 'use strict';
 
+const fs = require('fs');
 const path = require('path');
 const {spawn, spawnSync} = require('child_process');
 const testingLibrary = require('@testing-library/dom');
@@ -24,6 +25,21 @@ function cleanStdOutput(output) {
     .replace(/:\d{4,6}/g, ':XXXX')
     .replace(/port \d{4,6}/, 'port XXXX')
     .replace(/\d{4,}(\.\d{1,})?/g, 'XXXX');
+}
+
+async function safeDeleteFile(filePath) {
+  if (!fs.existsSync(filePath)) return;
+
+  let attempt = 0;
+  while (attempt < 3) {
+    attempt++;
+    try {
+      fs.unlinkSync(filePath);
+      return;
+    } catch (err) {
+      await new Promise(r => setTimeout(r, 1000));
+    }
+  }
 }
 
 async function startServer(sqlFile) {
@@ -89,4 +105,5 @@ module.exports = {
   startServer,
   waitForCondition,
   getSqlFilePath,
+  safeDeleteFile,
 };

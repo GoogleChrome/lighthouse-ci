@@ -11,6 +11,7 @@ const fs = require('fs');
 const path = require('path');
 const runTests = require('./server-test-suite.js').runTests;
 const runServer = require('../src/server.js').createServer;
+const {safeDeleteFile} = require('../../cli/test/test-utils.js');
 
 describe('sqlite server', () => {
   const state = {
@@ -21,7 +22,7 @@ describe('sqlite server', () => {
   const dbPath = path.join(__dirname, 'server-test.tmp.sql');
 
   beforeAll(async () => {
-    if (fs.existsSync(dbPath)) fs.unlinkSync(dbPath);
+    await safeDeleteFile(dbPath);
 
     const {port, close, storageMethod} = await runServer({
       logLevel: 'silent',
@@ -38,9 +39,9 @@ describe('sqlite server', () => {
     state.storageMethod = storageMethod;
   });
 
-  afterAll(() => {
-    fs.unlinkSync(dbPath);
-    state.closeServer();
+  afterAll(async () => {
+    await state.closeServer();
+    await safeDeleteFile(dbPath);
   });
 
   runTests(state);

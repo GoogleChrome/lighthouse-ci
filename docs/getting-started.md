@@ -223,7 +223,7 @@ lhci upload --target=temporary-public-storage
 
 If you're using `autorun`, setting `ci.upload.target` to `temporary-public-storage` in your `lighthouserc.json` is all that's necessary. The upload step will happen automatically.
 
-> Diffing between runs isn't available from temporary-public-storage; you have to run a LHCI server and setup your build to upload files there in order to get it. See [Lighthouse CI Server docs](the-lighthouse-ci-server) for details.
+> Diffing between runs isn't available from `temporary-public-storage`, you have to run a LHCI server and setup your build to upload files there in order to get it. See [Lighthouse CI Server docs](the-lighthouse-ci-server) for details.
 
 ### The Lighthouse CI Server
 

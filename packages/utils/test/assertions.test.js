@@ -562,7 +562,7 @@ describe('getAllAssertionResults', () => {
             {resourceType: 'font', budget: 1},
             {resourceType: 'third-party', budget: 5},
           ],
-          resourceSizes: [{resourceType: 'document', budget: 400}],
+          resourceSizes: [{resourceType: 'document', budget: 1}],
         },
       ];
 
@@ -596,7 +596,7 @@ describe('getAllAssertionResults', () => {
           actual: 1143,
           auditId: 'resource-summary',
           auditProperty: 'document.size',
-          expected: 400,
+          expected: 1024,
           level: 'error',
           name: 'maxNumericValue',
           operator: '<=',

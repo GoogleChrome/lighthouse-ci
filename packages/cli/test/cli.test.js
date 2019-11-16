@@ -418,7 +418,7 @@ describe('Lighthouse CI CLI', () => {
              Keep request counts low and transfer sizes small
              Documentation: https://developers.google.com/web/tools/lighthouse/audits/budgets
 
-                expected: <=[32m1[0m
+                expected: <=[32mXXXX[0m
                    found: [31mXXXX[0m
               [2mall values: XXXX, XXXX[0m
 

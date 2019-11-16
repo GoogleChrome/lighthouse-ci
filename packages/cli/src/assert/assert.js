@@ -37,11 +37,6 @@ function readBudgets(budgetsFile) {
   return JSON.parse(fs.readFileSync(fullyResolvedPath, 'utf8'));
 }
 
-/** @param {number} value @return {string} */
-function getBytesValueOutput(value) {
-  return `${(value / 1024).toFixed(2)} KB`;
-}
-
 /**
  * @param {LHCI.AssertCommand.Options} options
  * @return {Promise<void>}
@@ -81,12 +76,6 @@ async function runCommand(options) {
       const idPart = `${log.bold}${result.auditId}${log.reset}`;
       const propertyPart = result.auditProperty ? `.${result.auditProperty}` : '';
       const namePart = `${log.bold}${result.name}${log.reset}`;
-      const isResourceSizes = result.auditId === 'resource-summary';
-      const actual = isResourceSizes ? getBytesValueOutput(result.actual) : result.actual;
-      const expected = isResourceSizes ? getBytesValueOutput(result.expected) : result.expected;
-      const values = isResourceSizes
-        ? result.values.map(value => getBytesValueOutput(value))
-        : result.values;
 
       const auditTitlePart = result.auditTitle || '';
       const documentationPart = result.auditDocumentationLink
@@ -100,9 +89,9 @@ async function runCommand(options) {
 
       process.stderr.write(`
   ${icon} ${idPart}${propertyPart} ${label} for ${namePart} assertion${humanFriendlyParts}
-        expected: ${result.operator}${log.greenify(expected)}
-           found: ${log.redify(actual)}
-      ${log.dim}all values: ${values.join(', ')}${log.reset}\n\n`);
+        expected: ${result.operator}${log.greenify(result.expected)}
+           found: ${log.redify(result.actual)}
+      ${log.dim}all values: ${result.values.join(', ')}${log.reset}\n\n`);
     }
   }
 

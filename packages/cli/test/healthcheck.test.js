@@ -21,7 +21,7 @@ describe('Lighthouse CI healthcheck CLI', () => {
       expect(stdout).toMatchInlineSnapshot(`
         "✅  .lighthouseci/ directory writable
         ✅  Configuration file found
-        ⚠️   GitHub token set
+        ⚠️   GitHub token not set
         Healthcheck passed!
         "
       `);
@@ -38,7 +38,7 @@ describe('Lighthouse CI healthcheck CLI', () => {
       expect(stdout).toMatchInlineSnapshot(`
         "✅  .lighthouseci/ directory writable
         ✅  Configuration file found
-        ⚠️   GitHub token set
+        ⚠️   GitHub token not set
         Healthcheck passed!
         "
       `);
@@ -54,7 +54,7 @@ describe('Lighthouse CI healthcheck CLI', () => {
       expect(status).toEqual(0);
       expect(stdout).toMatchInlineSnapshot(`
         "✅  .lighthouseci/ directory writable
-        ⚠️   Configuration file found
+        ⚠️   Configuration file not found
         Healthcheck passed!
         "
       `);
@@ -70,7 +70,7 @@ describe('Lighthouse CI healthcheck CLI', () => {
       expect(status).toEqual(0);
       expect(stdout).toMatchInlineSnapshot(`
         "✅  .lighthouseci/ directory writable
-        ⚠️   Configuration file found
+        ⚠️   Configuration file not found
         Healthcheck passed!
         "
       `);
@@ -86,7 +86,7 @@ describe('Lighthouse CI healthcheck CLI', () => {
       expect(status).toEqual(0);
       expect(stdout).toMatchInlineSnapshot(`
         "✅  .lighthouseci/ directory writable
-        ⚠️   Configuration file found
+        ⚠️   Configuration file not found
         Healthcheck passed!
         "
       `);

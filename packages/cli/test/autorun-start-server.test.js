@@ -28,7 +28,7 @@ describe('Lighthouse CI autorun CLI with startServerCommand', () => {
 
     expect(stdout).toMatchInlineSnapshot(`
       "✅  .lighthouseci/ directory writable
-      ⚠️   Configuration file found
+      ⚠️   Configuration file not found
       Healthcheck passed!
 
       Started a web server with \\"node autorun-server.js\\"...

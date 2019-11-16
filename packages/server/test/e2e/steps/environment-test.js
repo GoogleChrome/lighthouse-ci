@@ -5,13 +5,9 @@
  */
 'use strict';
 
+/* eslint-env jest */
+
 module.exports = {
-  testRunner: require.resolve('jest-circus/runner'),
-  transform: {
-    '.*jsx$': 'babel-jest',
-  },
-  moduleNameMapper: {
-    '\\.css$': 'identity-obj-proxy',
-    '\\.(svg|png|jpg|jpeg)$': '<rootDir>/packages/server/test/__mocks__/file-mock.js',
-  },
+  shouldRunE2E: () => Boolean(!process.env.CI || process.env.RUN_E2E_TESTS),
+  emptyTest: () => it.skip('not enabled', () => {}),
 };

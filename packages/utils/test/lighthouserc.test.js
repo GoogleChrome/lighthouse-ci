@@ -10,6 +10,7 @@
 const fs = require('fs');
 const path = require('path');
 const rc = require('../src/lighthouserc.js');
+const {safeDeleteFile} = require('../../cli/test/test-utils.js');
 
 describe('lighthouserc.js', () => {
   describe('#loadAndParseRcFile', () => {
@@ -22,8 +23,8 @@ describe('lighthouserc.js', () => {
       tmpFile = path.join(__dirname, `fixtures/rc-${Math.random()}.tmp.json`);
     });
 
-    afterEach(() => {
-      if (fs.existsSync(tmpFile)) fs.unlinkSync(tmpFile);
+    afterEach(async () => {
+      await safeDeleteFile(tmpFile);
     });
 
     it('should load a basic json file', () => {

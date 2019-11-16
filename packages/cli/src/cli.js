@@ -117,7 +117,7 @@ async function run() {
 
 run().catch(err => {
   process.stderr.write(err.stack);
-  if (err.stdout) process.stderr.write(err.stdout);
-  if (err.stderr) process.stderr.write(err.stderr);
+  if (err.stdout) process.stderr.write('\n' + err.stdout.slice(0, 4000));
+  if (err.stderr) process.stderr.write('\n' + err.stderr);
   process.exit(1);
 });

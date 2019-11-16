@@ -50,7 +50,7 @@ async function createApp(options) {
 
 /**
  * @param {LHCI.ServerCommand.Options} options
- * @return {Promise<{port: number, close: () => void, storageMethod: StorageMethod}>}
+ * @return {Promise<{port: number, close: () => Promise<void>, storageMethod: StorageMethod}>}
  */
 async function createServer(options) {
   const {app, storageMethod} = await createApp(options);
@@ -65,9 +65,8 @@ async function createServer(options) {
       resolve({
         storageMethod,
         port: listenPort,
-        close: () => {
-          server.close();
-          storageMethod.close();
+        close: async () => {
+          await Promise.all([new Promise(r => server.close(r)), storageMethod.close()]);
         },
       });
     });

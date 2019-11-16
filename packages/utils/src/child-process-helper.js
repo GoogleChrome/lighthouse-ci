@@ -10,14 +10,14 @@ const childProcess = require('child_process');
 
 /** @param {number} pid */
 async function killProcessTree(pid) {
-  return new Promise((resolve, reject) => treeKill(pid, err => (err ? reject(err) : resolve())));
+  return new Promise(resolve => treeKill(pid, resolve));
 }
 
 /**
  * @param {string} command
  * @param {RegExp} pattern
  * @param {{timeout?: number}} [opts]
- * @return {Promise<{child: import('child_process').ChildProcess, patternMatch: string|null}>}
+ * @return {Promise<{child: import('child_process').ChildProcess, patternMatch: string|null, stdout: string, stderr: string}>}
  */
 async function runCommandAndWaitForPattern(command, pattern, opts = {}) {
   const {timeout = 5000} = opts;
@@ -64,24 +64,10 @@ async function runCommandAndWaitForPattern(command, pattern, opts = {}) {
   child.stderr.off('data', stderrListener);
   child.off('exit', exitListener);
 
-  return {child, patternMatch};
-}
-
-function getListOfRunningCommands() {
-  return childProcess
-    .spawnSync('ps', ['aux'])
-    .stdout.toString()
-    .split('\n')
-    .map(line => {
-      const matches = line.split(/\s+\d+:\d+(\.\d+)?/g);
-      return matches && matches[matches.length - 1];
-    })
-    .filter(Boolean)
-    .map(command => command.trim());
+  return {child, patternMatch, ...output};
 }
 
 module.exports = {
   killProcessTree,
-  getListOfRunningCommands,
   runCommandAndWaitForPattern,
 };

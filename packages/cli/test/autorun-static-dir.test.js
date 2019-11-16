@@ -5,6 +5,8 @@
  */
 'use strict';
 
+jest.retryTimes(3);
+
 /* eslint-env jest */
 
 const path = require('path');
@@ -19,11 +21,7 @@ describe('Lighthouse CI autorun CLI', () => {
       env: {LHCI_NO_LIGHTHOUSERC: undefined},
     });
 
-    const stdoutClean = stdout
-      .replace(/:\d{4,6}/g, ':XXXX')
-      .replace(/port \d{4,6}/, 'port XXXX')
-      .replace(/Open the report at.*\n/, 'Open the report at <link>\n');
-    const stderrClean = stderr.replace(/:\d{4,6}/g, ':XXXX').replace(/port \d{4,6}/, 'port XXXX');
+    const stdoutClean = stdout.replace(/Open the report at.*\n/, 'Open the report at <link>\n');
     expect(stdoutClean).toMatchInlineSnapshot(`
       "✅  .lighthouseci/ directory writable
       ✅  Configuration file found
@@ -46,12 +44,12 @@ describe('Lighthouse CI autorun CLI', () => {
 
       "
     `);
-    expect(stderrClean).toMatchInlineSnapshot(`
+    expect(stderr).toMatchInlineSnapshot(`
       "Checking assertions against 1 URL(s), 2 total run(s)
 
       1 result(s) for [1mhttp://localhost:XXXX/good.html[0m
 
-        [31m✘[0m  [1mviewport[0m failure for [1mminScore[0m assertion
+        [31mX[0m  [1mviewport[0m failure for [1mminScore[0m assertion
            Does not have a \`<meta name=\\"viewport\\">\` tag with \`width\` or \`initial-scale\`
            Documentation: https://web.dev/viewport
 

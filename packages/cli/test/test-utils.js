@@ -5,14 +5,41 @@
  */
 'use strict';
 
+const fs = require('fs');
 const path = require('path');
 const {spawn, spawnSync} = require('child_process');
 const testingLibrary = require('@testing-library/dom');
 
 const CLI_PATH = path.join(__dirname, '../src/cli.js');
+const UUID_REGEX = /[0-9a-f-]{36}/gi;
 
 function getSqlFilePath() {
   return `cli-test-${Math.round(Math.random() * 1e9)}.tmp.sql`;
+}
+
+function cleanStdOutput(output) {
+  return output
+    .replace(/✘/g, 'X')
+    .replace(/×/g, 'X')
+    .replace(/[0-9a-f-]{36}/gi, '<UUID>')
+    .replace(/:\d{4,6}/g, ':XXXX')
+    .replace(/port \d{4,6}/, 'port XXXX')
+    .replace(/\d{4,}(\.\d{1,})?/g, 'XXXX');
+}
+
+async function safeDeleteFile(filePath) {
+  if (!fs.existsSync(filePath)) return;
+
+  let attempt = 0;
+  while (attempt < 3) {
+    attempt++;
+    try {
+      fs.unlinkSync(filePath);
+      return;
+    } catch (err) {
+      await new Promise(r => setTimeout(r, 1000));
+    }
+  }
 }
 
 async function startServer(sqlFile) {
@@ -21,7 +48,12 @@ async function startServer(sqlFile) {
   }
 
   let stdout = '';
-  const serverProcess = spawn(CLI_PATH, ['server', '-p=0', `--storage.sqlDatabasePath=${sqlFile}`]);
+  const serverProcess = spawn('node', [
+    CLI_PATH,
+    'server',
+    '-p=0',
+    `--storage.sqlDatabasePath=${sqlFile}`,
+  ]);
   serverProcess.stdout.on('data', chunk => (stdout += chunk.toString()));
 
   await waitForCondition(() => stdout.includes('listening'));
@@ -39,7 +71,7 @@ function waitForCondition(fn, label) {
 /**
  * @param {string[]} args
  * @param {{cwd?: string, env?: Record<string, string>}} [overrides]
- * @return {{stdout: string, stderr: string, status: number}}
+ * @return {{stdout: string, stderr: string, status: number, matches: {uuids: RegExpMatchArray}}}
  */
 function runCLI(args, overrides = {}) {
   const {env: extraEnvVars, ...options} = overrides;
@@ -51,13 +83,20 @@ function runCLI(args, overrides = {}) {
     LHCI_NO_LIGHTHOUSERC: '1',
   };
   const env = {...cleanEnv, ...extraEnvVars};
-  let {stdout = '', stderr = '', status = -1} = spawnSync(CLI_PATH, args, {...options, env});
+  let {stdout = '', stderr = '', status = -1} = spawnSync('node', [CLI_PATH, ...args], {
+    ...options,
+    env,
+  });
 
   stdout = stdout.toString();
   stderr = stderr.toString();
   status = status || 0;
 
-  return {stdout, stderr, status};
+  const uuids = stdout.match(UUID_REGEX);
+  stdout = cleanStdOutput(stdout);
+  stderr = cleanStdOutput(stderr);
+
+  return {stdout, stderr, status, matches: {uuids}};
 }
 
 module.exports = {
@@ -66,4 +105,5 @@ module.exports = {
   startServer,
   waitForCondition,
   getSqlFilePath,
+  safeDeleteFile,
 };

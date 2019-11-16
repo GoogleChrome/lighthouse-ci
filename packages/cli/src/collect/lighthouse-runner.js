@@ -5,6 +5,7 @@
  */
 'use strict';
 
+const os = require('os');
 const fs = require('fs');
 const path = require('path');
 const childProcess = require('child_process');
@@ -13,6 +14,13 @@ const {getSavedReportsDirectory} = require('@lhci/utils/src/saved-reports.js');
 const LH_CLI_PATH = path.join(require.resolve('lighthouse'), '../../lighthouse-cli/index.js');
 
 class LighthouseRunner {
+  /** @param {string} output */
+  static isOutputLhrLike(output) {
+    return (
+      output.startsWith('{') && output.includes('"lighthouseVersion":') && output.endsWith('}')
+    );
+  }
+
   /**
    * @param {string} url
    * @param {Partial<LHCI.CollectCommand.Options>} options
@@ -69,7 +77,7 @@ class LighthouseRunner {
     let stderr = '';
 
     const {args, cleanupFn} = LighthouseRunner.computeArgumentsAndCleanup(url, options);
-    const process = childProcess.spawn(LH_CLI_PATH, args);
+    const process = childProcess.spawn('node', [LH_CLI_PATH, ...args]);
 
     process.stdout.on('data', chunk => (stdout += chunk.toString()));
     process.stderr.on('data', chunk => (stderr += chunk.toString()));
@@ -77,6 +85,18 @@ class LighthouseRunner {
     process.on('exit', code => {
       cleanupFn();
       if (code === 0) return resolve(stdout);
+
+      // On Windows killing Chrome is extraordinarily flaky.
+      // If it looks like we got an LHR and we only died because of killing Chrome, ignore it.
+      if (
+        code === 1 &&
+        os.platform() === 'win32' &&
+        LighthouseRunner.isOutputLhrLike(stdout.trim()) &&
+        stderr.includes('Generating results...') &&
+        stderr.includes('Chrome could not be killed')
+      ) {
+        return resolve(stdout);
+      }
 
       /** @type {any} */
       const error = new Error(`Lighthouse failed with exit code ${code}`);

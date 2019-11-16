@@ -1,33 +1,51 @@
-sudo: required
-dist: xenial
-language: node_js
 branches:
   only:
     - master # Only build master and PRs
-matrix:
-  include:
-    - node_js: '10'
-    - node_js: '11'
 git:
   depth: false # ensure we have full git history for our build-context.js tests
 cache:
   yarn: true
   directories:
     - node_modules
-before_script:
-  - google-chrome-stable --version
-  - export CHROME_PATH="$(which google-chrome-stable)"
-  - export POSTGRES_DB_URL="postgres://postgres@localhost/lighthouse_ci_test"
-  - psql -c 'create database lighthouse_ci_test;' -U postgres
-script:
-  - yarn build
-  - yarn test
-  - yarn ci:dogfood
-before_cache:
-  # nyc, jest and other projects store files in here. They mess up the travis build cache.
-  - rm -rf ./node_modules/.cache/
-services:
-  - postgresql
-  - xvfb
-addons:
-  chrome: stable
+stages:
+  - test
+jobs:
+  include:
+    - &base-test
+      os: osx
+      language: node_js
+      node_js: v10
+      stage: test
+      script:
+        - yarn build
+        - yarn test:unit
+      before_cache:
+        # nyc, jest and other projects store files in here. They mess up the travis build cache.
+        - rm -rf ./node_modules/.cache/
+      addons:
+        chrome: stable
+    - <<: *base-test
+      os: windows
+      before_install:
+        - export LHCI_GITHUB_TOKEN="" # prevent any accidental leaking of the token
+        - choco install googlechrome
+      before_script:
+        - ps -W | sort
+      after_script:
+        - ps -W | sort
+      env: YARN_GPG=no
+    - <<: *base-test
+      os: linux
+      before_script:
+        - google-chrome-stable --version
+        - export CHROME_PATH="$(which google-chrome-stable)"
+        - export POSTGRES_DB_URL="postgres://postgres@localhost/lighthouse_ci_test"
+        - export RUN_E2E_TESTS="true"
+        - psql -c 'create database lighthouse_ci_test;' -U postgres
+      script:
+        - yarn build
+        - yarn test
+        - yarn ci:dogfood
+      services:
+        - postgresql
+        - xvfb

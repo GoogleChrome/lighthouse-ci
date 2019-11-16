@@ -27,6 +27,7 @@ jobs:
     - <<: *base-test
       os: windows
       before_install:
+        - export YARN_GPG=no
         - export LHCI_GITHUB_TOKEN="" # prevent any accidental leaking of the token
         - choco install googlechrome
       before_script:

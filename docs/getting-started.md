@@ -8,7 +8,7 @@ This document provides a step-by-step walkthrough on how to setup Lighthouse CI 
 
 **Important Note Before Starting**
 
-Introducing performance measurement to a project for the first time can have a fairly steep learning curve. To avoid biting off more than you can chew at first, Lighthouse team recommends starting slowly. Refer to the [recommended configurations documentation](./configuration.md#recommendations) for advice on where to start based on your experience level and the project's maturity if you run into any issues.
+Introducing performance measurement to a project for the first time can have a fairly steep learning curve. Lighthouse team recommends starting slowly. Refer to the [recommended configurations documentation](./configuration.md#recommendations) for advice on where to start based on your experience level and the project's maturity if you run into any issues.
 
 ## Prerequisites
 

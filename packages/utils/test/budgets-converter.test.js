@@ -111,8 +111,8 @@ describe('convertBudgetsToAssertions', () => {
         {
           matchingUrlPattern: '.*',
           assertions: {
-            'resource-summary:script:size': ['error', {maxNumericValue: 123}],
-            'resource-summary:image:size': ['error', {maxNumericValue: 456}],
+            'resource-summary:script:size': ['error', {maxNumericValue: 123 * 1024}],
+            'resource-summary:image:size': ['error', {maxNumericValue: 456 * 1024}],
             'resource-summary:third-party:count': ['error', {maxNumericValue: 10}],
             'resource-summary:total:count': ['error', {maxNumericValue: 100}],
           },
@@ -120,7 +120,7 @@ describe('convertBudgetsToAssertions', () => {
         {
           matchingUrlPattern: 'https?:\\/\\/[^\\/]+\\/second\\-path',
           assertions: {
-            'resource-summary:script:size': ['error', {maxNumericValue: 1000}],
+            'resource-summary:script:size': ['error', {maxNumericValue: 1000 * 1024}],
           },
         },
       ],

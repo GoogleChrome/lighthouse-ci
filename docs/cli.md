@@ -174,7 +174,7 @@ lhci upload --serverBaseUrl=http://lhci.my-custom-domain.com/
 
 ### `assert`
 
-Asserts the conditions in the Lighthouse CI config and exits with the appropriate status code if there were any failures. See the [assertion docs](./docs/assertions.md) for more.
+Asserts the conditions in the Lighthouse CI config and exits with the appropriate status code if there were any failures. See the [assertion docs](./assertions.md) for more.
 
 ```bash
 lhci assert

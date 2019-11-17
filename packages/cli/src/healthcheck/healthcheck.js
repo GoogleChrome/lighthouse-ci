@@ -34,16 +34,18 @@ function buildCommand(yargs) {
   });
 }
 
-/** @type {Array<{id?: string, label: string, test: (opts: LHCI.YargsOptions) => Promise<boolean>|boolean, shouldTest: (opts: LHCI.YargsOptions) => boolean}>} */
+/** @type {Array<{id?: string, label: string, failureLabel: string, test: (opts: LHCI.YargsOptions) => Promise<boolean>|boolean, shouldTest: (opts: LHCI.YargsOptions) => boolean}>} */
 const checks = [
   {
     label: '.lighthouseci/ directory writable',
+    failureLabel: '.lighthouseci/ directory not writable',
     shouldTest: () => true,
     test: () => loadSavedLHRs().length >= 0,
   },
   {
     id: 'rcFile',
     label: 'Configuration file found',
+    failureLabel: 'Configuration file not found',
     shouldTest: () => true,
     test: opts => {
       const rcFile = resolveRcFilePath(opts.config);
@@ -54,6 +56,7 @@ const checks = [
   {
     id: 'githubToken',
     label: 'GitHub token set',
+    failureLabel: 'GitHub token not set',
     // the test only makes sense if they've configured an upload target of some sort
     shouldTest: opts => !!opts.target || !!opts.serverBaseUrl,
     test: opts => Boolean(opts.githubToken || opts.githubAppToken),
@@ -61,6 +64,7 @@ const checks = [
   {
     id: 'lhciServer',
     label: 'Ancestor hash determinable',
+    failureLabel: 'Ancestor hash not determinable',
     // the test only makes sense if they've configured an LHCI server
     shouldTest: opts => Boolean(opts.serverBaseUrl && opts.token),
     test: () => getAncestorHash().length > 0,
@@ -68,6 +72,7 @@ const checks = [
   {
     id: 'lhciServer',
     label: 'LHCI server reachable',
+    failureLabel: 'LHCI server not reachable',
     // the test only makes sense if they've configured an LHCI server
     shouldTest: opts => Boolean(opts.serverBaseUrl && opts.token),
     test: async ({serverBaseUrl = ''}) =>
@@ -76,6 +81,7 @@ const checks = [
   {
     id: 'lhciServer',
     label: 'LHCI server token valid',
+    failureLabel: 'LHCI server token invalid',
     // the test only makes sense if they've configured an LHCI server
     shouldTest: opts => Boolean(opts.serverBaseUrl && opts.token),
     test: async ({serverBaseUrl = '', token = ''}) => {
@@ -87,6 +93,7 @@ const checks = [
   {
     id: 'lhciServer',
     label: 'LHCI server unique build for this hash',
+    failureLabel: 'LHCI server non-unique build for this hash',
     // the test only makes sense if they've configured an LHCI server
     shouldTest: opts => Boolean(opts.serverBaseUrl && opts.token),
     test: async ({serverBaseUrl = '', token = ''}) => {
@@ -124,8 +131,9 @@ async function runCommand(options) {
 
     const isWarn = !!check.id && !checkIdsToRun.includes(check.id);
     const icon = result ? PASS_ICON : isWarn ? WARN_ICON : FAIL_ICON;
+    const label = result ? check.label : check.failureLabel;
     allPassed = allPassed && (isWarn || result);
-    process.stdout.write(`${icon}  ${check.label}${message}\n`);
+    process.stdout.write(`${icon}  ${label}${message}\n`);
   }
 
   if (allPassed) {

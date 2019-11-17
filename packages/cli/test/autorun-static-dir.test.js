@@ -25,7 +25,7 @@ describe('Lighthouse CI autorun CLI', () => {
     expect(stdoutClean).toMatchInlineSnapshot(`
       "✅  .lighthouseci/ directory writable
       ✅  Configuration file found
-      ⚠️   GitHub token set
+      ⚠️   GitHub token not set
       Healthcheck passed!
 
       Automatically determined ./build as \`staticDistDir\`.

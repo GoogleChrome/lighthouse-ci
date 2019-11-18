@@ -25,6 +25,7 @@ describe('Lighthouse CI autorun CLI', () => {
     expect(stdoutClean).toMatchInlineSnapshot(`
       "✅  .lighthouseci/ directory writable
       ✅  Configuration file found
+      ✅  Chrome installation found
       ⚠️   GitHub token not set
       Healthcheck passed!
 

@@ -21,6 +21,7 @@ describe('Lighthouse CI healthcheck CLI', () => {
       expect(stdout).toMatchInlineSnapshot(`
         "✅  .lighthouseci/ directory writable
         ✅  Configuration file found
+        ✅  Chrome installation found
         ⚠️   GitHub token not set
         Healthcheck passed!
         "
@@ -38,6 +39,7 @@ describe('Lighthouse CI healthcheck CLI', () => {
       expect(stdout).toMatchInlineSnapshot(`
         "✅  .lighthouseci/ directory writable
         ✅  Configuration file found
+        ✅  Chrome installation found
         ⚠️   GitHub token not set
         Healthcheck passed!
         "
@@ -55,6 +57,7 @@ describe('Lighthouse CI healthcheck CLI', () => {
       expect(stdout).toMatchInlineSnapshot(`
         "✅  .lighthouseci/ directory writable
         ⚠️   Configuration file not found
+        ✅  Chrome installation found
         Healthcheck passed!
         "
       `);
@@ -71,6 +74,7 @@ describe('Lighthouse CI healthcheck CLI', () => {
       expect(stdout).toMatchInlineSnapshot(`
         "✅  .lighthouseci/ directory writable
         ⚠️   Configuration file not found
+        ✅  Chrome installation found
         Healthcheck passed!
         "
       `);
@@ -87,6 +91,7 @@ describe('Lighthouse CI healthcheck CLI', () => {
       expect(stdout).toMatchInlineSnapshot(`
         "✅  .lighthouseci/ directory writable
         ⚠️   Configuration file not found
+        ✅  Chrome installation found
         Healthcheck passed!
         "
       `);

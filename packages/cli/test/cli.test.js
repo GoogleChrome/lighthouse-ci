@@ -110,6 +110,7 @@ describe('Lighthouse CI CLI', () => {
       expect(stdout).toMatchInlineSnapshot(`
         "✅  .lighthouseci/ directory writable
         ⚠️   Configuration file not found
+        ✅  Chrome installation found
         ⚠️   GitHub token not set
         ✅  Ancestor hash determinable
         ✅  LHCI server reachable
@@ -133,6 +134,7 @@ describe('Lighthouse CI CLI', () => {
       expect(stdout).toMatchInlineSnapshot(`
         "✅  .lighthouseci/ directory writable
         ✅  Configuration file found
+        ✅  Chrome installation found
         ❌  GitHub token not set
         ✅  Ancestor hash determinable
         ✅  LHCI server reachable

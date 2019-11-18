@@ -42,8 +42,8 @@ When using this option, you'll lose the default `:PORT` and `UUID` replacements,
 
 Webpages are fickle beasts and variance is a common problem when measuring properties of pages in a real browser as Lighthouse does. The Lighthouse team has [several](https://github.com/GoogleChrome/lighthouse/blob/v5.0.0/docs/variability.md) good [documents](https://docs.google.com/document/d/1AujmeKvBhzr-d8IsB7zPeS-vOtxCdw2GnspKpxJ7d_I/edit) on the [subject](https://docs.google.com/document/d/1BqtL-nG53rxWOI5RO0pItSRPowZVnYJ_gBEQCJ5EeUE/edit?usp=sharing), but the tl;dr is...
 
-- Run many times (LHCI runs 3 by default, use the `--numberOfRuns=X` option to increase this).
-- Use reliable hardware (avoid underpowered CI systems like Appveyor and burstable instances, use dedicate machines with a minimum 2 cores and 4GB of RAM).
+- Run many times (LHCI runs 3 by default, use the `--collect.numberOfRuns=X` option to increase this).
+- Use reliable hardware (avoid underpowered CI systems like Appveyor and burstable instances, use dedicate machines with a minimum of 2 cores and 4GB of RAM).
 - Eliminate non-determinism (remove random `setTimeout` calls, A/B tests, etc).
 - Avoid external dependencies (disable variable third-party integrations like ads, YouTube embeds, analytics, etc).
 - Assert facts over conclusions (start with assertions on the number and size of your JavaScript requests rather than the value of TTI).

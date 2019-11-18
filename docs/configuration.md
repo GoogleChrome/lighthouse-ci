@@ -131,7 +131,22 @@ If you're a Lighthouse pro, assert the recommended preset, increase the number o
   "ci": {
     "collect": {
       "settings": {
-        "configPath": "./path/to/lighthouse/config.js"
+        "configPath": "./path/to/lighthouse/config.js",
+        "plugins": ["lighthouse-plugin-field-performance"]
+      }
+    }
+  }
+}
+```
+
+### Custom Chrome Flags
+
+```json
+{
+  "ci": {
+    "collect": {
+      "settings": {
+        "chromeFlags": "--disable-gpu --no-sandbox"
       }
     }
   }

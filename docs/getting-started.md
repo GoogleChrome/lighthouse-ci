@@ -21,8 +21,6 @@ Your project should meet the following requirements:
    A) has a command that runs a web server with production-like assets.
    B) is a static site.
 
-In the examples that follow, use of GitHub and Travis CI are assumed but the same concepts apply to other providers. Refer to your specific provider's documentation for how to accomplish each setup step.
-
 ## Collect Lighthouse Results
 
 The below travis config will automatically find your project's static assets, run Lighthouse 3 times on each HTML file, and upload the reports to _temporary public_ storage where they'll be accessible to anyone with the URL.
@@ -162,13 +160,13 @@ GitHub status checks add additional granularity to your build reporting and dire
 
 #### GitHub App Method (Recommended)
 
-To enable GitHub status checks via the official GitHub app, [install and authorize the app](https://github.com/apps/lighthouse-ci) with the owner of the target repo. If the repo is within an organization, organization approval might be necessary. Copy the token provided on the authorization confirmation page and [add it to your build environment](https://docs.travis-ci.com/user/environment-variables/#defining-variables-in-repository-settings) as `LHCI_GITHUB_APP_TOKEN`. The next time your `lhci upload` command runs it will also set the results as GitHub status checks!
+To enable GitHub status checks via the official GitHub app, [install and authorize the app](https://github.com/apps/lighthouse-ci) with the owner of the target repo. If the repo is within an organization, organization approval might be necessary. Copy the token provided on the authorization confirmation page and add it to your build environment as `LHCI_GITHUB_APP_TOKEN`. The next time your `lhci upload` command runs it will also set the results as GitHub status checks!
 
 Be sure to keep this token secret. Anyone in possession of this token will be able to set status checks on your repository.
 
 #### Alternative: Personal Access Token Method
 
-If you don't want to use the Github App, you can enable this via a personal access token. The only difference is that your user account (and its avatar) will post a status check. [Create a token](https://github.com/settings/tokens/new) with the `repo:status` scope and [add it to your environment](https://docs.travis-ci.com/user/environment-variables/#defining-variables-in-repository-settings) as `LHCI_GITHUB_TOKEN`.
+If you don't want to use the Github App, you can enable this via a personal access token. The only difference is that your user account (and its avatar) will post a status check. [Create a token](https://github.com/settings/tokens/new) with the `repo:status` scope and add it to your environment as `LHCI_GITHUB_TOKEN`.
 
 Be sure to keep this token secret. Anyone in possession of this token will be able to set status checks on your repository.
 
@@ -194,7 +192,9 @@ Use token XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX to connect.
 Add your token to your CI with the environment variable `LHCI_TOKEN`. Alternatively, you can pass it to `upload` with the `--token` flag:
 
 ```
-lhci upload --serverBaseUrl="https://your-lhci-server-url.com" --token="$LHCI_SERVER_TOKEN"
+lhci autorun --upload.serverBaseUrl="https://your-lhci-server-url.example.com" --upload.token="$LHCI_SERVER_TOKEN"
 ```
 
-Note that this token is only semi-secret. Anyone with HTTP access to the server will already be able to view and create data on the server as it is unauthenticated.
+This token is only semi-secret in `0.3.x`. Anyone with HTTP access to the server will already be able to view and create data as it is unauthenticated.
+
+**NOTE:** If you run a matrix of environments in your tests, make sure you only run `lhci autorun` _ONCE_ per build. The Lighthouse CI server will only accept a single upload per hash and future attempts to upload data for that hash will be rejected.

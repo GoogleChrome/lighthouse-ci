@@ -29,13 +29,11 @@ updateNotifier({pkg}).notify({defer: false});
 /** @return {[string, (path: string) => LHCI.YargsOptions]|[LHCI.YargsOptions]} */
 function createYargsConfigArguments() {
   const simpleArgv = yargsParser(process.argv.slice(2), {envPrefix: 'LHCI'});
-  /** @type {[string, (path: string) => LHCI.YargsOptions]} */
-  const configOption = ['config', loadAndParseRcFile];
   // If they're using the config option or opting out of auto-detection, use the config option.
-  if (simpleArgv.config || hasOptedOutOfRcDetection()) return configOption;
+  if (simpleArgv.config || hasOptedOutOfRcDetection()) return ['config', loadAndParseRcFile];
   const rcFile = findRcFile();
   // If they don't currently have an rc file, use the config option for awareness.
-  if (!rcFile) return configOption;
+  if (!rcFile) return ['rc-file', loadAndParseRcFile];
   return [loadAndParseRcFile(rcFile)];
 }
 

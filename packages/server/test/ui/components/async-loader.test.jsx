@@ -17,7 +17,7 @@ afterEach(cleanup);
 describe('AsyncLoader', () => {
   it('should render the loading state', async () => {
     const {container} = render(<AsyncLoader loadingState="loading" />);
-    expect(container.innerHTML).toContain('<svg');
+    expect(container.innerHTML).toContain('loading-spinner');
   });
 
   it('should render the error state', async () => {

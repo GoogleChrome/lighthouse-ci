@@ -14,7 +14,7 @@
   justify-content: center;
 }
 
-.loading-spinner svg {
-  width: 50px;
-  height: 50px;
+.loading-spinner img {
+  width: 80px;
+  height: 80px;
 }

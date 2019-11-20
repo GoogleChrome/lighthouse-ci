@@ -35,4 +35,4 @@ addons:
 
 - [Lighthouse CI GitHub Action](https://github.com/treosh/lighthouse-ci-action) - Automatically run Lighthouse CI on every PR with GitHub Actions, no infrastructure required.
 
-- [Learning Lighthouse CI from scratch](https://github.com/hchiam/learning-lighthouse-ci) - A minimal example repo that you can use as a template for a beginner-friendly quickstart from scratch.
+- [Learning Lighthouse CI](https://github.com/hchiam/learning-lighthouse-ci) - A minimal example repo that you can use as a template when starting from scratch, offers a beginner-friendly quickstart guide using create-react-app.

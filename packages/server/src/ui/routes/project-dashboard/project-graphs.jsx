@@ -29,7 +29,9 @@ const Legend = props => {
   if (!props.statistics) return null;
 
   const urls = computeURLsFromStats(props.statistics);
-  const branches = Array.from(new Set(props.builds.map(build => build.branch)));
+  const branches = Array.from(
+    new Set(props.builds.map(build => build.branch).concat([props.branch]))
+  );
   return (
     <div className="dashboard-graphs__legend">
       <div className="dashboard-graphs__legend-items">
@@ -179,7 +181,12 @@ const augmentStatsWithBuilds = (stats, builds) => {
 
 /** @param {{project: LHCI.ServerCommand.Project, builds: Array<LHCI.ServerCommand.Build>, runUrl?: string, branch?: string}} props */
 export const ProjectGraphs = props => {
-  const {project, builds, branch = 'master'} = props;
+  const {project, builds, branch: overrideBranch} = props;
+  const branch =
+    overrideBranch ||
+    (!builds.length || builds.some(build => build.branch === 'master')
+      ? 'master'
+      : builds[0].branch);
   const buildIds = useMemo(
     () =>
       builds

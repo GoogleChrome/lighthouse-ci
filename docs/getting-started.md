@@ -111,6 +111,48 @@ lhci:
 
 </details>
 
+<details>
+<summary>Jenkins (Ubuntu-based)</summary>
+<br />
+
+**machine-setup.sh**
+
+```bash
+#!/bin/bash
+
+set -euxo pipefail
+
+# Add Chrome's apt-key
+echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" | sudo tee -a /etc/apt/sources.list.d/google.list
+wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
+
+# Add Node's apt-key
+curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
+
+# Install NodeJS and Google Chrome
+sudo apt-get update
+sudo apt-get install -y nodejs google-chrome-stable
+```
+
+**job.sh**
+
+```bash
+#!/bin/bash
+
+set -euxo pipefail
+
+npm install
+npm run build
+
+export CHROME_PATH=$(which google-chrome-stable)
+export LHCI_BUILD_CONTEXT__EXTERNAL_BUILD_URL="$BUILD_URL"
+
+npm install -g @lhci/cli@0.3.x
+lhci autorun --upload.target=temporary-public-storage
+```
+
+</details>
+
 That's it! With this in place, you'll have Lighthouse reports collected and uploaded with links to each report.
 
 Temporary public storage provides access to individual reports, but not historical data, report diffing, or build failures. Read on to find out how to [add assertions](#add-assertions), configure the [Lighthouse CI server](#the-lighthouse-ci-server) for report diffs and timeseries charts, and enable [GitHub status checks](#github-status-checks).

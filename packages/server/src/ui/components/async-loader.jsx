@@ -5,7 +5,6 @@
  */
 
 import {h} from 'preact';
-import {Redirect} from './redirect.jsx';
 import {LoadingSpinner} from './loading-spinner.jsx';
 
 /** @typedef {import('../hooks/use-api-data').LoadingState} LoadingState */

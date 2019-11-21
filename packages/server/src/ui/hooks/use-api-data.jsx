@@ -223,6 +223,7 @@ export function useBuildStatistics(projectId, buildIds) {
           })
         );
 
+        setStatistics(existing => existing || []);
         setLoadingState('loaded');
       } catch (err) {
         console.error(err); // eslint-disable-line no-console

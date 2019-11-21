@@ -10,6 +10,18 @@ import {LoadingSpinner} from './loading-spinner.jsx';
 
 /** @typedef {import('../hooks/use-api-data').LoadingState} LoadingState */
 
+const Resource404 = () => {
+  return (
+    <div>
+      <LoadingSpinner />
+      <p style={{textAlign: 'center'}}>
+        Oops! Unable to find the specified resource.{' '}
+        <a href="/app/projects">Go back to the project list</a>.
+      </p>
+    </div>
+  );
+};
+
 /**
  * @template T
  * @param {{loadingState: LoadingState, asyncData: T | undefined, render: (data: T) => JSX.Element, renderLoading?: () => JSX.Element}} props */
@@ -17,7 +29,7 @@ export const AsyncLoader = props => {
   const {asyncData, loadingState, render, renderLoading} = props;
 
   if (loadingState === 'loaded') {
-    return asyncData === undefined ? <Redirect to="/app/projects" /> : render(asyncData);
+    return asyncData === undefined ? <Resource404 /> : render(asyncData);
   } else if (loadingState === 'error') {
     return <h1>Lighthouse Error</h1>;
   } else if (loadingState === 'loading') {
@@ -32,6 +44,7 @@ export const AsyncLoader = props => {
  */
 export function combineLoadingStates(...states) {
   if (states.some(state => state[0] === 'error')) return 'error';
+  if (states.some(state => state[0] === 'loaded' && state[1] === undefined)) return 'loaded';
   if (states.some(state => state[0] === 'loading')) return 'loading';
   return 'loaded';
 }

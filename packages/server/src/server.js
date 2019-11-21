@@ -39,6 +39,7 @@ async function createApp(options) {
   // 2. Support JSON primitives because `PUT /builds/<id>/lifecycle "sealed"`
   app.use(bodyParser.json({limit: '10mb', strict: false}));
 
+  app.get('/', (_, res) => res.redirect('/app'));
   app.use('/version', (_, res) => res.send(version));
   app.use('/v1/projects', createProjectsRouter({storageMethod}));
   app.use('/app', express.static(DIST_FOLDER));

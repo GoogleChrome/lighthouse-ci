@@ -26,7 +26,7 @@ const {
   getAvatarUrl,
   getAncestorHashForMaster,
   getAncestorHashForBranch,
-  getRepoSlug,
+  getGitHubRepoSlug,
 } = require('@lhci/utils/src/build-context.js');
 
 /** @param {string} message */
@@ -132,7 +132,7 @@ function getUrlLabelForGithub(rawUrl, options) {
  */
 async function runGithubStatusCheck(options, targetUrlMap) {
   const hash = getCurrentHash();
-  const slug = getRepoSlug();
+  const slug = getGitHubRepoSlug();
   const {githubToken, githubAppToken} = options;
 
   if (!githubToken && !githubAppToken) return print('No GitHub token set, skipping.\n');

@@ -95,6 +95,22 @@ jobs:
 
 </details>
 
+<details>
+<summary>GitLab CI</summary>
+<br />
+
+```yaml
+image: cypress/browsers:node10.16.0-chrome77
+lhci:
+  script:
+    - npm install
+    - npm run build
+    - npm install -g @lhci/cli@0.3.x
+    - lhci autorun --upload.target=temporary-public-storage --collect.settings.chromeFlags="--no-sandbox" || echo "LHCI failed!"
+```
+
+</details>
+
 That's it! With this in place, you'll have Lighthouse reports collected and uploaded with links to each report.
 
 Temporary public storage provides access to individual reports, but not historical data, report diffing, or build failures. Read on to find out how to [add assertions](#add-assertions), configure the [Lighthouse CI server](#the-lighthouse-ci-server) for report diffs and timeseries charts, and enable [GitHub status checks](#github-status-checks).

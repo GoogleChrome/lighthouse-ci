@@ -8,6 +8,13 @@
 const crypto = require('crypto');
 const childProcess = require('child_process');
 
+/** @param {Array<string>} namesInPriorityOrder @return {string|undefined} */
+function getEnvVarIfSet(namesInPriorityOrder) {
+  for (const name of namesInPriorityOrder) {
+    if (process.env[name]) return process.env[name];
+  }
+}
+
 /**
  * @param {Array<[string, ReadonlyArray<string>]>} commands
  * @return {import('child_process').SpawnSyncReturns<string>}
@@ -25,15 +32,20 @@ function runCommandsUntilFirstSuccess(commands) {
   return result;
 }
 
-const envVars = process.env;
-
 /**
  * @return {string}
  */
 function getCurrentHash() {
-  if (envVars.TRAVIS_PULL_REQUEST_SHA) return envVars.TRAVIS_PULL_REQUEST_SHA;
-  if (envVars.TRAVIS_COMMIT) return envVars.TRAVIS_COMMIT;
-  if (envVars.CIRCLE_SHA1) return envVars.CIRCLE_SHA1;
+  const envHash = getEnvVarIfSet([
+    // Manual override
+    'LHCI_BUILD_CONTEXT__CURRENT_HASH',
+    // Travis CI
+    'TRAVIS_PULL_REQUEST_SHA',
+    'TRAVIS_COMMIT',
+    // Circle CI
+    'CIRCLE_SHA1',
+  ]);
+  if (envHash) return envHash;
 
   const result = childProcess.spawnSync('git', ['rev-list', '--no-merges', '-n1', 'HEAD'], {
     encoding: 'utf8',
@@ -64,15 +76,23 @@ function getCommitTime(hash) {
  * @return {string}
  */
 function getCurrentBranchRaw_() {
-  // Use Travis CI vars if available.
-  if (envVars.TRAVIS_PULL_REQUEST_BRANCH) return envVars.TRAVIS_PULL_REQUEST_BRANCH;
-  if (envVars.TRAVIS_BRANCH) return envVars.TRAVIS_BRANCH;
-  // Use GitHub Actions vars if available. See https://github.com/GoogleChrome/lighthouse-ci/issues/43#issuecomment-551174778
-  if (envVars.GITHUB_HEAD_REF) return envVars.GITHUB_HEAD_REF;
-  if (envVars.GITHUB_REF) return envVars.GITHUB_REF;
-
-  // Use CircleCI vars if available.
-  if (envVars.CIRCLE_BRANCH) return envVars.CIRCLE_BRANCH;
+  const envBranch = getEnvVarIfSet([
+    // Manual override
+    'LHCI_BUILD_CONTEXT__CURRENT_BRANCH',
+    // Travis CI
+    'TRAVIS_PULL_REQUEST_BRANCH',
+    'TRAVIS_BRANCH',
+    // GitHub Actions, see https://github.com/GoogleChrome/lighthouse-ci/issues/43#issuecomment-551174778
+    'GITHUB_HEAD_REF',
+    'GITHUB_REF',
+    // Circle CI
+    'CIRCLE_BRANCH',
+    // Gitlab CI, see https://docs.gitlab.com/ee/ci/variables/predefined_variables.html
+    'CI_EXTERNAL_PULL_REQUEST_SOURCE_BRANCH_NAME',
+    'CI_MERGE_REQUEST_SOURCE_BRANCH_NAME',
+    'CI_COMMIT_REF_NAME',
+  ]);
+  if (envBranch) return envBranch;
 
   const result = childProcess.spawnSync('git', ['rev-parse', '--abbrev-ref', 'HEAD'], {
     encoding: 'utf8',
@@ -99,9 +119,18 @@ function getCurrentBranch() {
  * @return {string}
  */
 function getExternalBuildUrl() {
-  if (envVars.TRAVIS_BUILD_WEB_URL) return envVars.TRAVIS_BUILD_WEB_URL;
-  if (envVars.CIRCLE_BUILD_URL) return envVars.CIRCLE_BUILD_URL;
-  return '';
+  const envUrl = getEnvVarIfSet([
+    // Manual override
+    'LHCI_BUILD_CONTEXT__EXTERNAL_BUILD_URL',
+    // Travis CI
+    'TRAVIS_BUILD_WEB_URL',
+    // Circle CI
+    'CIRCLE_BUILD_URL',
+    // Gitlab CI
+    'CI_JOB_URL',
+  ]);
+
+  return envUrl || '';
 }
 
 /**
@@ -192,15 +221,21 @@ function getAncestorHash(hash = 'HEAD') {
     : getAncestorHashForBranch(hash);
 }
 
-function getRepoSlug() {
-  // Support Travis CI
-  if (envVars.TRAVIS_PULL_REQUEST_SLUG) return envVars.TRAVIS_PULL_REQUEST_SLUG;
-  if (envVars.TRAVIS_REPO_SLUG) return envVars.TRAVIS_REPO_SLUG;
-  // Support GitHub Actions
-  if (envVars.GITHUB_REPOSITORY) return envVars.GITHUB_REPOSITORY;
+function getGitHubRepoSlug() {
+  const envSlug = getEnvVarIfSet([
+    // Manual override
+    'LHCI_BUILD_CONTEXT__GITHUB_REPO_SLUG',
+    // Travis CI
+    'TRAVIS_PULL_REQUEST_SLUG',
+    'TRAVIS_REPO_SLUG',
+    // GitHub Actions
+    'GITHUB_REPOSITORY',
+  ]);
+  if (envSlug) return envSlug;
+
   // Support CircleCI
-  if (envVars.CIRCLE_PROJECT_USERNAME && envVars.CIRCLE_PROJECT_REPONAME) {
-    return `${envVars.CIRCLE_PROJECT_USERNAME}/${envVars.CIRCLE_PROJECT_REPONAME}`;
+  if (process.env.CIRCLE_PROJECT_USERNAME && process.env.CIRCLE_PROJECT_REPONAME) {
+    return `${process.env.CIRCLE_PROJECT_USERNAME}/${process.env.CIRCLE_PROJECT_REPONAME}`;
   }
 }
 
@@ -215,5 +250,5 @@ module.exports = {
   getAncestorHash,
   getAncestorHashForMaster,
   getAncestorHashForBranch,
-  getRepoSlug,
+  getGitHubRepoSlug,
 };

@@ -10,6 +10,24 @@
 const buildContext = require('../src/build-context.js');
 
 describe('build-context.js', () => {
+  let envBefore;
+
+  beforeEach(() => {
+    envBefore = process.env;
+    process.env = {};
+    for (const [key, value] of Object.entries(envBefore)) {
+      if (key.startsWith('LHCI')) continue;
+      if (key.startsWith('TRAVIS')) continue;
+      if (key.startsWith('GITHUB')) continue;
+      if (key.startsWith('CI')) continue;
+      process.env[key] = value;
+    }
+  });
+
+  afterEach(() => {
+    process.env = envBefore;
+  });
+
   // commit e7f1b0fa3aebb6ef95e44c0d0b820433ffdd2e63
   // Author: Patrick Hulce <patrick.hulce@gmail.com>
   // Date:   Tue Oct 29 16:43:39 2019 -0500
@@ -22,6 +40,11 @@ describe('build-context.js', () => {
     it('should work', () => {
       expect(buildContext.getCurrentHash()).toMatch(/^[a-f0-9]{40}$/);
     });
+
+    it('should respect env override', () => {
+      process.env.LHCI_BUILD_CONTEXT__CURRENT_HASH = 'face1235';
+      expect(buildContext.getCurrentHash()).toEqual('face1235');
+    });
   });
 
   describe('#getCommitTime()', () => {
@@ -33,6 +56,11 @@ describe('build-context.js', () => {
   describe('#getCurrentBranch()', () => {
     it('should not throw', () => {
       buildContext.getCurrentBranch(hash);
+    });
+
+    it('should respect env override', () => {
+      process.env.LHCI_BUILD_CONTEXT__CURRENT_BRANCH = 'foobar-nonsense';
+      expect(buildContext.getCurrentBranch(hash)).toEqual('foobar-nonsense');
     });
   });
 
@@ -76,6 +104,26 @@ describe('build-context.js', () => {
 
     it('should return empty string when it fails', () => {
       expect(buildContext.getAncestorHashForMaster('random' + Math.random())).toEqual('');
+    });
+  });
+
+  describe('#getExternalBuildUrl()', () => {
+    it('should respect env override', () => {
+      process.env.LHCI_BUILD_CONTEXT__EXTERNAL_BUILD_URL = 'http://lhci.example.com/build/1';
+      expect(buildContext.getExternalBuildUrl()).toEqual('http://lhci.example.com/build/1');
+    });
+  });
+
+  describe('#getGitHubRepoSlug', () => {
+    it('should work for circle CI', () => {
+      process.env.CIRCLE_PROJECT_USERNAME = 'SuperLighthouse';
+      process.env.CIRCLE_PROJECT_REPONAME = 'lhci';
+      expect(buildContext.getGitHubRepoSlug()).toEqual('SuperLighthouse/lhci');
+    });
+
+    it('should respect env override', () => {
+      process.env.LHCI_BUILD_CONTEXT__GITHUB_REPO_SLUG = 'SuperLighthouse/manual';
+      expect(buildContext.getGitHubRepoSlug()).toEqual('SuperLighthouse/manual');
     });
   });
 });

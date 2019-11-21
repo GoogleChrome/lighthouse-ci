@@ -37,15 +37,21 @@ describe('AsyncLoader', () => {
     expect(container.innerHTML).toMatchInlineSnapshot(`"<span>{\\"x\\":1}</span>"`);
   });
 
-  it('should redirect in the loaded but undefined state', async () => {
+  it('should render 404 in the loaded but undefined state', async () => {
     const {container} = render(<AsyncLoader loadingState="loaded" asyncData={undefined} />);
-    expect(container.innerHTML).toMatchInlineSnapshot(`"<div to=\\"/app/projects\\"></div>"`);
+    expect(container.innerHTML).toContain('Oops');
   });
 });
 
 describe('combineLoadingStates', () => {
   it('should combine loaded states', () => {
     expect(combineLoadingStates(['loaded', 1], ['loaded', 2], ['loaded', 3])).toEqual('loaded');
+  });
+
+  it('should combine loaded 404 states', () => {
+    expect(
+      combineLoadingStates(['loaded', 1], ['loaded', undefined], ['loading', undefined])
+    ).toEqual('loaded');
   });
 
   it('should combine error states', () => {

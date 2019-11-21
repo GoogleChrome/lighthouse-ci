@@ -16,10 +16,10 @@ describe('build-context.js', () => {
     envBefore = process.env;
     process.env = {};
     for (const [key, value] of Object.entries(envBefore)) {
-      if (key.startsWith('LHCI')) continue;
-      if (key.startsWith('TRAVIS')) continue;
-      if (key.startsWith('GITHUB')) continue;
-      if (key.startsWith('CI')) continue;
+      if (key.startsWith('LHCI_')) continue;
+      if (key.startsWith('TRAVIS_')) continue;
+      if (key.startsWith('GITHUB_')) continue;
+      if (key.startsWith('CI_')) continue;
       process.env[key] = value;
     }
   });
@@ -55,6 +55,7 @@ describe('build-context.js', () => {
 
   describe('#getCurrentBranch()', () => {
     it('should not throw', () => {
+      if (process.env.CI) return; // CI-based runs rely on the env overrides
       buildContext.getCurrentBranch(hash);
     });
 

@@ -4,6 +4,14 @@
 
 First, make sure you're using `lhci autorun` or invoking `lhci healthcheck --fatal` in your script. Check the output logs of the healthcheck for anything that's failing and try resolving those problems first using the guide below before filing an issue.
 
+## My page is behind a login. How do I get Lighthouse CI to run on the real app?
+
+You have a couple of options to teach Lighthouse CI how to login to your page.
+
+- [`--collect.puppeteerScript`](./cli.md#using-puppeteer-scripts)
+- [Configure Custom Headers](./configuration.md#page-behind-authentication)
+- [Other Lighthouse Auth Methods](https://github.com/GoogleChrome/lighthouse/blob/v5.6.0/docs/authenticated-pages.md)
+
 ## The GitHub App/LHCI server upload isn't working on PRs from external contributors.
 
 Most CI systems prevent secrets from leaking into the environment of untrusted pull requests from forks. This is a helpful security measure to prevent privileged information from falling into malicious hands.

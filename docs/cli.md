@@ -114,6 +114,10 @@ Options:
                         URLs by adding this flag multiple times.
   --staticDistDir       The build directory where your HTML files to run
                         Lighthouse on are located.
+  --chromePath          The path to the Chrome or Chromium executable to use for
+                        collection.
+  --puppeteerScript     The path to a script that manipulates the browser with
+                        puppeteer before running Lighthouse, used for auth.
   --startServerCommand  The command to run to start the server.
   --settings            The Lighthouse settings and flags to use when collecting
   --numberOfRuns, -n    The number of times to run Lighthouse.
@@ -127,7 +131,35 @@ lhci collect --numberOfRuns=5 --url=https://example.com
 lhci collect --start-server-command="yarn serve" --url=http://localhost:8080/
 lhci collect --staticDistDir=./dist
 lhci collect --url=https://example-1.com --url=https://example-2.com
+lhci collect --start-server-command="yarn serve" --url=http://localhost:8080/ --puppeteer-script=./path/to/login-with-puppeteer.js
 ```
+
+#### Using Puppeteer Scripts
+
+When running Lighthouse CI on a page with behind authentication, you'll need to authorize the browser that Lighthouse CI will be using. While there are [several](./configuration.md#page-behind-authentication) different [options](https://github.com/GoogleChrome/lighthouse/blob/v5.6.0/docs/authenticated-pages.md) to accomplish this, `--puppeteer-script` is one of the most flexible and convenient.
+
+`--puppeteer-script` accepts a path to a JavaScript file that exports a function that will be invoked by Lighthouse CI before navigating, e.g. a script that will login to your site.
+
+**Example `puppeteer-script.js`**
+
+```js
+/**
+ * @param {puppeteer.Browser} browser
+ * @param {{url: string, options: LHCI.CollectCommand.Options}} context
+ */
+module.exports = async (browser, context) => {
+  const page = await browser.newPage();
+  await page.goto('http://localhost:8080/login');
+  await page.type('#username', 'admin');
+  await page.type('#password', 'password');
+  await page.click('[type="submit"]');
+  await page.waitForNavigation();
+};
+```
+
+Lighthouse CI will then use this browser that the script sets up when running Lighthouse. Note that if you store your credentials in `localStorage` or anything other than a cookie you might want to pair this option with `--settings.disableStorageReset` to force Lighthouse to keep the cache state.
+
+For more information on how to use puppeteer, read up on [their API docs](https://github.com/puppeteer/puppeteer/blob/v2.0.0/docs/api.md#class-browser).
 
 ---
 

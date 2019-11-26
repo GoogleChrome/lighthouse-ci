@@ -41,9 +41,7 @@ class PuppeteerManager {
   /** @return {Promise<number>} */
   async getBrowserPort() {
     const browser = await this._getBrowser();
-    const [_ = '', port = ''] = browser.wsEndpoint().match(/:(\d+)/) || [];
-    if (!port) throw new Error('Unable to determine port from puppeteer browser');
-    return parseInt(port, 10);
+    return Number(new URL(browser.wsEndpoint()).port);
   }
 
   /**

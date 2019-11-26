@@ -76,13 +76,14 @@ class LighthouseRunner {
     let stdout = '';
     let stderr = '';
 
+    const env = {...process.env, CHROME_PATH: options.chromePath || process.env.CHROME_PATH};
     const {args, cleanupFn} = LighthouseRunner.computeArgumentsAndCleanup(url, options);
-    const process = childProcess.spawn('node', [LH_CLI_PATH, ...args]);
+    const child = childProcess.spawn('node', [LH_CLI_PATH, ...args], {env});
 
-    process.stdout.on('data', chunk => (stdout += chunk.toString()));
-    process.stderr.on('data', chunk => (stderr += chunk.toString()));
+    child.stdout.on('data', chunk => (stdout += chunk.toString()));
+    child.stderr.on('data', chunk => (stderr += chunk.toString()));
 
-    process.on('exit', code => {
+    child.on('exit', code => {
       cleanupFn();
       if (code === 0) return resolve(stdout);
 

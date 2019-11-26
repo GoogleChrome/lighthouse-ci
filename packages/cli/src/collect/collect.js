@@ -6,8 +6,10 @@
 'use strict';
 
 const path = require('path');
+const ChromeLauncher = require('chrome-launcher').Launcher;
 const FallbackServer = require('./fallback-server.js');
 const LighthouseRunner = require('./lighthouse-runner.js');
+const PuppeteerManager = require('./puppeteer-manager.js');
 const {saveLHR, clearSavedLHRs} = require('@lhci/utils/src/saved-reports.js');
 const {
   runCommandAndWaitForPattern,
@@ -29,6 +31,14 @@ function buildCommand(yargs) {
     staticDistDir: {
       description: 'The build directory where your HTML files to run Lighthouse on are located.',
     },
+    chromePath: {
+      description: 'The path to the Chrome or Chromium executable to use for collection.',
+      default: process.env.CHROME_PATH || ChromeLauncher.getInstallations()[0],
+    },
+    puppeteerScript: {
+      description:
+        'The path to a script that manipulates the browser with puppeteer before running Lighthouse, used for auth.',
+    },
     startServerCommand: {
       description: 'The command to run to start the server.',
     },
@@ -45,18 +55,24 @@ function buildCommand(yargs) {
 /**
  * @param {string} url
  * @param {LHCI.CollectCommand.Options} options
+ * @param {{puppeteer: import('./puppeteer-manager.js')}} context
  * @return {Promise<void>}
  */
-async function runOnUrl(url, options) {
+async function runOnUrl(url, options, context) {
   const runner = new LighthouseRunner();
   process.stdout.write(`Running Lighthouse ${options.numberOfRuns} time(s) on ${url}\n`);
+
+  const baseSettings = options.settings || {};
+  const settings = context.puppeteer.isActive()
+    ? {...baseSettings, port: await context.puppeteer.getBrowserPort()}
+    : baseSettings;
 
   for (let i = 0; i < options.numberOfRuns; i++) {
     process.stdout.write(`Run #${i + 1}...`);
     try {
       const lhr = await runner.runUntilSuccess(url, {
         headful: options.headful,
-        settings: options.settings,
+        settings,
       });
       saveLHR(lhr);
       process.stdout.write('done.\n');
@@ -71,7 +87,7 @@ async function runOnUrl(url, options) {
  * @param {LHCI.CollectCommand.Options} options
  * @return {Promise<{urls: Array<string>, close: () => Promise<void>}>}
  */
-async function determineUrls(options) {
+async function startServerAndDetermineUrls(options) {
   if (options.url) {
     let close = async () => undefined;
     if (options.startServerCommand) {
@@ -115,10 +131,12 @@ async function runCommand(options) {
   if (options.method !== 'node') throw new Error(`Method "${options.method}" not yet supported`);
   if (!options.additive) clearSavedLHRs();
 
-  const {urls, close} = await determineUrls(options);
+  const puppeteer = new PuppeteerManager(options);
+  const {urls, close} = await startServerAndDetermineUrls(options);
   try {
     for (const url of urls) {
-      await runOnUrl(url, options);
+      await puppeteer.invokePuppeteerScriptForUrl(url);
+      await runOnUrl(url, options, {puppeteer});
     }
   } finally {
     await close();

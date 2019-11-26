@@ -42,6 +42,8 @@ declare global {
         url?: string | string[];
         staticDistDir?: string;
         startServerCommand?: string;
+        chromePath?: string;
+        puppeteerScript?: string;
         method: 'node';
         numberOfRuns: number;
         headful: boolean;

@@ -88,7 +88,8 @@ async function runOnUrl(url, options, context) {
  * @return {Promise<{urls: Array<string>, close: () => Promise<void>}>}
  */
 async function startServerAndDetermineUrls(options) {
-  if (options.url) {
+  const urlsAsArray = Array.isArray(options.url) ? options.url : options.url ? [options.url] : [];
+  if (!options.staticDistDir) {
     let close = async () => undefined;
     if (options.startServerCommand) {
       const {child, patternMatch, stdout, stderr} = await runCommandAndWaitForPattern(
@@ -107,19 +108,27 @@ async function startServerAndDetermineUrls(options) {
     }
 
     return {
-      urls: Array.isArray(options.url) ? options.url : [options.url],
+      urls: urlsAsArray,
       close,
     };
   }
-
-  if (!options.staticDistDir) throw new Error('Either url or staticDistDir required');
 
   const pathToBuildDir = path.resolve(process.cwd(), options.staticDistDir);
   const server = new FallbackServer(pathToBuildDir);
   await server.listen();
   process.stdout.write(`Started a web server on port ${server.port}...\n`);
 
-  const urls = server.getAvailableUrls();
+  const urls = urlsAsArray;
+  if (!urls.length) {
+    urls.push(...server.getAvailableUrls());
+  }
+
+  urls.forEach((rawUrl, i) => {
+    const url = new URL(rawUrl, 'http://localhost');
+    url.port = server.port.toString();
+    urls[i] = url.href;
+  });
+
   return {urls, close: async () => server.close()};
 }
 

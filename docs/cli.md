@@ -126,11 +126,18 @@ Options:
 
 **Examples**
 
-```
+```bash
+# Basic usage
 lhci collect --numberOfRuns=5 --url=https://example.com
+# Have LHCI start a server before running
 lhci collect --start-server-command="yarn serve" --url=http://localhost:8080/
+# Have LHCI use the built-in server on a static directory
 lhci collect --staticDistDir=./dist
+# Have LHCI use the built-in server and audit a specific URL
+lhci collect --staticDistDir=./public --url=http://localhost/products/pricing/
+# Run on multiple URLs
 lhci collect --url=https://example-1.com --url=https://example-2.com
+# Have LHCI start a server and login with puppeteer before running
 lhci collect --start-server-command="yarn serve" --url=http://localhost:8080/ --puppeteer-script=./path/to/login-with-puppeteer.js
 ```
 

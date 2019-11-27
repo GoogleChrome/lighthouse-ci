@@ -1,4 +1,4 @@
-# Troubleshooting FAQs
+# Troubleshooting / FAQs
 
 ## I can't get it working with my CI provider. Help!
 
@@ -11,6 +11,14 @@ You have a couple of options to teach Lighthouse CI how to login to your page.
 - [`--collect.puppeteerScript`](./cli.md#using-puppeteer-scripts)
 - [Configure Custom Headers](./configuration.md#page-behind-authentication)
 - [Other Lighthouse Auth Methods](https://github.com/GoogleChrome/lighthouse/blob/v5.6.0/docs/authenticated-pages.md)
+
+## Lighthouse is failing to run. How do I fix it?
+
+Checkout the [issues in Lighthouse](https://github.com/GoogleChrome/lighthouse/issues) to see if someone else has run into the same problem before (Hint: _closed_ issues often have solutions that you might find useful too!). Here are some of the most common problems we see...
+
+- **Missing Chrome**: You don't have Chrome available on your machine. Follow the examples in the [getting started guide](./getting-started.md#collect-lighthouse-results) to add Chrome to your CI provider. Follow the Jenkins setup section if you're running in a custom environment.
+- **Protocol Error: X.Y wasn't found**: Your version of Chrome is incompatible with the Lighthouse version, latest Lighthouse CI supports stable Chrome.
+- **No usable sandbox**: Your OS wasn't configured to support Chrome process sandboxing, try [creating a Chrome usergroup](https://github.com/GoogleChromeLabs/lighthousebot/blob/a4bfc0857741c1cd6bde9ded967971fd27254ed6/builder/Dockerfile#L35-L40) or running with `--collect.settings.chromeFlags="--no-sandbox"`.
 
 ## The GitHub App/LHCI server upload isn't working on PRs from external contributors.
 

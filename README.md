@@ -5,7 +5,7 @@
 Lighthouse CI is a set of commands that make continuously running, asserting, saving, and retrieving [Lighthouse](https://github.com/GoogleChrome/lighthouse) results as easy as possible.
 
 - [Getting Started](./docs/getting-started.md)
-- [Troubleshooting FAQs](./docs/troubleshooting.md)
+- [Troubleshooting / FAQs](./docs/troubleshooting.md)
 - [CLI Documentation](./docs/cli.md)
 - [Assertions Documentation](./docs/assertions.md)
 - [Server Documentation](./docs/recipes/docker-server/README.md)

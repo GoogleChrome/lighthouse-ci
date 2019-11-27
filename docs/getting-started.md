@@ -99,6 +99,8 @@ jobs:
 <summary>GitLab CI</summary>
 <br />
 
+**NOTE:** If you have the ability to run your jobs under a different user, you can avoid `--no-sandbox` by [creating a Chrome usergroup](https://github.com/GoogleChromeLabs/lighthousebot/blob/a4bfc0857741c1cd6bde9ded967971fd27254ed6/builder/Dockerfile#L35-L40).
+
 ```yaml
 image: cypress/browsers:node10.16.0-chrome77
 lhci:

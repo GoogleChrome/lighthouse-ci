@@ -15,7 +15,7 @@ Note that upward traversal is not supported. If you'd like to keep your lighthou
 
 ### Environment Variables
 
-Any configuration option can also be set using environment variables prefixed with `LHCI_`.
+Any configuration option can also be set using environment variables prefixed with `LHCI_`, following the [yargs API](https://github.com/yargs/yargs/blob/master/docs/api.md#envprefix) (so `LHCI_PROPERTY_NAME__SUBPROPERTY_NAME` is equivalent to `--propertyName.subpropertyName`).
 
 ```bash
 LHCI_TOKEN=12345 lhci upload

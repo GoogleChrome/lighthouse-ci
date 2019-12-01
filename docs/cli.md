@@ -8,6 +8,12 @@ The CLI is the primary API you'll use when setting up Lighthouse CI. Install the
 npm install -g @lhci/cli
 ```
 
+or
+
+```bash
+yarn global add @lhci/cli
+```
+
 ## Commands
 
 All commands support configuration via a JSON file passed in via `--config=./path/to/`. Any argument on the CLI can also be passed in via environment variable. For example, `--config=foo` can be replaced with `LH_RC_FILE=foo`. Learn more about [configuration](./configuration.md).

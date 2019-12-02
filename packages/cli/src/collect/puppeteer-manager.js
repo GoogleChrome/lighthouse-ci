@@ -27,6 +27,7 @@ class PuppeteerManager {
     const puppeteer = require('puppeteer');
     this._browser = await puppeteer.launch({
       pipe: false,
+      headless: !this._options.headful,
       executablePath: this._options.chromePath,
     });
 

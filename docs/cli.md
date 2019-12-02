@@ -256,8 +256,8 @@ Options:
   --storage.sqlDialect
                     [string] [choices: "sqlite", "postgres"] [default: "sqlite"]
   --storage.sqlDatabasePath              The path to a SQLite database on disk.
-  --storage.sqlConnectionUrl             The connection url to a postgres or
-                                         mysql database.
+  --storage.sqlConnectionUrl             The connection url to a postgres
+                                         database.
   --storage.sqlConnectionSsl             Whether the SQL connection should force
                                          use of SSL   [boolean] [default: false]
   --storage.sqlDangerouslyResetDatabase  Whether to force the database to the

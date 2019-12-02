@@ -34,7 +34,7 @@ function buildCommand(yargs) {
       description: 'The path to a SQLite database on disk.',
     },
     'storage.sqlConnectionUrl': {
-      description: 'The connection url to a postgres or mysql database.',
+      description: 'The connection url to a postgres database.',
     },
     'storage.sqlConnectionSsl': {
       type: 'boolean',

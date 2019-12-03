@@ -3,3 +3,4 @@
 .lighthouseci/
 .cache/
 dist/
+node_modules/

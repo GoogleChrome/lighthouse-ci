@@ -7,13 +7,19 @@
 
 const fs = require('fs');
 const path = require('path');
+const yaml = require('js-yaml');
 const _ = require('./lodash.js');
 
-// prettier-ignore
 const RC_FILE_NAMES = [
   '.lighthouserc.json',
   'lighthouserc.json',
+  '.lighthouserc.yml',
+  'lighthouserc.yml',
+  '.lighthouserc.yaml',
+  'lighthouserc.yaml',
 ];
+
+const YAML_FILE_EXTENSION_REGEX = /\.(yml|yaml)$/i;
 
 /**
  * Yargs will treat any key with a `.` in the name as a specifier for an object subpath.
@@ -42,15 +48,32 @@ function loadAndParseRcFile(pathToRcFile) {
 }
 
 /**
+ * Load file, parse and convert all `.` in key names to `:`
  * @param {string} pathToRcFile
  * @return {LHCI.LighthouseRc}
  */
 function loadRcFile(pathToRcFile) {
-  // Load the JSON and convert all `.` in key names to `:`
+  // Load file
   const contents = fs.readFileSync(pathToRcFile, 'utf8');
-  const rc = JSON.parse(contents);
+  const rc = parseFileContentToJSON(pathToRcFile, contents);
+  // Convert all `.` in key names to `:`
   recursivelyReplaceDotInKeyName(rc);
   return rc;
+}
+
+/**
+ * Parse file content to JSON.
+ * @param {string} pathToRcFile
+ * @param {string} contents
+ * @return {LHCI.LighthouseRc}
+ */
+function parseFileContentToJSON(pathToRcFile, contents) {
+  // Check if file path ends in yaml or yml
+  if (YAML_FILE_EXTENSION_REGEX.test(pathToRcFile)) {
+    // Parse yaml content to JSON
+    return yaml.safeLoad(contents);
+  }
+  return JSON.parse(contents);
 }
 
 /**

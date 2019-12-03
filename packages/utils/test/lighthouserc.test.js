@@ -8,28 +8,61 @@
 /* eslint-env jest */
 
 const fs = require('fs');
+const os = require('os');
 const path = require('path');
+const yaml = require('js-yaml');
 const rc = require('../src/lighthouserc.js');
 const {safeDeleteFile} = require('../../cli/test/test-utils.js');
 
 describe('lighthouserc.js', () => {
+  // Create a temp dir to store all test files.
+  let tempDir;
+  beforeAll(() => {
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'lighthouserc-'));
+  });
+
+  function writeYAMLFile(path, content) {
+    fs.writeFileSync(path, yaml.safeDump(content));
+  }
   describe('#loadAndParseRcFile', () => {
-    let tmpFile;
-    function writeFile(json) {
-      fs.writeFileSync(tmpFile, JSON.stringify(json));
+    function writeJSONFile(path, json) {
+      fs.writeFileSync(path, JSON.stringify(json));
+    }
+    function getRandomFilePath(ext = 'json') {
+      return path.join(tempDir, `rc-${Math.random()}.tmp.${ext}`);
     }
 
+    let rcJSONFilePath;
+    let rcYamlFilePath;
     beforeEach(() => {
-      tmpFile = path.join(__dirname, `fixtures/rc-${Math.random()}.tmp.json`);
+      rcJSONFilePath = getRandomFilePath();
+      rcYamlFilePath = getRandomFilePath('yml');
     });
-
     afterEach(async () => {
-      await safeDeleteFile(tmpFile);
+      await safeDeleteFile(rcJSONFilePath);
+      await safeDeleteFile(rcYamlFilePath);
     });
 
-    it('should load a basic json file', () => {
-      const rcFile = path.join(__dirname, 'fixtures/lighthouserc-fixture.json');
-      expect(rc.loadAndParseRcFile(rcFile)).toEqual({
+    describe('should load a basic file', () => {
+      const content = {
+        ci: {
+          assert: {
+            assertions: {
+              'speed-index': ['error', {minScore: 0.8}],
+            },
+          },
+          collect: {
+            numberOfRuns: 2,
+          },
+          server: {
+            port: 9009,
+            storage: {
+              sqlDatabasePath: 'cli-test-fixtures.tmp.sql',
+            },
+          },
+        },
+      };
+      const parsedContent = {
         assertions: {
           'speed-index': ['error', {minScore: 0.8}],
         },
@@ -38,30 +71,57 @@ describe('lighthouserc.js', () => {
         storage: {
           sqlDatabasePath: 'cli-test-fixtures.tmp.sql',
         },
+      };
+
+      it('JSON', () => {
+        writeJSONFile(rcJSONFilePath, content);
+        expect(rc.loadAndParseRcFile(rcJSONFilePath)).toEqual(parsedContent);
+      });
+
+      it('YAML', () => {
+        writeYAMLFile(rcYamlFilePath, content);
+        expect(rc.loadAndParseRcFile(rcYamlFilePath)).toEqual(parsedContent);
       });
     });
 
-    it('should convert keys with . in them', () => {
-      const assertions = {'resource-summary.script.size': 'off'};
-      writeFile({ci: {assert: {assertions}}});
-      expect(rc.loadAndParseRcFile(tmpFile)).toEqual({
+    describe('should convert keys with . in them', () => {
+      const content = {
+        ci: {assert: {assertions: {'resource-summary.script.size': 'off'}}},
+      };
+      const parsedContent = {
         assertions: {
           'resource-summary:script:size': 'off',
         },
+      };
+      it('JSON', () => {
+        writeJSONFile(rcJSONFilePath, content);
+        expect(rc.loadAndParseRcFile(rcJSONFilePath)).toEqual(parsedContent);
+      });
+
+      it('YAML', () => {
+        writeYAMLFile(rcYamlFilePath, content);
+        expect(rc.loadAndParseRcFile(rcYamlFilePath)).toEqual(parsedContent);
       });
     });
 
-    it('should load and flatten other properties', () => {
-      writeFile({
+    describe('should load and flatten other properties', () => {
+      const content = {
         ci: {assert: {x: 1}},
         'ci:client': {collect: {y: 2}, server: {ignored: true}},
         'ci:server': {collect: {ignored: true}, server: {z: 3}},
-      });
-
-      expect(rc.loadAndParseRcFile(tmpFile)).toEqual({
+      };
+      const parsedContent = {
         x: 1,
         y: 2,
         z: 3,
+      };
+      it('JSON', () => {
+        writeJSONFile(rcJSONFilePath, content);
+        expect(rc.loadAndParseRcFile(rcJSONFilePath)).toEqual(parsedContent);
+      });
+      it('YAML', () => {
+        writeYAMLFile(rcYamlFilePath, content);
+        expect(rc.loadAndParseRcFile(rcYamlFilePath)).toEqual(parsedContent);
       });
     });
   });
@@ -69,9 +129,27 @@ describe('lighthouserc.js', () => {
   describe('#findRcFile', () => {
     const LH_ROOT = path.join(__dirname, '../../../');
 
-    it('should find an rcfile in the directory', () => {
-      const expected = path.join(LH_ROOT, 'lighthouserc.json');
-      expect(rc.findRcFile(LH_ROOT)).toEqual(expected);
+    describe('should find an rcfile in the directory', () => {
+      let tempFile;
+      afterEach(async () => {
+        await safeDeleteFile(tempFile);
+        tempFile = null;
+      });
+
+      it('.json', () => {
+        const expected = path.join(LH_ROOT, 'lighthouserc.json');
+        expect(rc.findRcFile(LH_ROOT)).toEqual(expected);
+      });
+      it('.yaml', () => {
+        tempFile = path.join(tempDir, 'lighthouserc.yaml');
+        writeYAMLFile(tempFile, {});
+        expect(rc.findRcFile(tempDir)).toEqual(tempFile);
+      });
+      it('.yml', () => {
+        tempFile = path.join(tempDir, '.lighthouserc.yml');
+        writeYAMLFile(tempFile, {});
+        expect(rc.findRcFile(tempDir)).toEqual(tempFile);
+      });
     });
 
     it('should return undefined when find-up-style but recursive is false', () => {

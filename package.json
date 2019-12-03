@@ -34,6 +34,7 @@
     "@types/inquirer": "^6.0.3",
     "@types/isomorphic-fetch": "^0.0.34",
     "@types/jest": "^24.0.15",
+    "@types/js-yaml": "^3.12.1",
     "@types/morgan": "^1.7.35",
     "@types/node": "^11.13.2",
     "@types/plotly.js": "^1.44.9",

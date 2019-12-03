@@ -10,6 +10,10 @@ Lighthouse CI will automatically look for a configuration file in the current wo
 
 1. `.lighthouserc.json`
 1. `lighthouserc.json`
+1. `.lighthouserc.yml`
+1. `lighthouserc.yml`
+1. `.lighthouserc.yaml`
+1. `lighthouserc.yaml`
 
 Note that upward traversal is not supported. If you'd like to keep your lighthouse configuration in a different location, you can explicitly pass in a configuration file path to any `lhci` command using `--config=./path/to/file`.
 
@@ -33,7 +37,9 @@ lhci assert --preset=lighthouse:recommended --assertions.uses-webp-images=off
 
 ## Structure
 
-The structure of a `lighthouserc.json` is segmented by command. Any options you see for a particular command in the [CLI documentation](./cli.md) can be set by the property of the same name in the config file.
+The structure of the config file is segmented by command. Any options you see for a particular command in the [CLI documentation](./cli.md) can be set by the property of the same name in the config file.
+
+**`lighthouserc.json`:**
 
 ```json
 {
@@ -52,6 +58,23 @@ The structure of a `lighthouserc.json` is segmented by command. Any options you 
     }
   }
 }
+```
+
+**`lighthouserc.yml`:**
+
+```yml
+ci:
+  collect:
+    # collect options here
+
+  assert:
+    # assert options here
+
+  upload:
+    # upload options here
+
+  server:
+    # server options here
 ```
 
 ## Recommendations
@@ -194,4 +217,34 @@ If you're a Lighthouse pro, assert the recommended preset, increase the number o
     }
   }
 }
+```
+
+### YAML Advanced config
+
+```yml
+ci:
+  collect:
+    numberOfRuns: 5
+    startServerCommand: rails server -e production
+    url:
+      - http://localhost:3000/
+      - http://localhost:3000/pricing
+      - http://localhost:3000/support
+  assert:
+    preset: lighthouse:recommended
+    assertions:
+      offscreen-images: 'off'
+      uses-webp-images: 'off'
+      color-contrast: 'off'
+      first-contentful-paint:
+        - error
+        - maxNumericValue: 2000
+          aggregationMethod: optimistic
+      interactive:
+        - error
+        - maxNumericValue: 5000
+          aggregationMethod: optimistic
+  upload:
+    target: lhci
+    serverBaseUrl: https://lhci.example.com
 ```

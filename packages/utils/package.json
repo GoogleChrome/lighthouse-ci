@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "isomorphic-fetch": "^2.2.1",
+    "js-yaml": "^3.13.1",
     "tree-kill": "^1.2.1"
   }
 }

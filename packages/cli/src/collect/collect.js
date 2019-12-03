@@ -39,6 +39,9 @@ function buildCommand(yargs) {
       description:
         'The path to a script that manipulates the browser with puppeteer before running Lighthouse, used for auth.',
     },
+    puppeteerLaunchOptions: {
+      description: 'The object of puppeteer launch options',
+    },
     startServerCommand: {
       description: 'The command to run to start the server.',
     },

@@ -5,6 +5,7 @@
  */
 'use strict';
 
+const fs = require('fs');
 const express = require('express');
 const app = express();
 app.get('/', (req, res) => {
@@ -12,6 +13,14 @@ app.get('/', (req, res) => {
   if (!cookies.includes('loggedin=')) {
     res.status(401);
     res.send(`<!DOCTYPE html><html>Unauthorized`);
+    return;
+  }
+
+  const userAgent = req.header('user-agent') || '';
+  if (!userAgent.includes('lighthouseci')) {
+    fs.writeFileSync('ua.tmp.json', JSON.stringify({userAgent}));
+    res.status(500);
+    res.send(`<!DOCTYPE html><html>Invalid UA`);
     return;
   }
 

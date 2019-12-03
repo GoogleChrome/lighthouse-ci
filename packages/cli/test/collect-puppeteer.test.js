@@ -22,12 +22,16 @@ describe('Lighthouse CI collect CLI with puppeteer', () => {
         '-n=1',
         '--url=http://localhost:52426',
         '--start-server-command=node ./auth-server.js',
+        '--settings.emulatedFormFactor=none',
         '--puppeteer-script=./auth-server-script.js',
+        '--puppeteer-launch-options.args=--no-sandbox',
+        '--puppeteer-launch-options.args=--user-agent=lighthouseci',
       ],
       {cwd: autorunDir}
     );
 
     // The server above will return a 401 Unauthorized when the login script isn't invoked.
+    // The server above will return a 500 Server Error when the user agent isn't passed.
     // 4xx and 5xx status codes cause Lighthouse to exit with 1 and collect to fail.
     // Just succeeding here is enough to signal that our login script worked.
     expect(stdout).toMatchInlineSnapshot(`

@@ -44,6 +44,8 @@ declare global {
         startServerCommand?: string;
         chromePath?: string;
         puppeteerScript?: string;
+        /** @see https://github.com/puppeteer/puppeteer/blob/v2.0.0/docs/api.md#puppeteerlaunchoptions */
+        puppeteerLaunchOptions?: import('puppeteer').LaunchOptions;
         method: 'node';
         numberOfRuns: number;
         headful: boolean;

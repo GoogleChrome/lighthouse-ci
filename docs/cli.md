@@ -104,23 +104,25 @@ lhci collect --help
 Run Lighthouse and save the results to a local folder
 
 Options:
-  --help                Show help                                      [boolean]
-  --version             Show version number                            [boolean]
-  --config              Path to JSON config file
-  --method                          [string] [choices: "node"] [default: "node"]
-  --headful             Run with a headful Chrome                      [boolean]
-  --additive            Skips clearing of previous collect data        [boolean]
-  --url                 A URL to run Lighthouse on.  You can evaluate multiple
-                        URLs by adding this flag multiple times.
-  --staticDistDir       The build directory where your HTML files to run
-                        Lighthouse on are located.
-  --chromePath          The path to the Chrome or Chromium executable to use for
-                        collection.
-  --puppeteerScript     The path to a script that manipulates the browser with
-                        puppeteer before running Lighthouse, used for auth.
-  --startServerCommand  The command to run to start the server.
-  --settings            The Lighthouse settings and flags to use when collecting
-  --numberOfRuns, -n    The number of times to run Lighthouse.
+  --help                   Show help                                      [boolean]
+  --version                Show version number                            [boolean]
+  --config                 Path to JSON config file
+  --method                             [string] [choices: "node"] [default: "node"]
+  --headful                Run with a headful Chrome                      [boolean]
+  --additive               Skips clearing of previous collect data        [boolean]
+  --url                    A URL to run Lighthouse on.  You can evaluate multiple
+                           URLs by adding this flag multiple times.
+  --staticDistDir          The build directory where your HTML files to run
+                           Lighthouse on are located.
+  --chromePath             The path to the Chrome or Chromium executable to use for
+                           collection.
+  --puppeteerScript        The path to a script that manipulates the browser with
+                           puppeteer before running Lighthouse, used for auth.
+  --puppeteerLaunchOptions The path to a script that manipulates the browser with
+                           puppeteer before running Lighthouse, used for auth.
+  --startServerCommand     The command to run to start the server.
+  --settings               The Lighthouse settings and flags to use when collecting
+  --numberOfRuns, -n       The number of times to run Lighthouse.
                                                            [number] [default: 3]
 ```
 
@@ -143,6 +145,8 @@ lhci collect --start-server-command="yarn serve" --url=http://localhost:8080/ --
 
 #### Using Puppeteer Scripts
 
+**NOTE:** In order to use puppeteer scripts, you need to install `puppeteer` yourself, i.e. `npm install --save puppeteer`. Any version you like that has a `.launch` method compatible with v1.x or v2.x and works with the Chrome version installed in your environment should work.
+
 When running Lighthouse CI on a page with behind authentication, you'll need to authorize the browser that Lighthouse CI will be using. While there are [several](./configuration.md#page-behind-authentication) different [options](https://github.com/GoogleChrome/lighthouse/blob/v5.6.0/docs/authenticated-pages.md) to accomplish this, `--puppeteer-script` is one of the most flexible and convenient.
 
 `--puppeteer-script` accepts a path to a JavaScript file that exports a function that will be invoked by Lighthouse CI before navigating, e.g. a script that will login to your site.
@@ -164,7 +168,7 @@ module.exports = async (browser, context) => {
 };
 ```
 
-Lighthouse CI will then use this browser that the script sets up when running Lighthouse. Note that if you store your credentials in `localStorage` or anything other than a cookie you might want to pair this option with `--settings.disableStorageReset` to force Lighthouse to keep the cache state.
+Lighthouse CI will then use the browser that this script sets up when running Lighthouse. Note that if you store your credentials in `localStorage` or anything other than a cookie you might want to pair this option with `--settings.disableStorageReset` to force Lighthouse to keep the cache state.
 
 For more information on how to use puppeteer, read up on [their API docs](https://github.com/puppeteer/puppeteer/blob/v2.0.0/docs/api.md#class-browser).
 

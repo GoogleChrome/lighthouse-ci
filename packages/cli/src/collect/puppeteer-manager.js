@@ -26,7 +26,9 @@ class PuppeteerManager {
     // Delay require to only run after user requests puppeteer functionality.
     const puppeteer = require('puppeteer');
     this._browser = await puppeteer.launch({
+      ...(this._options.puppeteerLaunchOptions || {}),
       pipe: false,
+      devtools: false,
       headless: !this._options.headful,
       executablePath: this._options.chromePath,
     });

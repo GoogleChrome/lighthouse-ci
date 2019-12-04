@@ -36,11 +36,12 @@ function loadSavedLHRs() {
 /**
  * @param {string} lhr
  */
-function saveLHR(lhr) {
-  const filename = `lhr-${Date.now()}.json`;
-  const filePath = path.join(LHCI_DIR, filename);
+function saveLHR(lhr, baseDir = LHCI_DIR) {
+  const baseFilename = `lhr-${Date.now()}`;
+  const basePath = path.join(baseDir, baseFilename);
   ensureDirectoryExists();
-  fs.writeFileSync(filePath, lhr);
+  fs.writeFileSync(`${basePath}.json`, lhr);
+  fs.writeFileSync(`${basePath}.html`, getHTMLReportForLHR(JSON.parse(lhr)));
 }
 
 /**

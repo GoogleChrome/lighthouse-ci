@@ -5,8 +5,10 @@
  */
 'use strict';
 
+const os = require('os');
 const fs = require('fs');
 const path = require('path');
+const rimraf = require('rimraf');
 const {spawn, spawnSync} = require('child_process');
 const testingLibrary = require('@testing-library/dom');
 
@@ -40,6 +42,12 @@ async function safeDeleteFile(filePath) {
       await new Promise(r => setTimeout(r, 1000));
     }
   }
+}
+
+async function withTmpDir(fn) {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'lighthouse-ci-'));
+  await fn(tmpDir);
+  rimraf.sync(tmpDir);
 }
 
 async function startServer(sqlFile) {
@@ -106,4 +114,5 @@ module.exports = {
   waitForCondition,
   getSqlFilePath,
   safeDeleteFile,
+  withTmpDir,
 };

@@ -31,6 +31,8 @@
   top: 0;
   bottom: 0;
   background: var(--highlighted-background-color);
+
+  transition: left 1s, right 1s;
 }
 
 .audit-numeric-diff__box--improvement {
@@ -77,6 +79,8 @@
   display: flex;
   flex-direction: row;
   align-items: center;
+
+  transition: left 1s, right 1s;
 }
 
 .audit-numeric-diff__delta-label--narrow-left {

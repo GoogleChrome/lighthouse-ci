@@ -10,6 +10,26 @@ import clsx from 'clsx';
 import {Nbsp} from '../../../components/nbsp';
 import './numeric-diff.css';
 
+const BIG_PICTURE_LIMITS = {
+  'first-contentful-paint': [0, 10000],
+  'first-meaningful-paint': [0, 10000],
+  'largest-contentful-paint': [0, 15000],
+  'speed-index': [0, 15000],
+  'first-cpu-idle': [0, 15000],
+  interactive: [0, 20000],
+  'estimated-input-latency': [0, 1500],
+  'max-potential-fid': [0, 1500],
+  'total-blocking-time': [0, 1500],
+  __default__: [0, 30 * 1000],
+};
+
+/** @param {LH.AuditResult|undefined} audit @param {'lower'|'upper'} limitType */
+const getBigPictureLimit = (audit, limitType) => {
+  const auditId = /** @type {keyof typeof BIG_PICTURE_LIMITS} */ (audit && audit.id) || '';
+  const limits = BIG_PICTURE_LIMITS[auditId] || BIG_PICTURE_LIMITS.__default__;
+  return limits[limitType === 'lower' ? 0 : 1];
+};
+
 /** @param {number} x @param {'up'|'down'} direction */
 const toNearestRoundNumber = (x, direction) => {
   const fn = direction === 'up' ? Math.ceil : Math.floor;
@@ -105,7 +125,7 @@ const toDisplay = (x, options) => {
   };
 };
 
-/** @param {{diff: LHCI.NumericAuditDiff, audit?: LH.AuditResult, groupId?: string, showAsNarrow?: boolean}} props */
+/** @param {{diff: LHCI.NumericAuditDiff, audit?: LH.AuditResult, groupId?: string, showAsBigPicture?: boolean, showAsNarrow?: boolean}} props */
 export const NumericDiff = props => {
   const {diff, audit, groupId} = props;
   const unit = getUnitFromAudit(audit, groupId);
@@ -119,12 +139,18 @@ export const NumericDiff = props => {
   const delta = currentNumericValue - baseNumericValue;
   const minValue = Math.min(currentNumericValue, baseNumericValue);
   const maxValue = Math.max(currentNumericValue, baseNumericValue);
-  const lowerLimit = toNearestRoundNumber(minValue * 0.8, 'down');
-  const upperLimit = toNearestRoundNumber(maxValue * 1.2, 'up');
+  const lowerLimit = props.showAsBigPicture
+    ? getBigPictureLimit(audit, 'lower')
+    : toNearestRoundNumber(minValue * 0.8, 'down');
+  const upperLimit = props.showAsBigPicture
+    ? getBigPictureLimit(audit, 'upper')
+    : toNearestRoundNumber(maxValue * 1.2, 'up');
   const range = upperLimit - lowerLimit;
 
-  const boxLeft = (100 * (minValue - lowerLimit)) / range;
-  const boxRight = 100 - (100 * (maxValue - lowerLimit)) / range;
+  const minValueConstrainted = Math.min(Math.max(minValue, lowerLimit), upperLimit);
+  const maxValueConstrainted = Math.min(Math.max(maxValue, lowerLimit), upperLimit);
+  const boxLeft = (100 * (minValueConstrainted - lowerLimit)) / range;
+  const boxRight = 100 - (100 * (maxValueConstrainted - lowerLimit)) / range;
   const deltaType = getDeltaLabel(delta, 'audit');
   const minValueIsCurrentValue = minValue === currentNumericValue;
   const hoverDisplay = `${toDisplay(baseNumericValue, {unit, withSuffix: true}).string} to ${

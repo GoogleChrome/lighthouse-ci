@@ -8,9 +8,42 @@
   margin: calc(2 * var(--base-spacing));
 }
 
+.audit-group__header {
+  display: flex;
+  flex-direction: row;
+}
+
 .audit-group__title {
   font-size: var(--header-font-size);
   margin-bottom: calc(var(--base-spacing) / 2);
+  flex-grow: 1;
+}
+
+.audit-group__big-picture-tabs {
+  width: 380px;
+  display: flex;
+  flex-direction: row;
+  margin-right: calc(var(--base-spacing) / 2);
+}
+
+.big-picture-tabs__tab {
+  flex-grow: 1;
+
+  cursor: pointer;
+
+  font-size: var(--smaller-font-size);
+  text-align: center;
+  text-transform: uppercase;
+  color: var(--secondary-text-color);
+  font-weight: var(--medium-font-weight);
+
+  border-bottom: 1px solid var(--base-border-color);
+  margin-bottom: calc(var(--base-spacing) / 2);
+}
+
+.big-picture-tabs__tab--selected {
+  color: var(--base-text-color);
+  border-bottom: 1px solid var(--strong-border-color);
 }
 
 .audit-group__audit {

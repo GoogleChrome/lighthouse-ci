@@ -162,7 +162,7 @@ export const ItemDiff = props => {
   );
 };
 
-/** @param {{pair: LHCI.AuditPair, showAsNarrow: boolean}} props */
+/** @param {{pair: LHCI.AuditPair, showAsBigPicture: boolean, showAsNarrow: boolean}} props */
 export const AuditDiff = props => {
   const {audit, baseAudit, diffs, group} = props.pair;
   const noDiffAvailable = <span>No diff available</span>;
@@ -176,6 +176,7 @@ export const AuditDiff = props => {
         diff={numericDiff}
         audit={audit}
         groupId={group.id}
+        showAsBigPicture={props.showAsBigPicture}
         showAsNarrow={props.showAsNarrow}
       />
     );

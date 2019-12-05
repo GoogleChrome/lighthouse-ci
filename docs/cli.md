@@ -110,25 +110,27 @@ lhci collect --help
 Run Lighthouse and save the results to a local folder
 
 Options:
-  --help                   Show help                                      [boolean]
-  --version                Show version number                            [boolean]
-  --config                 Path to JSON config file
-  --method                             [string] [choices: "node"] [default: "node"]
-  --headful                Run with a headful Chrome                      [boolean]
-  --additive               Skips clearing of previous collect data        [boolean]
-  --url                    A URL to run Lighthouse on.  You can evaluate multiple
-                           URLs by adding this flag multiple times.
-  --staticDistDir          The build directory where your HTML files to run
-                           Lighthouse on are located.
-  --chromePath             The path to the Chrome or Chromium executable to use for
-                           collection.
-  --puppeteerScript        The path to a script that manipulates the browser with
-                           puppeteer before running Lighthouse, used for auth.
-  --puppeteerLaunchOptions The path to a script that manipulates the browser with
-                           puppeteer before running Lighthouse, used for auth.
-  --startServerCommand     The command to run to start the server.
-  --settings               The Lighthouse settings and flags to use when collecting
-  --numberOfRuns, -n       The number of times to run Lighthouse.
+  --help                    Show help                                      [boolean]
+  --version                 Show version number                            [boolean]
+  --config                  Path to JSON config file
+  --method                              [string] [choices: "node"] [default: "node"]
+  --headful                 Run with a headful Chrome                      [boolean]
+  --additive                Skips clearing of previous collect data        [boolean]
+  --url                     A URL to run Lighthouse on.  You can evaluate multiple
+                            URLs by adding this flag multiple times.
+  --staticDistDir           The build directory where your HTML files to run
+                            Lighthouse on are located.
+  --chromePath              The path to the Chrome or Chromium executable to use for
+                            collection.
+  --puppeteerScript         The path to a script that manipulates the browser with
+                            puppeteer before running Lighthouse, used for auth.
+  --puppeteerLaunchOptions  The path to a script that manipulates the browser with
+                            puppeteer before running Lighthouse, used for auth.
+  --startServerCommand      The command to run to start the server.
+  --startServerReadyPattern String pattern to listen for started server.
+                                              [string] [default: "listen|ready"]
+  --settings                The Lighthouse settings and flags to use when collecting
+  --numberOfRuns, -n        The number of times to run Lighthouse.
                                                            [number] [default: 3]
 ```
 

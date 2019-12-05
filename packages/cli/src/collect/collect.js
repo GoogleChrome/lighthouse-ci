@@ -45,6 +45,11 @@ function buildCommand(yargs) {
     startServerCommand: {
       description: 'The command to run to start the server.',
     },
+    startServerReadyPattern: {
+      description: 'String pattern to listen for started server.',
+      type: 'string',
+      default: 'listen|ready',
+    },
     settings: {description: 'The Lighthouse settings and flags to use when collecting'},
     numberOfRuns: {
       alias: 'n',
@@ -95,9 +100,10 @@ async function startServerAndDetermineUrls(options) {
   if (!options.staticDistDir) {
     let close = async () => undefined;
     if (options.startServerCommand) {
+      const regexPattern = new RegExp(options.startServerReadyPattern, 'i');
       const {child, patternMatch, stdout, stderr} = await runCommandAndWaitForPattern(
         options.startServerCommand,
-        /(listen|ready)/i,
+        regexPattern,
         {timeout: 10000}
       );
       process.stdout.write(`Started a web server with "${options.startServerCommand}"...\n`);
@@ -105,7 +111,9 @@ async function startServerAndDetermineUrls(options) {
 
       if (!patternMatch) {
         process.stdout.write(`WARNING: Timed out waiting for the server to start listening.\n`);
-        process.stdout.write(`         Ensure the server prints "listening" when it is ready.\n`);
+        // This is only for readability.
+        const message = `Ensure the server prints a matching pattern ${regexPattern} when it is ready.\n`;
+        process.stdout.write(`         ${message}`);
         if (process.env.CI) process.stderr.write(`\nServer Output:\n${stdout}\n${stderr}\n`);
       }
     }

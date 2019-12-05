@@ -17,7 +17,7 @@ import {useState} from 'preact/hooks';
  */
 export const AuditGroup = props => {
   const {group, pairs} = props;
-  const [showAsBigPicture, setShowAsBigPicture] = useState(false);
+  const [showAsBigPicture, setShowAsBigPicture] = useState(group.id === 'metrics');
 
   return (
     <Paper className="audit-group">
@@ -27,19 +27,19 @@ export const AuditGroup = props => {
           <div className="audit-group__big-picture-tabs">
             <span
               className={clsx('big-picture-tabs__tab', {
-                'big-picture-tabs__tab--selected': !showAsBigPicture,
-              })}
-              onClick={() => setShowAsBigPicture(false)}
-            >
-              Calibrated
-            </span>
-            <span
-              className={clsx('big-picture-tabs__tab', {
                 'big-picture-tabs__tab--selected': showAsBigPicture,
               })}
               onClick={() => setShowAsBigPicture(true)}
             >
-              Overall
+              Overview
+            </span>
+            <span
+              className={clsx('big-picture-tabs__tab', {
+                'big-picture-tabs__tab--selected': !showAsBigPicture,
+              })}
+              onClick={() => setShowAsBigPicture(false)}
+            >
+              Magnified
             </span>
           </div>
         ) : (

@@ -9,8 +9,8 @@
 
 jest.retryTimes(3);
 
-const os = require('os');
 const path = require('path');
+const os = require('os');
 const {spawn} = require('child_process');
 const fetch = require('isomorphic-fetch');
 const log = require('lighthouse-logger');
@@ -29,7 +29,6 @@ describe('Lighthouse CI CLI', () => {
   const rcMatrixFile = path.join(__dirname, 'fixtures/lighthouserc-matrix.json');
   const rcExtendedFile = path.join(__dirname, 'fixtures/lighthouserc-extended.json');
   const budgetsFile = path.join(__dirname, 'fixtures/budgets.json');
-  const staticDistDir = path.join(__dirname, 'fixtures');
   const tmpSqlFilePath = getSqlFilePath();
 
   let server;
@@ -148,30 +147,8 @@ describe('Lighthouse CI CLI', () => {
     });
   });
 
+  // FIXME: Tests dependency. Moving these tests breaks others.
   describe('collect', () => {
-    it('should collect results from staticDistDir', () => {
-      const {stdout, stderr, status} = runCLI([
-        'collect',
-        `--config=${rcFile}`,
-        `--static-dist-dir=${staticDistDir}`,
-      ]);
-
-      const stdoutClean = stdout;
-      expect(stdoutClean).toMatchInlineSnapshot(`
-        "Started a web server on port XXXX...
-        Running Lighthouse 2 time(s) on http://localhost:XXXX/checkout.html
-        Run #1...done.
-        Run #2...done.
-        Running Lighthouse 2 time(s) on http://localhost:XXXX/index.html
-        Run #1...done.
-        Run #2...done.
-        Done running Lighthouse!
-        "
-      `);
-      expect(stderr.toString()).toMatchInlineSnapshot(`""`);
-      expect(status).toEqual(0);
-    }, 90000);
-
     it('should collect results with a server command', () => {
       // FIXME: for some inexplicable reason this test cannot pass in Travis Windows
       if (os.platform() === 'win32') return;
@@ -196,7 +173,6 @@ describe('Lighthouse CI CLI', () => {
       expect(stderr.toString()).toMatchInlineSnapshot(`""`);
       expect(status).toEqual(0);
     }, 60000);
-
     it('should collect results from explicit urls', () => {
       const {stdout, stderr, status} = runCLI([
         'collect',

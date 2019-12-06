@@ -115,4 +115,5 @@ module.exports = {
   getSqlFilePath,
   safeDeleteFile,
   withTmpDir,
+  cleanStdOutput,
 };

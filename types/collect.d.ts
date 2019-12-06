@@ -42,6 +42,7 @@ declare global {
         url?: string | string[];
         staticDistDir?: string;
         startServerCommand?: string;
+        startServerReadyPattern: string;
         chromePath?: string;
         puppeteerScript?: string;
         /** @see https://github.com/puppeteer/puppeteer/blob/v2.0.0/docs/api.md#puppeteerlaunchoptions */

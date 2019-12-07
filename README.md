@@ -36,3 +36,9 @@ addons:
 - [Lighthouse CI GitHub Action](https://github.com/treosh/lighthouse-ci-action) - Automatically run Lighthouse CI on every PR with GitHub Actions, no infrastructure required.
 
 - [Learning Lighthouse CI](https://github.com/hchiam/learning-lighthouse-ci) - A minimal example repo that you can use as a template when starting from scratch, offers a beginner-friendly quickstart guide using create-react-app.
+
+## Community Guides
+A collection of unofficial blog posts, tutorials, and guides written by the community on using Lighthouse CI. 
+
+**NOTE:** This is not official documentation. You're encouraged to familiarize yourself with Lighthouse CI and read through [Getting Started](./docs/getting-started.md) before continuing.
+- [Integerate Lighthouse CI for static website generator](https://blog.akansh.com/integrate-lighthouse-ci-with-static-site-generators/) - An article on integrating Lighthouse CI with static website generators like Gatsby, Jekyll, etc. 

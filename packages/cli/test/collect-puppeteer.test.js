@@ -23,6 +23,7 @@ describe('Lighthouse CI collect CLI with puppeteer', () => {
         '--url=http://localhost:52426',
         '--start-server-command=node ./auth-server.js',
         '--settings.emulatedFormFactor=none',
+        '--settings.chromeFlags="user-agent=lighthouseci"',
         '--puppeteer-script=./auth-server-script.js',
         '--puppeteer-launch-options.args=--no-sandbox',
         '--puppeteer-launch-options.args=--user-agent=lighthouseci',
@@ -41,7 +42,11 @@ describe('Lighthouse CI collect CLI with puppeteer', () => {
       Done running Lighthouse!
       "
     `);
-    expect(stderr).toMatchInlineSnapshot(`""`);
+    expect(stderr).toMatchInlineSnapshot(`
+      "WARNING: collect.settings.chromeFlags option will be ignored.
+      WARNING: If you want chromeFlags with puppeteerScript, use collect.puppeteerLaunchOptions.args option.
+      "
+    `);
     expect(status).toEqual(0);
   }, 180000);
 });

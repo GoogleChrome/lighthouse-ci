@@ -145,11 +145,29 @@ async function startServerAndDetermineUrls(options) {
 
 /**
  * @param {LHCI.CollectCommand.Options} options
+ * @return {void}
+ */
+function checkIgnoredChromeFlagsOption(options) {
+  const usePuppeteerScript = !!options.puppeteerScript;
+  const useChromeFlags = options.settings ? !!options.settings.chromeFlags : false;
+
+  if (usePuppeteerScript && useChromeFlags) {
+    process.stderr.write(`WARNING: collect.settings.chromeFlags option will be ignored.\n`);
+    process.stderr.write(
+      `WARNING: If you want chromeFlags with puppeteerScript, use collect.puppeteerLaunchOptions.args option.\n`
+    );
+  }
+}
+
+/**
+ * @param {LHCI.CollectCommand.Options} options
  * @return {Promise<void>}
  */
 async function runCommand(options) {
   if (options.method !== 'node') throw new Error(`Method "${options.method}" not yet supported`);
   if (!options.additive) clearSavedLHRs();
+
+  checkIgnoredChromeFlagsOption(options);
 
   const puppeteer = new PuppeteerManager(options);
   const {urls, close} = await startServerAndDetermineUrls(options);

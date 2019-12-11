@@ -51,6 +51,9 @@ export const PageSidebar = props => {
           }}
         />
       </div>
+      <div className="page-sidebar__footer">
+        <div className="page-sidebar__version">Version {process.env.npm_package_version}</div>
+      </div>
     </div>
   );
 };

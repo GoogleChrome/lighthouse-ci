@@ -97,6 +97,8 @@
 
   --page-sidebar-width: 260px;
   --page-sidebar-nav-item-height: 24px;
+  --page-sidebar-footer-font-size: 14px;
+  --page-sidebar-footer-margin: 25px;
 
   --gauge-size: 82px;
   --gauge-stroke-width: 7px;

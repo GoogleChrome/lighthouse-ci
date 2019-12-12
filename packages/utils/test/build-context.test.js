@@ -51,6 +51,11 @@ describe('build-context.js', () => {
     it('should work', () => {
       expect(buildContext.getCommitTime(hash)).toEqual('2019-10-29T16:43:39-05:00');
     });
+
+    it('should respect env override', () => {
+      process.env.LHCI_BUILD_CONTEXT__COMMIT_TIME = '2019-12-11T16:54:32.000Z';
+      expect(buildContext.getCommitTime(hash)).toEqual('2019-12-11T16:54:32.000Z');
+    });
   });
 
   describe('#getCurrentBranch()', () => {
@@ -69,11 +74,21 @@ describe('build-context.js', () => {
     it('should work', () => {
       expect(buildContext.getCommitMessage(hash)).toEqual('feat(server): add version endpoint');
     });
+
+    it('should respect env override', () => {
+      process.env.LHCI_BUILD_CONTEXT__COMMIT_MESSAGE = 'Daily run';
+      expect(buildContext.getCommitMessage(hash)).toEqual('Daily run');
+    });
   });
 
   describe('#getAuthor()', () => {
     it('should work', () => {
       expect(buildContext.getAuthor(hash)).toEqual('Patrick Hulce <patrick.hulce@gmail.com>');
+    });
+
+    it('should respect env override', () => {
+      process.env.LHCI_BUILD_CONTEXT__AUTHOR = 'Paul Irish <paulirish@google.com>';
+      expect(buildContext.getAuthor(hash)).toEqual('Paul Irish <paulirish@google.com>');
     });
   });
 
@@ -82,6 +97,11 @@ describe('build-context.js', () => {
       expect(buildContext.getAvatarUrl(hash)).toEqual(
         'https://www.gravatar.com/avatar/78bafdcaf40e20b90bb76b9aa5834e11.jpg?d=identicon'
       );
+    });
+
+    it('should respect env override', () => {
+      process.env.LHCI_BUILD_CONTEXT__AVATAR_URL = 'http://localhost:1234/profile.jpg';
+      expect(buildContext.getAvatarUrl(hash)).toEqual('http://localhost:1234/profile.jpg');
     });
   });
 
@@ -94,6 +114,11 @@ describe('build-context.js', () => {
 
     it('should return empty string when it fails', () => {
       expect(buildContext.getAncestorHashForMaster('random' + Math.random())).toEqual('');
+    });
+
+    it('should respect env override', () => {
+      process.env.LHCI_BUILD_CONTEXT__ANCESTOR_HASH = '123456789';
+      expect(buildContext.getAncestorHash(hash)).toEqual('123456789');
     });
   });
 
@@ -118,6 +143,11 @@ describe('build-context.js', () => {
   describe('#getGitRemote', () => {
     it('should find the origin', () => {
       expect(buildContext.getGitRemote()).toContain('lighthouse-ci');
+    });
+
+    it('should respect env override', () => {
+      process.env.LHCI_BUILD_CONTEXT__GIT_REMOTE = 'git@github.com:patrickhulce/lighthouse-ci.git';
+      expect(buildContext.getGitRemote()).toEqual('git@github.com:patrickhulce/lighthouse-ci.git');
     });
   });
 

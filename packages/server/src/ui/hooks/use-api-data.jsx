@@ -34,7 +34,7 @@ export const api = new ApiClient({
 /** @typedef {'loading'|'error'|'loaded'} LoadingState */
 
 /**
- * @template {keyof StrictOmit<ApiClient, '_rootURL'|'_URL'>} T
+ * @template {keyof StrictOmit<ApiClient, '_rootURL'|'_URL'|'_extraHeaders'|'_fetch'>} T
  * @param {T} apiMethod
  * @param {Parameters<ApiClient[T]>|undefined} apiParameters
  * @return {[LoadingState, UnPromisify<ReturnType<ApiClient[T]>> | undefined]}

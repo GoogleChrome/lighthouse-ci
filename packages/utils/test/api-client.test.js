@@ -10,17 +10,38 @@
 const ApiClient = require('../src/api-client.js');
 
 describe('Lighthouse CI API Client', () => {
-  const fetchMockImpl = () => ({json: () => ({})});
+  const fetchMockImpl = () => ({json: () => ({}), text: () => ''});
+
   it('should normalize URLs relative to root', async () => {
     let fetchMock = jest.fn().mockImplementation(fetchMockImpl);
     let client = new ApiClient({rootURL: 'http://localhost:9000', fetch: fetchMock});
     await client.getProjects();
-    expect(fetchMock).toHaveBeenCalledWith(`http://localhost:9000/v1/projects`);
+    expect(fetchMock).toHaveBeenCalledWith(`http://localhost:9000/v1/projects`, {headers: {}});
 
     fetchMock = jest.fn().mockImplementation(fetchMockImpl);
     client = new ApiClient({rootURL: 'http://localhost:9000/', fetch: fetchMock});
     await client.getProjects();
-    expect(fetchMock).toHaveBeenCalledWith(`http://localhost:9000/v1/projects`);
+    expect(fetchMock).toHaveBeenCalledWith(`http://localhost:9000/v1/projects`, {headers: {}});
+  });
+
+  it('should pass through headers', async () => {
+    const fetchMock = jest.fn().mockImplementation(fetchMockImpl);
+    const client = new ApiClient({
+      rootURL: 'http://localhost:9000',
+      fetch: fetchMock,
+      extraHeaders: {Authorization: 'Bearer 1234'},
+    });
+
+    await client.getVersion();
+    expect(fetchMock.mock.calls[0][1]).toEqual({headers: {Authorization: 'Bearer 1234'}});
+    await client.getProjects();
+    expect(fetchMock.mock.calls[1][1]).toEqual({headers: {Authorization: 'Bearer 1234'}});
+    await client.createProject({name: 'Foo'});
+    expect(fetchMock.mock.calls[2][1]).toEqual({
+      method: 'POST',
+      body: JSON.stringify({name: 'Foo'}),
+      headers: {Authorization: 'Bearer 1234', 'content-type': 'application/json'},
+    });
   });
 
   describe('getBuilds', () => {
@@ -29,7 +50,8 @@ describe('Lighthouse CI API Client', () => {
       const client = new ApiClient({rootURL: 'http://localhost:9000', fetch: fetchMock});
       await client.getBuilds('124', {branch: 'master'});
       expect(fetchMock).toHaveBeenCalledWith(
-        `http://localhost:9000/v1/projects/124/builds?branch=master`
+        `http://localhost:9000/v1/projects/124/builds?branch=master`,
+        {headers: {}}
       );
     });
   });

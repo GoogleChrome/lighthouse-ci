@@ -194,20 +194,22 @@ Save the results to the server
 Options:
   --help                    Show help                                  [boolean]
   --version                 Show version number                        [boolean]
-  --config                  Path to JSON config file
   --target                  The type of target to upload the data to. If set to
                             anything other than "lhci", some of the options will
                             not apply.
         [string] [choices: "lhci", "temporary-public-storage"] [default: "lhci"]
-  --token                   The Lighthouse CI server token for the project, only
-                            applies to `lhci` target.                   [string]
+  --token                   [lhci only] The Lighthouse CI server token for the
+                            project.                                    [string]
   --githubToken             The GitHub token to use to apply a status check.
                                                                         [string]
   --githubAppToken          The LHCI GitHub App token to use to apply a status
                             check.                                      [string]
-  --serverBaseUrl           The base URL of the server where results will be
-                            saved.           [default: "http://localhost:9001/"]
-  --urlReplacementPatterns  sed-like replacement patterns to mask
+  --extraHeaders            [lhci only] Extra headers to use when making API
+                            requests to the LHCI server.
+  --serverBaseUrl           [lhci only] The base URL of the LHCI server where
+                            results will be saved.
+                                             [default: "http://localhost:9001/"]
+  --urlReplacementPatterns  [lhci only] sed-like replacement patterns to mask
                             non-deterministic URL substrings.  [array] [default:
   ["s#:[0-9]{3,5}/#:PORT/#","s/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[
                                                           0-9a-f]{12}/UUID/ig"]]
@@ -219,6 +221,7 @@ Options:
 lhci upload --config=./lighthouserc.json
 lhci upload --target=temporary-public-storage
 lhci upload --serverBaseUrl=http://lhci.my-custom-domain.com/
+lhci upload --extraHeaders.Authorization='Basic dGVzdDoxMjPCow=='
 ```
 
 #### Build Context

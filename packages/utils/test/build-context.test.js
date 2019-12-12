@@ -115,6 +115,12 @@ describe('build-context.js', () => {
     });
   });
 
+  describe('#getGitRemote', () => {
+    it('should find the origin', () => {
+      expect(buildContext.getGitRemote()).toContain('lighthouse-ci');
+    });
+  });
+
   describe('#getGitHubRepoSlug', () => {
     it('should work for circle CI', () => {
       process.env.CIRCLE_PROJECT_USERNAME = 'SuperLighthouse';
@@ -125,6 +131,10 @@ describe('build-context.js', () => {
     it('should respect env override', () => {
       process.env.LHCI_BUILD_CONTEXT__GITHUB_REPO_SLUG = 'SuperLighthouse/manual';
       expect(buildContext.getGitHubRepoSlug()).toEqual('SuperLighthouse/manual');
+    });
+
+    it('should fallback to getGitRemote result', () => {
+      expect(buildContext.getGitHubRepoSlug()).toEqual('GoogleChrome/lighthouse-ci');
     });
   });
 });

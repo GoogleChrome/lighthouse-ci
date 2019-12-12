@@ -108,7 +108,7 @@ describe('collect', () => {
       expect(stdout).toMatchInlineSnapshot(`
         "Started a web server with \\"${cleanStartCommand}\\"...
         WARNING: Timed out waiting for the server to start listening.
-                 Ensure the server prints a matching pattern /listen|ready/i when it is ready.
+                 Ensure the server prints a pattern that matches /listen|ready/i when it is ready.
         Running Lighthouse 1 time(s) on http://localhost:XXXX/
         Run #1...done.
         Done running Lighthouse!

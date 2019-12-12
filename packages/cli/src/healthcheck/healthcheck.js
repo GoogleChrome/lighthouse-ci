@@ -12,6 +12,7 @@ const {
   getCurrentHash,
   getAncestorHash,
   getCurrentBranch,
+  getGitHubRepoSlug,
 } = require('@lhci/utils/src/build-context.js');
 const {loadSavedLHRs} = require('@lhci/utils/src/saved-reports.js');
 
@@ -65,7 +66,7 @@ const checks = [
     label: 'GitHub token set',
     failureLabel: 'GitHub token not set',
     // the test only makes sense if they've configured an upload target of some sort
-    shouldTest: opts => !!opts.target || !!opts.serverBaseUrl,
+    shouldTest: opts => !!getGitHubRepoSlug() && (!!opts.target || !!opts.serverBaseUrl),
     test: opts => Boolean(opts.githubToken || opts.githubAppToken),
   },
   {

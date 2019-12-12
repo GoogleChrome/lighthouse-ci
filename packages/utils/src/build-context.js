@@ -32,6 +32,18 @@ function runCommandsUntilFirstSuccess(commands) {
   return result;
 }
 
+/** @return {string|undefined} */
+function getGitRemote() {
+  const result = childProcess.spawnSync('git', ['remote', '-v'], {encoding: 'utf8'});
+  if (result.status !== 0) return undefined;
+
+  const originLine = result.stdout.split('\n').find(l => l.startsWith('origin'));
+  if (!originLine) return undefined;
+  const matches = originLine.match(/^origin\s+(\S+)\s+/);
+  if (!matches) return undefined;
+  return matches[1];
+}
+
 /**
  * @return {string}
  */
@@ -237,6 +249,12 @@ function getGitHubRepoSlug() {
   if (process.env.CIRCLE_PROJECT_USERNAME && process.env.CIRCLE_PROJECT_REPONAME) {
     return `${process.env.CIRCLE_PROJECT_USERNAME}/${process.env.CIRCLE_PROJECT_REPONAME}`;
   }
+
+  const remote = getGitRemote();
+  if (remote && remote.includes('github.com')) {
+    const remoteMatch = remote.match(/github\.com.([^/]+\/.+)\.git/);
+    if (remoteMatch) return remoteMatch[1];
+  }
 }
 
 module.exports = {
@@ -250,5 +268,6 @@ module.exports = {
   getAncestorHash,
   getAncestorHashForMaster,
   getAncestorHashForBranch,
+  getGitRemote,
   getGitHubRepoSlug,
 };

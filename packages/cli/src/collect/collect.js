@@ -110,9 +110,9 @@ async function startServerAndDetermineUrls(options) {
       close = () => killProcessTree(child.pid);
 
       if (!patternMatch) {
-        process.stdout.write(`WARNING: Timed out waiting for the server to start listening.\n`);
         // This is only for readability.
-        const message = `Ensure the server prints a matching pattern ${regexPattern} when it is ready.\n`;
+        const message = `Ensure the server prints a pattern that matches ${regexPattern} when it is ready.\n`;
+        process.stdout.write(`WARNING: Timed out waiting for the server to start listening.\n`);
         process.stdout.write(`         ${message}`);
         if (process.env.CI) process.stderr.write(`\nServer Output:\n${stdout}\n${stderr}\n`);
       }

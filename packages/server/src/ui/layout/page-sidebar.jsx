@@ -52,7 +52,10 @@ export const PageSidebar = props => {
         />
       </div>
       <div className="page-sidebar__footer">
-        <div className="page-sidebar__version">Version {process.env.npm_package_version}</div>
+        <div className="page-sidebar__version">
+          {/* This environment variable is set by npm/yarn on any script command. */}
+          v{process.env.npm_package_version}
+         </div>
       </div>
     </div>
   );

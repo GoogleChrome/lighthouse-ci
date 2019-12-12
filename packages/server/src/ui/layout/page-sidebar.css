@@ -71,6 +71,12 @@
 }
 
 .page-sidebar__footer {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: var(--base-spacing);
+  text-align: center;
+}
   padding: 0 var(--page-header-horizontal-padding);
   width: 100%;
   display: flex;
@@ -81,5 +87,5 @@
 }
 
 .page-sidebar__version {
-  color:sandybrown;
+  color: var(--inverted-secondary-text-color);
 }

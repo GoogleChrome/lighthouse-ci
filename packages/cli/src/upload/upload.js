@@ -54,7 +54,7 @@ function buildCommand(yargs) {
     },
     token: {
       type: 'string',
-      description: 'The Lighthouse CI server token for the project, only applies to `lhci` target.',
+      description: '[lhci only] The Lighthouse CI server token for the project.',
     },
     githubToken: {
       type: 'string',
@@ -64,13 +64,17 @@ function buildCommand(yargs) {
       type: 'string',
       description: 'The LHCI GitHub App token to use to apply a status check.',
     },
+    extraHeaders: {
+      description: '[lhci only] Extra headers to use when making API requests to the LHCI server.',
+    },
     serverBaseUrl: {
-      description: 'The base URL of the server where results will be saved.',
+      description: '[lhci only] The base URL of the LHCI server where results will be saved.',
       default: 'http://localhost:9001/',
     },
     urlReplacementPatterns: {
       type: 'array',
-      description: 'sed-like replacement patterns to mask non-deterministic URL substrings.',
+      description:
+        '[lhci only] sed-like replacement patterns to mask non-deterministic URL substrings.',
       default: [
         's#:[0-9]{3,5}/#:PORT/#', // replace ports
         's/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/UUID/ig', // replace UUIDs
@@ -212,7 +216,7 @@ async function runGithubStatusCheck(options, targetUrlMap) {
 async function runLHCITarget(options) {
   if (!options.token) throw new Error('Must provide token for LHCI target');
 
-  const api = new ApiClient({rootURL: options.serverBaseUrl});
+  const api = new ApiClient({rootURL: options.serverBaseUrl, extraHeaders: options.extraHeaders});
 
   const project = await api.findProjectByToken(options.token);
   if (!project) {

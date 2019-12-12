@@ -10,10 +10,11 @@ const fetch = require('isomorphic-fetch');
 
 class ApiClient {
   /**
-   * @param {{rootURL: string, fetch?: import('isomorphic-fetch'), URL?: typeof import('url').URL}} options
+   * @param {{rootURL: string, fetch?: import('isomorphic-fetch'), URL?: typeof import('url').URL, extraHeaders?: Record<string, string>}} options
    */
   constructor(options) {
     this._rootURL = options.rootURL;
+    this._extraHeaders = options.extraHeaders || {};
     this._fetch = options.fetch || fetch;
     this._URL = options.URL || URL;
 
@@ -72,7 +73,7 @@ class ApiClient {
     const response = await this._fetch(this._normalizeURL(url).href, {
       method,
       body: JSON.stringify(body),
-      headers: {'content-type': 'application/json'},
+      headers: {...this._extraHeaders, 'content-type': 'application/json'},
     });
 
     return this._convertFetchResponseToReturnValue(response);
@@ -93,7 +94,7 @@ class ApiClient {
       }
     }
 
-    const response = await this._fetch(url.href);
+    const response = await this._fetch(url.href, {headers: {...this._extraHeaders}});
     return this._convertFetchResponseToReturnValue(response);
   }
 
@@ -126,7 +127,9 @@ class ApiClient {
    * @return {Promise<string>}
    */
   async getVersion() {
-    const response = await this._fetch(this._normalizeURL('/version').href);
+    const response = await this._fetch(this._normalizeURL('/version').href, {
+      headers: {...this._extraHeaders},
+    });
     return response.text();
   }
 

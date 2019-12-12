@@ -11,8 +11,8 @@ const LHCI_DIR = path.join(process.cwd(), '.lighthouseci');
 const LHR_REGEX = /^lhr-\d+\.json$/;
 const ASSERTION_RESULTS_PATH = path.join(LHCI_DIR, 'assertion-results.json');
 
-function ensureDirectoryExists() {
-  if (!fs.existsSync(LHCI_DIR)) fs.mkdirSync(LHCI_DIR);
+function ensureDirectoryExists(baseDir = LHCI_DIR) {
+  if (!fs.existsSync(baseDir)) fs.mkdirSync(baseDir, {recursive: true});
 }
 
 /**
@@ -39,7 +39,7 @@ function loadSavedLHRs() {
 function saveLHR(lhr, baseDir = LHCI_DIR) {
   const baseFilename = `lhr-${Date.now()}`;
   const basePath = path.join(baseDir, baseFilename);
-  ensureDirectoryExists();
+  ensureDirectoryExists(baseDir);
   fs.writeFileSync(`${basePath}.json`, lhr);
   fs.writeFileSync(`${basePath}.html`, getHTMLReportForLHR(JSON.parse(lhr)));
 }

@@ -69,3 +69,15 @@
   color: var(--inverted-text-color);
   text-decoration: none;
 }
+
+.page-sidebar__footer {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: var(--base-spacing);
+  text-align: center;
+}
+
+.page-sidebar__version {
+  color: var(--inverted-secondary-text-color);
+}

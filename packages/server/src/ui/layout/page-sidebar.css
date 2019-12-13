@@ -80,4 +80,5 @@
 
 .page-sidebar__version {
   color: var(--inverted-secondary-text-color);
+  font-size: var(--subtext-font-size);
 }

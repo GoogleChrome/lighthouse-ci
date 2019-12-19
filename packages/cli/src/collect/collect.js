@@ -31,6 +31,10 @@ function buildCommand(yargs) {
     staticDistDir: {
       description: 'The build directory where your HTML files to run Lighthouse on are located.',
     },
+    isSinglePageApplication: {
+      description:
+        'If the application is created by Single Page Application, enable redirect to index.html.',
+    },
     chromePath: {
       description: 'The path to the Chrome or Chromium executable to use for collection.',
       default: process.env.CHROME_PATH || ChromeLauncher.getInstallations()[0],
@@ -125,7 +129,7 @@ async function startServerAndDetermineUrls(options) {
   }
 
   const pathToBuildDir = path.resolve(process.cwd(), options.staticDistDir);
-  const server = new FallbackServer(pathToBuildDir);
+  const server = new FallbackServer(pathToBuildDir, options.isSinglePageApplication);
   await server.listen();
   process.stdout.write(`Started a web server on port ${server.port}...\n`);
 

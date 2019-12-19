@@ -13,12 +13,16 @@ const createHttpServer = require('http').createServer;
 class FallbackServer {
   /**
    * @param {string} pathToBuildDir
+   * @param {boolean|undefined} isSinglePageApplication
    */
-  constructor(pathToBuildDir) {
+  constructor(pathToBuildDir, isSinglePageApplication) {
     this._pathToBuildDir = pathToBuildDir;
     this._app = express();
     this._app.use(compression());
     this._app.use('/', express.static(pathToBuildDir));
+    if (isSinglePageApplication === true) {
+      this._app.use('/*', (req, res) => res.sendFile(pathToBuildDir + '/index.html'));
+    }
     this._port = 0;
     /** @type {undefined|ReturnType<typeof createHttpServer>} */
     this._server = undefined;

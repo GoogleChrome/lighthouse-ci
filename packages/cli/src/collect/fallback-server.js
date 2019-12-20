@@ -20,7 +20,7 @@ class FallbackServer {
     this._app = express();
     this._app.use(compression());
     this._app.use('/', express.static(pathToBuildDir));
-    if (isSinglePageApplication === true) {
+    if (isSinglePageApplication) {
       this._app.use('/*', (req, res) => res.sendFile(pathToBuildDir + '/index.html'));
     }
     this._port = 0;

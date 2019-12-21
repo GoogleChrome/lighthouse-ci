@@ -14,9 +14,7 @@ describe('fallbackServer', () => {
         resolve(body);
       });
     });
-    expect(body).toEqual(
-      '<!DOCTYPE html>\n<html>\n  <head>\n    <meta charset="utf-8" />\n    <title>index test page for staticDistDir usage</title>\n  </head>\n  <body>\n    test\n  </body>\n</html>\n'
-    );
+    expect(body.includes('index test page for staticDistDir usage')).toEqual(true);
   });
 
   it('should "/"  request result with isSinglePageApplication', async () => {
@@ -26,9 +24,7 @@ describe('fallbackServer', () => {
         resolve(body);
       });
     });
-    expect(body).toEqual(
-      '<!DOCTYPE html>\n<html>\n  <head>\n    <meta charset="utf-8" />\n    <title>index test page for staticDistDir usage</title>\n  </head>\n  <body>\n    test\n  </body>\n</html>\n'
-    );
+    expect(body.includes('index test page for staticDistDir usage')).toEqual(true);
   });
 
   it('should "/japan" request result without isSinglePageApplication', async () => {
@@ -40,9 +36,7 @@ describe('fallbackServer', () => {
       });
     });
 
-    expect(body).toEqual(
-      '<!DOCTYPE html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n<title>Error</title>\n</head>\n<body>\n<pre>Cannot GET /japan</pre>\n</body>\n</html>\n'
-    );
+    expect(body.includes('Cannot GET /japan')).toEqual(true);
   });
 
   it('should "/japan"  request result with isSinglePageApplication', async () => {
@@ -52,8 +46,6 @@ describe('fallbackServer', () => {
         resolve(body);
       });
     });
-    expect(body).toEqual(
-      '<!DOCTYPE html>\n<html>\n  <head>\n    <meta charset="utf-8" />\n    <title>index test page for staticDistDir usage</title>\n  </head>\n  <body>\n    test\n  </body>\n</html>\n'
-    );
+    expect(body.includes('index test page for staticDistDir usage')).toEqual(true);
   });
 });

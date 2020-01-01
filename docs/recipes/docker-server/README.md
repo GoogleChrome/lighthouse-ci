@@ -64,5 +64,17 @@ kubectl get service
 # kubernetes    ClusterIP      10.X.X.X       <none>         443/TCP        9m
 # lhci-server   LoadBalancer   10.X.X.X       X.X.X.X        80:XXXXX/TCP   2m
 ```
+### Docker-compose
+
+An example docker-compose.yml could look like this:
+```  lhci:
+    container_name: lhci_server
+    image: patrickhulce/lhci-server
+    volumes:
+      - lhci-data:/data
+    ports:
+      - 9001:9001```
+
 
 Note that the server has no authentication mechanisms and that anyone with HTTP access to the server will be able to view and create data. If your server contains sensitive information, consider protecting it within a firewall that is only accessible to your internal network.
+To setup the server you can run ```lhci wizard``` locally (with lhci installed) and make sure you have your 'serverBaseUrl' in your 'lighthouserc.json' configured

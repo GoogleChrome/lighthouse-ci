@@ -11,6 +11,7 @@ const path = require('path');
 const rimraf = require('rimraf');
 const {spawn, spawnSync} = require('child_process');
 const testingLibrary = require('@testing-library/dom');
+const FallbackServer = require('../src/collect/fallback-server.js');
 
 const CLI_PATH = path.join(__dirname, '../src/cli.js');
 const UUID_REGEX = /[0-9a-f-]{36}/gi;
@@ -107,6 +108,19 @@ function runCLI(args, overrides = {}) {
   return {stdout, stderr, status, matches: {uuids}};
 }
 
+/**
+ * @param {string} staticDistDir
+ * @param {boolean} isSinglePageApplication
+ * @returns {Promise<FallbackServer>}
+ */
+async function startFallbackServer(staticDistDir, isSinglePageApplication) {
+  const pathToBuildDir = path.resolve(process.cwd(), staticDistDir);
+  const server = new FallbackServer(pathToBuildDir, isSinglePageApplication);
+  await server.listen();
+  process.stdout.write(`Started a web server on port ${server.port}...\n`);
+  return server;
+}
+
 module.exports = {
   CLI_PATH,
   runCLI,
@@ -116,4 +130,5 @@ module.exports = {
   safeDeleteFile,
   withTmpDir,
   cleanStdOutput,
+  startFallbackServer,
 };

@@ -41,6 +41,7 @@ declare global {
       export interface Options {
         url?: string | string[];
         staticDistDir?: string;
+        isSinglePageApplication?: boolean;
         startServerCommand?: string;
         startServerReadyPattern: string;
         chromePath?: string;

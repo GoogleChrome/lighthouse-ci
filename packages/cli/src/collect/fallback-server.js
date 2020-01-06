@@ -35,6 +35,7 @@ class FallbackServer {
   /** @return {Promise<void>} */
   listen() {
     const server = createHttpServer(this._app);
+    this._server = server;
 
     return new Promise((resolve, reject) => {
       server.listen(0, () => {

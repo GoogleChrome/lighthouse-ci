@@ -110,14 +110,14 @@ function runCLI(args, overrides = {}) {
 
 /**
  * @param {string} staticDistDir
- * @param {boolean} isSinglePageApplication
+ * @param {{isSinglePageApplication: boolean}} options
  * @returns {Promise<FallbackServer>}
  */
-async function startFallbackServer(staticDistDir, isSinglePageApplication) {
+async function startFallbackServer(staticDistDir, options) {
+  const {isSinglePageApplication} = options;
   const pathToBuildDir = path.resolve(process.cwd(), staticDistDir);
   const server = new FallbackServer(pathToBuildDir, isSinglePageApplication);
   await server.listen();
-  process.stdout.write(`Started a web server on port ${server.port}...\n`);
   return server;
 }
 

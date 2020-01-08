@@ -8,6 +8,8 @@ Lighthouse CI configuration can be managed through a config file, environment va
 
 Lighthouse CI will automatically look for a configuration file in the current working directory in the following priority order:
 
+1. `.lighthouserc.js`
+1. `lighthouserc.js`
 1. `.lighthouserc.json`
 1. `lighthouserc.json`
 1. `.lighthouserc.yml`
@@ -38,6 +40,27 @@ lhci assert --preset=lighthouse:recommended --assertions.uses-webp-images=off
 ## Structure
 
 The structure of the config file is segmented by command. Any options you see for a particular command in the [CLI documentation](./cli.md) can be set by the property of the same name in the config file.
+
+**`lighthouserc.js`:**
+
+```js
+module.exports = {
+  ci: {
+    collect: {
+      // collect options here
+    },
+    assert: {
+      // assert options here
+    },
+    upload: {
+      // upload options here
+    },
+    server: {
+      // server options here
+    },
+  },
+};
+```
 
 **`lighthouserc.json`:**
 
@@ -188,6 +211,18 @@ If you're a Lighthouse pro, assert the recommended preset, increase the number o
     }
   }
 }
+```
+
+```js
+module.exports = {
+  ci: {
+    collect: {
+      settings: {
+        extraHeaders: JSON.stringify({Cookie: 'token=1234'}),
+      },
+    },
+  },
+};
 ```
 
 ### Non-NodeJS Server

@@ -24,21 +24,33 @@ describe('lighthouserc.js', () => {
   function writeYAMLFile(path, content) {
     fs.writeFileSync(path, yaml.safeDump(content));
   }
-  describe('#loadAndParseRcFile', () => {
-    function writeJSONFile(path, json) {
-      fs.writeFileSync(path, JSON.stringify(json));
-    }
-    function getRandomFilePath(ext = 'json') {
-      return path.join(tempDir, `rc-${Math.random()}.tmp.${ext}`);
-    }
 
+  function writeJSONFile(path, json) {
+    fs.writeFileSync(path, JSON.stringify(json));
+  }
+
+  function writeJsFile(path, json) {
+    const doubleWrappedJson = JSON.stringify(JSON.stringify(json));
+    fs.writeFileSync(path, `module.exports = JSON.parse(${doubleWrappedJson})`);
+  }
+
+  function getRandomFilePath(ext = 'json') {
+    return path.join(tempDir, `rc-${Math.random()}.tmp.${ext}`);
+  }
+
+  describe('#loadAndParseRcFile', () => {
+    let rcJsFilePath;
     let rcJSONFilePath;
     let rcYamlFilePath;
+
     beforeEach(() => {
-      rcJSONFilePath = getRandomFilePath();
+      rcJsFilePath = getRandomFilePath('js');
+      rcJSONFilePath = getRandomFilePath('json');
       rcYamlFilePath = getRandomFilePath('yml');
     });
+
     afterEach(async () => {
+      await safeDeleteFile(rcJsFilePath);
       await safeDeleteFile(rcJSONFilePath);
       await safeDeleteFile(rcYamlFilePath);
     });
@@ -73,6 +85,11 @@ describe('lighthouserc.js', () => {
         },
       };
 
+      it('Js', () => {
+        writeJsFile(rcJsFilePath, content);
+        expect(rc.loadAndParseRcFile(rcJsFilePath)).toEqual(parsedContent);
+      });
+
       it('JSON', () => {
         writeJSONFile(rcJSONFilePath, content);
         expect(rc.loadAndParseRcFile(rcJSONFilePath)).toEqual(parsedContent);
@@ -93,6 +110,12 @@ describe('lighthouserc.js', () => {
           'resource-summary:script:size': 'off',
         },
       };
+
+      it('Js', () => {
+        writeJsFile(rcJsFilePath, content);
+        expect(rc.loadAndParseRcFile(rcJsFilePath)).toEqual(parsedContent);
+      });
+
       it('JSON', () => {
         writeJSONFile(rcJSONFilePath, content);
         expect(rc.loadAndParseRcFile(rcJSONFilePath)).toEqual(parsedContent);
@@ -115,10 +138,17 @@ describe('lighthouserc.js', () => {
         y: 2,
         z: 3,
       };
+
+      it('Js', () => {
+        writeJsFile(rcJsFilePath, content);
+        expect(rc.loadAndParseRcFile(rcJsFilePath)).toEqual(parsedContent);
+      });
+
       it('JSON', () => {
         writeJSONFile(rcJSONFilePath, content);
         expect(rc.loadAndParseRcFile(rcJSONFilePath)).toEqual(parsedContent);
       });
+
       it('YAML', () => {
         writeYAMLFile(rcYamlFilePath, content);
         expect(rc.loadAndParseRcFile(rcYamlFilePath)).toEqual(parsedContent);
@@ -136,15 +166,23 @@ describe('lighthouserc.js', () => {
         tempFile = null;
       });
 
+      it('.js', () => {
+        tempFile = path.join(tempDir, 'lighthouserc.js');
+        writeJsFile(tempFile, {});
+        expect(rc.findRcFile(tempDir)).toEqual(tempFile);
+      });
+
       it('.json', () => {
         const expected = path.join(LH_ROOT, 'lighthouserc.json');
         expect(rc.findRcFile(LH_ROOT)).toEqual(expected);
       });
+
       it('.yaml', () => {
         tempFile = path.join(tempDir, 'lighthouserc.yaml');
         writeYAMLFile(tempFile, {});
         expect(rc.findRcFile(tempDir)).toEqual(tempFile);
       });
+
       it('.yml', () => {
         tempFile = path.join(tempDir, '.lighthouserc.yml');
         writeYAMLFile(tempFile, {});

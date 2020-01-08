@@ -11,6 +11,8 @@ const yaml = require('js-yaml');
 const _ = require('./lodash.js');
 
 const RC_FILE_NAMES = [
+  '.lighthouserc.js',
+  'lighthouserc.js',
   '.lighthouserc.json',
   'lighthouserc.json',
   '.lighthouserc.yml',
@@ -19,6 +21,7 @@ const RC_FILE_NAMES = [
   'lighthouserc.yaml',
 ];
 
+const JS_FILE_EXTENSION_REGEX = /\.(js)$/i;
 const YAML_FILE_EXTENSION_REGEX = /\.(yml|yaml)$/i;
 
 /**
@@ -68,11 +71,18 @@ function loadRcFile(pathToRcFile) {
  * @return {LHCI.LighthouseRc}
  */
 function parseFileContentToJSON(pathToRcFile, contents) {
-  // Check if file path ends in yaml or yml
+  // Check if file path ends in .js
+  if (JS_FILE_EXTENSION_REGEX.test(pathToRcFile)) {
+    return require(pathToRcFile);
+  }
+
+  // Check if file path ends in .yaml or .yml
   if (YAML_FILE_EXTENSION_REGEX.test(pathToRcFile)) {
     // Parse yaml content to JSON
     return yaml.safeLoad(contents);
   }
+
+  // Fallback to JSON parsing
   return JSON.parse(contents);
 }
 

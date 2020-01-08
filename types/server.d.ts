@@ -92,6 +92,13 @@ declare global {
       export interface StorageOptions {
         storageMethod: 'sql' | 'spanner';
         sqlDialect: 'sqlite' | 'mysql' | 'postgres';
+        sqlDialectOptions?: {
+          ssl?: {
+            ca?: string;
+            key?: string;
+            cert?: string;
+          };
+        };
         sqlDatabasePath?: string;
         sqlConnectionSsl?: string;
         sqlConnectionUrl?: string;

@@ -95,6 +95,7 @@ function createSequelize(options) {
   return new Sequelize(options.sqlConnectionUrl, {
     ...sequelizeOptions,
     ssl: !!options.sqlConnectionSsl,
+    dialectOptions: options.sqlDialectOptions,
   });
 }
 

@@ -254,6 +254,32 @@ module.exports = {
 }
 ```
 
+### Custom SSL Certificate for Database Connection
+
+```js
+const fs = require('fs');
+
+module.exports = {
+  ci: {
+    server: {
+      storage: {
+        storageMethod: 'sql',
+        sqlDialect: 'postgres',
+        sqlConnectionSsl: true,
+        sqlConnectionUrl: process.env.DATABASE_URL,
+        sqlDialectOptions: {
+          ssl: {
+            ca: fs.readFileSync('./certs/ca.crt', 'utf8'),
+            key: fs.readFileSync('./certs/client.foo.key', 'utf8'),
+            cert: fs.readFileSync('./certs/client.foo.crt', 'utf8'),
+          },
+        },
+      },
+    },
+  },
+};
+```
+
 ### YAML Advanced config
 
 ```yml

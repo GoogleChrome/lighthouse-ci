@@ -11,12 +11,14 @@ jest.retryTimes(3);
 
 const path = require('path');
 const os = require('os');
+const fs = require('fs');
 const {spawn} = require('child_process');
 const fetch = require('isomorphic-fetch');
 const log = require('lighthouse-logger');
 const puppeteer = require('puppeteer');
 const {
   startServer,
+  cleanStdOutput,
   waitForCondition,
   getSqlFilePath,
   safeDeleteFile,
@@ -216,6 +218,16 @@ describe('Lighthouse CI CLI', () => {
       expect(uuids).toHaveLength(5);
     });
 
+    it('should have written links to a file', () => {
+      const linksFile = path.join(process.cwd(), '.lighthouseci/links.json');
+      const links = fs.readFileSync(linksFile, 'utf8');
+      expect(cleanStdOutput(links)).toMatchInlineSnapshot(`
+        "{
+          \\"http://localhost:XXXX/app/\\": \\"http://localhost:XXXX/app/projects/awesomeciprojectname/compare/<UUID>?compareUrl=http%3A%2F%2Flocalhost%3APORT%2Fapp%2F\\"
+        }"
+      `);
+    });
+
     it('should have saved lhrs to the API', async () => {
       const [projectId, buildId, runAId, runBId] = uuids;
       const response = await fetch(
@@ -251,6 +263,16 @@ describe('Lighthouse CI CLI', () => {
       expect(stdout).toContain('Open the report at');
       expect(stderr).toEqual(``);
       expect(status).toEqual(0);
+    });
+
+    it('should have written links to a file', () => {
+      const linksFile = path.join(process.cwd(), '.lighthouseci/links.json');
+      const links = fs.readFileSync(linksFile, 'utf8');
+      expect(cleanStdOutput(links)).toMatchInlineSnapshot(`
+        "{
+          \\"http://localhost:XXXX/app/\\": \\"https://storage.googleapis.com/lighthouse-infrastructure.appspot.com/reports/XXXX-XXXX.report.html\\"
+        }"
+      `);
     });
 
     it('should fail repeated attempts', () => {

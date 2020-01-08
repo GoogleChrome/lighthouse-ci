@@ -9,6 +9,7 @@ const URL = require('url').URL;
 const fetch = require('isomorphic-fetch');
 const _ = require('@lhci/utils/src/lodash.js');
 const ApiClient = require('@lhci/utils/src/api-client.js');
+const {writeUrlMapToFile} = require('@lhci/utils/src/saved-reports.js');
 const {computeRepresentativeRuns} = require('@lhci/utils/src/representative-runs.js');
 const {
   loadSavedLHRs,
@@ -276,6 +277,7 @@ async function runLHCITarget(options) {
   print(`Done saving build results to Lighthouse CI\n`);
   print(`View build diff at ${buildViewUrl.href}\n`);
 
+  writeUrlMapToFile(targetUrlMap);
   await runGithubStatusCheck(options, targetUrlMap);
 }
 
@@ -315,6 +317,7 @@ async function runTemporaryPublicStorageTarget(options) {
     }
   }
 
+  writeUrlMapToFile(targetUrlMap);
   await runGithubStatusCheck(options, targetUrlMap);
 }
 

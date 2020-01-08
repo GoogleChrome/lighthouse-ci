@@ -10,6 +10,7 @@ const path = require('path');
 const LHCI_DIR = path.join(process.cwd(), '.lighthouseci');
 const LHR_REGEX = /^lhr-\d+\.json$/;
 const ASSERTION_RESULTS_PATH = path.join(LHCI_DIR, 'assertion-results.json');
+const URL_LINK_MAP_PATH = path.join(LHCI_DIR, 'links.json');
 
 function ensureDirectoryExists(baseDir = LHCI_DIR) {
   if (!fs.existsSync(baseDir)) fs.mkdirSync(baseDir, {recursive: true});
@@ -100,6 +101,20 @@ function replaceUrlPatterns(url, sedLikeReplacementPatterns) {
   return replaced;
 }
 
+/**
+ * @param {Map<string, string>} targetUrlMap
+ */
+function writeUrlMapToFile(targetUrlMap) {
+  /** @type {Record<string, string>} */
+  const urlMapAsObject = {};
+
+  for (const [testedUrl, link] of targetUrlMap.entries()) {
+    urlMapAsObject[testedUrl] = link;
+  }
+
+  fs.writeFileSync(URL_LINK_MAP_PATH, JSON.stringify(urlMapAsObject, null, 2));
+}
+
 module.exports = {
   getHTMLReportForLHR,
   loadSavedLHRs,
@@ -109,4 +124,5 @@ module.exports = {
   saveAssertionResults,
   getSavedReportsDirectory,
   replaceUrlPatterns,
+  writeUrlMapToFile,
 };

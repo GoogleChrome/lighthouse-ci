@@ -122,7 +122,7 @@ const PwaScoreItem = props => {
 };
 
 /**
- * @param {{build: LHCI.ServerCommand.Build | null, lhr?: LH.Result, baseLhr?: LH.Result}} props
+ * @param {{lhr?: LH.Result, baseLhr?: LH.Result}} props
  */
 export const LhrComparisonScores = props => {
   const {lhr, baseLhr} = props;

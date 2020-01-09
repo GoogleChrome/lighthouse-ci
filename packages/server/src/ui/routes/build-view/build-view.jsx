@@ -92,8 +92,8 @@ export function computeAuditGroups(lhr, baseLhr, options) {
 /** @typedef {{id: string, audits: Array<LH.AuditResult>, group: {id: string, title: string}}} IntermediateAuditGroupDef */
 /** @typedef {{id: string, pairs: Array<LHCI.AuditPair>, group: {id: string, title: string}}} AuditGroupDef */
 
-/** @param {{selectedUrl: string, selectedAuditId?: string | null, build: LHCI.ServerCommand.Build | null, lhr?: LH.Result, baseLhr?: LH.Result, urls: Array<string>, percentAbsoluteDeltaThreshold: number, setPercentAbsoluteDeltaThreshold: (x: number) => void}} props */
-const BuildViewScoreAndUrl = props => {
+/** @param {{selectedUrl: string, selectedAuditId?: string | null, lhr?: LH.Result, baseLhr?: LH.Result, urls: Array<string>, percentAbsoluteDeltaThreshold: number, setPercentAbsoluteDeltaThreshold: (x: number) => void}} props */
+const LhrComparisonScoresAndUrl = props => {
   return (
     <div className="build-view__scores-and-url">
       <div className="container">
@@ -152,11 +152,75 @@ const AuditGroups = props => {
   );
 };
 
+/** @param {{lhr: LH.Result, baseLhr: LH.Result|undefined, selectedUrl: string, availableUrls: string[], className?: string, renderChildren?: (o: {auditGroups: Array<AuditGroupDef>}) => import('preact').VNode}} props */
+const LhrComparison = props => {
+  const {lhr, baseLhr, selectedUrl} = props;
+  const [percentAbsoluteDeltaThreshold, setDiffThreshold] = useState(0.05);
+  const [selectedAuditId, setAuditId] = useState(/** @type {string|null} */ (null));
+
+  // Attach the LHRs to the window for easy debugging.
+  useEffect(() => {
+    // @ts-ignore
+    window.__LHR__ = lhr;
+    // @ts-ignore
+    window.__BASE_LHR__ = baseLhr;
+  }, [lhr, baseLhr]);
+
+  const auditGroups = computeAuditGroups(lhr, baseLhr, {percentAbsoluteDeltaThreshold});
+
+  return (
+    <Fragment>
+      {selectedAuditId ? (
+        <AuditDetailPane
+          selectedAuditId={selectedAuditId}
+          setSelectedAuditId={setAuditId}
+          pairs={auditGroups.map(group => group.pairs).reduce((a, b) => a.concat(b))}
+          baseLhr={baseLhr}
+        />
+      ) : (
+        <Fragment />
+      )}
+      <div
+        className={clsx('build-view', props.className, {
+          'build-view--with-audit-selection': !!selectedAuditId,
+        })}
+      >
+        <LhrComparisonScoresAndUrl
+          lhr={lhr}
+          baseLhr={baseLhr}
+          selectedUrl={selectedUrl}
+          selectedAuditId={selectedAuditId}
+          urls={props.availableUrls}
+          percentAbsoluteDeltaThreshold={percentAbsoluteDeltaThreshold}
+          setPercentAbsoluteDeltaThreshold={setDiffThreshold}
+        />
+        <div className="container">
+          {props.renderChildren ? props.renderChildren({auditGroups}) : null}
+          {auditGroups.length && baseLhr ? (
+            <Fragment>
+              {selectedAuditId ? null : (
+                <div className="build-view__legend-and-options">
+                  <LhrComparisonLegend />
+                </div>
+              )}
+              <AuditGroups
+                showAsNarrow={!!selectedAuditId}
+                auditGroups={auditGroups}
+                baseLhr={baseLhr}
+                selectedAuditId={selectedAuditId}
+                setSelectedAuditId={setAuditId}
+              />
+            </Fragment>
+          ) : null}
+        </div>
+      </div>
+    </Fragment>
+  );
+};
+
 /** @param {{project: LHCI.ServerCommand.Project, build: LHCI.ServerCommand.Build, ancestorBuild: LHCI.ServerCommand.Build | null, runs: Array<LHCI.ServerCommand.Run>, compareUrl?: string, hasBaseOverride: boolean}} props */
 const BuildView_ = props => {
-  const [percentAbsoluteDeltaThreshold, setDiffThreshold] = useState(0.05);
   const [openBuildHash, setOpenBuild] = useState(/** @type {null|'base'|'compare'} */ (null));
-  const [selectedAuditId, setAuditId] = useState(/** @type {string|null} */ (null));
   const [isOpenLhrLinkHovered, setLhrLinkHover] = useState(false);
   const selectedUrl = props.compareUrl || (props.runs[0] && props.runs[0].url);
   const buildHashSelectorCloseFn = useCallback(() => setOpenBuild(null), [setOpenBuild]);
@@ -188,14 +252,6 @@ const BuildView_ = props => {
     lhrError = err;
   }
 
-  // Attach the LHRs to the window for easy debugging.
-  useEffect(() => {
-    // @ts-ignore
-    window.__LHR__ = lhr;
-    // @ts-ignore
-    window.__BASE_LHR__ = baseLhr;
-  }, [lhr, baseLhr]);
-
   if (!run || !lhr) {
     return (
       <Fragment>
@@ -208,8 +264,7 @@ const BuildView_ = props => {
     );
   }
 
-  const auditGroups = computeAuditGroups(lhr, baseLhr, {percentAbsoluteDeltaThreshold});
-
+  const definedLhr = lhr;
   return (
     <Page
       headerLeft={
@@ -250,7 +305,7 @@ const BuildView_ = props => {
       }
     >
       <DocumentTitle title={`Compare "${props.build.commitMessage}"`} />
-      {(openBuildHash && (
+      {openBuildHash ? (
         <BuildHashSelector
           build={props.build}
           ancestorBuild={props.ancestorBuild}
@@ -259,63 +314,27 @@ const BuildView_ = props => {
           baseLhr={baseLhr}
           close={buildHashSelectorCloseFn}
         />
-      )) || <Fragment />}
-      {(selectedAuditId && (
-        <AuditDetailPane
-          selectedAuditId={selectedAuditId}
-          setSelectedAuditId={setAuditId}
-          pairs={auditGroups.map(group => group.pairs).reduce((a, b) => a.concat(b))}
-          baseLhr={baseLhr}
-        />
-      )) || <Fragment />}
+      ) : (
+        <Fragment />
+      )}
       {(lhrError && <h1>Error parsing LHR ({lhrError.stack})</h1>) || <Fragment />}
-      <div
-        className={clsx('build-view', {
-          'build-view--with-audit-selection': !!selectedAuditId,
-          'build-view--with-lhr-link-hover': isOpenLhrLinkHovered,
-        })}
-      >
-        <BuildViewScoreAndUrl
-          build={props.build}
-          lhr={lhr}
-          baseLhr={baseLhr}
-          selectedUrl={selectedUrl}
-          selectedAuditId={selectedAuditId}
-          urls={availableUrls}
-          percentAbsoluteDeltaThreshold={percentAbsoluteDeltaThreshold}
-          setPercentAbsoluteDeltaThreshold={setDiffThreshold}
-        />
-        <div className="container">
+      <LhrComparison
+        lhr={lhr}
+        baseLhr={baseLhr}
+        selectedUrl={selectedUrl}
+        availableUrls={availableUrls}
+        className={clsx({'build-view--with-lhr-link-hover': isOpenLhrLinkHovered})}
+        renderChildren={({auditGroups}) => (
           <BuildViewWarnings
-            lhr={lhr}
+            lhr={definedLhr}
             build={props.build}
             auditGroups={auditGroups}
             baseBuild={props.ancestorBuild}
             baseLhr={baseLhr}
             hasBaseOverride={props.hasBaseOverride}
           />
-          {auditGroups.length && baseLhr ? (
-            <Fragment>
-              {selectedAuditId ? (
-                <Fragment />
-              ) : (
-                <div className="build-view__legend-and-options">
-                  <LhrComparisonLegend />
-                </div>
-              )}
-              <AuditGroups
-                showAsNarrow={!!selectedAuditId}
-                auditGroups={auditGroups}
-                baseLhr={baseLhr}
-                selectedAuditId={selectedAuditId}
-                setSelectedAuditId={setAuditId}
-              />
-            </Fragment>
-          ) : (
-            <Fragment />
-          )}
-        </div>
-      </div>
+        )}
+      />
     </Page>
   );
 };

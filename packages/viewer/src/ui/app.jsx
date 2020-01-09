@@ -9,7 +9,7 @@ import {useState} from 'preact/hooks';
 import '../../../server/src/ui/app.css';
 import './app.css';
 import {LandingRoute} from './routes/landing/landing.jsx';
-import {ComparisonRoute} from './routes/comparison/comparison';
+import {ComparisonRoute} from './routes/comparison/comparison.jsx';
 
 /**
  * @typedef {{filename: string, data: string, lhr: LH.Result}} ReportData

@@ -5,15 +5,22 @@
  */
 
 import {h, Fragment} from 'preact';
+import {useState} from 'preact/hooks';
 import './comparison.css';
-import {LH_LOGO_PATH} from '../../components';
+import {LH_LOGO_PATH} from '../../components/lhci-components.jsx';
+import {ReportUploadBox} from '../../components/report-upload-box';
 
 /** @typedef {import('../../app.jsx').ReportData} ReportData */
 
 /** @param {{baseReport: ReportData, compareReport: ReportData, setBaseReport: (d: ReportData|undefined) => void, setCompareReport: (d: ReportData|undefined) => void}} props */
 export const ComparisonRoute = props => {
+  const [errorMessage, setErrorMessage] = useState('');
+
   return (
     <div className="comparison">
+      <div className="comparison__toast-container">
+        {errorMessage ? <div className="toast toast--error">{errorMessage}</div> : <Fragment />}
+      </div>
       <div className="comparison-header">
         <div className="comparison-header__logo">
           <img
@@ -25,7 +32,20 @@ export const ComparisonRoute = props => {
             }}
           />
         </div>
-        <div className="comparison-header__upload" />
+        <div className="comparison-header__upload">
+          <ReportUploadBox
+            variant="base"
+            report={props.baseReport}
+            setReport={props.setBaseReport}
+            setErrorMessage={setErrorMessage}
+          />
+          <ReportUploadBox
+            variant="compare"
+            report={props.compareReport}
+            setReport={props.setCompareReport}
+            setErrorMessage={setErrorMessage}
+          />
+        </div>
         <a className="comparison-header__info" href="https://github.com/GoogleChrome/lighthouse-ci">
           <i className="material-icons">info</i>
         </a>

@@ -6,73 +6,11 @@
 
 import {h, Fragment} from 'preact';
 import './landing.css';
-import {CONFETTI_PATH, LH_LOGO_PATH, Paper} from '../../components';
+import {CONFETTI_PATH, LH_LOGO_PATH, Paper} from '../../components/lhci-components.jsx';
 import {useState} from 'preact/hooks';
+import {ReportUploadBox} from '../../components/report-upload-box';
 
 /** @typedef {import('../../app.jsx').ReportData} ReportData */
-
-/** @param {string} s @return {LH.Result|Error} */
-function parseStringAsLhr(s) {
-  if (s.trim().charAt(0) === '{') {
-    try {
-      const lhr = JSON.parse(s);
-      if (lhr.lighthouseVersion) return lhr;
-      return new Error(`JSON did not contain a lighthouseVersion`);
-    } catch (err) {
-      return err;
-    }
-  }
-
-  return new Error('File was not valid JSON');
-}
-
-/** @param {{variant: 'base'|'compare', report: ReportData|undefined, setReport: (d: ReportData) => void, setErrorMessage: (s: string) => void}} props */
-const ReportUploadBox = props => {
-  return (
-    <div className={`report-upload-box report-upload-box--${props.variant}`}>
-      <span className="report-upload-box__label">
-        {props.variant === 'base' ? 'Base' : 'Compare'}
-      </span>
-      <div className="report-upload-box__file">
-        {props.report ? <span>{props.report.filename}</span> : <Fragment />}
-      </div>
-      <label className="report-upload-box__upload">
-        Upload
-        <input
-          type="file"
-          style={{display: 'none'}}
-          onChange={e => {
-            const input = e.target;
-            if (!(input instanceof HTMLInputElement)) return;
-            const files = input.files;
-            if (!files || files.length !== 1) return;
-            const filename = files[0].name;
-            const reader = new FileReader();
-            reader.readAsText(files[0], 'utf-8');
-            reader.addEventListener('load', () => {
-              if (typeof reader.result !== 'string') {
-                props.setErrorMessage('File was not readable as text!');
-                return;
-              }
-
-              const lhr = parseStringAsLhr(reader.result);
-              if (lhr instanceof Error) {
-                props.setErrorMessage(`Invalid file: ${lhr.message}`);
-                return;
-              }
-
-              props.setErrorMessage('');
-              props.setReport({filename, data: reader.result, lhr});
-            });
-            reader.addEventListener('error', () => {
-              props.setErrorMessage('File was not readable!');
-            });
-          }}
-        />
-      </label>
-    </div>
-  );
-};
 
 /** @param {{baseReport?: ReportData, compareReport?: ReportData, setBaseReport: (d: ReportData) => void, setCompareReport: (d: ReportData) => void}} props */
 export const LandingRoute = props => {

@@ -5,10 +5,12 @@
  */
 
 import {h, Fragment} from 'preact';
-import _ from '@lhci/utils/src/lodash';
-import {useState, useMemo, useCallback, useEffect} from 'preact/hooks';
+import {useState, useMemo, useCallback} from 'preact/hooks';
+import {Link, route} from 'preact-router';
+import clsx from 'clsx';
+import './build-view.css';
+
 import {AsyncLoader, combineLoadingStates, combineAsyncData} from '../../components/async-loader';
-import {Dropdown} from '../../components/dropdown';
 import {
   useBuild,
   useOptionalBuildById,
@@ -18,205 +20,13 @@ import {
 } from '../../hooks/use-api-data';
 import {BuildHashSelector} from './build-hash-selector';
 import {BuildSelectorHeaderSection} from './build-selector-header-section';
-import {AuditDetailPane} from './audit-detail/audit-detail-pane';
 import {Page} from '../../layout/page';
-import {LhrComparisonScores} from './lhr-comparison-scores';
-import {AuditGroup} from './audit-list/audit-group';
 
-import './build-view.css';
-import {LhrComparisonLegend} from './lhr-comparison-legend';
-import clsx from 'clsx';
-import {findAuditDiffs, getDiffSeverity} from '@lhci/utils/src/audit-diff-finder';
-import {route, Link} from 'preact-router';
-import {BuildViewWarnings} from './build-view-warnings';
+import {BuildViewWarnings, computeWarnings} from './build-view-warnings';
 import {DocumentTitle} from '../../components/document-title';
 import {LoadingSpinner} from '../../components/loading-spinner';
-
-/**
- * @param {LH.Result} lhr
- * @param {LH.Result|undefined} baseLhr
- * @param {{percentAbsoluteDeltaThreshold: number}} options
- * @return {Array<AuditGroupDef>}
- */
-export function computeAuditGroups(lhr, baseLhr, options) {
-  /** @type {Array<IntermediateAuditGroupDef|undefined>} */
-  const rawAuditGroups = Object.entries(lhr.categories)
-    .map(([categoryId, category]) => {
-      const auditRefsGroupedByGroup = _.groupBy(category.auditRefs, ref => ref.group);
-      return auditRefsGroupedByGroup.map(auditRefGroup => {
-        let groupId = auditRefGroup[0].group || '';
-        let group = lhr.categoryGroups && lhr.categoryGroups[groupId];
-        if (!group) {
-          if (auditRefsGroupedByGroup.length !== 1) return;
-          groupId = `category:${categoryId}`;
-          group = {title: category.title, description: category.description};
-        }
-
-        const audits = auditRefGroup
-          .map(ref => ({...lhr.audits[ref.id], id: ref.id}))
-          .sort((a, b) => (a.score || 0) - (b.score || 0));
-        return {id: groupId, group: {...group, id: groupId}, audits};
-      });
-    })
-    .reduce((a, b) => a.concat(b));
-
-  /** @type {Array<AuditGroupDef>} */
-  const auditGroups = [];
-
-  for (const intermediateGroup of rawAuditGroups) {
-    if (!intermediateGroup) continue;
-
-    const auditPairs = intermediateGroup.audits
-      .map(audit => {
-        const baseAudit = baseLhr && baseLhr.audits[audit.id || ''];
-        const diffs = baseAudit
-          ? findAuditDiffs(baseAudit, audit, {...options, synthesizeItemKeyDiffs: true})
-          : [];
-        const maxSeverity = Math.max(...diffs.map(getDiffSeverity), 0);
-        return {audit, baseAudit, diffs, maxSeverity, group: intermediateGroup.group};
-      })
-      .filter(pair => !pair.baseAudit || pair.diffs.length);
-
-    const auditGroup = {
-      id: intermediateGroup.id,
-      group: intermediateGroup.group,
-      pairs: auditPairs.sort((a, b) => (a.audit.score || 0) - (b.audit.score || 0)),
-    };
-
-    if (auditGroup.pairs.length) auditGroups.push(auditGroup);
-  }
-
-  return auditGroups;
-}
-
-/** @typedef {{id: string, audits: Array<LH.AuditResult>, group: {id: string, title: string}}} IntermediateAuditGroupDef */
-/** @typedef {{id: string, pairs: Array<LHCI.AuditPair>, group: {id: string, title: string}}} AuditGroupDef */
-
-/** @param {{selectedUrl: string, selectedAuditId?: string | null, lhr?: LH.Result, baseLhr?: LH.Result, urls: Array<string>, percentAbsoluteDeltaThreshold: number, setPercentAbsoluteDeltaThreshold: (x: number) => void}} props */
-const LhrComparisonScoresAndUrl = props => {
-  return (
-    <div className="build-view__scores-and-url">
-      <div className="container">
-        <div className="build-view__dropdowns">
-          <Dropdown
-            label="URL"
-            className="dropdown--url"
-            value={props.selectedUrl}
-            setValue={url => {
-              const to = new URL(window.location.href);
-              to.searchParams.set('compareUrl', url);
-              route(`${to.pathname}${to.search}`);
-            }}
-            options={props.urls.map(url => ({value: url, label: url}))}
-          />
-          <Dropdown
-            label="Threshold"
-            value={props.percentAbsoluteDeltaThreshold.toString()}
-            setValue={value => {
-              props.setPercentAbsoluteDeltaThreshold(Number(value));
-            }}
-            options={[
-              {value: '0', label: '0%'},
-              {value: '0.05', label: '5%'},
-              {value: '0.1', label: '10%'},
-              {value: '0.15', label: '15%'},
-              {value: '0.25', label: '25%'},
-            ]}
-          />
-        </div>
-        {props.selectedAuditId ? <Fragment /> : <LhrComparisonScores {...props} />}
-      </div>
-    </div>
-  );
-};
-
-/** @param {{auditGroups: Array<AuditGroupDef|undefined>, baseLhr?: LH.Result, selectedAuditId: string|null, setSelectedAuditId: (id: string|null) => void, showAsNarrow: boolean}} props */
-const AuditGroups = props => {
-  return (
-    <div className="build-view__audit-groups">
-      {props.auditGroups.map(auditGroup => {
-        if (!auditGroup) return undefined;
-        return (
-          <AuditGroup
-            key={auditGroup.id}
-            showAsNarrow={props.showAsNarrow}
-            pairs={auditGroup.pairs}
-            group={auditGroup.group}
-            baseLhr={props.baseLhr}
-            selectedAuditId={props.selectedAuditId}
-            setSelectedAuditId={props.setSelectedAuditId}
-          />
-        );
-      })}
-    </div>
-  );
-};
-
-/** @param {{lhr: LH.Result, baseLhr: LH.Result|undefined, selectedUrl: string, availableUrls: string[], className?: string, renderChildren?: (o: {auditGroups: Array<AuditGroupDef>}) => import('preact').VNode}} props */
-const LhrComparison = props => {
-  const {lhr, baseLhr, selectedUrl} = props;
-  const [percentAbsoluteDeltaThreshold, setDiffThreshold] = useState(0.05);
-  const [selectedAuditId, setAuditId] = useState(/** @type {string|null} */ (null));
-
-  // Attach the LHRs to the window for easy debugging.
-  useEffect(() => {
-    // @ts-ignore
-    window.__LHR__ = lhr;
-    // @ts-ignore
-    window.__BASE_LHR__ = baseLhr;
-  }, [lhr, baseLhr]);
-
-  const auditGroups = computeAuditGroups(lhr, baseLhr, {percentAbsoluteDeltaThreshold});
-
-  return (
-    <Fragment>
-      {selectedAuditId ? (
-        <AuditDetailPane
-          selectedAuditId={selectedAuditId}
-          setSelectedAuditId={setAuditId}
-          pairs={auditGroups.map(group => group.pairs).reduce((a, b) => a.concat(b))}
-          baseLhr={baseLhr}
-        />
-      ) : (
-        <Fragment />
-      )}
-      <div
-        className={clsx('build-view', props.className, {
-          'build-view--with-audit-selection': !!selectedAuditId,
-        })}
-      >
-        <LhrComparisonScoresAndUrl
-          lhr={lhr}
-          baseLhr={baseLhr}
-          selectedUrl={selectedUrl}
-          selectedAuditId={selectedAuditId}
-          urls={props.availableUrls}
-          percentAbsoluteDeltaThreshold={percentAbsoluteDeltaThreshold}
-          setPercentAbsoluteDeltaThreshold={setDiffThreshold}
-        />
-        <div className="container">
-          {props.renderChildren ? props.renderChildren({auditGroups}) : null}
-          {auditGroups.length && baseLhr ? (
-            <Fragment>
-              {selectedAuditId ? null : (
-                <div className="build-view__legend-and-options">
-                  <LhrComparisonLegend />
-                </div>
-              )}
-              <AuditGroups
-                showAsNarrow={!!selectedAuditId}
-                auditGroups={auditGroups}
-                baseLhr={baseLhr}
-                selectedAuditId={selectedAuditId}
-                setSelectedAuditId={setAuditId}
-              />
-            </Fragment>
-          ) : null}
-        </div>
-      </div>
-    </Fragment>
-  );
-};
+import {LhrComparison} from './lhr-comparison.jsx';
+import {Dropdown} from '../../components/dropdown';
 
 /** @param {{project: LHCI.ServerCommand.Project, build: LHCI.ServerCommand.Build, ancestorBuild: LHCI.ServerCommand.Build | null, runs: Array<LHCI.ServerCommand.Run>, compareUrl?: string, hasBaseOverride: boolean}} props */
 const BuildView_ = props => {
@@ -265,6 +75,14 @@ const BuildView_ = props => {
   }
 
   const definedLhr = lhr;
+  const warningProps = {
+    lhr: definedLhr,
+    build: props.build,
+    baseBuild: props.ancestorBuild,
+    baseLhr: baseLhr,
+    hasBaseOverride: props.hasBaseOverride,
+  };
+
   return (
     <Page
       headerLeft={
@@ -321,19 +139,27 @@ const BuildView_ = props => {
       <LhrComparison
         lhr={lhr}
         baseLhr={baseLhr}
-        selectedUrl={selectedUrl}
-        availableUrls={availableUrls}
         className={clsx({'build-view--with-lhr-link-hover': isOpenLhrLinkHovered})}
-        renderChildren={({auditGroups}) => (
-          <BuildViewWarnings
-            lhr={definedLhr}
-            build={props.build}
-            auditGroups={auditGroups}
-            baseBuild={props.ancestorBuild}
-            baseLhr={baseLhr}
-            hasBaseOverride={props.hasBaseOverride}
-          />
-        )}
+        hookElements={{
+          warnings: computeWarnings(warningProps).hasWarning ? (
+            <BuildViewWarnings {...warningProps} />
+          ) : (
+            undefined
+          ),
+          dropdowns: (
+            <Dropdown
+              label="URL"
+              className="dropdown--url"
+              value={selectedUrl}
+              setValue={url => {
+                const to = new URL(window.location.href);
+                to.searchParams.set('compareUrl', url);
+                route(`${to.pathname}${to.search}`);
+              }}
+              options={availableUrls.map(url => ({value: url, label: url}))}
+            />
+          ),
+        }}
       />
     </Page>
   );

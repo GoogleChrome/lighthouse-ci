@@ -4,6 +4,8 @@
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
  */
 
+import {VNode} from 'preact';
+
 declare global {
   namespace LHCI {
     export type YargsOptions = Partial<
@@ -84,6 +86,8 @@ declare global {
       maxSeverity: number;
       group: {id: string; title: string};
     }
+
+    export type HookElements<K extends keyof any> = {[P in K]?: VNode};
   }
 }
 

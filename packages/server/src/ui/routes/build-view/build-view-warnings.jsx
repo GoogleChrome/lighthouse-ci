@@ -9,9 +9,25 @@ import {Paper} from '../../components/paper';
 import './build-view-warnings.css';
 import {LhrViewerLink} from '../../components/lhr-viewer-link';
 
-/** @param {{build: LHCI.ServerCommand.Build, baseBuild: LHCI.ServerCommand.Build | null, auditGroups: Array<any>, lhr: LH.Result, baseLhr?: LH.Result, hasBaseOverride: boolean}} props */
+/** @param {{build: LHCI.ServerCommand.Build, baseBuild: LHCI.ServerCommand.Build | null, lhr: LH.Result, baseLhr?: LH.Result, hasBaseOverride: boolean}} props */
+export function computeWarnings(props) {
+  const {build, baseBuild, baseLhr, hasBaseOverride} = props;
+  const missingBase = !baseBuild;
+  const missingBaseLhr = !baseLhr;
+  const baseAndCompareAreSame = baseBuild && build.hash === baseBuild.hash;
+  const missingAncestor = baseBuild && baseBuild.hash !== build.ancestorHash && !hasBaseOverride;
+  return {
+    hasWarning: missingBase || missingBaseLhr || baseAndCompareAreSame || missingAncestor,
+    missingBase,
+    missingBaseLhr,
+    baseAndCompareAreSame,
+    missingAncestor,
+  };
+}
+
+/** @param {{build: LHCI.ServerCommand.Build, baseBuild: LHCI.ServerCommand.Build | null, lhr: LH.Result, baseLhr?: LH.Result, hasBaseOverride: boolean}} props */
 export const BuildViewWarnings = props => {
-  const {build, baseBuild, baseLhr, auditGroups, hasBaseOverride} = props;
+  const warnings = computeWarnings(props);
 
   const lhrLinkEl = (
     <Fragment>
@@ -21,7 +37,7 @@ export const BuildViewWarnings = props => {
     </Fragment>
   );
 
-  if (!baseBuild) {
+  if (warnings.missingBase) {
     return (
       <Paper className="build-view__warning">
         <i className="material-icons">sentiment_very_dissatisfied</i>
@@ -33,7 +49,7 @@ export const BuildViewWarnings = props => {
     );
   }
 
-  if (build.hash === baseBuild.hash) {
+  if (warnings.baseAndCompareAreSame) {
     return (
       <Paper className="build-view__warning">
         <i className="material-icons">sentiment_very_dissatisfied</i>
@@ -45,7 +61,7 @@ export const BuildViewWarnings = props => {
     );
   }
 
-  if (!baseLhr) {
+  if (warnings.missingBaseLhr) {
     return (
       <Paper className="build-view__warning">
         <i className="material-icons">sentiment_very_dissatisfied</i>
@@ -57,25 +73,13 @@ export const BuildViewWarnings = props => {
     );
   }
 
-  if (baseBuild.hash !== build.ancestorHash && !hasBaseOverride) {
+  if (warnings.missingAncestor) {
     return (
       <Paper className="build-view__warning">
         <i className="material-icons">warning</i>
         <div>
           This base build is not the exact ancestor of the compare. Differences may not be due to
           this specific commit.
-        </div>
-      </Paper>
-    );
-  }
-
-  if (baseLhr && !auditGroups.length) {
-    return (
-      <Paper className="build-view__warning">
-        <i className="material-icons">sentiment_satisfied_alt</i>
-        <div>
-          Woah, no differences found! Switch base builds to explore other differences, or{' '}
-          {lhrLinkEl}
         </div>
       </Paper>
     );

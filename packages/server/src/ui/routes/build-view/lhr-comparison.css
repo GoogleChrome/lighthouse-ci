@@ -1,0 +1,57 @@
+/**
+ * @license Copyright 2019 Google Inc. All Rights Reserved.
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
+ */
+
+.lhr-comparison--with-audit-selection {
+  width: 40%;
+}
+
+.lhr-comparison__scores-and-dropdowns {
+  height: 260px;
+  width: calc(100% + 2 * var(--base-spacing));
+  padding: var(--base-spacing);
+  margin: calc(-1 * var(--base-spacing));
+  margin-bottom: var(--base-spacing);
+
+  background: var(--highlighted-background-color);
+  border-bottom: 1px solid var(--base-border-color);
+}
+
+.lhr-comparison--with-audit-selection .lhr-comparison__scores-and-dropdowns {
+  background: none;
+  border-bottom: none;
+  height: auto;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.lhr-comparison--with-audit-selection .lhr-comparison__dropdowns {
+  margin-bottom: 0;
+}
+
+.lhr-comparison__scores-and-dropdowns .container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.lhr-comparison__dropdowns {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+
+  margin-top: calc(var(--base-spacing) / 2);
+  margin-bottom: var(--base-spacing);
+}
+
+.lhr-comparison__dropdowns .dropdown {
+  margin-right: var(--base-spacing);
+}
+
+.lhr-comparison__legend-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}

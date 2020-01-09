@@ -7,10 +7,14 @@
 import {h, Fragment} from 'preact';
 import './report-upload-box.css';
 import {LhrViewerButton} from './lhci-components';
+import {useState, useEffect} from 'preact/hooks';
+import clsx from 'clsx';
 
 /** @typedef {import('../app.jsx').ToastMessage} ToastMessage */
 /** @typedef {import('../app.jsx').ReportData} ReportData */
 /** @typedef {'filename'|'hostname'|'pathname'|'path'|'timestamp-hostname'|'timestamp-pathname'} DisplayType */
+/** @typedef {{variant: 'base'|'compare', displayType: DisplayType, report: ReportData|undefined, setReport: (d: ReportData) => void, addToast: (t: ToastMessage) => void, showOpenLhrLink?: boolean, dragTarget?: 'self' | 'document'}} ReportUploadBoxProps */
+/** @typedef {{isDragging: boolean, dragTarget: HTMLElement|undefined}} DragData */
 
 /** @param {string} s @return {LH.Result|Error} */
 export function parseStringAsLhr(s) {
@@ -56,10 +60,110 @@ const FilePill = props => {
   return <span title={tooltip}>{options[props.displayType]}</span>;
 };
 
-/** @param {{variant: 'base'|'compare', displayType: DisplayType, report: ReportData|undefined, setReport: (d: ReportData) => void, addToast: (t: ToastMessage) => void, showOpenLhrLink?: boolean}} props */
+/** @param {Pick<ReportUploadBoxProps, 'addToast'|'setReport'>} props @param {FileList} fileList */
+function handleFileInput(props, fileList) {
+  const filename = fileList[0].name;
+  const reader = new FileReader();
+  reader.readAsText(fileList[0], 'utf-8');
+
+  reader.addEventListener('load', () => {
+    if (typeof reader.result !== 'string') {
+      props.addToast({message: 'File was not readable as text!', level: 'error'});
+      return;
+    }
+
+    const lhr = parseStringAsLhr(reader.result);
+    if (lhr instanceof Error) {
+      props.addToast({message: `Invalid file: ${lhr.message}`, level: 'error'});
+      return;
+    }
+
+    props.setReport({filename, data: reader.result, lhr});
+  });
+
+  reader.addEventListener('error', () => {
+    props.addToast({message: 'File was not readable!', level: 'error'});
+  });
+}
+
+/** @param {ReportUploadBoxProps} props @param {DragData} dragData @param {(d: DragData) => void} setDragData @param {Event} e */
+function handleDragEnter(props, dragData, setDragData, e) {
+  if (!(e.target instanceof HTMLElement)) return;
+  if (dragData.isDragging && dragData.dragTarget === e.target) return;
+  e.stopPropagation();
+  e.preventDefault();
+  setDragData({isDragging: true, dragTarget: e.target});
+}
+
+/** @param {ReportUploadBoxProps} props @param {DragData} dragData @param {(d: DragData) => void} setDragData @param {Event} e */
+function handleDragLeave(props, dragData, setDragData, e) {
+  if (e.target !== dragData.dragTarget) return;
+  e.stopPropagation();
+  e.preventDefault();
+  setDragData({isDragging: false, dragTarget: undefined});
+}
+
+/** @param {ReportUploadBoxProps} props @param {DragData} dragData @param {(d: DragData) => void} setDragData @param {Event} e */
+function handleDragOver(props, dragData, setDragData, e) {
+  if (!dragData.dragTarget) return;
+  e.stopPropagation();
+  e.preventDefault();
+}
+
+/** @param {Pick<ReportUploadBoxProps, 'addToast'|'setReport'>} props @param {DragData} dragData @param {(d: DragData) => void} setDragData @param {Event} e */
+function handleDrop(props, dragData, setDragData, e) {
+  if (!dragData.dragTarget) return;
+  if (!(e instanceof DragEvent)) return;
+  if (!e.dataTransfer) return;
+  e.stopPropagation();
+  e.preventDefault();
+  setDragData({isDragging: false, dragTarget: undefined});
+  handleFileInput(props, e.dataTransfer.files);
+}
+
+/** @param {ReportUploadBoxProps} props */
 export const ReportUploadBox = props => {
+  const [dragData, setDragData] = useState({
+    isDragging: false,
+    dragTarget: /** @type {HTMLElement|undefined} */ (undefined),
+  });
+
+  useEffect(() => {
+    if (props.dragTarget !== 'document') return;
+
+    /** @param {Event} e */
+    const onDragEnter = e => handleDragEnter(props, dragData, setDragData, e);
+    /** @param {Event} e */
+    const onDragLeave = e => handleDragLeave(props, dragData, setDragData, e);
+    /** @param {Event} e */
+    const onDragOver = e => handleDragOver(props, dragData, setDragData, e);
+    /** @param {Event} e */
+    const onDrop = e => handleDrop(props, dragData, setDragData, e);
+
+    document.addEventListener('dragenter', onDragEnter);
+    document.addEventListener('dragleave', onDragLeave);
+    document.addEventListener('dragover', onDragOver);
+    document.addEventListener('drop', onDrop);
+
+    return () => {
+      document.removeEventListener('dragenter', onDragEnter);
+      document.removeEventListener('dragleave', onDragLeave);
+      document.removeEventListener('dragover', onDragOver);
+      document.removeEventListener('drop', onDrop);
+    };
+  }, [props.dragTarget, props.addToast, props.setReport, dragData, setDragData]);
+
   return (
-    <div className={`report-upload-box report-upload-box--${props.variant}`}>
+    <div
+      className={clsx(`report-upload-box report-upload-box--${props.variant}`, {
+        'report-upload-box--drop': dragData.isDragging,
+      })}
+      onDragEnter={e => handleDragEnter(props, dragData, setDragData, e)}
+      onDragLeave={e => handleDragLeave(props, dragData, setDragData, e)}
+      onDragOver={e => handleDragOver(props, dragData, setDragData, e)}
+      onDrop={e => handleDrop(props, dragData, setDragData, e)}
+    >
+      <div className="report-upload-box__drop-outline">Drop your report to upload</div>
       <span className="report-upload-box__label">
         {props.variant === 'base' ? 'Base' : 'Compare'}
       </span>
@@ -82,28 +186,9 @@ export const ReportUploadBox = props => {
           onChange={e => {
             const input = e.target;
             if (!(input instanceof HTMLInputElement)) return;
-            const files = input.files;
-            if (!files || files.length !== 1) return;
-            const filename = files[0].name;
-            const reader = new FileReader();
-            reader.readAsText(files[0], 'utf-8');
-            reader.addEventListener('load', () => {
-              if (typeof reader.result !== 'string') {
-                props.addToast({message: 'File was not readable as text!', level: 'error'});
-                return;
-              }
-
-              const lhr = parseStringAsLhr(reader.result);
-              if (lhr instanceof Error) {
-                props.addToast({message: `Invalid file: ${lhr.message}`, level: 'error'});
-                return;
-              }
-
-              props.setReport({filename, data: reader.result, lhr});
-            });
-            reader.addEventListener('error', () => {
-              props.addToast({message: 'File was not readable!', level: 'error'});
-            });
+            const fileList = input.files;
+            if (!fileList || fileList.length !== 1) return;
+            handleFileInput(props, fileList);
           }}
         />
       </label>

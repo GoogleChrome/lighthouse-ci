@@ -30,7 +30,7 @@ export const LandingRoute = props => {
         </a>
         <img className="landing__logo" src={LH_LOGO_PATH} alt="Lighthouse Logo" />
         <h1>Lighthouse CI Diff</h1>
-        <span>Upload two Lighthouse reports to start comparing...</span>
+        <span>Select or drag two Lighthouse reports to start comparing...</span>
         <div className="landing__upload">
           <ReportUploadBox
             variant="base"
@@ -38,6 +38,7 @@ export const LandingRoute = props => {
             setReport={props.setBaseReport}
             addToast={props.addToast}
             displayType="filename"
+            dragTarget={props.baseReport ? 'self' : 'document'}
           />
           <ReportUploadBox
             variant="compare"
@@ -45,6 +46,7 @@ export const LandingRoute = props => {
             setReport={props.setCompareReport}
             addToast={props.addToast}
             displayType="filename"
+            dragTarget={props.baseReport ? 'document' : 'self'}
           />
         </div>
       </Paper>

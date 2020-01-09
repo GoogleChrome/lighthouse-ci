@@ -9,6 +9,7 @@
   height: var(--page-header-height);
   padding: var(--base-spacing);
 
+  position: relative;
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -19,6 +20,26 @@
 
 .report-upload-box:first-child {
   border-right: 1px solid var(--base-border-color);
+}
+
+.report-upload-box--drop .report-upload-box__drop-outline {
+  display: flex;
+}
+
+.report-upload-box__drop-outline {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+
+  display: none;
+  align-items: center;
+  justify-content: center;
+
+  z-index: 10;
+  background: rgba(255, 255, 255, 0.8);
+  border: 3px dashed var(--base-border-color);
 }
 
 .report-upload-box--compare .report-upload-box__label {

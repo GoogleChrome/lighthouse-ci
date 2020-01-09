@@ -79,6 +79,7 @@ function createSequelize(options) {
   const sequelizeOptions = {
     operatorsAliases: false,
     logging: () => {},
+    type: Sequelize.QueryTypes.BULKUPDATE,
   };
 
   if (dialect === 'sqlite') {
@@ -298,7 +299,7 @@ class SqlStorageMethod {
     const builds = await this._findAll(buildModel, {
       where: {projectId, ...omit(options, ['limit'], {dropUndefined: true})},
       order,
-      limit: options.limit || 10,
+      limit: Number(options.limit) || 10,
     });
     return clone(builds);
   }

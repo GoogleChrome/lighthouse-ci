@@ -27,14 +27,14 @@ function buildCommand(yargs) {
     },
     'storage.sqlDialect': {
       type: 'string',
-      choices: ['sqlite', 'postgres'],
+      choices: ['sqlite', 'postgres', 'mysql'],
       default: 'sqlite',
     },
     'storage.sqlDatabasePath': {
       description: 'The path to a SQLite database on disk.',
     },
     'storage.sqlConnectionUrl': {
-      description: 'The connection url to a postgres database.',
+      description: 'The connection url to a postgres or mysql database.',
     },
     'storage.sqlConnectionSsl': {
       type: 'boolean',

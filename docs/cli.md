@@ -288,7 +288,7 @@ Options:
   --logLevel        [string] [choices: "silent", "verbose"] [default: "verbose"]
   --port, -p                                            [number] [default: 9001]
   --storage.sqlDialect
-                    [string] [choices: "sqlite", "postgres"] [default: "sqlite"]
+                    [string] [choices: "sqlite", "postgres","mysql"] [default: "sqlite"]
   --storage.sqlDatabasePath              The path to a SQLite database on disk.
   --storage.sqlConnectionUrl             The connection url to a postgres
                                          database.

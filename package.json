@@ -60,6 +60,7 @@
     "jest-fetch-mock": "^2.1.2",
     "jest-image-snapshot": "^2.9.0",
     "lerna": "^3.16.4",
+    "mysql2": "^1.7.0",
     "parcel-bundler": "^1.12.3",
     "pg": "^7.12.1",
     "pg-hstore": "^2.3.3",

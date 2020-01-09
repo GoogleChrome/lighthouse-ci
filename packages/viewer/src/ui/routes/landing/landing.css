@@ -59,6 +59,11 @@
   font-size: 28px;
 }
 
+.landing__error {
+  color: var(--fail-color);
+  margin-top: var(--base-spacing);
+}
+
 .landing__upload {
   width: 100%;
   display: flex;
@@ -83,6 +88,10 @@
 
 .report-upload-box:first-child {
   border-right: 1px solid var(--base-border-color);
+}
+
+.report-upload-box--compare .report-upload-box__label {
+  color: var(--compare-color);
 }
 
 .report-upload-box__file {

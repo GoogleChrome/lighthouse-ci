@@ -5,14 +5,37 @@
  */
 
 import {h} from 'preact';
+import {useState} from 'preact/hooks';
 import '../../../server/src/ui/app.css';
 import './app.css';
 import {LandingRoute} from './routes/landing/landing.jsx';
+import {ComparisonRoute} from './routes/comparison/comparison';
+
+/**
+ * @typedef {{filename: string, data: string, lhr: LH.Result}} ReportData
+ */
 
 export const App = () => {
+  const [baseReport, setBaseReport] = useState(/** @type {ReportData|undefined} */ ({}));
+  const [compareReport, setCompareReport] = useState(/** @type {ReportData|undefined} */ ({}));
+
   return (
     <div className="lhci">
-      <LandingRoute />
+      {baseReport && compareReport ? (
+        <ComparisonRoute
+          baseReport={baseReport}
+          setBaseReport={setBaseReport}
+          compareReport={compareReport}
+          setCompareReport={setCompareReport}
+        />
+      ) : (
+        <LandingRoute
+          baseReport={baseReport}
+          setBaseReport={setBaseReport}
+          compareReport={compareReport}
+          setCompareReport={setCompareReport}
+        />
+      )}
     </div>
   );
 };

@@ -9,7 +9,7 @@ import {h, Fragment} from 'preact';
 /** @typedef {import('../app.jsx').ReportData} ReportData */
 
 /** @param {string} s @return {LH.Result|Error} */
-function parseStringAsLhr(s) {
+export function parseStringAsLhr(s) {
   if (s.trim().charAt(0) === '{') {
     try {
       const lhr = JSON.parse(s);

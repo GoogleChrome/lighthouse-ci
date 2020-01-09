@@ -4,23 +4,72 @@
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
  */
 
-import {h} from 'preact';
-import {useState} from 'preact/hooks';
+import {h, Fragment} from 'preact';
+import {useState, useEffect} from 'preact/hooks';
 import '../../../server/src/ui/app.css';
 import './app.css';
 import {LandingRoute} from './routes/landing/landing.jsx';
 import {ComparisonRoute} from './routes/comparison/comparison.jsx';
+import {LoadingSpinner} from './components/lhci-components.jsx';
+import {parseStringAsLhr} from './components/report-upload-box.jsx';
+
+const SEARCH_PARAMS = new URLSearchParams(location.search);
+const INITIAL_BASE_URL = SEARCH_PARAMS.get('baseReport');
+const INITIAL_COMPARE_URL = SEARCH_PARAMS.get('compareReport');
 
 /**
  * @typedef {{filename: string, data: string, lhr: LH.Result}} ReportData
  */
 
+/**
+ * @param {string} url
+ * @param {(r: ReportData) => void} setReport
+ */
+async function loadReportFromURL(url, setReport) {
+  const filename = new URL(url).pathname.split('/').slice(-1)[0] || 'Unknown';
+  const response = await fetch(url);
+  const data = await response.text();
+  const lhr = parseStringAsLhr(data);
+  if (lhr instanceof Error) return;
+  setReport({filename, data, lhr});
+}
+
+/**
+ * @param {(r: ReportData) => void} setBaseReport
+ * @param {(r: ReportData) => void} setCompareReport
+ * @param {(b: boolean) => void} setIsLoading
+ */
+async function loadInitialReports(setBaseReport, setCompareReport, setIsLoading) {
+  const promises = [
+    INITIAL_BASE_URL && loadReportFromURL(INITIAL_BASE_URL, setBaseReport),
+    INITIAL_COMPARE_URL && loadReportFromURL(INITIAL_COMPARE_URL, setCompareReport),
+  ].filter(/** @return {p is Promise<void>} */ p => !!p);
+  if (!promises.length) return;
+
+  setIsLoading(true);
+  await Promise.all(promises).catch();
+  setIsLoading(false);
+}
+
 export const App = () => {
-  const [baseReport, setBaseReport] = useState(/** @type {ReportData|undefined} */ ({}));
-  const [compareReport, setCompareReport] = useState(/** @type {ReportData|undefined} */ ({}));
+  const initialReport = /** @type {ReportData|undefined} */ (undefined);
+  const [isLoading, setIsLoading] = useState(false);
+  const [baseReport, setBaseReport] = useState(initialReport);
+  const [compareReport, setCompareReport] = useState(initialReport);
+
+  useEffect(() => {
+    loadInitialReports(setBaseReport, setCompareReport, setIsLoading);
+  }, []);
 
   return (
-    <div className="lhci">
+    <div className="lhci-viewer">
+      {isLoading ? (
+        <div className="loading-container">
+          <LoadingSpinner />
+        </div>
+      ) : (
+        <Fragment />
+      )}
       {baseReport && compareReport ? (
         <ComparisonRoute
           baseReport={baseReport}

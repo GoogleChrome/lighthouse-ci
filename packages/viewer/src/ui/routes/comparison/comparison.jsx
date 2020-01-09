@@ -50,8 +50,8 @@ export const ComparisonRoute = props => {
           <i className="material-icons">info</i>
         </a>
       </div>
-      <pre>{JSON.stringify(props.baseReport.lhr)}</pre>
-      <pre>{JSON.stringify(props.compareReport.lhr)}</pre>
+      <pre>{JSON.stringify(props.baseReport.lhr, null, 2)}</pre>
+      <pre>{JSON.stringify(props.compareReport.lhr, null, 2)}</pre>
     </div>
   );
 };

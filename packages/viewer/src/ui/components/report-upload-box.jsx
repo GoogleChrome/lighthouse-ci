@@ -18,17 +18,22 @@ import clsx from 'clsx';
 
 /** @param {string} s @return {LH.Result|Error} */
 export function parseStringAsLhr(s) {
+  if (s.includes('<script>window.__LIGHTHOUSE_JSON__ = ')) {
+    const match = s.match(/window\.__LIGHTHOUSE_JSON__ = (.*?});<\/script>/);
+    if (match) s = match[1];
+  }
+
   if (s.trim().charAt(0) === '{') {
     try {
       const lhr = JSON.parse(s);
       if (lhr.lighthouseVersion) return lhr;
       return new Error(`JSON did not contain a lighthouseVersion`);
     } catch (err) {
-      return err;
+      return new Error(`File was not valid JSON (${err.message})`);
     }
   }
 
-  return new Error('File was not valid JSON');
+  return new Error('File was not a valid report');
 }
 
 /** @param {LH.Result} lhrA  @param {LH.Result} lhrB @return {DisplayType} */
@@ -175,7 +180,9 @@ export const ReportUploadBox = props => {
         )}
       </div>
       <div className="report-upload-box__lhr-link">
-        {props.report && props.showOpenLhrLink ? <LhrViewerButton lhr={props.report.lhr} /> : null}
+        {props.report && props.showOpenLhrLink ? (
+          <LhrViewerButton lhr={props.report.lhr} label="View Report" />
+        ) : null}
       </div>
       <div className="report-upload-box__spacer" />
       <label className="report-upload-box__upload">

@@ -30,7 +30,7 @@ export const LandingRoute = props => {
         </a>
         <img className="landing__logo" src={LH_LOGO_PATH} alt="Lighthouse Logo" />
         <h1>Lighthouse CI Diff</h1>
-        <span>Select or drag two Lighthouse reports to start comparing...</span>
+        <span>Drag or upload two Lighthouse reports to start comparing!</span>
         <div className="landing__upload">
           <ReportUploadBox
             variant="base"

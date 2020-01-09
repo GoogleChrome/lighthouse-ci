@@ -47,8 +47,9 @@
 }
 
 .report-upload-box__file {
+  flex-shrink: 1;
   font-family: var(--monospace-font-family);
-  max-width: calc(100% - 120px);
+  max-width: calc(100% - 140px);
 
   margin: 0 var(--base-spacing);
   padding: 0 calc(var(--base-spacing) / 2);
@@ -81,7 +82,9 @@
 }
 
 .report-upload-box__upload {
+  width: max-content;
   text-transform: uppercase;
+  white-space: nowrap;
   cursor: pointer;
 
   border-radius: 3px;

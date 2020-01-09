@@ -11,13 +11,13 @@ import './lhr-viewer-button.css';
 // @ts-ignore - ts doesn't know how parcel works :)
 const LH_ICON_PATH = require('../favicon.svg');
 
-/** @param {{lhr: LH.Result}} props */
+/** @param {{lhr: LH.Result, label?: string}} props */
 export const LhrViewerButton = props => {
-  const {lhr} = props;
+  const {lhr, label = 'Open Report'} = props;
   return (
     <LhrViewerLink lhr={lhr}>
       <div className="lhr-viewer-button" role="button">
-        <img src={LH_ICON_PATH} /> <span>Open Report</span>
+        <img src={LH_ICON_PATH} /> <span>{label}</span>
       </div>
     </LhrViewerLink>
   );

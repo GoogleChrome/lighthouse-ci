@@ -1,0 +1,25 @@
+{
+  "name": "@lhci/viewer",
+  "version": "0.1.0",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/GoogleChrome/lighthouse-ci.git"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "clean": "rm -rf ./dist",
+    "start": "parcel start ./src/ui/index.html",
+    "build": "parcel build ./src/ui/index.html --public-url=./",
+    "build:watch": "parcel watch ./src/ui/index.html  --public-url=./"
+  },
+  "devDependencies": {
+    "clsx": "^1.0.4",
+    "preact": "^10.0.1"
+  },
+  "alias": {
+    "isomorphic-fetch": "clsx"
+  }
+}

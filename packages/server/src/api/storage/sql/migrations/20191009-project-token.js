@@ -14,7 +14,7 @@ module.exports = {
    */
   up: async (queryInterface, Sequelize) => {
     await queryInterface.addColumn('projects', 'token', {type: Sequelize.UUID()});
-    await queryInterface.bulkUpdate('projects', {token: Sequelize.col('id')}, {token: null});
+    await queryInterface.bulkUpdate('projects', {token: Sequelize.col('id')}, {token: null}, {type: Sequelize.QueryTypes.BULKUPDATE});
   },
   /**
    * @param {import('sequelize').QueryInterface} queryInterface

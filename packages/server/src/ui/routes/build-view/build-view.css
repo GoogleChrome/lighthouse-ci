@@ -4,20 +4,23 @@
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
  */
 
-.build-view--with-audit-selection {
+.lhr-comparison--with-audit-selection {
   width: 40%;
 }
 
-.build-view--with-lhr-link-hover .build-view__scores-and-url .dropdown--url {
+.build-view--with-lhr-link-hover .lhr-comparison__scores-and-dropdowns .dropdown--url {
   background: var(--compare-secondary-highlight-color);
 }
 
-.build-view--with-lhr-link-hover .build-view__scores-and-url .dropdown--url .dropdown__label {
+.build-view--with-lhr-link-hover
+  .lhr-comparison__scores-and-dropdowns
+  .dropdown--url
+  .dropdown__label {
   padding-left: calc(var(--base-spacing) / 4);
   margin-right: calc(var(--base-spacing) / 4);
 }
 
-.build-view__scores-and-url {
+.lhr-comparison__scores-and-dropdowns {
   height: 260px;
   width: calc(100% + 2 * var(--base-spacing));
   padding: var(--base-spacing);
@@ -28,7 +31,7 @@
   border-bottom: 1px solid var(--base-border-color);
 }
 
-.build-view--with-audit-selection .build-view__scores-and-url {
+.lhr-comparison--with-audit-selection .lhr-comparison__scores-and-dropdowns {
   background: none;
   border-bottom: none;
   height: auto;
@@ -36,17 +39,17 @@
   padding-bottom: 0;
 }
 
-.build-view--with-audit-selection .build-view__dropdowns {
+.lhr-comparison--with-audit-selection .lhr-comparison__dropdowns {
   margin-bottom: 0;
 }
 
-.build-view__scores-and-url .container {
+.lhr-comparison__scores-and-dropdowns .container {
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
-.build-view__dropdowns {
+.lhr-comparison__dropdowns {
   display: flex;
   flex-direction: row;
   justify-content: center;
@@ -55,42 +58,12 @@
   margin-bottom: var(--base-spacing);
 }
 
-.build-view__dropdowns .dropdown {
+.lhr-comparison__dropdowns .dropdown {
   margin-right: var(--base-spacing);
 }
 
-.build-view__legend-and-options {
+.lhr-comparison__legend-container {
   display: flex;
   flex-direction: row;
   justify-content: center;
-}
-
-.build-selector-header {
-  position: fixed;
-  height: var(--page-header-height);
-  top: 0;
-  left: 0;
-  right: 0;
-
-  margin: 0 !important;
-
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-
-  font-size: var(--base-font-size);
-  font-weight: var(--medium-font-weight);
-
-  cursor: pointer;
-  background: var(--neutral-highlight-color);
-  color: var(--neutral-color);
-}
-
-.build-selector-header * {
-  margin-left: var(--base-spacing);
-}
-
-.build-selector-header--compare {
-  background: var(--compare-highlight-color);
-  color: var(--compare-color);
 }

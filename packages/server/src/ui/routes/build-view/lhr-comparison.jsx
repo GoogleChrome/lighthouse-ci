@@ -11,13 +11,14 @@ import _ from '@lhci/utils/src/lodash';
 import {findAuditDiffs, getDiffSeverity} from '@lhci/utils/src/audit-diff-finder';
 
 import {Dropdown} from '../../components/dropdown';
-
 import {AuditDetailPane} from './audit-detail/audit-detail-pane';
 import {LhrComparisonScores} from './lhr-comparison-scores';
 import {AuditGroup} from './audit-list/audit-group';
 import {LhrComparisonLegend} from './lhr-comparison-legend';
 import {Paper} from '../../components/paper';
 import {LhrViewerLink} from '../../components/lhr-viewer-link';
+
+import './lhr-comparison.css';
 
 /** @typedef {{id: string, audits: Array<LH.AuditResult>, group: {id: string, title: string}}} IntermediateAuditGroupDef */
 /** @typedef {{id: string, pairs: Array<LHCI.AuditPair>, group: {id: string, title: string}}} AuditGroupDef */
@@ -74,9 +75,9 @@ export function computeAuditGroups(lhr, baseLhr, options) {
 /** @param {{hookElements: LHCI.HookElements<'dropdowns'>, selectedAuditId?: string | null, lhr?: LH.Result, baseLhr?: LH.Result, percentAbsoluteDeltaThreshold: number, setPercentAbsoluteDeltaThreshold: (x: number) => void}} props */
 const LhrComparisonScoresAndUrl = props => {
   return (
-    <div className="build-view__scores-and-url">
+    <div className="lhr-comparison__scores-and-dropdowns">
       <div className="container">
-        <div className="build-view__dropdowns">
+        <div className="lhr-comparison__dropdowns">
           {props.hookElements.dropdowns}
           <Dropdown
             label="Threshold"
@@ -150,8 +151,8 @@ export const LhrComparison = props => {
         <Fragment />
       )}
       <div
-        className={clsx('build-view', props.className, {
-          'build-view--with-audit-selection': !!selectedAuditId,
+        className={clsx('lhr-comparison', props.className, {
+          'lhr-comparison--with-audit-selection': !!selectedAuditId,
         })}
       >
         <LhrComparisonScoresAndUrl
@@ -167,7 +168,7 @@ export const LhrComparison = props => {
           {auditGroups.length && baseLhr ? (
             <Fragment>
               {selectedAuditId ? null : (
-                <div className="build-view__legend-and-options">
+                <div className="lhr-comparison__legend-container">
                   <LhrComparisonLegend />
                 </div>
               )}

@@ -10,9 +10,9 @@
 const runTests = require('./server-test-suite.js').runTests;
 const runServer = require('../src/server.js').createServer;
 
-describe('postgres server', () => {
+describe('mysql server', () => {
   if (!process.env.MYSQL_DB_URL) {
-    it.skip('should work on postgres', () => {});
+    it.skip('should work on mysql', () => {});
     return;
   }
 

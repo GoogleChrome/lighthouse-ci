@@ -5,22 +5,22 @@
  */
 
 import {h} from 'preact';
-import './build-view-legend.css';
+import './lhr-comparison-legend.css';
 import {ScoreIcon} from '../../components/score-icon';
 
-export const BuildViewLegend = () => {
+export const LhrComparisonLegend = () => {
   return (
-    <div className="build-view__legend">
+    <div className="lhr-comparison-legend">
       <ScoreIcon score={0} />
-      <span className="build-view-legend__label">0-49</span>
+      <span className="lhr-comparison-legend__label">0-49</span>
       <ScoreIcon score={0.5} />
-      <span className="build-view-legend__label">50-89</span>
+      <span className="lhr-comparison-legend__label">50-89</span>
       <ScoreIcon score={1} />
-      <span className="build-view-legend__label">90-100</span>
-      <i className="build-view-legend__chip build-view-legend__chip--regression" />
-      <span className="build-view-legend__label">Regression</span>
-      <i className="build-view-legend__chip build-view-legend__chip--improvement" />
-      <span className="build-view-legend__label">Improvement</span>
+      <span className="lhr-comparison-legend__label">90-100</span>
+      <i className="lhr-comparison-legend__chip lhr-comparison-legend__chip--regression" />
+      <span className="lhr-comparison-legend__label">Regression</span>
+      <i className="lhr-comparison-legend__chip lhr-comparison-legend__chip--improvement" />
+      <span className="lhr-comparison-legend__label">Improvement</span>
     </div>
   );
 };

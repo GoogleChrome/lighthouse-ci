@@ -5,7 +5,7 @@
  */
 
 import {h, Fragment} from 'preact';
-import './build-score-comparison.css';
+import './lhr-comparison-scores.css';
 import clsx from 'clsx';
 
 import {Gauge} from '../../components/gauge';
@@ -43,10 +43,10 @@ const StandardScoreItem = props => {
 
       const delta = renderScore(category.score - baseCategory.score);
 
-      classes = `build-score-comparison-item--${getDiffLabel(diff)}`;
+      classes = `lhr-comparison-scores-item--${getDiffLabel(diff)}`;
 
       deltaEl = (
-        <div className={clsx('build-score-comparison-item__delta')}>
+        <div className={clsx('lhr-comparison-scores-item__delta')}>
           {delta < 0 ? delta : `+${delta}`}
         </div>
       );
@@ -54,9 +54,9 @@ const StandardScoreItem = props => {
   }
 
   return (
-    <div key={categoryId} className={clsx('build-score-comparison-item', classes)}>
+    <div key={categoryId} className={clsx('lhr-comparison-scores-item', classes)}>
       <Gauge score={category.score} diff={diff} />
-      <div className="build-score-comparison-item__label">{category.title}</div>
+      <div className="lhr-comparison-scores-item__label">{category.title}</div>
       {deltaEl}
     </div>
   );
@@ -99,7 +99,7 @@ const PwaScoreItem = props => {
     );
 
     deltaEl = (
-      <div className={clsx('build-score-comparison-item__delta')}>
+      <div className={clsx('lhr-comparison-scores-item__delta')}>
         {allEqual ? '-' : individualBadges}
       </div>
     );
@@ -109,13 +109,13 @@ const PwaScoreItem = props => {
     <div
       key={categoryId}
       className={clsx(
-        'build-score-comparison-item',
-        `build-score-comparison-item--pwa`,
-        `build-score-comparison-item--${overallStatus}`
+        'lhr-comparison-scores-item',
+        `lhr-comparison-scores-item--pwa`,
+        `lhr-comparison-scores-item--${overallStatus}`
       )}
     >
       <PWAGauge status={compareStatus} />
-      <div className="build-score-comparison-item__label">PWA</div>
+      <div className="lhr-comparison-scores-item__label">PWA</div>
       {deltaEl}
     </div>
   );
@@ -124,14 +124,14 @@ const PwaScoreItem = props => {
 /**
  * @param {{build: LHCI.ServerCommand.Build | null, lhr?: LH.Result, baseLhr?: LH.Result}} props
  */
-export const BuildScoreComparison = props => {
+export const LhrComparisonScores = props => {
   const {lhr, baseLhr} = props;
   if (!lhr) return null;
 
   const categoryIds = Object.keys(lhr.categories);
 
   return (
-    <div className="build-score-comparison">
+    <div className="lhr-comparison-scores">
       {categoryIds
         .sort((idA, idB) => {
           const sortKeyA = idA === 'pwa' ? Infinity : categoryIds.indexOf(idA);

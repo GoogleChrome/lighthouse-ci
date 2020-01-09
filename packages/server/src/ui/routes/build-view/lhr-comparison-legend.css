@@ -4,7 +4,7 @@
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
  */
 
-.build-view__legend {
+.lhr-comparison-legend {
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -18,28 +18,28 @@
   border-radius: 9999px; /* force fully rounded corners */
 }
 
-.build-view-legend__label {
+.lhr-comparison-legend__label {
   font-family: var(--monospace-font-family);
   font-size: var(--monospace-font-size);
   margin-left: calc(var(--base-spacing) / 2);
   margin-right: calc(var(--base-spacing) * 1.5);
 }
 
-.build-view-legend__label:last-child {
+.lhr-comparison-legend__label:last-child {
   margin-right: 0;
 }
 
-.build-view-legend__chip {
+.lhr-comparison-legend__chip {
   display: 'block';
   width: var(--base-icon-size);
   height: var(--base-icon-size);
   border-radius: 2px;
 }
 
-.build-view-legend__chip--regression {
+.lhr-comparison-legend__chip--regression {
   background: var(--regression-color);
 }
 
-.build-view-legend__chip--improvement {
+.lhr-comparison-legend__chip--improvement {
   background: var(--improvement-color);
 }

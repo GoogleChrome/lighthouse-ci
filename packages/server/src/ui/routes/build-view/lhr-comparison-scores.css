@@ -4,13 +4,13 @@
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
  */
 
-.build-score-comparison {
+.lhr-comparison-scores {
   display: flex;
   width: 100%;
   margin-top: var(--base-spacing);
 }
 
-.build-score-comparison-item {
+.lhr-comparison-scores-item {
   /* properties that affect how it's rendered within its parent */
   flex-basis: 0;
   flex-grow: 1;
@@ -21,7 +21,7 @@
   align-items: center;
 }
 
-.build-score-comparison-item__label {
+.lhr-comparison-scores-item__label {
   margin-top: var(--base-spacing);
   font-size: var(--gauge-title-font-size);
   white-space: nowrap;
@@ -29,7 +29,7 @@
   text-overflow: ellipsis;
 }
 
-.build-score-comparison-item__delta {
+.lhr-comparison-scores-item__delta {
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -48,23 +48,23 @@
   text-align: center;
 }
 
-.build-score-comparison-item__delta > .pwa-icon {
+.lhr-comparison-scores-item__delta > .pwa-icon {
   margin-right: calc(var(--base-spacing) / 2);
 }
 
-.build-score-comparison-item__delta > .pwa-icon:last-child {
+.lhr-comparison-scores-item__delta > .pwa-icon:last-child {
   margin-right: 0;
 }
 
-.build-score-comparison-item--improvement .build-score-comparison-item__delta {
+.lhr-comparison-scores-item--improvement .lhr-comparison-scores-item__delta {
   background-color: var(--improvement-color);
 }
 
-.build-score-comparison-item--regression .build-score-comparison-item__delta {
+.lhr-comparison-scores-item--regression .lhr-comparison-scores-item__delta {
   background-color: var(--regression-color);
 }
 
-.build-score-comparison-item--pwa .build-score-comparison-item__delta {
+.lhr-comparison-scores-item--pwa .lhr-comparison-scores-item__delta {
   background-color: var(--secondary-background-color);
   color: var(--base-text-color);
 }

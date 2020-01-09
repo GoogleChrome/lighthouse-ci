@@ -20,11 +20,11 @@ import {BuildHashSelector} from './build-hash-selector';
 import {BuildSelectorHeaderSection} from './build-selector-header-section';
 import {AuditDetailPane} from './audit-detail/audit-detail-pane';
 import {Page} from '../../layout/page';
-import {BuildScoreComparison} from './build-score-comparison';
+import {LhrComparisonScores} from './lhr-comparison-scores';
 import {AuditGroup} from './audit-list/audit-group';
 
 import './build-view.css';
-import {BuildViewLegend} from './build-view-legend';
+import {LhrComparisonLegend} from './lhr-comparison-legend';
 import clsx from 'clsx';
 import {findAuditDiffs, getDiffSeverity} from '@lhci/utils/src/audit-diff-finder';
 import {route, Link} from 'preact-router';
@@ -124,7 +124,7 @@ const BuildViewScoreAndUrl = props => {
             ]}
           />
         </div>
-        {props.selectedAuditId ? <Fragment /> : <BuildScoreComparison {...props} />}
+        {props.selectedAuditId ? <Fragment /> : <LhrComparisonScores {...props} />}
       </div>
     </div>
   );
@@ -300,7 +300,7 @@ const BuildView_ = props => {
                 <Fragment />
               ) : (
                 <div className="build-view__legend-and-options">
-                  <BuildViewLegend />
+                  <LhrComparisonLegend />
                 </div>
               )}
               <AuditGroups

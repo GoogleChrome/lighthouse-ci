@@ -39,13 +39,16 @@ jobs:
       before_script:
         - google-chrome-stable --version
         - export CHROME_PATH="$(which google-chrome-stable)"
-        - export POSTGRES_DB_URL="postgres://postgres@localhost/lighthouse_ci_test"
         - export RUN_E2E_TESTS="true"
+        - export POSTGRES_DB_URL="postgres://postgres@localhost/lighthouse_ci_test"
         - psql -c 'create database lighthouse_ci_test;' -U postgres
+        - export MYSQL_DB_URL="mysql://root@localhost/lighthouse_ci_test"
+        - mysql -e 'create database if not exists lighthouse_ci_test;' -u root
       script:
         - yarn build
         - yarn test
         - yarn ci:dogfood
       services:
         - postgresql
+        - mysql
         - xvfb

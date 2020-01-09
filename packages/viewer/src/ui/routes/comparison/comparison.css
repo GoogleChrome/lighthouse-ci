@@ -13,6 +13,7 @@
 }
 
 .comparison-header {
+  position: relative;
   height: var(--page-header-height);
 
   display: flex;
@@ -38,6 +39,18 @@
   flex-grow: 1;
   display: flex;
   flex-direction: row;
+}
+
+.comparison-header__switcher {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+
+  z-index: 5;
+  border-radius: 100%;
+  background: var(--highlighted-background-color);
+  cursor: pointer;
 }
 
 .comparison-header__info {

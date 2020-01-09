@@ -19,6 +19,15 @@ export const ComparisonRoute = props => {
   return (
     <div className="comparison">
       <div className="comparison-header">
+        <div
+          className="comparison-header__switcher"
+          onClick={() => {
+            props.setBaseReport(props.compareReport);
+            props.setCompareReport(props.baseReport);
+          }}
+        >
+          <i className="material-icons">swap_horiz</i>
+        </div>
         <div className="comparison-header__logo">
           <img
             src={LH_LOGO_PATH}

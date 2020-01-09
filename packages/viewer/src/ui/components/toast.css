@@ -4,30 +4,12 @@
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
  */
 
-body {
-  width: 100vw;
-  min-height: 100vh;
-  position: relative;
+.toast {
+  padding: calc(var(--base-spacing));
+  background: var(--neutral-color);
+  color: var(--inverted-text-color);
 }
 
-.loading-container {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  background: rgba(255, 255, 255, 0.8);
-  z-index: 1000;
-}
-
-.toast-container {
-  position: absolute;
-  z-index: 10;
-  left: var(--base-spacing);
-  bottom: var(--base-spacing);
+.toast--error {
+  color: var(--fail-color);
 }

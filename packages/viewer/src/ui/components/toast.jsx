@@ -1,0 +1,27 @@
+/**
+ * @license Copyright 2020 Google Inc. All Rights Reserved.
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
+ */
+
+import {h, Fragment} from 'preact';
+import './toast.css';
+import {useEffect} from 'preact/hooks';
+
+/** @typedef {import('../app.jsx').ToastMessage} ToastMessage */
+
+/** @param {{toast: ToastMessage, setToasts: import('preact/hooks/src').StateUpdater<Array<ToastMessage>>}} props */
+export const Toast = props => {
+  const setToasts = props.setToasts;
+  const {message, level = 'info'} = props.toast;
+
+  useEffect(() => {
+    const interval = setTimeout(
+      () => setToasts(toasts => toasts.filter(t => t !== props.toast)),
+      5000
+    );
+    return () => clearInterval(interval);
+  }, []);
+
+  return <div className={`toast toast--${level}`}>{message}</div>;
+};

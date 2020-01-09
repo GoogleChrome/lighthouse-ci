@@ -10,9 +10,10 @@ import './comparison.css';
 import {LH_LOGO_PATH} from '../../components/lhci-components.jsx';
 import {ReportUploadBox} from '../../components/report-upload-box';
 
+/** @typedef {import('../../app.jsx').ToastMessage} ToastMessage */
 /** @typedef {import('../../app.jsx').ReportData} ReportData */
 
-/** @param {{baseReport: ReportData, compareReport: ReportData, setBaseReport: (d: ReportData|undefined) => void, setCompareReport: (d: ReportData|undefined) => void}} props */
+/** @param {{baseReport: ReportData, compareReport: ReportData, setBaseReport: (d: ReportData|undefined) => void, setCompareReport: (d: ReportData|undefined) => void, addToast: (t: ToastMessage) => void}} props */
 export const ComparisonRoute = props => {
   const [errorMessage, setErrorMessage] = useState('');
 
@@ -37,13 +38,13 @@ export const ComparisonRoute = props => {
             variant="base"
             report={props.baseReport}
             setReport={props.setBaseReport}
-            setErrorMessage={setErrorMessage}
+            addToast={props.addToast}
           />
           <ReportUploadBox
             variant="compare"
             report={props.compareReport}
             setReport={props.setCompareReport}
-            setErrorMessage={setErrorMessage}
+            addToast={props.addToast}
           />
         </div>
         <a className="comparison-header__info" href="https://github.com/GoogleChrome/lighthouse-ci">

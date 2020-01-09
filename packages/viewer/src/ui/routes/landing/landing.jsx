@@ -10,12 +10,11 @@ import {CONFETTI_PATH, LH_LOGO_PATH, Paper} from '../../components/lhci-componen
 import {useState} from 'preact/hooks';
 import {ReportUploadBox} from '../../components/report-upload-box';
 
+/** @typedef {import('../../app.jsx').ToastMessage} ToastMessage */
 /** @typedef {import('../../app.jsx').ReportData} ReportData */
 
-/** @param {{baseReport?: ReportData, compareReport?: ReportData, setBaseReport: (d: ReportData) => void, setCompareReport: (d: ReportData) => void}} props */
+/** @param {{baseReport?: ReportData, compareReport?: ReportData, setBaseReport: (d: ReportData) => void, setCompareReport: (d: ReportData) => void, addToast: (t: ToastMessage) => void}} props */
 export const LandingRoute = props => {
-  const [errorMessage, setErrorMessage] = useState('');
-
   return (
     <div className="landing">
       <div className="landing__background">
@@ -33,19 +32,18 @@ export const LandingRoute = props => {
         <img className="landing__logo" src={LH_LOGO_PATH} alt="Lighthouse Logo" />
         <h1>Lighthouse CI Diff</h1>
         <span>Upload two Lighthouse reports to start comparing...</span>
-        {errorMessage ? <span className="landing__error">{errorMessage}</span> : <Fragment />}
         <div className="landing__upload">
           <ReportUploadBox
             variant="base"
             report={props.baseReport}
             setReport={props.setBaseReport}
-            setErrorMessage={setErrorMessage}
+            addToast={props.addToast}
           />
           <ReportUploadBox
             variant="compare"
             report={props.compareReport}
             setReport={props.setCompareReport}
-            setErrorMessage={setErrorMessage}
+            addToast={props.addToast}
           />
         </div>
       </Paper>

@@ -5,7 +5,9 @@
  */
 
 import {h, Fragment} from 'preact';
+import './report-upload-box.css';
 
+/** @typedef {import('../app.jsx').ToastMessage} ToastMessage */
 /** @typedef {import('../app.jsx').ReportData} ReportData */
 
 /** @param {string} s @return {LH.Result|Error} */
@@ -23,7 +25,7 @@ export function parseStringAsLhr(s) {
   return new Error('File was not valid JSON');
 }
 
-/** @param {{variant: 'base'|'compare', report: ReportData|undefined, setReport: (d: ReportData) => void, setErrorMessage: (s: string) => void}} props */
+/** @param {{variant: 'base'|'compare', report: ReportData|undefined, setReport: (d: ReportData) => void, addToast: (t: ToastMessage) => void}} props */
 export const ReportUploadBox = props => {
   return (
     <div className={`report-upload-box report-upload-box--${props.variant}`}>
@@ -48,21 +50,20 @@ export const ReportUploadBox = props => {
             reader.readAsText(files[0], 'utf-8');
             reader.addEventListener('load', () => {
               if (typeof reader.result !== 'string') {
-                props.setErrorMessage('File was not readable as text!');
+                props.addToast({message: 'File was not readable as text!', level: 'error'});
                 return;
               }
 
               const lhr = parseStringAsLhr(reader.result);
               if (lhr instanceof Error) {
-                props.setErrorMessage(`Invalid file: ${lhr.message}`);
+                props.addToast({message: `Invalid file: ${lhr.message}`, level: 'error'});
                 return;
               }
 
-              props.setErrorMessage('');
               props.setReport({filename, data: reader.result, lhr});
             });
             reader.addEventListener('error', () => {
-              props.setErrorMessage('File was not readable!');
+              props.addToast({message: 'File was not readable!', level: 'error'});
             });
           }}
         />

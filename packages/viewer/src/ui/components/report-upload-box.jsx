@@ -6,9 +6,11 @@
 
 import {h, Fragment} from 'preact';
 import './report-upload-box.css';
+import {LhrViewerButton} from './lhci-components';
 
 /** @typedef {import('../app.jsx').ToastMessage} ToastMessage */
 /** @typedef {import('../app.jsx').ReportData} ReportData */
+/** @typedef {'filename'|'hostname'|'pathname'|'path'|'timestamp-hostname'|'timestamp-pathname'} DisplayType */
 
 /** @param {string} s @return {LH.Result|Error} */
 export function parseStringAsLhr(s) {
@@ -25,7 +27,36 @@ export function parseStringAsLhr(s) {
   return new Error('File was not valid JSON');
 }
 
-/** @param {{variant: 'base'|'compare', report: ReportData|undefined, setReport: (d: ReportData) => void, addToast: (t: ToastMessage) => void}} props */
+/** @param {LH.Result} lhrA  @param {LH.Result} lhrB @return {DisplayType} */
+export function computeBestDisplayType(lhrA, lhrB) {
+  const urlA = new URL(lhrA.finalUrl);
+  const urlB = new URL(lhrB.finalUrl);
+  if (urlA.hostname !== urlB.hostname) return 'hostname';
+  if (urlA.pathname !== urlB.pathname) return 'pathname';
+  if (urlA.search !== urlB.search) return 'path';
+  if (urlA.pathname.length < 5) return 'timestamp-hostname';
+  return 'timestamp-pathname';
+}
+
+/** @param {{report: ReportData, displayType: DisplayType}} props */
+const FilePill = props => {
+  const {filename, lhr} = props.report;
+  const url = new URL(lhr.finalUrl);
+  const timestamp = new Date(lhr.fetchTime).toLocaleString();
+  const options = {
+    filename,
+    hostname: url.hostname,
+    pathname: url.pathname,
+    path: `${url.pathname}${url.search}`,
+    'timestamp-hostname': `${timestamp} (${url.hostname})`,
+    'timestamp-pathname': `${timestamp} (${url.pathname})`,
+  };
+
+  const tooltip = `${url.href} at ${timestamp}`;
+  return <span title={tooltip}>{options[props.displayType]}</span>;
+};
+
+/** @param {{variant: 'base'|'compare', displayType: DisplayType, report: ReportData|undefined, setReport: (d: ReportData) => void, addToast: (t: ToastMessage) => void, showOpenLhrLink?: boolean}} props */
 export const ReportUploadBox = props => {
   return (
     <div className={`report-upload-box report-upload-box--${props.variant}`}>
@@ -33,8 +64,16 @@ export const ReportUploadBox = props => {
         {props.variant === 'base' ? 'Base' : 'Compare'}
       </span>
       <div className="report-upload-box__file">
-        {props.report ? <span>{props.report.filename}</span> : <Fragment />}
+        {props.report ? (
+          <FilePill report={props.report} displayType={props.displayType} />
+        ) : (
+          <Fragment />
+        )}
       </div>
+      <div className="report-upload-box__lhr-link">
+        {props.report && props.showOpenLhrLink ? <LhrViewerButton lhr={props.report.lhr} /> : null}
+      </div>
+      <div className="report-upload-box__spacer" />
       <label className="report-upload-box__upload">
         Upload
         <input

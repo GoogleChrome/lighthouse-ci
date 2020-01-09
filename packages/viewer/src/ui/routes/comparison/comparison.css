@@ -18,6 +18,7 @@
   display: flex;
   flex-direction: row;
 
+  background: var(--highlighted-background-color);
   border-bottom: 1px solid var(--base-border-color);
 }
 
@@ -33,6 +34,7 @@
 }
 
 .comparison-header__upload {
+  max-width: calc(100vw - var(--page-header-height) * 2);
   flex-grow: 1;
   display: flex;
   flex-direction: row;
@@ -46,4 +48,8 @@
   justify-content: center;
 
   border-left: 1px solid var(--base-border-color);
+}
+
+.comparison-body {
+  padding-top: var(--base-spacing);
 }

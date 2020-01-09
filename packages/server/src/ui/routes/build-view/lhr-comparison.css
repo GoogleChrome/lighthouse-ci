@@ -55,3 +55,26 @@
   flex-direction: row;
   justify-content: center;
 }
+
+.lhr-comparison__warning {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+
+  min-height: 80px;
+  margin-bottom: calc(var(--base-spacing) * 2);
+}
+
+.lhr-comparison__warning i {
+  font-size: 40px;
+  margin: 0 var(--base-spacing);
+}
+
+.lhr-comparison__warning div {
+  line-height: 1.5;
+}
+
+.lhr-comparison__warning__lhr-link {
+  cursor: pointer;
+  color: var(--improvement-color);
+}

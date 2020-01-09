@@ -4,10 +4,9 @@
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
  */
 
-import {h, Fragment} from 'preact';
+import {h} from 'preact';
 import './landing.css';
 import {CONFETTI_PATH, LH_LOGO_PATH, Paper} from '../../components/lhci-components.jsx';
-import {useState} from 'preact/hooks';
 import {ReportUploadBox} from '../../components/report-upload-box';
 
 /** @typedef {import('../../app.jsx').ToastMessage} ToastMessage */
@@ -38,12 +37,14 @@ export const LandingRoute = props => {
             report={props.baseReport}
             setReport={props.setBaseReport}
             addToast={props.addToast}
+            displayType="filename"
           />
           <ReportUploadBox
             variant="compare"
             report={props.compareReport}
             setReport={props.setCompareReport}
             addToast={props.addToast}
+            displayType="filename"
           />
         </div>
       </Paper>

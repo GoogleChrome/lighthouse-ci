@@ -5,23 +5,19 @@
  */
 
 import {h, Fragment} from 'preact';
-import {useState} from 'preact/hooks';
 import './comparison.css';
 import {LH_LOGO_PATH} from '../../components/lhci-components.jsx';
-import {ReportUploadBox} from '../../components/report-upload-box';
+import {ReportUploadBox, computeBestDisplayType} from '../../components/report-upload-box';
+import {LhrComparison} from '../../../../../server/src/ui/routes/build-view/lhr-comparison';
 
 /** @typedef {import('../../app.jsx').ToastMessage} ToastMessage */
 /** @typedef {import('../../app.jsx').ReportData} ReportData */
 
 /** @param {{baseReport: ReportData, compareReport: ReportData, setBaseReport: (d: ReportData|undefined) => void, setCompareReport: (d: ReportData|undefined) => void, addToast: (t: ToastMessage) => void}} props */
 export const ComparisonRoute = props => {
-  const [errorMessage, setErrorMessage] = useState('');
-
+  const displayType = computeBestDisplayType(props.baseReport.lhr, props.compareReport.lhr);
   return (
     <div className="comparison">
-      <div className="comparison__toast-container">
-        {errorMessage ? <div className="toast toast--error">{errorMessage}</div> : <Fragment />}
-      </div>
       <div className="comparison-header">
         <div className="comparison-header__logo">
           <img
@@ -39,20 +35,29 @@ export const ComparisonRoute = props => {
             report={props.baseReport}
             setReport={props.setBaseReport}
             addToast={props.addToast}
+            displayType={displayType}
+            showOpenLhrLink
           />
           <ReportUploadBox
             variant="compare"
             report={props.compareReport}
             setReport={props.setCompareReport}
             addToast={props.addToast}
+            displayType={displayType}
+            showOpenLhrLink
           />
         </div>
         <a className="comparison-header__info" href="https://github.com/GoogleChrome/lighthouse-ci">
           <i className="material-icons">info</i>
         </a>
       </div>
-      <pre>{JSON.stringify(props.baseReport.lhr, null, 2)}</pre>
-      <pre>{JSON.stringify(props.compareReport.lhr, null, 2)}</pre>
+      <div className="comparison-body">
+        <LhrComparison
+          lhr={props.compareReport.lhr}
+          baseLhr={props.baseReport.lhr}
+          hookElements={{}}
+        />
+      </div>
     </div>
   );
 };

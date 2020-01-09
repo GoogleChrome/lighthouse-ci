@@ -72,6 +72,7 @@ export function computeAuditGroups(lhr, baseLhr, options) {
   }
   return auditGroups;
 }
+
 /** @param {{hookElements: LHCI.HookElements<'dropdowns'>, selectedAuditId?: string | null, lhr?: LH.Result, baseLhr?: LH.Result, percentAbsoluteDeltaThreshold: number, setPercentAbsoluteDeltaThreshold: (x: number) => void}} props */
 const LhrComparisonScoresAndUrl = props => {
   return (
@@ -103,7 +104,7 @@ const LhrComparisonScoresAndUrl = props => {
 /** @param {{auditGroups: Array<AuditGroupDef|undefined>, baseLhr?: LH.Result, selectedAuditId: string|null, setSelectedAuditId: (id: string|null) => void, showAsNarrow: boolean}} props */
 const AuditGroups = props => {
   return (
-    <div className="build-view__audit-groups">
+    <div className="lhr-comparison__audit-groups">
       {props.auditGroups.map(auditGroup => {
         if (!auditGroup) return undefined;
         return (
@@ -122,7 +123,7 @@ const AuditGroups = props => {
   );
 };
 
-/** @param {{lhr: LH.Result, baseLhr: LH.Result|undefined, hookElements: LHCI.HookElements<'dropdowns'|'warnings'>, className?: string, renderChildren?: (o: {auditGroups: Array<AuditGroupDef>}) => import('preact').VNode}} props */
+/** @param {{lhr: LH.Result, baseLhr: LH.Result|undefined, hookElements: LHCI.HookElements<'dropdowns'|'warnings'>, className?: string}} props */
 export const LhrComparison = props => {
   const {lhr, baseLhr} = props;
   const [percentAbsoluteDeltaThreshold, setDiffThreshold] = useState(0.05);
@@ -181,11 +182,11 @@ export const LhrComparison = props => {
               />
             </Fragment>
           ) : props.hookElements.warnings ? null : (
-            <Paper className="build-view__warning">
+            <Paper className="lhr-comparison__warning">
               <i className="material-icons">sentiment_satisfied_alt</i>
               <div>
                 Woah, no differences found! Switch base builds to explore other differences, or{' '}
-                <LhrViewerLink className="build-view-warning__lhr-link" lhr={props.lhr}>
+                <LhrViewerLink className="lhr-comparison__warning__lhr-link" lhr={props.lhr}>
                   jump straight to the Lighthouse report.
                 </LhrViewerLink>
               </div>

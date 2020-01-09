@@ -27,21 +27,47 @@
 
 .report-upload-box__file {
   font-family: var(--monospace-font-family);
-  flex-grow: 1;
-}
+  max-width: calc(100% - 120px);
 
-.report-upload-box__file span {
   margin: 0 var(--base-spacing);
   padding: 0 calc(var(--base-spacing) / 2);
   border-radius: 10000px;
   background: var(--neutral-highlight-color);
+
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 
-.report-upload-box--compare .report-upload-box__file span {
+.report-upload-box--compare .report-upload-box__file {
   background: var(--compare-highlight-color);
+}
+
+.report-upload-box__lhr-link {
+  display: none;
+}
+
+.report-upload-box:hover .report-upload-box__lhr-link {
+  display: block;
+}
+
+.report-upload-box .lhr-viewer-button:hover {
+  background: var(--compare-highlight-color);
+}
+
+.report-upload-box__spacer {
+  flex-grow: 1;
 }
 
 .report-upload-box__upload {
   text-transform: uppercase;
   cursor: pointer;
+
+  border-radius: 3px;
+  padding: calc(var(--base-spacing) / 2);
+  background: var(--highlighted-background-color);
+}
+
+.report-upload-box__upload:hover {
+  background: var(--compare-highlight-color);
 }

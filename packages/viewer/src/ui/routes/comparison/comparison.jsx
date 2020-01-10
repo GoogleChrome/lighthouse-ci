@@ -41,6 +41,7 @@ export const ComparisonRoute = props => {
         <div className="comparison-header__upload">
           <ReportUploadBox
             variant="base"
+            dragTarget="self"
             report={props.baseReport}
             setReport={props.setBaseReport}
             addToast={props.addToast}
@@ -49,6 +50,7 @@ export const ComparisonRoute = props => {
           />
           <ReportUploadBox
             variant="compare"
+            dragTarget="self"
             report={props.compareReport}
             setReport={props.setCompareReport}
             addToast={props.addToast}

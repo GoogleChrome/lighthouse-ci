@@ -55,7 +55,7 @@ async function loadInitialReports(setBaseReport, setCompareReport, setIsLoading,
   await Promise.all(
     promises.map(p =>
       p.catch(err => {
-        console.error(err);
+        console.error(err); // eslint-disable-line no-console
         addToast({message: `Failed loading report from URL: ${err.message}`, level: 'error'});
       })
     )
@@ -88,7 +88,7 @@ export const App = () => {
       )}
       <div className="toast-container">
         {toasts.map(toast => (
-          <Toast toast={toast} setToasts={setToasts} />
+          <Toast key={toast.message} toast={toast} setToasts={setToasts} />
         ))}
       </div>
       {baseReport && compareReport ? (

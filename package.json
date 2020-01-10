@@ -6,7 +6,7 @@
   "scripts": {
     "clean": "lerna exec --parallel 'rm -rf ./dist'",
     "ci:dogfood": "./scripts/ci-dogfood.sh",
-    "build": "lerna run --scope @lhci/server build",
+    "build": "lerna run --scope @lhci/server --scope @lhci/viewer build",
     "build:watch": "lerna run --scope @lhci/server build:watch --stream",
     "build:source-map-explorer": "lerna run --scope @lhci/server build:source-map-explorer",
     "start": "./packages/cli/src/cli.js",
@@ -20,7 +20,7 @@
     "test:typecheck": "tsc -p .",
     "test:lint": "npm run test:lint:js && npm run test:lint:jsx",
     "test:lint:js": "eslint ./packages/*/src ./packages/*/test",
-    "test:lint:jsx": "eslint -c ./.eslintrc.ui.js --ext jsx ./packages/server/src/ui",
+    "test:lint:jsx": "eslint -c ./.eslintrc.ui.js --ext jsx ./packages/server/src/ui ./packages/viewer/src/ui",
     "test:unit": "jest --maxWorkers=2"
   },
   "devDependencies": {

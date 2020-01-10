@@ -24,7 +24,7 @@ export const LandingRoute = props => {
           className="landing__info-icon"
           href="https://github.com/GoogleChrome/lighthouse-ci"
           target="_blank"
-          rel="noopener"
+          rel="noopener noreferrer"
         >
           <i className="material-icons">info</i>
         </a>

@@ -14,7 +14,12 @@ module.exports = {
    */
   up: async (queryInterface, Sequelize) => {
     await queryInterface.addColumn('projects', 'slug', {type: Sequelize.STRING(40)});
-    await queryInterface.bulkUpdate('projects', {slug: Sequelize.col('id')}, {slug: null}, { type: Sequelize.QueryTypes.BULKUPDATE });
+    await queryInterface.bulkUpdate(
+      'projects',
+      {slug: Sequelize.col('id')},
+      {slug: null},
+      {type: Sequelize.QueryTypes.BULKUPDATE}
+    );
     await queryInterface.addIndex('projects', {
       // @ts-ignore - Sequelize types are out of date
       name: 'projects_unique_slug',

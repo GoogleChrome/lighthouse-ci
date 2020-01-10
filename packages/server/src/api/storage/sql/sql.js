@@ -78,7 +78,7 @@ function createSequelize(options) {
   const dialect = options.sqlDialect;
   const sequelizeOptions = {
     operatorsAliases: false,
-    logging: () => {}
+    logging: () => {},
   };
 
   if (dialect === 'sqlite') {

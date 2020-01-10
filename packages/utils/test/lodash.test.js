@@ -133,13 +133,19 @@ describe('lodash.js', () => {
   describe('#groupBy', () => {
     it('should group items by a key', () => {
       const items = [1, 2, 3, 4, 5];
-      expect(_.groupBy(items, x => x % 2)).toEqual([[1, 3, 5], [2, 4]]);
+      expect(_.groupBy(items, x => x % 2)).toEqual([
+        [1, 3, 5],
+        [2, 4],
+      ]);
       expect(_.groupBy(items, x => x % 3)).toEqual([[1, 4], [2, 5], [3]]);
     });
 
     it('should use referential equality for key', () => {
       const items = [1, 2, 3, 4, 5];
-      expect(_.groupBy(items, x => x % 2)).toEqual([[1, 3, 5], [2, 4]]);
+      expect(_.groupBy(items, x => x % 2)).toEqual([
+        [1, 3, 5],
+        [2, 4],
+      ]);
       expect(_.groupBy(items, x => ({v: x % 2}))).toEqual([[1], [2], [3], [4], [5]]);
     });
   });

@@ -394,7 +394,10 @@ describe('#getDiffSeverity', () => {
       numericValue: 1000,
       details: {
         headings: [{key: 'wastedMs'}, {key: 'wastedKb'}],
-        items: [{url: 'urlA', wastedMs: 2000}, {url: 'urlB', wastedKb: 2000e3}],
+        items: [
+          {url: 'urlA', wastedMs: 2000},
+          {url: 'urlB', wastedKb: 2000e3},
+        ],
       },
     };
 
@@ -404,7 +407,10 @@ describe('#getDiffSeverity', () => {
       numericValue: 1100,
       details: {
         headings: [{key: 'wastedMs'}, {key: 'wastedKb'}],
-        items: [{url: 'urlA', wastedMs: 2500}, {url: 'urlD', wastedKb: 70e3}],
+        items: [
+          {url: 'urlA', wastedMs: 2500},
+          {url: 'urlD', wastedKb: 70e3},
+        ],
       },
     };
 
@@ -414,7 +420,10 @@ describe('#getDiffSeverity', () => {
       numericValue: 400,
       details: {
         headings: [{key: 'wastedMs'}, {key: 'wastedKb'}],
-        items: [{url: 'urlA', wastedMs: 1200}, {url: 'urlB', wastedKb: 1800e3}],
+        items: [
+          {url: 'urlA', wastedMs: 1200},
+          {url: 'urlB', wastedKb: 1800e3},
+        ],
       },
     };
 

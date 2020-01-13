@@ -30,7 +30,7 @@ const {computeRepresentativeRuns} = require('./representative-runs.js');
 
 /** @type {Record<AssertionType, (result: LH.AuditResult) => number | undefined>} */
 const AUDIT_TYPE_VALUE_GETTERS = {
-  auditRan: result => ((result === undefined ? 0 : 1)),
+  auditRan: result => (result === undefined ? 0 : 1),
   minScore: result => {
     if (typeof result.score === 'number') return result.score;
     if (result.scoreDisplayMode === 'notApplicable') return 1;

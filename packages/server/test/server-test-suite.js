@@ -61,10 +61,7 @@ function runTests(state) {
 
     it('should list projects', async () => {
       const projects = await client.getProjects();
-      expect(projects).toEqual([
-        {...projectB, token: ''},
-        {...projectA, token: ''},
-      ]);
+      expect(projects).toEqual([{...projectB, token: ''}, {...projectA, token: ''}]);
     });
 
     it('should fetch a project by a token', async () => {

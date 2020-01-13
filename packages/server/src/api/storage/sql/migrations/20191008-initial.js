@@ -18,8 +18,8 @@ module.exports = {
       id: {type: Sequelize.UUID(), primaryKey: true},
       name: {type: Sequelize.STRING(40)},
       externalUrl: {type: Sequelize.STRING(256)},
-      createdAt: {type: Sequelize.DATE()},
-      updatedAt: {type: Sequelize.DATE()},
+      createdAt: {type: Sequelize.DATE(6)},
+      updatedAt: {type: Sequelize.DATE(6)},
     });
     await queryInterface.createTable('builds', {
       id: {type: Sequelize.UUID(), primaryKey: true},
@@ -32,9 +32,9 @@ module.exports = {
       avatarUrl: {type: Sequelize.STRING(256)},
       ancestorHash: {type: Sequelize.STRING(40)},
       externalBuildUrl: {type: Sequelize.STRING(256)},
-      runAt: {type: Sequelize.DATE()},
-      createdAt: {type: Sequelize.DATE()},
-      updatedAt: {type: Sequelize.DATE()},
+      runAt: {type: Sequelize.DATE(6)},
+      createdAt: {type: Sequelize.DATE(6)},
+      updatedAt: {type: Sequelize.DATE(6)},
     });
     await queryInterface.createTable('runs', {
       id: {type: Sequelize.UUID(), primaryKey: true},
@@ -43,8 +43,8 @@ module.exports = {
       representative: {type: Sequelize.BOOLEAN},
       url: {type: Sequelize.STRING({length: 256})},
       lhr: {type: Sequelize.TEXT},
-      createdAt: {type: Sequelize.DATE()},
-      updatedAt: {type: Sequelize.DATE()},
+      createdAt: {type: Sequelize.DATE(6)},
+      updatedAt: {type: Sequelize.DATE(6)},
     });
     await queryInterface.createTable('statistics', {
       id: {type: Sequelize.UUID(), primaryKey: true},
@@ -53,8 +53,8 @@ module.exports = {
       url: {type: Sequelize.STRING({length: 256})},
       name: {type: Sequelize.STRING({length: 100})},
       value: {type: Sequelize.NUMERIC(12, 4)},
-      createdAt: {type: Sequelize.DATE()},
-      updatedAt: {type: Sequelize.DATE()},
+      createdAt: {type: Sequelize.DATE(6)},
+      updatedAt: {type: Sequelize.DATE(6)},
     });
   },
   /**

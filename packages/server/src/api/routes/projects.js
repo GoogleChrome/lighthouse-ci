@@ -69,7 +69,7 @@ function createRouter(context) {
   router.get(
     '/:projectId/builds',
     handleAsyncError(async (req, res) => {
-      if (!isNaN(req.query.limit)) {
+      if (Number.isInteger(parseInt(req.query.limit))) {
         req.query.limit = parseInt(req.query.limit);
       }
       const builds = await context.storageMethod.getBuilds(req.params.projectId, req.query);

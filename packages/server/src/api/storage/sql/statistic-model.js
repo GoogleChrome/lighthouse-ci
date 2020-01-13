@@ -21,6 +21,8 @@ const attributes = {
   url: {type: Sequelize.STRING({length: 256})},
   name: {type: Sequelize.STRING({length: 100})},
   value: {type: Sequelize.NUMERIC(12, 4)},
+  createdAt: {type: Sequelize.DATE(6)},
+  updatedAt: {type: Sequelize.DATE(6)},
 };
 
 module.exports = {

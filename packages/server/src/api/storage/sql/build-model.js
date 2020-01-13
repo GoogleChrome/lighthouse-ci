@@ -24,9 +24,11 @@ const attributes = {
   avatarUrl: {type: Sequelize.STRING(256)},
   ancestorHash: {type: Sequelize.STRING(40)},
   externalBuildUrl: {type: Sequelize.STRING(256)},
-  runAt: {type: Sequelize.DATE()}, // should mostly be equal to createdAt but modifiable by the consumer
-  committedAt: {type: Sequelize.DATE()},
-  ancestorCommittedAt: {type: Sequelize.DATE()},
+  runAt: {type: Sequelize.DATE(6)}, // should mostly be equal to createdAt but modifiable by the consumer
+  committedAt: {type: Sequelize.DATE(6)},
+  ancestorCommittedAt: {type: Sequelize.DATE(6)},
+  createdAt: {type: Sequelize.DATE(6)},
+  updatedAt: {type: Sequelize.DATE(6)},
 };
 
 module.exports = {

@@ -108,9 +108,7 @@ async function startServerAndDetermineUrls(options) {
       const {child, patternMatch, stdout, stderr} = await runCommandAndWaitForPattern(
         options.startServerCommand,
         regexPattern,
-        {
-          timeout: 10000,
-        }
+        {timeout: 10000}
       );
       process.stdout.write(`Started a web server with "${options.startServerCommand}"...\n`);
       close = () => killProcessTree(child.pid);

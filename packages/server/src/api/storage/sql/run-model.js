@@ -20,6 +20,8 @@ const attributes = {
   representative: {type: Sequelize.BOOLEAN},
   url: {type: Sequelize.STRING({length: 256})},
   lhr: {type: Sequelize.TEXT('long')},
+  createdAt: {type: Sequelize.DATE(6)},
+  updatedAt: {type: Sequelize.DATE(6)},
 };
 
 module.exports = {

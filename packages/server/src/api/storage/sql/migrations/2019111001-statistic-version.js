@@ -14,7 +14,12 @@ module.exports = {
    */
   up: async (queryInterface, Sequelize) => {
     await queryInterface.addColumn('statistics', 'version', {type: Sequelize.NUMERIC(8, 2)});
-    await queryInterface.bulkUpdate('statistics', {version: 1}, {version: null});
+    await queryInterface.bulkUpdate(
+      'statistics',
+      {version: 1},
+      {version: null},
+      {type: Sequelize.QueryTypes.BULKUPDATE}
+    );
   },
   /**
    * @param {import('sequelize').QueryInterface} queryInterface

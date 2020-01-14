@@ -22,7 +22,7 @@
     "compression": "^1.7.4",
     "express": "^4.16.4",
     "morgan": "^1.9.1",
-    "sequelize": "^4.42.0",
+    "sequelize": "^4.44.3",
     "umzug": "^2.2.0",
     "uuid": "^3.3.2"
   },

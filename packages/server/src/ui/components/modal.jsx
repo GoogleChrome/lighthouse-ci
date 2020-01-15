@@ -5,15 +5,22 @@
  */
 
 import {h} from 'preact';
-import {createPortal} from 'preact/compat';
+import {createPortal, useRef, useEffect} from 'preact/compat';
 import clsx from 'clsx';
 import './modal.css';
 
-const modalRoot = document.getElementById('preact-portal-modal');
-if (!modalRoot) throw new Error('Missing #preact-portal-modal');
-
 /** @param {{className?: string, children: LHCI.PreactNode, onClose: () => void}} props */
 export const Modal = props => {
+  const modalRootRef = useRef(
+    document.getElementById('preact-modal-root') || document.createElement('div')
+  );
+
+  useEffect(() => {
+    modalRootRef.current.id = 'preact-modal-root';
+    document.body.appendChild(modalRootRef.current);
+    return () => document.body.removeChild(modalRootRef.current);
+  }, []);
+
   return createPortal(
     <div className="modal-backdrop">
       <div className={clsx('modal', props.className)} style={{position: 'relative'}}>
@@ -23,6 +30,6 @@ export const Modal = props => {
         </div>
       </div>
     </div>,
-    modalRoot
+    modalRootRef.current
   );
 };

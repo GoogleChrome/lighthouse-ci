@@ -100,16 +100,22 @@
 
   --gauge-size: 82px;
   --gauge-stroke-width: 7px;
+
   --build-score-delta-badge-height: 24px;
+
   --pill-height: 26px;
   --pill-content-height: calc(var(--pill-height) - 6px);
   --pill-spacing: calc(var(--base-spacing) / 2);
+
   --avatar-image-size: 25px;
 
   --audit-group-audit-height: 36px;
 
   --paper-min-width: 200px;
+
   --dashboard-graph-min-height: 300px;
+
+  --warning-message-icon-height: 40px;
 }
 
 html,
@@ -174,4 +180,8 @@ a {
 
 a .material-icons {
   color: var(--base-text-color);
+}
+
+.position-relative {
+  position: relative;
 }

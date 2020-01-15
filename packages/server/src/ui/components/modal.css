@@ -4,9 +4,34 @@
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
  */
 
-import {h, render} from 'preact';
-import {App} from './app.jsx';
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10000;
 
-const preactRoot = document.getElementById('preact-root');
-if (!preactRoot) throw new Error('Missing #preact-root');
-render(<App />, preactRoot);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: rgb(0, 0, 0, 0.7);
+}
+
+.modal {
+  position: relative;
+  width: 60vw;
+  min-width: 400px;
+  max-width: 800px;
+  background: var(--highlighted-background-color);
+  padding: var(--base-spacing);
+  padding-right: calc(var(--base-spacing) * 2);
+}
+
+.modal__close {
+  position: absolute;
+  top: calc(var(--base-spacing) / 2);
+  right: calc(var(--base-spacing) / 2);
+  cursor: pointer;
+}

@@ -5,6 +5,8 @@
  */
 'use strict';
 
+/** @typedef {{port: number, close: () => Promise<void>, storageMethod: StorageMethod}} ServerInstance */
+
 const path = require('path');
 const createHttpServer = require('http').createServer;
 const express = require('express');
@@ -51,7 +53,7 @@ async function createApp(options) {
 
 /**
  * @param {LHCI.ServerCommand.Options} options
- * @return {Promise<{port: number, close: () => Promise<void>, storageMethod: StorageMethod}>}
+ * @return {Promise<ServerInstance>}
  */
 async function createServer(options) {
   const {app, storageMethod} = await createApp(options);

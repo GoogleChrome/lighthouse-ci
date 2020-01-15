@@ -15,9 +15,13 @@ const testingLibrary = require('@testing-library/dom');
 
 const CLI_PATH = path.join(__dirname, '../src/cli.js');
 
+/** @typedef {import('../src/server').ServerInstance & {sqlFile?: string}} ServerInstance */
+
+/** @type {Array<ServerInstance>} */
 const servers = [];
 const renderedComponents = new Set();
 
+/** @param {string} [sqlFile] */
 async function createTestServer(sqlFile) {
   if (!sqlFile) {
     sqlFile = `cli-test-${Math.round(Math.random() * 1e9)}.tmp.sql`;
@@ -25,16 +29,26 @@ async function createTestServer(sqlFile) {
 
   const options = {
     port: 0,
-    logLevel: 'silent',
-    storage: {storageMethod: 'sql', sqlDialect: 'sqlite', sqlDatabasePath: sqlFile},
+    logLevel: /** @type {'silent'} */ ('silent'),
+    storage: {
+      storageMethod: /** @type {'sql'} */ ('sql'),
+      sqlDialect: /** @type {'sqlite'} */ ('sqlite'),
+      sqlDatabasePath: sqlFile,
+    },
   };
 
+  /** @type {ServerInstance} */
   const server = await createServer(options);
   server.sqlFile = sqlFile;
   servers.push(server);
   return server;
 }
 
+/**
+ *
+ * @param {LHCI.PreactNode} preactNodeToRender
+ * @param {{container?: HTMLElement}} context
+ */
 function render(preactNodeToRender, {container} = {}) {
   if (!container) {
     container = document.body.appendChild(document.createElement('div'));
@@ -57,12 +71,14 @@ function cleanup() {
   if (servers.length > 1) throw new Error('Cannot have multiple servers in same jest context');
 
   for (const server of servers) {
-    if (fs.existsSync(server.sqlFile)) fs.unlinkSync(server.sqlFile);
+    if (server.sqlFile && fs.existsSync(server.sqlFile)) fs.unlinkSync(server.sqlFile);
     server.close();
   }
 }
 
+/** @param {import('puppeteer').Page} page */
 function waitForNetworkIdle0(page) {
+  /** @type {NodeJS.Timeout} */
   let idleTimeout;
   let inflight = 0;
 
@@ -113,12 +129,17 @@ async function waitForAllImages(page) {
   });
 }
 
-/** @type {typeof import('@testing-library/dom').fireEvent} */
-const dispatchEvent = (...args) => testingLibrary.fireEvent(...args);
+/**
+ * @type {any}
+ * @param {Document | Element | Window} element
+ * @param {Event} evt
+ */
+const dispatchEvent = (element, evt) => testingLibrary.fireEvent(element, evt);
 
 Object.keys(testingLibrary.fireEvent).forEach(key => {
-  dispatchEvent[key] = (...args) => {
-    testingLibrary.fireEvent(...args);
+  /**  @param {Document | Element | Window} element  @param {Event} evt */
+  dispatchEvent[key] = (element, evt) => {
+    testingLibrary.fireEvent(element, evt);
     return new Promise(resolve => process.nextTick(resolve));
   };
 });
@@ -128,7 +149,12 @@ const wait = testingLibrary.wait;
 const prettyDOM = testingLibrary.prettyDOM;
 
 /** PrettyDOM but without the color control characters. */
-const snapshotDOM = (el, maxLength) => prettyDOM(el, maxLength).replace(/\[\d{1,2}m/g, '');
+/** @param {HTMLElement} el @param {number} maxLength */
+const snapshotDOM = (el, maxLength) => {
+  const prettified = prettyDOM(el, maxLength);
+  if (!prettified) return prettified;
+  return prettified.replace(/\[\d{1,2}m/g, '');
+};
 
 module.exports = {
   CLI_PATH,
@@ -141,4 +167,6 @@ module.exports = {
   snapshotDOM,
   waitForNetworkIdle0,
   waitForAllImages,
+  shouldRunE2E: () => Boolean(!process.env.CI || process.env.RUN_E2E_TESTS),
+  emptyTest: () => it.skip('not enabled', () => {}),
 };

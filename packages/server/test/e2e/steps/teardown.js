@@ -9,6 +9,7 @@
 
 const {cleanup} = require('../../test-utils.js');
 
+/** @param {LHCI.E2EState} state */
 module.exports = state => {
   describe('teardown', () => {
     it('should teardown the server', async () => {

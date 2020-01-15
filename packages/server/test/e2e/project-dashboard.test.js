@@ -7,12 +7,12 @@
 
 /* eslint-env jest, browser */
 
-const {shouldRunE2E, emptyTest} = require('./steps/environment-test');
+const {shouldRunE2E, emptyTest} = require('../test-utils.js');
 
 describe('Project dashboard', () => {
   if (!shouldRunE2E()) return emptyTest();
 
-  const state = {};
+  const state = /** @type {LHCI.E2EState} */ ({});
 
   require('./steps/setup')(state);
 

@@ -25,6 +25,7 @@ const toMatchImageSnapshot = configureToMatchImageSnapshot({
 
 expect.extend({toMatchImageSnapshot});
 
+/** @param {LHCI.E2EState} state */
 module.exports = state => {
   state.debug = Boolean(process.env.DEBUG);
 

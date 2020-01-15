@@ -1,0 +1,9 @@
+# Always validate the PR title, and ignore the commits
+titleOnly: true
+# You can define a list of valid scopes
+scopes:
+  - cli
+  - server
+  - utils
+  - viewer
+  - recipes

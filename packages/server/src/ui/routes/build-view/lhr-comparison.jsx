@@ -19,6 +19,8 @@ import {Paper} from '../../components/paper';
 import {LhrViewerLink} from '../../components/lhr-viewer-link';
 
 import './lhr-comparison.css';
+import {Modal} from '../../components/modal';
+import {LhrRuntimeDiff, computeRuntimeDiffs} from './lhr-comparison-runtime-diff';
 
 /** @typedef {{id: string, audits: Array<LH.AuditResult>, group: {id: string, title: string}}} IntermediateAuditGroupDef */
 /** @typedef {{id: string, pairs: Array<LHCI.AuditPair>, group: {id: string, title: string}}} AuditGroupDef */
@@ -126,8 +128,10 @@ const AuditGroups = props => {
 /** @param {{lhr: LH.Result, baseLhr: LH.Result|undefined, hookElements: LHCI.HookElements<'dropdowns'|'warnings'>, className?: string}} props */
 export const LhrComparison = props => {
   const {lhr, baseLhr} = props;
+  const defaultAck = /** @type {'none'|'acknowledged'|'closed'} */ ('none');
   const [percentAbsoluteDeltaThreshold, setDiffThreshold] = useState(0.05);
   const [selectedAuditId, setAuditId] = useState(/** @type {string|null} */ (null));
+  const [runtimeDiffAck, setRuntimeDiffAck] = useState(defaultAck);
 
   // Attach the LHRs to the window for easy debugging.
   useEffect(() => {
@@ -137,10 +141,17 @@ export const LhrComparison = props => {
     window.__BASE_LHR__ = baseLhr;
   }, [lhr, baseLhr]);
 
+  const runtimeDiffs = computeRuntimeDiffs(lhr, baseLhr);
+  const runtimeDiffsHaveError = runtimeDiffs.some(diff => diff.severity === 'error');
   const auditGroups = computeAuditGroups(lhr, baseLhr, {percentAbsoluteDeltaThreshold});
 
   return (
     <Fragment>
+      {runtimeDiffAck === 'none' && runtimeDiffsHaveError ? (
+        <Modal onClose={() => setRuntimeDiffAck('acknowledged')}>
+          <LhrRuntimeDiff diffs={runtimeDiffs} variant="full" />
+        </Modal>
+      ) : null}
       {selectedAuditId ? (
         <AuditDetailPane
           selectedAuditId={selectedAuditId}
@@ -166,6 +177,17 @@ export const LhrComparison = props => {
         />
         <div className="container">
           {props.hookElements.warnings}
+          {runtimeDiffAck !== 'closed' && runtimeDiffs.length ? (
+            <Paper className="position-relative">
+              <LhrRuntimeDiff diffs={runtimeDiffs} variant="mini" />
+              <div
+                className="lhr-comparison-runtime-diff__close"
+                onClick={() => setRuntimeDiffAck('closed')}
+              >
+                <i className="material-icons">close</i>
+              </div>
+            </Paper>
+          ) : null}
           {auditGroups.length && baseLhr ? (
             <Fragment>
               {selectedAuditId ? null : (

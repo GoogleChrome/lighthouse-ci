@@ -1,0 +1,46 @@
+/**
+ * @license Copyright 2020 Google Inc. All Rights Reserved.
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
+ */
+
+.lhr-comparison-runtime-diff {
+  position: relative;
+}
+
+.lhr-comparison-runtime-diff .lhr-comparison__warning {
+  margin-bottom: 0;
+}
+
+.lhr-comparison-runtime-diff__diffs {
+  --table-margin: calc(var(--warning-message-icon-height) + 2 * var(--base-spacing));
+
+  width: calc(100% - var(--table-margin));
+  text-align: left;
+
+  margin-left: var(--table-margin);
+}
+
+.lhr-comparison-runtime-diff__close {
+  position: absolute;
+  top: calc(var(--base-spacing) / 2);
+  right: calc(var(--base-spacing) / 2);
+  cursor: pointer;
+}
+
+.lhr-comparison-runtime-diff table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.lhr-comparison-runtime-diff table th {
+  font-weight: var(--medium-font-weight);
+}
+
+.lhr-comparison-runtime-diff table tbody td {
+  padding: calc(var(--base-spacing) / 2);
+}
+
+.lhr-comparison-runtime-diff table tbody tr:nth-child(even) {
+  background: var(--secondary-background-color);
+}

@@ -61,12 +61,12 @@
   flex-direction: row;
   align-items: center;
 
-  min-height: 80px;
+  min-height: calc(var(--warning-message-icon-height) * 2);
   margin-bottom: calc(var(--base-spacing) * 2);
 }
 
 .lhr-comparison__warning i {
-  font-size: 40px;
+  font-size: var(--warning-message-icon-height);
   margin: 0 var(--base-spacing);
 }
 

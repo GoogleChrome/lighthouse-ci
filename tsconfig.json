@@ -7,11 +7,19 @@
     "checkJs": true,
     "strict": true,
 
+    "skipLibCheck": true,
+
     "jsx": "preserve",
     "jsxFactory": "preact.h",
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "diagnostics": true
   },
-  "include": ["packages/*/src/**/*.js", "types/**/*.ts", "packages/*/src/**/*.jsx", "scripts/*.js"]
+  "include": [
+    "packages/*/src/**/*.js",
+    "types/**/*.ts",
+    "packages/*/src/**/*.jsx",
+    "scripts/*.js",
+    "packages/server/test/e2e/*"
+  ]
 }

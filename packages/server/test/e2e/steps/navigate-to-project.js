@@ -9,6 +9,7 @@ const {waitForNetworkIdle0, waitForAllImages} = require('../../test-utils.js');
 
 /* eslint-env jest, browser */
 
+/** @param {LHCI.E2EState} state @param {string} projectName */
 module.exports = (state, projectName) => {
   describe('navigate to project', () => {
     it('should navigate to the project list', async () => {
@@ -18,9 +19,9 @@ module.exports = (state, projectName) => {
     it('should click on link to project', async () => {
       const clickPromise = state.page.evaluate(name => {
         const links = [...document.querySelectorAll('a')];
-        const matchingLink = links.find(link => link.textContent.includes(name));
+        const matchingLink = links.find(link => (link.textContent || '').includes(name));
         if (matchingLink) return matchingLink.click();
-        throw new Error(`${links.map(link => link.textContent)} did not include ${name}`);
+        throw new Error(`${links.map(link => link.textContent).join(' ')} did not include ${name}`);
       }, projectName);
 
       await Promise.all([clickPromise, waitForNetworkIdle0(state.page)]);

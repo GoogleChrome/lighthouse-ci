@@ -4,7 +4,7 @@
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
  */
 
-import {VNode} from 'preact';
+import {ComponentChildren} from 'preact';
 
 declare global {
   namespace LHCI {
@@ -87,7 +87,17 @@ declare global {
       group: {id: string; title: string};
     }
 
-    export type HookElements<K extends keyof any> = {[P in K]?: VNode};
+    export type PreactNode = ComponentChildren;
+    export type HookElements<K extends keyof any> = {[P in K]?: PreactNode};
+
+    export interface E2EState {
+      debug: boolean;
+      rootURL: string;
+      client: import('../packages/utils/src/api-client');
+      server: {port: number};
+      browser: import('puppeteer').Browser;
+      page: import('puppeteer').Page;
+    }
   }
 }
 

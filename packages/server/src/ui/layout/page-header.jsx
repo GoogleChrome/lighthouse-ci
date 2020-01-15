@@ -4,11 +4,11 @@
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
  */
 
-import {h, VNode} from 'preact';
+import {h} from 'preact';
 import clsx from 'clsx';
 import './page-header.css';
 
-/** @param {{children?: Array<VNode> | VNode, childrenLeft?: Array<VNode>| VNode, childrenRight?: Array<VNode>| VNode, setIsSidebarOpen: (isOpen: boolean) => void}} props */
+/** @param {{children?: LHCI.PreactNode, childrenLeft?: LHCI.PreactNode, childrenRight?: LHCI.PreactNode, setIsSidebarOpen: (isOpen: boolean) => void}} props */
 export const PageHeader = props => {
   return (
     <div className={clsx('page-header')}>

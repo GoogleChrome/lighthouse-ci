@@ -4,10 +4,10 @@
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
  */
 
-import {h, VNode, Fragment} from 'preact';
+import {h, Fragment} from 'preact';
 
 /**
- * @param {{header?: Array<VNode> | VNode, children: VNode | Array<VNode>}} props
+ * @param {{header?: LHCI.PreactNode, children: LHCI.PreactNode}} props
  */
 export const Page = props => {
   return (

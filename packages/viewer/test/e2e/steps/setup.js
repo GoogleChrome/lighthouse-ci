@@ -7,13 +7,20 @@
 
 /* eslint-env jest */
 
-const {cleanupE2E} = require('../../test-utils.js');
+const {createTestServer, launchBrowser, setupImageSnapshots} = require('../../test-utils.js');
+
+setupImageSnapshots();
 
 /** @param {LHCI.E2EState} state */
 module.exports = state => {
-  describe('teardown', () => {
-    it('should cleanup', async () => {
-      await cleanupE2E(state);
+  state.debug = Boolean(process.env.DEBUG);
+
+  describe('initialize', () => {
+    it('should initialize a server', async () => {
+      state.server = await createTestServer();
+      state.rootURL = `http://localhost:${state.server.port}`;
     });
+
+    it('should initialize a browser', () => launchBrowser(state));
   });
 };

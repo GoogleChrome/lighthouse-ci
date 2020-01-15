@@ -9,6 +9,8 @@
 
 const fs = require('fs');
 const path = require('path');
+const puppeteer = require('puppeteer');
+const {configureToMatchImageSnapshot} = require('jest-image-snapshot');
 const {createServer} = require('../src/server.js');
 const preactRender = require('preact').render;
 const testingLibrary = require('@testing-library/dom');
@@ -73,6 +75,17 @@ function cleanup() {
   for (const server of servers) {
     if (server.sqlFile && fs.existsSync(server.sqlFile)) fs.unlinkSync(server.sqlFile);
     server.close();
+  }
+}
+
+/** @param {LHCI.E2EState} state */
+async function cleanupE2E(state) {
+  if (state.browser) {
+    await state.browser.close();
+  }
+
+  if (state.server) {
+    await state.server.close();
   }
 }
 
@@ -156,17 +169,45 @@ const snapshotDOM = (el, maxLength) => {
   return prettified.replace(/\[\d{1,2}m/g, '');
 };
 
+/** @param {'5.6.0'} version_ @param {'verge'} site @param {'a'|'b'} variant  */
+function getTestLHRPath(version_, site, variant) {
+  const version = version_.replace(/\./g, '-');
+  return path.join(__dirname, 'fixtures', `lh-${version}-${site}-${variant}.json`);
+}
+
 module.exports = {
   CLI_PATH,
   createTestServer,
   render,
   cleanup,
+  cleanupE2E,
   wait,
   dispatchEvent,
   prettyDOM,
   snapshotDOM,
   waitForNetworkIdle0,
   waitForAllImages,
+  // Utils for E2E tests
+  getTestLHRPath,
   shouldRunE2E: () => Boolean(!process.env.CI || process.env.RUN_E2E_TESTS),
   emptyTest: () => it.skip('not enabled', () => {}),
+  setupImageSnapshots: () => {
+    const toMatchImageSnapshot = configureToMatchImageSnapshot({
+      // FIXME: we're more forgiving in Travis where font rendering on linux creates small changes
+      failureThreshold: process.env.TRAVIS ? 0.05 : 0.001,
+      failureThresholdType: 'percent',
+    });
+
+    expect.extend({toMatchImageSnapshot});
+  },
+  /** @param {LHCI.E2EState} state */
+  launchBrowser: async state => {
+    state.browser = await puppeteer.launch({
+      headless: !state.debug,
+      slowMo: state.debug ? 250 : undefined,
+      devtools: state.debug,
+      env: {...process.env, TZ: 'America/Chicago'},
+    });
+    state.page = await state.browser.newPage();
+  },
 };

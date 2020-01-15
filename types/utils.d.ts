@@ -94,7 +94,7 @@ declare global {
       debug: boolean;
       rootURL: string;
       client: import('../packages/utils/src/api-client');
-      server: {port: number};
+      server: {port: number; close: () => Promise<void>};
       browser: import('puppeteer').Browser;
       page: import('puppeteer').Page;
     }

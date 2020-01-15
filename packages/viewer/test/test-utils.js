@@ -5,4 +5,20 @@
  */
 'use strict';
 
-module.exports = require('../../server/test/test-utils.js');
+const fs = require('fs');
+const path = require('path');
+const FallbackServer = require('../../cli/src/collect/fallback-server.js');
+
+module.exports = {
+  ...require('../../server/test/test-utils.js'),
+  createTestServer: async () => {
+    const pathToBuildDir = path.resolve(__dirname, '../dist');
+    if (!fs.existsSync(`${pathToBuildDir}/index.html`)) {
+      throw new Error('Build viewer before running tests');
+    }
+
+    const server = new FallbackServer(pathToBuildDir, false);
+    await server.listen();
+    return server;
+  },
+};

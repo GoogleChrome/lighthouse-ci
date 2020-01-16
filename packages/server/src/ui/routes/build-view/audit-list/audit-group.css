@@ -61,6 +61,15 @@
   background: var(--secondary-background-color);
 }
 
+.audit-group__expand-toggle {
+  display: none;
+  cursor: pointer;
+}
+
+.audit-group__expand-toggle i {
+  transform: rotate(90deg);
+}
+
 .audit-group__audit-title {
   margin-left: var(--base-spacing);
   font-weight: var(--medium-font-weight);
@@ -166,4 +175,24 @@
 .audit-group__diff-badge--improvement {
   background: var(--improvement-color);
   color: var(--inverted-text-color);
+}
+
+.audit-group--unchanged .audit-group__header {
+  cursor: pointer;
+}
+
+.audit-group--unchanged .audit-group__audit-diff {
+  display: none;
+}
+
+.audit-group--unchanged .audit-group__audit:hover .audit-group__audit-diff {
+  display: flex;
+}
+
+.audit-group--unchanged .audit-group__expand-toggle {
+  display: block;
+}
+
+.audit-group--expanded .audit-group__expand-toggle i {
+  transform: rotate(-90deg);
 }

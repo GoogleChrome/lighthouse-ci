@@ -7,36 +7,44 @@
 import {h} from 'preact';
 import clsx from 'clsx';
 
+/** @param {LH.Result} lhr */
+export function createLhrOpenClickHandler(lhr) {
+  /** @param {Event} evt */
+  const handler = evt => {
+    evt.preventDefault();
+    evt.stopImmediatePropagation();
+
+    const VIEWER_ORIGIN = 'https://googlechrome.github.io';
+    // Chrome doesn't allow us to immediately postMessage to a popup right
+    // after it's created. Normally, we could also listen for the popup window's
+    // load event, however it is cross-domain and won't fire. Instead, listen
+    // for a message from the target app saying "I'm open".
+    window.addEventListener('message', function msgHandler(messageEvent) {
+      if (messageEvent.origin !== VIEWER_ORIGIN) {
+        return;
+      }
+      if (popup && messageEvent.data.opened) {
+        popup.postMessage({lhresults: lhr}, VIEWER_ORIGIN);
+        window.removeEventListener('message', msgHandler);
+      }
+    });
+
+    // The popup's window.name is keyed by version+url+fetchTime, so we reuse/select tabs correctly
+    const fetchTime = lhr.fetchTime;
+    const windowName = `${lhr.lighthouseVersion}-${lhr.requestedUrl}-${fetchTime}`;
+    const popup = window.open(`${VIEWER_ORIGIN}/lighthouse/viewer`, windowName);
+  };
+
+  return handler;
+}
+
 /** @param {{children: string|JSX.Element|JSX.Element[], lhr: LH.Result, className?: string}} props */
 export const LhrViewerLink = props => {
   const {children, lhr} = props;
   return (
     <span
       className={clsx('lhr-viewer-link', props.className)}
-      onClick={evt => {
-        evt.preventDefault();
-        evt.stopImmediatePropagation();
-
-        const VIEWER_ORIGIN = 'https://googlechrome.github.io';
-        // Chrome doesn't allow us to immediately postMessage to a popup right
-        // after it's created. Normally, we could also listen for the popup window's
-        // load event, however it is cross-domain and won't fire. Instead, listen
-        // for a message from the target app saying "I'm open".
-        window.addEventListener('message', function msgHandler(messageEvent) {
-          if (messageEvent.origin !== VIEWER_ORIGIN) {
-            return;
-          }
-          if (popup && messageEvent.data.opened) {
-            popup.postMessage({lhresults: lhr}, VIEWER_ORIGIN);
-            window.removeEventListener('message', msgHandler);
-          }
-        });
-
-        // The popup's window.name is keyed by version+url+fetchTime, so we reuse/select tabs correctly
-        const fetchTime = lhr.fetchTime;
-        const windowName = `${lhr.lighthouseVersion}-${lhr.requestedUrl}-${fetchTime}`;
-        const popup = window.open(`${VIEWER_ORIGIN}/lighthouse/viewer`, windowName);
-      }}
+      onClick={createLhrOpenClickHandler(lhr)}
     >
       {children}
     </span>

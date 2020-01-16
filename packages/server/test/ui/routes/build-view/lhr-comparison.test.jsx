@@ -33,6 +33,7 @@ describe('LhrComparison', () => {
 
       categories = {
         performance: {
+          title: 'Performance',
           auditRefs: [
             {id: 'tti', group: 'metrics'},
             {id: 'badimages', group: 'opportunites'},
@@ -40,6 +41,7 @@ describe('LhrComparison', () => {
           ],
         },
         a11y: {
+          title: 'Accessibility',
           auditRefs: [{id: 'badimages', group: 'images'}, {id: 'debugdata', group: 'missing'}],
         },
         seo: {
@@ -66,6 +68,7 @@ describe('LhrComparison', () => {
               maxSeverity: 0,
             },
           ],
+          showAsUnchanged: false,
         },
         {
           group: {id: 'opportunites', title: 'Opportunities'},
@@ -79,6 +82,7 @@ describe('LhrComparison', () => {
               maxSeverity: 0,
             },
           ],
+          showAsUnchanged: false,
         },
         {
           group: {id: 'images', title: 'Images'},
@@ -92,6 +96,7 @@ describe('LhrComparison', () => {
               maxSeverity: 0,
             },
           ],
+          showAsUnchanged: false,
         },
         {
           group: {id: 'category:seo', title: 'SEO', description: 'SEO description'},
@@ -105,6 +110,7 @@ describe('LhrComparison', () => {
               maxSeverity: 0,
             },
           ],
+          showAsUnchanged: false,
         },
       ]);
     });
@@ -144,9 +150,109 @@ describe('LhrComparison', () => {
       ]);
     });
 
-    it('should hide groups without diffs', () => {
+    it('should render groups without diffs as showAsUnchanged=true', () => {
       const lhr = {audits, categories, categoryGroups};
-      expect(computeAuditGroups(lhr, lhr)).toEqual([]);
+      expect(computeAuditGroups(lhr, lhr)).toEqual([
+        {
+          group: {
+            id: 'unchanged:performance',
+            title: 'Unchanged Audits - Performance',
+          },
+          id: 'unchanged:performance',
+          pairs: [
+            {
+              audit: {
+                id: 'tti',
+                name: 'Interactive',
+                score: 1,
+              },
+              baseAudit: {
+                name: 'Interactive',
+                score: 1,
+              },
+              diffs: [],
+              group: {
+                id: 'metrics',
+                title: 'Metrics',
+              },
+              maxSeverity: 0,
+            },
+            {
+              audit: {
+                id: 'badimages',
+                name: 'Bad images',
+                score: 1,
+              },
+              baseAudit: {
+                name: 'Bad images',
+                score: 1,
+              },
+              diffs: [],
+              group: {
+                id: 'opportunites',
+                title: 'Opportunities',
+              },
+              maxSeverity: 0,
+            },
+          ],
+          showAsUnchanged: true,
+        },
+        {
+          group: {
+            id: 'unchanged:a11y',
+            title: 'Unchanged Audits - Accessibility',
+          },
+          id: 'unchanged:a11y',
+          pairs: [
+            {
+              audit: {
+                id: 'badimages',
+                name: 'Bad images',
+                score: 1,
+              },
+              baseAudit: {
+                name: 'Bad images',
+                score: 1,
+              },
+              diffs: [],
+              group: {
+                id: 'images',
+                title: 'Images',
+              },
+              maxSeverity: 0,
+            },
+          ],
+          showAsUnchanged: true,
+        },
+        {
+          group: {
+            id: 'unchanged:seo',
+            title: 'Unchanged Audits - SEO',
+          },
+          id: 'unchanged:seo',
+          pairs: [
+            {
+              audit: {
+                id: 'badimages',
+                name: 'Bad images',
+                score: 1,
+              },
+              baseAudit: {
+                name: 'Bad images',
+                score: 1,
+              },
+              diffs: [],
+              group: {
+                description: 'SEO description',
+                id: 'category:seo',
+                title: 'SEO',
+              },
+              maxSeverity: 0,
+            },
+          ],
+          showAsUnchanged: true,
+        },
+      ]);
     });
   });
 });

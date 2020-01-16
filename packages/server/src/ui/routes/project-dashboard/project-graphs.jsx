@@ -17,7 +17,18 @@ import {Dropdown} from '../../components/dropdown';
 import {route} from 'preact-router';
 import {LoadingSpinner} from '../../components/loading-spinner';
 
-const COLORS = ['#4587f4', '#f44587', '#87f445'];
+const COLORS = [
+  '#4587f4',
+  '#f44587',
+  '#87f445',
+  '#9e7cef',
+  '#d96dda',
+  '#ff60ba',
+  '#ff5f92',
+  '#ff6f68',
+  '#ff893d',
+  '#ffa600',
+];
 
 /** @param {Array<StatisticWithBuild>} stats */
 function computeURLsFromStats(stats) {

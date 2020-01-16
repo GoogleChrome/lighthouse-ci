@@ -29,6 +29,7 @@ declare global {
       id?: string;
       title?: string;
       description?: string;
+      errorMessage?: string;
       score: number | null;
       displayValue?: string;
       numericValue?: number;

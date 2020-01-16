@@ -45,6 +45,13 @@ async function loadReportFromURL(url, setReport) {
  * @param {(t: ToastMessage) => void} addToast
  */
 async function loadInitialReports(setBaseReport, setCompareReport, setIsLoading, addToast) {
+  if (window.location.hostname === 'localhost') {
+    const lastBaseReport = localStorage.getItem('lastBaseReport');
+    const lastCompareReport = localStorage.getItem('lastCompareReport');
+    if (lastBaseReport) setBaseReport(JSON.parse(lastBaseReport));
+    if (lastCompareReport) setCompareReport(JSON.parse(lastCompareReport));
+  }
+
   const promises = [
     INITIAL_BASE_URL && loadReportFromURL(INITIAL_BASE_URL, setBaseReport),
     INITIAL_COMPARE_URL && loadReportFromURL(INITIAL_COMPARE_URL, setCompareReport),
@@ -76,6 +83,11 @@ export const App = () => {
   useEffect(() => {
     loadInitialReports(setBaseReport, setCompareReport, setIsLoading, addToast);
   }, []);
+
+  useEffect(() => {
+    localStorage.setItem('lastBaseReport', JSON.stringify(baseReport));
+    localStorage.setItem('lastCompareReport', JSON.stringify(compareReport));
+  }, [baseReport, compareReport]);
 
   return (
     <div className="lhci-viewer">

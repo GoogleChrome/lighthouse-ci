@@ -106,7 +106,7 @@ function getUniqueBaseCompareIndexPairs(diffs) {
 /** @param {{diffs: Array<LHCI.AuditDiff>, audit: LH.AuditResult, baseAudit: LH.AuditResult, groupId: string, showAsNarrow?: boolean}} props */
 export const ItemDiff = props => {
   const {diffs, baseAudit, groupId} = props;
-  if (!baseAudit.details || !baseAudit.details.items) return null;
+  const baseAuditItems = (baseAudit.details && baseAudit.details.items) || [];
 
   const rowIndexes = getUniqueBaseCompareIndexPairs(diffs);
   const rowLabels = rowIndexes
@@ -121,7 +121,7 @@ export const ItemDiff = props => {
       <div className="audit-group__diff-badge-group">
         <IconForAuditItems audit={props.audit} groupId={groupId} />
         <div className="audit-group__diff-badges">
-          <span className="audit-group__diff-badge">{baseAudit.details.items.length}</span>
+          <span className="audit-group__diff-badge">{baseAuditItems.length}</span>
         </div>
       </div>
       <i
@@ -162,12 +162,37 @@ export const ItemDiff = props => {
   );
 };
 
+const NoBaseAudit = () => (
+  <div className="audit-group__error-message" data-tooltip="Audit did not run in the base report">
+    <i className="material-icons">error_outline</i> Audit Missing
+  </div>
+);
+
+/** @param {{audit: LH.AuditResult, baseAudit: LH.AuditResult}} props */
+const ErrorDiff = props => {
+  let message = 'An unknown error occurred while trying to compare the audit results.';
+  if (props.audit.scoreDisplayMode === 'error') {
+    message = `Audit in compare report errored: ${props.audit.errorMessage}`;
+  } else if (props.baseAudit.scoreDisplayMode === 'error') {
+    message = `Audit in base report errored: ${props.baseAudit.errorMessage}`;
+  }
+
+  return (
+    <div className="audit-group__error-message" data-tooltip={message}>
+      <i className="material-icons">error_outline</i> Audit Error
+    </div>
+  );
+};
+
 /** @param {{pair: LHCI.AuditPair, showAsBigPicture: boolean, showAsNarrow: boolean}} props */
 export const AuditDiff = props => {
   const {audit, baseAudit, diffs, group} = props.pair;
   const noDiffAvailable = <span>No diff available</span>;
 
-  if (!baseAudit) return noDiffAvailable;
+  if (!baseAudit) return <NoBaseAudit />;
+
+  const errorDiff = diffs.find(diff => diff.type === 'error');
+  if (errorDiff) return <ErrorDiff audit={audit} baseAudit={baseAudit} />;
 
   const numericDiff = diffs.find(diff => diff.type === 'numericValue');
   if (numericDiff && numericDiff.type === 'numericValue') {

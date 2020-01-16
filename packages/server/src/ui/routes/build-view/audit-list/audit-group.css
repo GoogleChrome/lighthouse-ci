@@ -65,6 +65,7 @@
   margin-left: var(--base-spacing);
   font-weight: var(--medium-font-weight);
   min-width: 25px;
+  max-width: 70%;
 
   overflow: hidden;
   text-overflow: ellipsis;
@@ -80,6 +81,17 @@
   align-items: center;
   font-family: var(--monospace-font-family);
   font-size: var(--monospace-font-size);
+}
+
+.audit-group__error-message {
+  display: flex;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.audit-group__error-message i {
+  margin-right: calc(var(--base-spacing) / 2);
 }
 
 .audit-group__diff-arrow {

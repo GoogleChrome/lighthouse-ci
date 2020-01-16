@@ -33,16 +33,38 @@ const ScoreOnlyDetails = props => {
   );
 };
 
+/** @param {{pair: LHCI.AuditPair}} props */
+const ErrorDetails = props => {
+  const erroredAudit =
+    props.pair.audit.scoreDisplayMode === 'error' ? props.pair.audit : props.pair.baseAudit;
+  if (!erroredAudit) return null;
+  return (
+    <Fragment>
+      <div className="audit-detail-pane__audit-details-summary">
+        Error occurred in the{' '}
+        {erroredAudit === props.pair.baseAudit ? 'base report:' : 'compare report:'}
+      </div>
+      <pre>{erroredAudit.errorMessage || 'Unknown error'}</pre>
+    </Fragment>
+  );
+};
+
 /** @param {{pair: LHCI.AuditPair, key?: string}} props */
 const Details = props => {
   const {pair} = props;
-  const type = pair.audit.details && pair.audit.details.type;
+  const details = pair.audit.details || {type: 'unknown'};
+  const baseDetails = (pair.baseAudit && pair.baseAudit.details) || {type: 'unknown'};
+  const hasItems = Boolean((details.items || []).length || (baseDetails.items || []).length);
 
   let itemDiff = undefined;
   let tableDetails = undefined;
   let numericDetails = undefined;
 
-  if (type === 'table' || type === 'opportunity') {
+  if (pair.audit.errorMessage || (pair.baseAudit && pair.baseAudit.errorMessage)) {
+    return <ErrorDetails pair={pair} />;
+  }
+
+  if ((details.type === 'table' || details.type === 'opportunity') && hasItems) {
     tableDetails = <TableDetails pair={pair} />;
     if (pair.baseAudit) {
       itemDiff = <ItemDiff {...pair} baseAudit={pair.baseAudit} groupId={pair.group.id} />;

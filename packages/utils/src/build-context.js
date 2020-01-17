@@ -67,7 +67,7 @@ function getCurrentHash() {
   ]);
   if (envHash) return envHash;
 
-  const result = childProcess.spawnSync('git', ['rev-list', '--no-merges', '-n1', 'HEAD'], {
+  const result = childProcess.spawnSync('git', ['rev-parse', 'HEAD'], {
     encoding: 'utf8',
   });
   if (result.status !== 0) {

@@ -12,6 +12,7 @@ declare global {
       export interface Options {
         target: UploadTarget;
         token?: string;
+        uploadUrlMap?: boolean;
         extraHeaders?: Record<string, string>;
         githubToken?: string;
         githubAppToken?: string;

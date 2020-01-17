@@ -35,8 +35,13 @@ const print = message => {
   process.stdout.write(message);
 };
 
+const DIFF_VIEWER_URL = 'https://googlechrome.github.io/lighthouse-ci/viewer/';
 const TEMPORARY_PUBLIC_STORAGE_URL =
   'https://us-central1-lighthouse-infrastructure.cloudfunctions.net/saveHtmlReport';
+const GET_URL_MAP_URL =
+  'https://us-central1-lighthouse-infrastructure.cloudfunctions.net/getUrlMap';
+const SAVE_URL_MAP_URL =
+  'https://us-central1-lighthouse-infrastructure.cloudfunctions.net/saveUrlMap';
 const GITHUB_APP_STATUS_CHECK_URL =
   'https://us-central1-lighthouse-infrastructure.cloudfunctions.net/githubAppPostStatusCheck';
 
@@ -71,6 +76,12 @@ function buildCommand(yargs) {
     serverBaseUrl: {
       description: '[lhci only] The base URL of the LHCI server where results will be saved.',
       default: 'http://localhost:9001/',
+    },
+    uploadUrlMap: {
+      type: 'boolean',
+      description:
+        '[temporary-public-storage only] Whether to post links to historical base results to storage or not. Defaults to true only on master branch.',
+      default: getCurrentBranch() === 'master',
     },
     urlReplacementPatterns: {
       type: 'array',
@@ -211,6 +222,73 @@ async function runGithubStatusCheck(options, targetUrlMap) {
 }
 
 /**
+ * Fetches the last public URL mapping from master if it exists.
+ *
+ * @param {LHCI.UploadCommand.Options} options
+ * @return {Promise<Map<string, string>>}
+ */
+async function getPreviousUrlMap(options) {
+  const slug = getGitHubRepoSlug();
+  if (!slug) return new Map();
+
+  try {
+    const fetchUrl = new URL(GET_URL_MAP_URL);
+    fetchUrl.searchParams.set('slug', slug);
+    const apiResponse = await fetch(fetchUrl.href);
+    const {success, url} = await apiResponse.json();
+    if (!success) return new Map();
+    const mapResponse = await fetch(url);
+    if (mapResponse.status !== 200) return new Map();
+    const entries = Object.entries(await mapResponse.json());
+    return new Map(
+      entries.map(([k, v]) => [replaceUrlPatterns(k, options.urlReplacementPatterns), v])
+    );
+  } catch (err) {
+    print(`Error while fetching previous urlMap: ${err.message}`);
+    return new Map();
+  }
+}
+
+/**
+ * Saves the provided URL map to temporary public storage.
+ *
+ * @param {Map<string, string>} urlMap
+ * @return {Promise<void>}
+ */
+async function writeUrlMapToApi(urlMap) {
+  const slug = getGitHubRepoSlug();
+  if (!slug) return;
+
+  try {
+    /** @type {Record<string, string>} */
+    const payload = {slug};
+    Array.from(urlMap.entries()).forEach(([k, v]) => (payload[k] = v));
+    await fetch(SAVE_URL_MAP_URL, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+      headers: {'content-type': 'application/json'},
+    });
+  } catch (err) {
+    print(`Failed to save urlMap: ${err.message}`);
+  }
+}
+
+/**
+ * @param {string} compareUrl
+ * @param {string} urlAudited
+ * @param {Map<string, string>} previousUrlMap
+ * @return {string}
+ */
+function buildTemporaryStorageLink(compareUrl, urlAudited, previousUrlMap) {
+  const baseUrl = previousUrlMap.get(urlAudited);
+  if (!baseUrl) return compareUrl;
+  const linkUrl = new URL(DIFF_VIEWER_URL);
+  linkUrl.searchParams.set('baseReport', baseUrl);
+  linkUrl.searchParams.set('compareReport', compareUrl);
+  return linkUrl.href;
+}
+
+/**
  * @param {LHCI.UploadCommand.Options} options
  * @return {Promise<void>}
  */
@@ -248,7 +326,7 @@ async function runLHCITarget(options) {
   print(`Saving CI build (${build.id})\n`);
 
   const lhrs = loadSavedLHRs();
-  const urlReplacementPatterns = options.urlReplacementPatterns.filter(Boolean);
+  const urlReplacementPatterns = options.urlReplacementPatterns;
   const targetUrlMap = new Map();
 
   const buildViewUrl = new URL(
@@ -293,9 +371,10 @@ async function runTemporaryPublicStorageTarget(options) {
   const representativeLhrs = computeRepresentativeRuns(lhrsByUrl);
   const targetUrlMap = new Map();
 
+  const previousUrlMap = await getPreviousUrlMap(options);
+
   for (const lhr of representativeLhrs) {
-    const urlAudited = lhr.finalUrl;
-    print(`Uploading median LHR of ${urlAudited}...`);
+    print(`Uploading median LHR of ${lhr.finalUrl}...`);
 
     try {
       const response = await fetch(TEMPORARY_PUBLIC_STORAGE_URL, {
@@ -306,8 +385,10 @@ async function runTemporaryPublicStorageTarget(options) {
 
       const {success, url} = await response.json();
       if (success && url) {
-        print(`success!\nOpen the report at ${url}\n`);
-        targetUrlMap.set(urlAudited, url);
+        const urlReplaced = replaceUrlPatterns(lhr.finalUrl, options.urlReplacementPatterns);
+        const urlToLinkTo = buildTemporaryStorageLink(url, urlReplaced, previousUrlMap);
+        print(`success!\nOpen the report at ${urlToLinkTo}\n`);
+        targetUrlMap.set(lhr.finalUrl, urlToLinkTo);
       } else {
         print(`failed!\n`);
       }
@@ -318,6 +399,7 @@ async function runTemporaryPublicStorageTarget(options) {
   }
 
   writeUrlMapToFile(targetUrlMap);
+  if (options.uploadUrlMap) await writeUrlMapToApi(targetUrlMap);
   await runGithubStatusCheck(options, targetUrlMap);
 }
 
@@ -326,6 +408,8 @@ async function runTemporaryPublicStorageTarget(options) {
  * @return {Promise<void>}
  */
 async function runCommand(options) {
+  options.urlReplacementPatterns = options.urlReplacementPatterns.filter(Boolean);
+
   switch (options.target) {
     case 'lhci':
       return runLHCITarget(options);

@@ -33,6 +33,9 @@ if [[ -n "$LHCI_CANARY_SERVER_URL" ]]; then
     --token="$LHCI_CANARY_SERVER_TOKEN"
 fi
 
+# Upload the results to temporary public storage too
+yarn start upload --target=temporary-public-storage
+
 # Kill the LHCI server from earlier.
 kill $!
 

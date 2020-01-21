@@ -9,21 +9,47 @@ import * as d3 from 'd3';
 
 import './category-score-graph.css';
 import {useRef, useEffect} from 'preact/hooks';
+import clsx from 'clsx';
+
+const GRAPH_MARGIN = 10;
+const GRAPH_MARGIN_RIGHT = 50;
+const DELTA_GRAPH_MIN = -50;
+const DELTA_GRAPH_MAX = 50;
 
 /** @typedef {import('./project-graphs-redesign.jsx').StatisticWithBuild} StatisticWithBuild */
+
+/** @param {HTMLElement} rootEl */
+function createRootSvg(rootEl) {
+  const height = rootEl.clientHeight;
+  const width = rootEl.clientWidth;
+  const graphWidth = width - GRAPH_MARGIN - GRAPH_MARGIN_RIGHT;
+  const graphHeight = height - GRAPH_MARGIN * 2;
+
+  return {
+    width,
+    height,
+    graphWidth,
+    graphHeight,
+    svg: d3
+      .select(rootEl)
+      .append('svg')
+      .attr('width', width)
+      .attr('height', height)
+      .append('g')
+      .attr('style', `transform: translate(${GRAPH_MARGIN}px, ${GRAPH_MARGIN}px)`),
+  };
+}
 
 /**
  *
  * @param {HTMLElement} rootEl
  * @param {Array<StatisticWithBuild>} statistics
  */
-function render(rootEl, statistics) {
-  const margin = 10;
-  const marginRight = 50;
-  const height = rootEl.clientHeight;
-  const width = rootEl.clientWidth;
-  const graphWidth = width - margin - marginRight;
-  const graphHeight = height - margin * 2;
+function renderScoreGraph(rootEl, statistics) {
+  d3.select(rootEl)
+    .selectAll('*')
+    .remove();
+  const {svg, width, graphWidth, graphHeight} = createRootSvg(rootEl);
 
   /** @type {[number, number][]} */
   const passingGuideLine = [[0, 90], [statistics.length - 1, 90]];
@@ -62,22 +88,10 @@ function render(rootEl, statistics) {
     .x(d => xScale(d[0]))
     .y(d => yScale(d[1]));
 
-  d3.select(rootEl)
-    .selectAll('*')
-    .remove();
-
-  const svg = d3
-    .select(rootEl)
-    .append('svg')
-    .attr('width', width)
-    .attr('height', height)
-    .append('g')
-    .attr('style', `transform: translate(${margin}px, ${margin}px)`);
-
   svg
     .append('g')
     .attr('class', 'y-axis')
-    .attr('style', `transform: translateX(${width - marginRight / 2}px)`)
+    .attr('style', `transform: translateX(${width - GRAPH_MARGIN_RIGHT / 2}px)`)
     .call(yAxis);
 
   svg
@@ -114,16 +128,77 @@ function render(rootEl, statistics) {
     .attr('r', 3);
 }
 
+/**
+ *
+ * @param {HTMLElement} rootEl
+ * @param {Array<StatisticWithBuild>} statistics
+ */
+function renderScoreDeltaGraph(rootEl, statistics) {
+  d3.select(rootEl)
+    .selectAll('*')
+    .remove();
+  const deltas = statistics
+    .map((stat, i) => (i === 0 ? 0 : (stat.value - statistics[i - 1].value) * 100))
+    .map(delta => Math.min(Math.max(delta, DELTA_GRAPH_MIN), DELTA_GRAPH_MAX));
+  const {svg, graphWidth, graphHeight} = createRootSvg(rootEl);
+
+  const xScale = d3
+    .scaleLinear()
+    .domain([0, deltas.length - 1])
+    .range([0, graphWidth]);
+
+  const yScale = d3
+    .scaleLinear()
+    .domain([DELTA_GRAPH_MIN, DELTA_GRAPH_MAX])
+    .range([graphHeight, 0]);
+
+  svg
+    .selectAll('.score-delta')
+    .data(deltas)
+    .enter()
+    .append('rect')
+    .attr('class', d =>
+      clsx('score-delta', {
+        'score-delta--improvement': d > 0,
+        'score-delta--regression': d < 0,
+      })
+    )
+    .attr('x', (d, i) => xScale(i - 1) + graphWidth / deltas.length / 4)
+    .attr('y', d => (d > 0 ? yScale(d) : yScale(0)))
+    .attr('width', graphWidth / deltas.length / 2)
+    .attr('height', d => Math.abs(yScale(d) - yScale(0)));
+
+  svg
+    .append('line')
+    .attr('class', 'score-guide')
+    .attr('x1', xScale(0))
+    .attr('y1', yScale(0))
+    .attr('x2', xScale(deltas.length - 1))
+    .attr('y2', yScale(0));
+}
+
 /** @param {{statistics: Array<StatisticWithBuild>}} props */
-const Graph = props => {
+const ScoreGraph = props => {
   const graphElRef = useRef(/** @type {HTMLElement|undefined} */ (undefined));
 
   useEffect(() => {
     if (!graphElRef.current) return;
-    render(graphElRef.current, props.statistics);
+    renderScoreGraph(graphElRef.current, props.statistics);
   }, [props.statistics.length]);
 
   return <div className="category-score-graph__score-graph" ref={graphElRef} />;
+};
+
+/** @param {{statistics: Array<StatisticWithBuild>}} props */
+const ScoreDeltaGraph = props => {
+  const graphElRef = useRef(/** @type {HTMLElement|undefined} */ (undefined));
+
+  useEffect(() => {
+    if (!graphElRef.current) return;
+    renderScoreDeltaGraph(graphElRef.current, props.statistics);
+  }, [props.statistics.length]);
+
+  return <div className="category-score-graph__score-delta-graph" ref={graphElRef} />;
 };
 
 /** @param {{category: 'performance'|'pwa', statistics: Array<StatisticWithBuild>}} props */
@@ -133,7 +208,8 @@ export const CategoryScoreGraph = props => {
   return (
     <div className="category-score-graph">
       <h2>Overview</h2>
-      <Graph statistics={statistics} />
+      <ScoreGraph statistics={statistics} />
+      <ScoreDeltaGraph statistics={statistics} />
     </div>
   );
 };

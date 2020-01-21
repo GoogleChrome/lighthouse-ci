@@ -55,3 +55,21 @@
   font-size: var(--subtext-font-size);
   color: var(--secondary-text-color);
 }
+
+.category-score-graph__score-delta-graph {
+  width: 100%;
+  height: 100px;
+}
+
+.category-score-graph__score-delta-graph .score-delta--improvement {
+  fill: var(--improvement-color);
+}
+
+.category-score-graph__score-delta-graph .score-delta--regression {
+  fill: var(--regression-color);
+}
+
+.category-score-graph__score-delta-graph .score-guide {
+  fill: none;
+  stroke: var(--secondary-background-color);
+}

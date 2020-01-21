@@ -25,10 +25,16 @@ function render(rootEl, statistics) {
   const graphWidth = width - margin - marginRight;
   const graphHeight = height - margin * 2;
 
+  /** @type {[number, number][]} */
+  const passingGuideLine = [[0, 90], [statistics.length - 1, 90]];
+  /** @type {[number, number][]} */
+  const failingGuideLine = [[0, 50], [statistics.length - 1, 50]];
+
   const xScale = d3
     .scaleLinear()
     .domain([0, statistics.length - 1])
     .range([0, graphWidth]);
+
   const yScale = d3
     .scaleLinear()
     .domain([0, 100])
@@ -40,11 +46,15 @@ function render(rootEl, statistics) {
     .tickSize(0);
 
   /** @type {() => import('d3').Line<StatisticWithBuild>} */
-  const d3Line = d3.line;
-  const line = d3Line()
+  const statisticLine = d3.line;
+  const scoreLine = statisticLine()
     .x((d, i) => xScale(i))
-    .y(d => yScale(d.value * 100))
-    .curve(d3.curveMonotoneX);
+    .y(d => yScale(d.value * 100));
+
+  const guideLine = d3
+    .line()
+    .x(d => xScale(d[0]))
+    .y(d => yScale(d[1]));
 
   d3.select(rootEl)
     .selectAll('*')
@@ -66,9 +76,30 @@ function render(rootEl, statistics) {
 
   svg
     .append('path')
+    .datum(passingGuideLine)
+    .attr('class', 'score-guide')
+    .attr('d', guideLine);
+  svg
+    .append('path')
+    .datum(failingGuideLine)
+    .attr('class', 'score-guide')
+    .attr('d', guideLine);
+
+  svg
+    .append('path')
     .datum(statistics)
     .attr('class', 'score-line')
-    .attr('d', line);
+    .attr('d', scoreLine);
+
+  svg
+    .selectAll('.score-point')
+    .data(statistics)
+    .enter()
+    .append('circle')
+    .attr('class', 'score-point')
+    .attr('cx', (d, i) => xScale(i))
+    .attr('cy', d => yScale(d.value * 100))
+    .attr('r', 3);
 }
 
 /** @param {{statistics: Array<StatisticWithBuild>}} props */

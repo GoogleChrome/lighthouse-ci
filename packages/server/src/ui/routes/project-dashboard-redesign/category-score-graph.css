@@ -25,12 +25,21 @@
   width: 100%;
   height: 175px;
 }
+
 .category-score-graph__score-graph .score-line {
   fill: none;
   stroke: var(--neutral-color);
 }
 
-.category-score-graph__score-graph .y-axis line,
+.category-score-graph__score-graph .score-guide {
+  fill: none;
+  stroke: var(--base-border-color);
+}
+
+.category-score-graph__score-graph .score-point {
+  fill: var(--neutral-color);
+}
+
 .category-score-graph__score-graph .y-axis path {
   fill: none;
   stroke: none;

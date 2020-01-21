@@ -39,6 +39,19 @@ export const App = () => {
           }
         />
         <LazyRoute
+          path="/app/projects/:projectSlug/dashboard"
+          loading={() => (
+            <Page>
+              <LoadingSpinner />
+            </Page>
+          )}
+          getComponent={() =>
+            import('./routes/project-dashboard-redesign/project-dashboard.jsx').then(
+              m => m.ProjectDashboard
+            )
+          }
+        />
+        <LazyRoute
           path="/app/projects/:projectSlug/compare/:partialBuildId"
           loading={() => (
             <Page>

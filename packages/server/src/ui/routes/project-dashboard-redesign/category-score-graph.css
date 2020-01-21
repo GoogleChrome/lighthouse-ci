@@ -31,6 +31,10 @@
   stroke: var(--neutral-color);
 }
 
+.category-score-graph__score-graph .score-error-range {
+  fill: var(--secondary-background-color);
+}
+
 .category-score-graph__score-graph .score-guide {
   fill: none;
   stroke: var(--base-border-color);

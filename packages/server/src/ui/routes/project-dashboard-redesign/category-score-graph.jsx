@@ -47,9 +47,15 @@ function render(rootEl, statistics) {
 
   /** @type {() => import('d3').Line<StatisticWithBuild>} */
   const statisticLine = d3.line;
+  /** @type {() => import('d3').Area<StatisticWithBuild>} */
+  const statisticArea = d3.area;
   const scoreLine = statisticLine()
     .x((d, i) => xScale(i))
     .y(d => yScale(d.value * 100));
+  const scoreRange = statisticArea()
+    .x((d, i) => xScale(i))
+    .y0(d => yScale(Math.max(d.value * 100 - 8, 0)))
+    .y1(d => yScale(Math.min(100, d.value * 100 + 8)));
 
   const guideLine = d3
     .line()
@@ -73,6 +79,12 @@ function render(rootEl, statistics) {
     .attr('class', 'y-axis')
     .attr('style', `transform: translateX(${width - marginRight / 2}px)`)
     .call(yAxis);
+
+  svg
+    .append('path')
+    .datum(statistics)
+    .attr('class', 'score-error-range')
+    .attr('d', scoreRange);
 
   svg
     .append('path')

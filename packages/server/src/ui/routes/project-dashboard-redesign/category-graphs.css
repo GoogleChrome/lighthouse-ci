@@ -5,10 +5,11 @@
  */
 
 .paper.category-graphs {
+  padding: 0;
+  width: 100%;
+
   display: flex;
   flex-direction: column;
-
-  padding: 0;
 }
 
 .category-graphs__header {
@@ -18,4 +19,13 @@
   flex-direction: row;
 
   border-bottom: 1px solid var(--base-border-color);
+}
+
+.category-graphs__body {
+  min-height: 300px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }

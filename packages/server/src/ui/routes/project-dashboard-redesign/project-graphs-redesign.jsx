@@ -49,11 +49,12 @@ export const ProjectGraphs = props => {
   );
   const [loadingState, stats] = useBuildStatistics(project.id, buildIds);
   const statsWithBuildsUnfiltered = augmentStatsWithBuilds(stats, builds);
+  const url = props.runUrl || (statsWithBuildsUnfiltered && statsWithBuildsUnfiltered[0].url) || '';
   const statsWithBuilds =
     statsWithBuildsUnfiltered &&
     statsWithBuildsUnfiltered
       .filter(stat => stat.build.branch === branch)
-      .filter(stat => !props.runUrl || stat.url === props.runUrl);
+      .filter(stat => stat.url === url);
 
   return (
     <div className="dashboard-graphs-redesign">

@@ -218,9 +218,9 @@ function renderScoreDeltaGraph(rootEl, statistics) {
         'score-delta--regression': d < 0,
       })
     )
-    .attr('x', (d, i) => xScale(i) - graphWidth / deltas.length / 4)
+    .attr('x', (d, i) => xScale(i) - graphWidth / deltas.length / 8)
     .attr('y', d => (d > 0 ? yScale(d) : yScale(0)))
-    .attr('width', graphWidth / deltas.length / 2)
+    .attr('width', graphWidth / deltas.length / 4)
     .attr('height', d => Math.abs(yScale(d) - yScale(0)));
 }
 
@@ -229,8 +229,12 @@ const ScoreGraph = props => {
   const graphElRef = useRef(/** @type {HTMLElement|undefined} */ (undefined));
 
   useEffect(() => {
-    if (!graphElRef.current) return;
-    renderScoreGraph(graphElRef.current, props.statistics);
+    const rerender = () =>
+      graphElRef.current && renderScoreGraph(graphElRef.current, props.statistics);
+
+    rerender();
+    window.addEventListener('resize', rerender);
+    return () => window.removeEventListener('resize', rerender);
   }, [props.statistics.length]);
 
   return <div className="category-score-graph__score-graph" ref={graphElRef} />;
@@ -241,8 +245,12 @@ const ScoreDeltaGraph = props => {
   const graphElRef = useRef(/** @type {HTMLElement|undefined} */ (undefined));
 
   useEffect(() => {
-    if (!graphElRef.current) return;
-    renderScoreDeltaGraph(graphElRef.current, props.statistics);
+    const rerender = () =>
+      graphElRef.current && renderScoreDeltaGraph(graphElRef.current, props.statistics);
+
+    rerender();
+    window.addEventListener('resize', rerender);
+    return () => window.removeEventListener('resize', rerender);
   }, [props.statistics.length]);
 
   return <div className="category-score-graph__score-delta-graph" ref={graphElRef} />;

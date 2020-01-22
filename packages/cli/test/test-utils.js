@@ -27,6 +27,10 @@ function cleanStdOutput(output) {
     .replace(/[0-9a-f-]{36}/gi, '<UUID>')
     .replace(/:\d{4,6}/g, ':XXXX')
     .replace(/port \d{4,6}/, 'port XXXX')
+    .replace(
+      /appspot.com\/reports\/[0-9-]+.report.html/,
+      'appspot.com/reports/XXXX-XXXX.report.html'
+    )
     .replace(/\d{4,}(\.\d{1,})?/g, 'XXXX');
 }
 

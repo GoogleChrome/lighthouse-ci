@@ -15,9 +15,9 @@ import clsx from 'clsx';
 
 /** @typedef {import('./project-graphs-redesign.jsx').StatisticWithBuild} StatisticWithBuild */
 
-const BUILD_LIMIT_OPTIONS = [{value: 25}, {value: 50}, {value: 1000, label: 'Max'}];
+const BUILD_LIMIT_OPTIONS = [{value: 25}, {value: 50}, {value: 100}, {value: 150, label: 'Max'}];
 
-/** @param {{title: string, category: 'performance'|'pwa', statistics?: Array<StatisticWithBuild>, loadingState: import('../../components/async-loader').LoadingState, builds: LHCI.ServerCommand.Build[], buildLimit: number, setBuildLimit: (n: number) => void}} props */
+/** @param {{title: string, category: 'performance'|'pwa'|'seo'|'accessibility', statistics?: Array<StatisticWithBuild>, loadingState: import('../../components/async-loader').LoadingState, builds: LHCI.ServerCommand.Build[], buildLimit: number, setBuildLimit: (n: number) => void}} props */
 export const CategoryGraphs = props => {
   return (
     <Paper className="category-graphs">
@@ -41,13 +41,10 @@ export const CategoryGraphs = props => {
         <AsyncLoader
           loadingState={props.loadingState}
           asyncData={props.statistics}
+          renderLoading={() => <span>Loading, please wait...</span>}
           render={allStats => (
             <Fragment>
               <CategoryScoreGraph {...props} statistics={allStats} />
-              <pre>
-                Data goes here...
-                {JSON.stringify(allStats, null, 2)}
-              </pre>
             </Fragment>
           )}
         />

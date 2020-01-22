@@ -256,7 +256,7 @@ const ScoreDeltaGraph = props => {
   return <div className="category-score-graph__score-delta-graph" ref={graphElRef} />;
 };
 
-/** @param {{category: 'performance'|'pwa', statistics: Array<StatisticWithBuild>}} props */
+/** @param {{category: 'performance'|'pwa'|'seo'|'accessibility', statistics: Array<StatisticWithBuild>}} props */
 export const CategoryScoreGraph = props => {
   const statistics = props.statistics.filter(s => s.name === `category_${props.category}_average`);
 

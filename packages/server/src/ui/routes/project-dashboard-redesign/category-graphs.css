@@ -22,7 +22,7 @@
 }
 
 .category-graphs__body {
-  min-height: 300px;
+  min-height: 350px;
 
   display: flex;
   flex-direction: column;

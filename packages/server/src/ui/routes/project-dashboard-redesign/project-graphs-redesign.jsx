@@ -71,6 +71,33 @@ export const ProjectGraphs = props => {
         buildLimit={buildLimit}
         setBuildLimit={setBuildLimit}
       />
+      <CategoryGraphs
+        title="Accessibility"
+        category="accessibility"
+        loadingState={loadingState}
+        statistics={statsWithBuilds}
+        builds={builds}
+        buildLimit={buildLimit}
+        setBuildLimit={setBuildLimit}
+      />
+      <CategoryGraphs
+        title="PWA"
+        category="pwa"
+        loadingState={loadingState}
+        statistics={statsWithBuilds}
+        builds={builds}
+        buildLimit={buildLimit}
+        setBuildLimit={setBuildLimit}
+      />
+      <CategoryGraphs
+        title="SEO"
+        category="seo"
+        loadingState={loadingState}
+        statistics={statsWithBuilds}
+        builds={builds}
+        buildLimit={buildLimit}
+        setBuildLimit={setBuildLimit}
+      />
     </div>
   );
 };

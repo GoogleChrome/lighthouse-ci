@@ -18,6 +18,51 @@ const DELTA_GRAPH_MAX = 50;
 
 /** @typedef {import('./project-graphs-redesign.jsx').StatisticWithBuild} StatisticWithBuild */
 
+/** @param {StatisticWithBuild} statistic */
+function getClassNameFromStatistic(statistic) {
+  if (statistic.value >= 0.9) return 'score--pass';
+  if (statistic.value < 0.5) return 'score--fail';
+  return 'score--average';
+}
+
+/**
+ * This function takes the score statistics and creates line segments that can be individually colored
+ * based on their score.
+ *
+ * @param {Array<StatisticWithBuild>} statistics
+ * @return {Array<Array<StatisticWithBuild>>}
+ */
+export function computeScoreLineSegments(statistics) {
+  const statsReversed = statistics.slice().reverse();
+  const firstStatistic = statsReversed.pop();
+  if (!firstStatistic) return [];
+
+  /** @type {Array<StatisticWithBuild>} */
+  let segment = [firstStatistic];
+  let currentClass = getClassNameFromStatistic(firstStatistic);
+  /** @type {Array<Array<StatisticWithBuild>>} */
+  const segments = [segment];
+
+  while (statsReversed.length) {
+    const nextStatistic = statsReversed.pop();
+    if (!nextStatistic) throw new Error('Impossible');
+
+    if (currentClass === getClassNameFromStatistic(nextStatistic)) {
+      // We're continuing the same score class, keep the same segment and add this stat to it.
+      segment.push(nextStatistic);
+    } else {
+      // We're changing the score class. End the previous segment where it was and start a new one.
+      // This new segment will start at the end of the last segment.
+      const lastSegmentEnd = segment[segment.length - 1];
+      currentClass = getClassNameFromStatistic(nextStatistic);
+      segment = [lastSegmentEnd, nextStatistic];
+      segments.push(segment);
+    }
+  }
+
+  return segments.filter(segment => segment.length > 1);
+}
+
 /** @param {HTMLElement} rootEl */
 function createRootSvg(rootEl) {
   const height = rootEl.clientHeight;
@@ -76,7 +121,7 @@ function renderScoreGraph(rootEl, statistics) {
   /** @type {() => import('d3').Area<StatisticWithBuild>} */
   const statisticArea = d3.area;
   const scoreLine = statisticLine()
-    .x((d, i) => xScale(i))
+    .x(d => xScale(statistics.indexOf(d)))
     .y(d => yScale(d.value * 100));
   const scoreRange = statisticArea()
     .x((d, i) => xScale(i))
@@ -111,18 +156,20 @@ function renderScoreGraph(rootEl, statistics) {
     .attr('class', 'score-guide')
     .attr('d', guideLine);
 
-  svg
-    .append('path')
-    .datum(statistics)
-    .attr('class', 'score-line')
-    .attr('d', scoreLine);
+  for (const lineData of computeScoreLineSegments(statistics)) {
+    svg
+      .append('path')
+      .datum(lineData)
+      .attr('class', clsx('score-line', getClassNameFromStatistic(lineData[lineData.length - 1])))
+      .attr('d', scoreLine);
+  }
 
   svg
     .selectAll('.score-point')
     .data(statistics)
     .enter()
     .append('circle')
-    .attr('class', 'score-point')
+    .attr('class', d => clsx('score-point', getClassNameFromStatistic(d)))
     .attr('cx', (d, i) => xScale(i))
     .attr('cy', d => yScale(d.value * 100))
     .attr('r', 3);
@@ -153,6 +200,14 @@ function renderScoreDeltaGraph(rootEl, statistics) {
     .range([graphHeight, 0]);
 
   svg
+    .append('line')
+    .attr('class', 'score-guide')
+    .attr('x1', xScale(0))
+    .attr('y1', yScale(0))
+    .attr('x2', xScale(deltas.length - 1))
+    .attr('y2', yScale(0));
+
+  svg
     .selectAll('.score-delta')
     .data(deltas)
     .enter()
@@ -163,18 +218,10 @@ function renderScoreDeltaGraph(rootEl, statistics) {
         'score-delta--regression': d < 0,
       })
     )
-    .attr('x', (d, i) => xScale(i - 1) + graphWidth / deltas.length / 4)
+    .attr('x', (d, i) => xScale(i) - graphWidth / deltas.length / 4)
     .attr('y', d => (d > 0 ? yScale(d) : yScale(0)))
     .attr('width', graphWidth / deltas.length / 2)
     .attr('height', d => Math.abs(yScale(d) - yScale(0)));
-
-  svg
-    .append('line')
-    .attr('class', 'score-guide')
-    .attr('x1', xScale(0))
-    .attr('y1', yScale(0))
-    .attr('x2', xScale(deltas.length - 1))
-    .attr('y2', yScale(0));
 }
 
 /** @param {{statistics: Array<StatisticWithBuild>}} props */

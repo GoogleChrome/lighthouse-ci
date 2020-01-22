@@ -26,9 +26,19 @@
   height: 175px;
 }
 
-.category-score-graph__score-graph .score-line {
+.category-score-graph__score-graph .score-line.score--pass {
   fill: none;
-  stroke: var(--neutral-color);
+  stroke: var(--pass-color);
+}
+
+.category-score-graph__score-graph .score-line.score--average {
+  fill: none;
+  stroke: var(--average-color);
+}
+
+.category-score-graph__score-graph .score-line.score--fail {
+  fill: none;
+  stroke: var(--fail-color);
 }
 
 .category-score-graph__score-graph .score-error-range {
@@ -40,8 +50,16 @@
   stroke: var(--base-border-color);
 }
 
-.category-score-graph__score-graph .score-point {
-  fill: var(--neutral-color);
+.category-score-graph__score-graph .score-point.score--pass {
+  fill: var(--pass-color);
+}
+
+.category-score-graph__score-graph .score-point.score--average {
+  fill: var(--average-color);
+}
+
+.category-score-graph__score-graph .score-point.score--fail {
+  fill: var(--fail-color);
 }
 
 .category-score-graph__score-graph .y-axis path {

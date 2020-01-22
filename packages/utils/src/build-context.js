@@ -62,6 +62,8 @@ function getCurrentHash() {
     'TRAVIS_COMMIT',
     // Circle CI
     'CIRCLE_SHA1',
+    // GitLab CI
+    'CI_COMMIT_SHA',
   ]);
   if (envHash) return envHash;
 

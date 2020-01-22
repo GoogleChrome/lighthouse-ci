@@ -64,6 +64,7 @@ describe('getAllAssertionResults', () => {
         name: 'auditRan',
         operator: '>=',
         values: [0, 0],
+        passed: false,
       },
     ]);
   });
@@ -76,6 +77,39 @@ describe('getAllAssertionResults', () => {
 
     const results = getAllAssertionResults({assertions}, lhrs);
     expect(results).toEqual([]);
+  });
+
+  it('should return passed assertions with flag', () => {
+    const assertions = {
+      'first-contentful-paint': ['error', {minScore: 0.5}],
+      'network-requests': ['warn', {maxLength: 10}],
+    };
+
+    const results = getAllAssertionResults({assertions, includePassedAssertions: true}, lhrs);
+    expect(results).toEqual([
+      {
+        actual: 0.8,
+        auditId: 'first-contentful-paint',
+        expected: 0.5,
+        level: 'error',
+        name: 'minScore',
+        operator: '>=',
+        url: 'http://page-1.com',
+        values: [0.6, 0.8],
+        passed: true,
+      },
+      {
+        actual: 2,
+        auditId: 'network-requests',
+        expected: 10,
+        level: 'warn',
+        name: 'maxLength',
+        operator: '<=',
+        url: 'http://page-1.com',
+        values: [4, 2],
+        passed: true,
+      },
+    ]);
   });
 
   it('should assert audit failures', () => {
@@ -96,6 +130,7 @@ describe('getAllAssertionResults', () => {
         name: 'minScore',
         operator: '>=',
         values: [0.6, 0.8],
+        passed: false,
       },
       {
         url: 'http://page-1.com',
@@ -106,6 +141,7 @@ describe('getAllAssertionResults', () => {
         name: 'maxLength',
         operator: '<=',
         values: [4, 2],
+        passed: false,
       },
       {
         url: 'http://page-1.com',
@@ -116,6 +152,7 @@ describe('getAllAssertionResults', () => {
         name: 'maxNumericValue',
         operator: '<=',
         values: [5000, 5500],
+        passed: false,
       },
     ]);
   });
@@ -138,6 +175,7 @@ describe('getAllAssertionResults', () => {
         name: 'minScore',
         operator: '>=',
         values: [0.5, 0.8],
+        passed: false,
       },
       {
         url: 'http://page-1.com',
@@ -149,6 +187,7 @@ describe('getAllAssertionResults', () => {
         name: 'minScore',
         operator: '>=',
         values: [0.1, 0.1],
+        passed: false,
       },
     ]);
   });
@@ -334,6 +373,7 @@ describe('getAllAssertionResults', () => {
           operator: '<=',
           url: 'http://example.com',
           values: [23000],
+          passed: false,
         },
       ]);
     });
@@ -529,6 +569,7 @@ describe('getAllAssertionResults', () => {
           name: 'maxNumericValue',
           operator: '<=',
           values: [3608],
+          passed: false,
         },
         {
           url: 'http://page-1.com',
@@ -540,6 +581,7 @@ describe('getAllAssertionResults', () => {
           name: 'maxNumericValue',
           operator: '<=',
           values: [103675],
+          passed: false,
         },
         {
           url: 'http://page-1.com',
@@ -551,6 +593,7 @@ describe('getAllAssertionResults', () => {
           name: 'maxNumericValue',
           operator: '<=',
           values: [4],
+          passed: false,
         },
       ]);
     });
@@ -579,6 +622,7 @@ describe('getAllAssertionResults', () => {
           name: 'maxNumericValue',
           operator: '<=',
           values: [2, 2],
+          passed: false,
         },
         {
           url: 'http://example.com',
@@ -590,6 +634,7 @@ describe('getAllAssertionResults', () => {
           name: 'maxNumericValue',
           operator: '<=',
           values: [7, 7],
+          passed: false,
         },
         {
           url: 'http://example.com',
@@ -601,6 +646,7 @@ describe('getAllAssertionResults', () => {
           name: 'maxNumericValue',
           operator: '<=',
           values: [1143, 1143],
+          passed: false,
         },
       ]);
     });
@@ -625,6 +671,7 @@ describe('getAllAssertionResults', () => {
           name: 'maxNumericValue',
           operator: '<=',
           values: [1143, 1143],
+          passed: false,
         },
         {
           url: 'http://example.com',
@@ -636,6 +683,7 @@ describe('getAllAssertionResults', () => {
           name: 'maxNumericValue',
           operator: '<=',
           values: [2, 2],
+          passed: false,
         },
         {
           url: 'http://example.com',
@@ -647,6 +695,7 @@ describe('getAllAssertionResults', () => {
           name: 'maxNumericValue',
           operator: '<=',
           values: [7, 7],
+          passed: false,
         },
       ]);
     });
@@ -672,6 +721,7 @@ describe('getAllAssertionResults', () => {
           name: 'minScore',
           operator: '>=',
           values: [0.6, 0.8],
+          passed: false,
         },
         {
           url: 'http://page-2.com',
@@ -682,6 +732,7 @@ describe('getAllAssertionResults', () => {
           name: 'minScore',
           operator: '>=',
           values: [0.6, 0.8],
+          passed: false,
         },
       ]);
     });
@@ -701,6 +752,7 @@ describe('getAllAssertionResults', () => {
           name: 'minScore',
           operator: '>=',
           values: [0.6, 0.8],
+          passed: false,
         },
       ]);
     });
@@ -744,6 +796,7 @@ describe('getAllAssertionResults', () => {
           name: 'minScore',
           operator: '>=',
           values: [0.6, 0.8],
+          passed: false,
         },
         {
           url: 'http://page-2.com',
@@ -754,6 +807,7 @@ describe('getAllAssertionResults', () => {
           name: 'minScore',
           operator: '>=',
           values: [0.6, 0.8],
+          passed: false,
         },
       ]);
     });

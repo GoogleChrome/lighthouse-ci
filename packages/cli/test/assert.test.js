@@ -23,13 +23,14 @@ describe('Lighthouse CI assert CLI', () => {
     const {status, stdout, stderr} = runCLI(['assert', ...args], {cwd: fixtureDir});
     const failures = (stderr.match(/\S+ failure/g) || []).map(replaceTerminalChars);
     const warnings = (stderr.match(/\S+ warning/g) || []).map(replaceTerminalChars);
+    const passes = (stderr.match(/\S+ passing/g) || []).map(replaceTerminalChars);
     // Assert that we didn't fail with a stack trace :)
     expect(stderr).not.toContain('TypeError: ');
     expect(stderr).not.toContain(path.join(__dirname, '../../'));
-    return {status, stdout, stderr, failures, warnings};
+    return {status, stdout, stderr, failures, warnings, passes};
   };
 
-  beforeAll(() => {
+  const writeLhr = (passingAuditIds = []) => {
     const lighthouseciDir = path.join(fixtureDir, '.lighthouseci');
     if (fs.existsSync(lighthouseciDir)) rimraf.sync(lighthouseciDir);
     if (!fs.existsSync(lighthouseciDir)) fs.mkdirSync(lighthouseciDir, {recursive: true});
@@ -38,17 +39,22 @@ describe('Lighthouse CI assert CLI', () => {
     fakeLhr.categories.pwa = {score: 0};
     fakeLhr.audits['performance-budget'] = {score: 0};
     for (const key of Object.keys(fullPreset.assertions)) {
-      fakeLhr.audits[key] = {score: 0, details: {items: [{}]}};
+      fakeLhr.audits[key] = {score: passingAuditIds.includes(key) ? 1 : 0, details: {items: [{}]}};
     }
 
     fs.writeFileSync(fakeLhrPath, JSON.stringify(fakeLhr));
+  };
+
+  beforeAll(() => {
+    writeLhr(['first-contentful-paint']);
   });
 
   it('should run the recommended preset', () => {
     const result = run([`--preset=lighthouse:recommended`]);
     expect(result.status).toEqual(1);
-    expect(result.warnings).toHaveLength(17);
     expect(result.failures).toHaveLength(79);
+    expect(result.warnings).toHaveLength(16);
+    expect(result.passes).toHaveLength(0);
     expect(result.failures).toContain('deprecations failure');
     expect(result.failures).toContain('viewport failure');
   });
@@ -56,8 +62,9 @@ describe('Lighthouse CI assert CLI', () => {
   it('should run the no-pwa preset', () => {
     const result = run([`--preset=lighthouse:no-pwa`]);
     expect(result.status).toEqual(1);
-    expect(result.warnings).toHaveLength(14);
     expect(result.failures).toHaveLength(70);
+    expect(result.warnings).toHaveLength(13);
+    expect(result.passes).toHaveLength(0);
     expect(result.failures).toContain('deprecations failure');
     expect(result.failures).not.toContain('viewport failure');
   });
@@ -71,5 +78,42 @@ describe('Lighthouse CI assert CLI', () => {
   it('should run assertions from a config', () => {
     const result = run([`--config=${fixtureDir}/../lighthouserc.json`]);
     expect(result.failures).toContain('speed-index failure');
+  });
+
+  it('should return passing audits', () => {
+    const result = run([`--preset=lighthouse:recommended`, '--include-passed-assertions']);
+    expect(result.status).toEqual(1);
+    expect(result.warnings).toHaveLength(16);
+    expect(result.failures).toHaveLength(79);
+    expect(result.passes).toHaveLength(1);
+    expect(result.passes).toContain('first-contentful-paint passing');
+    expect(result.failures).toContain('viewport failure');
+  });
+
+  it('should set the status code of failures appropriately', () => {
+    const result = run([`--assertions.deprecations=error`]);
+    expect(result.status).toEqual(1);
+    expect(result.failures).toHaveLength(1);
+    expect(result.warnings).toHaveLength(0);
+    expect(result.passes).toHaveLength(0);
+  });
+
+  it('should set the status code of warnings appropriately', () => {
+    const result = run([`--assertions.deprecations=warn`, '--include-passed-assertions']);
+    expect(result.status).toEqual(0);
+    expect(result.failures).toHaveLength(0);
+    expect(result.warnings).toHaveLength(1);
+    expect(result.passes).toHaveLength(0);
+  });
+
+  it('should set the status code of passes appropriately', () => {
+    const result = run([
+      `--assertions.first-contentful-paint=error`,
+      '--include-passed-assertions',
+    ]);
+    expect(result.status).toEqual(0);
+    expect(result.failures).toHaveLength(0);
+    expect(result.warnings).toHaveLength(0);
+    expect(result.passes).toHaveLength(1);
   });
 });

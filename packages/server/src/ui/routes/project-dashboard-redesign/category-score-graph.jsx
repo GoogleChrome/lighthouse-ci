@@ -18,7 +18,7 @@ const DELTA_GRAPH_MAX = 50;
 
 /** @typedef {import('./project-graphs-redesign.jsx').StatisticWithBuild} StatisticWithBuild */
 
-/** @param {StatisticWithBuild} statistic */
+/** @param {Pick<StatisticWithBuild, 'value'>} statistic */
 function getClassNameFromStatistic(statistic) {
   if (statistic.value >= 0.9) return 'score--pass';
   if (statistic.value < 0.5) return 'score--fail';
@@ -27,7 +27,8 @@ function getClassNameFromStatistic(statistic) {
 
 /**
  * This function takes the score statistics and creates line segments that can be individually colored
- * based on their score.
+ * based on their score. This is not currently used, but is an interesting alternative to masking.
+ * TODO: remove this if we end up deciding against it
  *
  * @param {Array<StatisticWithBuild>} statistics
  * @return {Array<Array<StatisticWithBuild>>}
@@ -69,17 +70,19 @@ function createRootSvg(rootEl) {
   const width = rootEl.clientWidth;
   const graphWidth = width - GRAPH_MARGIN - GRAPH_MARGIN_RIGHT;
   const graphHeight = height - GRAPH_MARGIN * 2;
+  const svgRoot = d3
+    .select(rootEl)
+    .append('svg')
+    .attr('width', width)
+    .attr('height', height);
 
   return {
     width,
     height,
     graphWidth,
     graphHeight,
-    svg: d3
-      .select(rootEl)
-      .append('svg')
-      .attr('width', width)
-      .attr('height', height)
+    masks: svgRoot.append('defs'),
+    svg: svgRoot
       .append('g')
       .attr('style', `transform: translate(${GRAPH_MARGIN}px, ${GRAPH_MARGIN}px)`),
   };
@@ -94,16 +97,19 @@ function renderScoreGraph(rootEl, statistics) {
   d3.select(rootEl)
     .selectAll('*')
     .remove();
-  const {svg, width, graphWidth, graphHeight} = createRootSvg(rootEl);
+  const {svg, masks, width, graphWidth, graphHeight} = createRootSvg(rootEl);
+  const n = statistics.length - 1;
+  const statName = statistics[0].name;
+  const scoreLineMaskId = `scoreLineMask-${statName}`;
 
   /** @type {[number, number][]} */
-  const passingGuideLine = [[0, 90], [statistics.length - 1, 90]];
+  const passingGuideLine = [[0, 90], [n, 90]];
   /** @type {[number, number][]} */
-  const failingGuideLine = [[0, 50], [statistics.length - 1, 50]];
+  const failingGuideLine = [[0, 50], [n, 50]];
 
   const xScale = d3
     .scaleLinear()
-    .domain([0, statistics.length - 1])
+    .domain([0, n])
     .range([0, graphWidth]);
 
   const yScale = d3
@@ -133,37 +139,72 @@ function renderScoreGraph(rootEl, statistics) {
     .x(d => xScale(d[0]))
     .y(d => yScale(d[1]));
 
+  masks
+    .append('mask')
+    .attr('id', scoreLineMaskId)
+    .append('path')
+    .datum(statistics)
+    .attr('d', scoreLine)
+    .style('stroke', 'white');
+
+  // The numbers on the y-axis to the right-hand side
   svg
     .append('g')
     .attr('class', 'y-axis')
     .attr('style', `transform: translateX(${width - GRAPH_MARGIN_RIGHT / 2}px)`)
     .call(yAxis);
 
+  // The grey error bar area behind the score line
   svg
     .append('path')
     .datum(statistics)
     .attr('class', 'score-error-range')
     .attr('d', scoreRange);
 
+  // Passing/Average horizontal score guide
   svg
     .append('path')
     .datum(passingGuideLine)
     .attr('class', 'score-guide')
     .attr('d', guideLine);
+  // Average/Failing horizontal score guide
   svg
     .append('path')
     .datum(failingGuideLine)
     .attr('class', 'score-guide')
     .attr('d', guideLine);
 
-  for (const lineData of computeScoreLineSegments(statistics)) {
-    svg
-      .append('path')
-      .datum(lineData)
-      .attr('class', clsx('score-line', getClassNameFromStatistic(lineData[lineData.length - 1])))
-      .attr('d', scoreLine);
-  }
+  // Passing score line mask fill
+  svg
+    .append('rect')
+    .attr('x', xScale(0))
+    .attr('y', yScale(100))
+    .attr('width', xScale(n) - xScale(0))
+    .attr('height', yScale(90) - yScale(100))
+    .attr('mask', `url(#${scoreLineMaskId})`)
+    .attr('class', clsx('score-line-fill', getClassNameFromStatistic({value: 1})));
 
+  // Average score line mask fill
+  svg
+    .append('rect')
+    .attr('x', xScale(0))
+    .attr('y', yScale(90))
+    .attr('width', xScale(n) - xScale(0))
+    .attr('height', yScale(50) - yScale(90))
+    .attr('mask', `url(#${scoreLineMaskId})`)
+    .attr('class', clsx('score-line-fill', getClassNameFromStatistic({value: 0.75})));
+
+  // Failing score line mask fill
+  svg
+    .append('rect')
+    .attr('x', xScale(0))
+    .attr('y', yScale(50))
+    .attr('width', xScale(n) - xScale(0))
+    .attr('height', yScale(0) - yScale(50))
+    .attr('mask', `url(#${scoreLineMaskId})`)
+    .attr('class', clsx('score-line-fill', getClassNameFromStatistic({value: 0})));
+
+  // The individual score points
   svg
     .selectAll('.score-point')
     .data(statistics)

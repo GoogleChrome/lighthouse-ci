@@ -26,19 +26,16 @@
   height: 175px;
 }
 
-.category-score-graph__score-graph .score-line.score--pass {
-  fill: none;
-  stroke: var(--pass-color);
+.category-score-graph__score-graph .score-line-fill.score--pass {
+  fill: var(--pass-color);
 }
 
-.category-score-graph__score-graph .score-line.score--average {
-  fill: none;
-  stroke: var(--average-color);
+.category-score-graph__score-graph .score-line-fill.score--average {
+  fill: var(--average-color);
 }
 
-.category-score-graph__score-graph .score-line.score--fail {
-  fill: none;
-  stroke: var(--fail-color);
+.category-score-graph__score-graph .score-line-fill.score--fail {
+  fill: var(--fail-color);
 }
 
 .category-score-graph__score-graph .score-error-range {

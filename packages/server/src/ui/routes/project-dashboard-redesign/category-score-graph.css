@@ -91,3 +91,11 @@
   fill: none;
   stroke: var(--secondary-background-color);
 }
+
+.category-score-graph__date-range {
+  display: flex;
+  flex-direction: row;
+
+  color: var(--secondary-text-color);
+  font-size: var(--subtext-font-size);
+}

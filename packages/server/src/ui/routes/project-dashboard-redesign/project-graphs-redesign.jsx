@@ -5,7 +5,7 @@
  */
 
 import {h} from 'preact';
-import {useMemo} from 'preact/hooks';
+import {useMemo, useState} from 'preact/hooks';
 import _ from '@lhci/utils/src/lodash.js';
 import {useBuildStatistics} from '../../hooks/use-api-data';
 
@@ -38,18 +38,22 @@ export const ProjectGraphs = props => {
     (!builds.length || builds.some(build => build.branch === 'master')
       ? 'master'
       : builds[0].branch);
+  const [buildLimit, setBuildLimit] = useState(25);
   const buildIds = useMemo(
     () =>
       builds
         .filter(build => build.branch === branch)
         .sort((a, b) => new Date(b.runAt).getTime() - new Date(a.runAt).getTime())
         .map(build => build.id)
-        .slice(0, 20),
-    [builds, branch]
+        .slice(0, buildLimit),
+    [builds, branch, buildLimit]
   );
   const [loadingState, stats] = useBuildStatistics(project.id, buildIds);
   const statsWithBuildsUnfiltered = augmentStatsWithBuilds(stats, builds);
-  const url = props.runUrl || (statsWithBuildsUnfiltered && statsWithBuildsUnfiltered[0].url) || '';
+  const statForBranch =
+    statsWithBuildsUnfiltered && statsWithBuildsUnfiltered.find(s => s.build.branch);
+  const url = props.runUrl || (statForBranch && statForBranch.url) || '';
+
   const statsWithBuilds =
     statsWithBuildsUnfiltered &&
     statsWithBuildsUnfiltered
@@ -64,6 +68,8 @@ export const ProjectGraphs = props => {
         loadingState={loadingState}
         statistics={statsWithBuilds}
         builds={builds}
+        buildLimit={buildLimit}
+        setBuildLimit={setBuildLimit}
       />
     </div>
   );

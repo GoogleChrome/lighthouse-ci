@@ -462,7 +462,7 @@ function createLoadTestDataset() {
   const builds = [];
   /** @type {Array<LHCI.ServerCommand.Run>} */
   const runs = [];
-  for (let i = 0; i < 100; i++) {
+  for (let i = 0; i < 500; i++) {
     const runAt = new Date(
       new Date((builds[i - 1] || {runAt: new Date('2019-07-01')}).runAt).getTime() +
         Math.round(Math.random() * 24 * 60 * 60 * 1000)
@@ -496,7 +496,7 @@ function createLoadTestDataset() {
 
     const port = 1000 + Math.round(Math.random() * 60000);
     const urls = [`http://localhost:${port}/index.html`, `http://localhost:${port}/about.html`];
-    for (let j = 0; j < 10; j++) {
+    for (let j = 0; j < 5; j++) {
       for (const url of urls) {
         runs.push({
           id: '',

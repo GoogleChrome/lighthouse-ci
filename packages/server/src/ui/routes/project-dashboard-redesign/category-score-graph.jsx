@@ -260,11 +260,22 @@ const ScoreDeltaGraph = props => {
 export const CategoryScoreGraph = props => {
   const statistics = props.statistics.filter(s => s.name === `category_${props.category}_average`);
 
+  if (!statistics.length) return <span>No data available</span>;
+
   return (
     <div className="category-score-graph">
       <h2>Overview</h2>
       <ScoreGraph statistics={statistics} />
       <ScoreDeltaGraph statistics={statistics} />
+      <div className="category-score-graph__date-range">
+        <div style={{marginLeft: GRAPH_MARGIN}}>
+          {new Date(statistics[0].createdAt || '').toLocaleDateString()}
+        </div>
+        <div style={{flexGrow: 1}} />
+        <div style={{marginRight: GRAPH_MARGIN_RIGHT}}>
+          {new Date(statistics[statistics.length - 1].createdAt || '').toLocaleDateString()}
+        </div>
+      </div>
     </div>
   );
 };

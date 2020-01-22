@@ -29,3 +29,23 @@
   align-items: center;
   justify-content: center;
 }
+
+.category-graphs__title {
+  flex-grow: 1;
+}
+
+.category-graphs__build-limit {
+  color: var(--secondary-text-color);
+  font-size: var(--base-font-size);
+  font-weight: var(--medium-font-weight);
+  text-transform: uppercase;
+}
+
+.category-graphs__build-limit .build-limit-option {
+  margin-left: var(--base-spacing);
+  cursor: pointer;
+}
+
+.category-graphs__build-limit .build-limit-option--selected {
+  color: var(--base-text-color);
+}

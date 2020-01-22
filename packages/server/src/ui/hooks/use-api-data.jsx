@@ -91,7 +91,7 @@ export function useProjectBySlug(projectSlug) {
  * @return {[LoadingState, Array<LHCI.ServerCommand.Build> | undefined]}
  */
 export function useProjectBuilds(projectId) {
-  const options = useMemo(() => ({limit: 100}), []);
+  const options = useMemo(() => ({limit: 1000}), []);
   return useApiData('getBuilds', projectId ? [projectId, options] : undefined);
 }
 

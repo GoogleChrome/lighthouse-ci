@@ -11,15 +11,31 @@ import {Paper} from '../../components/paper.jsx';
 
 import './category-graphs.css';
 import {CategoryScoreGraph} from './category-score-graph';
+import clsx from 'clsx';
 
 /** @typedef {import('./project-graphs-redesign.jsx').StatisticWithBuild} StatisticWithBuild */
 
-/** @param {{title: string, category: 'performance'|'pwa', statistics?: Array<StatisticWithBuild>, loadingState: import('../../components/async-loader').LoadingState, builds: LHCI.ServerCommand.Build[]}} props */
+const BUILD_LIMIT_OPTIONS = [{value: 25}, {value: 50}, {value: 1000, label: 'Max'}];
+
+/** @param {{title: string, category: 'performance'|'pwa', statistics?: Array<StatisticWithBuild>, loadingState: import('../../components/async-loader').LoadingState, builds: LHCI.ServerCommand.Build[], buildLimit: number, setBuildLimit: (n: number) => void}} props */
 export const CategoryGraphs = props => {
   return (
     <Paper className="category-graphs">
       <div className="category-graphs__header">
         <h3 className="category-graphs__title">{props.title}</h3>
+        <div className="category-graphs__build-limit">
+          {BUILD_LIMIT_OPTIONS.map(option => (
+            <span
+              key={option.value}
+              className={clsx('build-limit-option', {
+                'build-limit-option--selected': props.buildLimit === option.value,
+              })}
+              onClick={() => props.setBuildLimit(option.value)}
+            >
+              {option.label || option.value}
+            </span>
+          ))}
+        </div>
       </div>
       <div className="category-graphs__body">
         <AsyncLoader

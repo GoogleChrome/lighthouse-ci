@@ -34,7 +34,7 @@
 
   /** Themematic constants */
   --base-text-color: var(--color-gray-900);
-  --secondary-text-color: var(--color-gray-600);
+  --secondary-text-color: var(--color-gray-500);
   --inverted-text-color: var(--color-gray-50);
   --inverted-secondary-text-color: var(--color-gray-500);
 
@@ -164,6 +164,10 @@ h6 {
   display: flex;
   flex-direction: row;
   align-items: center;
+}
+
+.text--secondary {
+  color: var(--secondary-text-color);
 }
 
 .text--improvement {

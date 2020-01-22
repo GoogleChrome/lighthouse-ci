@@ -521,6 +521,10 @@ function createLoadTestDataset() {
               }
             }
 
+            for (const categoryId of Object.keys(lhr.categories)) {
+              lhr.categories[categoryId].score = Math.random();
+            }
+
             return JSON.stringify(lhr);
           },
         });

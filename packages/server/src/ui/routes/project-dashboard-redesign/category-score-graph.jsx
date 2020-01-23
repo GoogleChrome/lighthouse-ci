@@ -12,6 +12,7 @@ import './category-score-graph.css';
 import {useRef, useEffect, useState} from 'preact/hooks';
 import clsx from 'clsx';
 import {Gauge} from '../../components/gauge';
+import {ScoreDeltaBadge} from '../../components/score-delta-badge';
 
 const GRAPH_MARGIN = 10;
 const GRAPH_MARGIN_RIGHT = 50;
@@ -370,8 +371,8 @@ const HoverCard = props => {
     const diff = previousStat && {
       type: 'score',
       auditId: '',
-      baseValue: previousStat.value,
-      compareValue: stat.value,
+      baseValue: Math.round(previousStat.value * 100) / 100,
+      compareValue: Math.round(stat.value * 100) / 100,
     };
     contents = (
       <Fragment>
@@ -382,6 +383,7 @@ const HoverCard = props => {
           </span>
         </div>
         <Gauge score={stat.value} diff={diff} />
+        {diff ? <ScoreDeltaBadge diff={diff} /> : null}
       </Fragment>
     );
   }

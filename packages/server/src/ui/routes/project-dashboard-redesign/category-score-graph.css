@@ -135,3 +135,7 @@
 .hover-card .gauge {
   margin-bottom: var(--base-spacing);
 }
+
+.hover-card .score-delta-badge {
+  margin-bottom: var(--base-spacing);
+}

@@ -17,47 +17,26 @@ import {
   OptimizedIcon,
   getBadgeDiffType,
 } from '../../components/pwa-gauge';
-import {getDiffLabel} from '@lhci/utils/src/audit-diff-finder';
-
-/** @param {number} score */
-const renderScore = score => Math.round(score * 100);
+import {ScoreDeltaBadge} from '../../components/score-delta-badge';
 
 /** @param {{lhr: LH.Result, baseLhr?: LH.Result, categoryId: string}} props */
 const StandardScoreItem = props => {
   const {lhr, baseLhr, categoryId} = props;
   const category = lhr.categories[categoryId];
-  let deltaEl = null;
-  let classes = '';
+  const baseCategory = baseLhr && baseLhr.categories[categoryId];
   /** @type {LHCI.NumericAuditDiff|undefined} */
-  let diff = undefined;
-
-  if (baseLhr) {
-    const baseCategory = baseLhr.categories[categoryId];
-    if (baseCategory) {
-      diff = {
-        auditId: '',
-        type: 'score',
-        baseValue: baseCategory.score,
-        compareValue: category.score,
-      };
-
-      const delta = renderScore(category.score - baseCategory.score);
-
-      classes = `lhr-comparison-scores-item--${getDiffLabel(diff)}`;
-
-      deltaEl = (
-        <div className={clsx('lhr-comparison-scores-item__delta')}>
-          {delta < 0 ? delta : `+${delta}`}
-        </div>
-      );
-    }
-  }
+  const diff = baseCategory && {
+    auditId: '',
+    type: 'score',
+    baseValue: baseCategory.score,
+    compareValue: category.score,
+  };
 
   return (
-    <div key={categoryId} className={clsx('lhr-comparison-scores-item', classes)}>
+    <div key={categoryId} className={clsx('lhr-comparison-scores-item')}>
       <Gauge score={category.score} diff={diff} />
       <div className="lhr-comparison-scores-item__label">{category.title}</div>
-      {deltaEl}
+      {diff ? <ScoreDeltaBadge diff={diff} className="lhr-comparison-scores-item__delta" /> : null}
     </div>
   );
 };

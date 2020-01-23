@@ -56,14 +56,6 @@
   margin-right: 0;
 }
 
-.lhr-comparison-scores-item--improvement .lhr-comparison-scores-item__delta {
-  background-color: var(--improvement-color);
-}
-
-.lhr-comparison-scores-item--regression .lhr-comparison-scores-item__delta {
-  background-color: var(--regression-color);
-}
-
 .lhr-comparison-scores-item--pwa .lhr-comparison-scores-item__delta {
   background-color: var(--secondary-background-color);
   color: var(--base-text-color);

@@ -70,9 +70,32 @@ function groupIntoMap(items, keyFn) {
   return groups;
 }
 
+/**
+ * @param {() => void} fn
+ * @param {number} time
+ * @return {{(): void; cancel: () => void;}}
+ */
+function debounce(fn, time) {
+  /** @type {NodeJS.Timeout|undefined} */
+  let timeout;
+  const cancel = () => {
+    if (timeout) clearTimeout(timeout);
+    timeout = undefined;
+  };
+
+  const debouncedFn = () => {
+    if (timeout) clearTimeout(timeout);
+    timeout = setTimeout(fn, time);
+  };
+
+  debouncedFn.cancel = cancel;
+  return debouncedFn;
+}
+
 module.exports = {
   merge,
   kebabCase,
+  debounce,
   /**
    * Generates an array of numbers from `from` (inclusive) to `to` (exclusive)
    * @param {number} from

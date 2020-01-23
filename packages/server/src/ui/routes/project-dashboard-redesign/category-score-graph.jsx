@@ -4,17 +4,19 @@
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
  */
 
-import {h} from 'preact';
+import {h, Fragment} from 'preact';
 import * as d3 from 'd3';
+import * as _ from '@lhci/utils/src/lodash.js';
 
 import './category-score-graph.css';
-import {useRef, useEffect} from 'preact/hooks';
+import {useRef, useEffect, useState} from 'preact/hooks';
 import clsx from 'clsx';
 
 const GRAPH_MARGIN = 10;
 const GRAPH_MARGIN_RIGHT = 50;
 const DELTA_GRAPH_MIN = -50;
 const DELTA_GRAPH_MAX = 50;
+const HOVER_CARD_MARGIN = 100;
 
 /** @typedef {import('./project-graphs-redesign.jsx').StatisticWithBuild} StatisticWithBuild */
 
@@ -105,10 +107,14 @@ export function buildMinMaxByBuildId(statistics) {
 /**
  *
  * @param {HTMLElement} rootEl
- * @param {Array<StatisticWithBuild>} statisticsWithMinMax
  * @param {Array<StatisticWithBuild>} statistics
+ * @param {Array<StatisticWithBuild>} statisticsWithMinMax
+ * @param {(s: string|undefined) => void} setSelectedBuildId
  */
-function renderScoreGraph(rootEl, statisticsWithMinMax, statistics) {
+function renderScoreGraph(rootEl, statistics, statisticsWithMinMax, setSelectedBuildId) {
+  const rootParentEl = rootEl.closest('.category-score-graph');
+  if (!(rootParentEl instanceof HTMLElement)) throw new Error('Missing category-score-graph');
+
   d3.select(rootEl)
     .selectAll('*')
     .remove();
@@ -117,6 +123,7 @@ function renderScoreGraph(rootEl, statisticsWithMinMax, statistics) {
   const n = statistics.length - 1;
   const statName = statistics[0].name;
   const scoreLineMaskId = `scoreLineMask-${statName}`;
+  const debouncedClearBuildId = _.debounce(() => setSelectedBuildId(undefined), 250);
 
   /** @type {[number, number][]} */
   const passingGuideLine = [[0, 90], [n, 90]];
@@ -230,6 +237,35 @@ function renderScoreGraph(rootEl, statisticsWithMinMax, statistics) {
     .attr('cx', (d, i) => xScale(i))
     .attr('cy', d => yScale(d.value * 100))
     .attr('r', 3);
+
+  svg
+    .selectAll('.score-point__hitbox')
+    .data(statistics)
+    .enter()
+    .append('rect')
+    .style('fill', 'rgba(0,0,0,0)')
+    .attr('x', (d, i) => xScale(i) - graphWidth / n / 2)
+    .attr('y', yScale(100))
+    .attr('width', graphWidth / n)
+    .attr('height', yScale(0) - yScale(100))
+    .on('mouseover', (d, i) => {
+      debouncedClearBuildId.cancel();
+      setSelectedBuildId(d.buildId);
+
+      const hoverCard = rootParentEl.querySelector('.hover-card');
+      if (!(hoverCard instanceof HTMLElement)) return;
+      const leftPx = xScale(i) + HOVER_CARD_MARGIN;
+      if (leftPx + 200 < graphWidth) {
+        hoverCard.style.left = leftPx + 'px';
+        hoverCard.style.right = '';
+      } else {
+        const rightPx =
+          graphWidth - (leftPx - HOVER_CARD_MARGIN) + GRAPH_MARGIN_RIGHT + HOVER_CARD_MARGIN;
+        hoverCard.style.left = '';
+        hoverCard.style.right = rightPx + 'px';
+      }
+    })
+    .on('mouseout', debouncedClearBuildId);
 }
 
 /**
@@ -281,14 +317,19 @@ function renderScoreDeltaGraph(rootEl, statistics) {
     .attr('height', d => Math.abs(yScale(d) - yScale(0)));
 }
 
-/** @param {{statistics: Array<StatisticWithBuild>, averageStatistics: Array<StatisticWithBuild>}} props */
+/** @param {{statistics: Array<StatisticWithBuild>, averageStatistics: Array<StatisticWithBuild>, setSelectedBuildId: (s: string|undefined) => void}} props */
 const ScoreGraph = props => {
   const graphElRef = useRef(/** @type {HTMLElement|undefined} */ (undefined));
 
   useEffect(() => {
     const rerender = () =>
       graphElRef.current &&
-      renderScoreGraph(graphElRef.current, props.statistics, props.averageStatistics);
+      renderScoreGraph(
+        graphElRef.current,
+        props.averageStatistics,
+        props.statistics,
+        props.setSelectedBuildId
+      );
 
     rerender();
     window.addEventListener('resize', rerender);
@@ -314,8 +355,44 @@ const ScoreDeltaGraph = props => {
   return <div className="category-score-graph__score-delta-graph" ref={graphElRef} />;
 };
 
+/** @param {{selectedBuildId: string|undefined, averageStatistics: Array<StatisticWithBuild>}} props */
+const HoverCard = props => {
+  const {selectedBuildId, averageStatistics: stats} = props;
+  const statWithBuild = selectedBuildId && stats.find(s => s.buildId === selectedBuildId);
+  const build = statWithBuild && statWithBuild.build;
+
+  let contents = <Fragment />;
+  if (build) {
+    const createdAt = new Date(build.createdAt || '');
+    contents = (
+      <Fragment>
+        <div className="hover-card__datetime">
+          <span className="hover-card__date">{createdAt.toLocaleDateString()}</span>
+          <span className="hover-card__time">
+            {createdAt.getHours()}:{createdAt.getMinutes()}
+          </span>
+        </div>
+      </Fragment>
+    );
+  }
+
+  return (
+    <div
+      className={clsx('hover-card', {
+        'hover-card--visible': !!props.selectedBuildId,
+      })}
+    >
+      {contents}
+    </div>
+  );
+};
+
 /** @param {{category: 'performance'|'pwa'|'seo'|'accessibility', statistics: Array<StatisticWithBuild>}} props */
 export const CategoryScoreGraph = props => {
+  const [selectedBuildId, setSelectedBuildId] = useState(
+    /** @type {undefined|string} */ (undefined)
+  );
+
   const allStats = props.statistics.filter(s => s.name.startsWith(`category_${props.category}`));
   const averageStats = allStats.filter(s => s.name.endsWith('_average'));
 
@@ -324,8 +401,13 @@ export const CategoryScoreGraph = props => {
   return (
     <div className="category-score-graph">
       <h2>Overview</h2>
-      <ScoreGraph statistics={allStats} averageStatistics={averageStats} />
+      <ScoreGraph
+        statistics={allStats}
+        averageStatistics={averageStats}
+        setSelectedBuildId={setSelectedBuildId}
+      />
       <ScoreDeltaGraph averageStatistics={averageStats} />
+      <HoverCard selectedBuildId={selectedBuildId} averageStatistics={averageStats} />
       <div className="category-score-graph__date-range">
         <div style={{marginLeft: GRAPH_MARGIN}}>
           {new Date(averageStats[0].createdAt || '').toLocaleDateString()}

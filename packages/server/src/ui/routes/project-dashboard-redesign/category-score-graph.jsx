@@ -117,6 +117,11 @@ export function buildMinMaxByBuildId(statistics) {
 function renderScoreGraph(rootEl, statistics, statisticsWithMinMax, setSelectedBuildId, setPinned) {
   const rootParentEl = rootEl.closest('.category-score-graph');
   if (!(rootParentEl instanceof HTMLElement)) throw new Error('Missing category-score-graph');
+  const getTrackingLineEl = () => {
+    const trackingLineEl = rootParentEl.querySelector('.tracking-line');
+    if (!(trackingLineEl instanceof SVGElement)) throw new Error('Missing tracking line!');
+    return trackingLineEl;
+  };
 
   d3.select(rootEl)
     .selectAll('*')
@@ -193,6 +198,7 @@ function renderScoreGraph(rootEl, statistics, statisticsWithMinMax, setSelectedB
     .datum(passingGuideLine)
     .attr('class', 'score-guide')
     .attr('d', guideLine);
+
   // Average/Failing horizontal score guide
   svg
     .append('path')
@@ -230,6 +236,16 @@ function renderScoreGraph(rootEl, statistics, statisticsWithMinMax, setSelectedB
     .attr('mask', `url(#${scoreLineMaskId})`)
     .attr('class', clsx('score-line-fill', getClassNameFromStatistic({value: 0})));
 
+  // The tracking line for the hover/click effects
+  svg
+    .append('line')
+    .attr('class', 'tracking-line')
+    .style('transform', 'translateX(-9999px)')
+    .attr('x1', xScale(0))
+    .attr('y1', yScale(0))
+    .attr('x2', xScale(0))
+    .attr('y2', yScale(100));
+
   // The individual score points
   svg
     .selectAll('.score-point')
@@ -241,12 +257,13 @@ function renderScoreGraph(rootEl, statistics, statisticsWithMinMax, setSelectedB
     .attr('cy', d => yScale(d.value * 100))
     .attr('r', 3);
 
+  // The click and mouseover hitboxes for the score points
   svg
     .selectAll('.score-point__hitbox')
     .data(statistics)
     .enter()
     .append('rect')
-    .style('fill', 'rgba(0,0,0,0)')
+    .attr('class', 'score-point__hitbox')
     .attr('x', (d, i) => xScale(i) - graphWidth / n / 2)
     .attr('y', yScale(100))
     .attr('width', graphWidth / n)
@@ -254,17 +271,23 @@ function renderScoreGraph(rootEl, statistics, statisticsWithMinMax, setSelectedB
     .on('click', () => {
       setPinned(current => {
         const next = !current;
-        if (!next) setSelectedBuildId(undefined);
+        if (!next) debouncedClearBuildId();
         return next;
       });
     })
     .on('mouseover', (d, i) => {
       debouncedClearBuildId.cancel();
       if (rootParentEl.querySelector('.hover-card--pinned')) return;
+      // Set the selected build
       setSelectedBuildId(d.buildId);
+
+      // Update the position of the tracking line
+      getTrackingLineEl().setAttribute('style', `transform: translateX(${xScale(i)}px)`);
 
       const hoverCard = rootParentEl.querySelector('.hover-card');
       if (!(hoverCard instanceof HTMLElement)) return;
+
+      // Update the position of the hover card
       const leftPx = xScale(i) + HOVER_CARD_MARGIN;
       if (leftPx + 200 < graphWidth) {
         hoverCard.style.left = leftPx + 'px';
@@ -444,7 +467,13 @@ export const CategoryScoreGraph = props => {
   if (!averageStats.length) return <span>No data available</span>;
 
   return (
-    <div id={id} className="category-score-graph">
+    <div
+      id={id}
+      className={clsx('category-score-graph', {
+        'category-score-graph--with-selected-build': !!selectedBuildId,
+        'category-score-graph--pinned': !!pinned,
+      })}
+    >
       <h2>Overview</h2>
       <ScoreGraph
         statistics={allStats}

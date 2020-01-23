@@ -111,9 +111,10 @@ export function buildMinMaxByBuildId(statistics) {
  * @param {HTMLElement} rootEl
  * @param {Array<StatisticWithBuild>} statistics
  * @param {Array<StatisticWithBuild>} statisticsWithMinMax
- * @param {(s: string|undefined) => void} setSelectedBuildId
+ * @param {import('preact/hooks/src').StateUpdater<string|undefined>} setSelectedBuildId
+ * @param {import('preact/hooks/src').StateUpdater<boolean>} setPinned
  */
-function renderScoreGraph(rootEl, statistics, statisticsWithMinMax, setSelectedBuildId) {
+function renderScoreGraph(rootEl, statistics, statisticsWithMinMax, setSelectedBuildId, setPinned) {
   const rootParentEl = rootEl.closest('.category-score-graph');
   if (!(rootParentEl instanceof HTMLElement)) throw new Error('Missing category-score-graph');
 
@@ -250,8 +251,16 @@ function renderScoreGraph(rootEl, statistics, statisticsWithMinMax, setSelectedB
     .attr('y', yScale(100))
     .attr('width', graphWidth / n)
     .attr('height', yScale(0) - yScale(100))
+    .on('click', () => {
+      setPinned(current => {
+        const next = !current;
+        if (!next) setSelectedBuildId(undefined);
+        return next;
+      });
+    })
     .on('mouseover', (d, i) => {
       debouncedClearBuildId.cancel();
+      if (rootParentEl.querySelector('.hover-card--pinned')) return;
       setSelectedBuildId(d.buildId);
 
       const hoverCard = rootParentEl.querySelector('.hover-card');
@@ -267,7 +276,10 @@ function renderScoreGraph(rootEl, statistics, statisticsWithMinMax, setSelectedB
         hoverCard.style.right = rightPx + 'px';
       }
     })
-    .on('mouseout', debouncedClearBuildId);
+    .on('mouseout', () => {
+      if (rootParentEl.querySelector('.hover-card--pinned')) return;
+      debouncedClearBuildId();
+    });
 }
 
 /**
@@ -319,7 +331,7 @@ function renderScoreDeltaGraph(rootEl, statistics) {
     .attr('height', d => Math.abs(yScale(d) - yScale(0)));
 }
 
-/** @param {{statistics: Array<StatisticWithBuild>, averageStatistics: Array<StatisticWithBuild>, setSelectedBuildId: (s: string|undefined) => void}} props */
+/** @param {{statistics: Array<StatisticWithBuild>, averageStatistics: Array<StatisticWithBuild>, setSelectedBuildId: import('preact/hooks/src').StateUpdater<string|undefined>, setPinned: import('preact/hooks/src').StateUpdater<boolean>}} props */
 const ScoreGraph = props => {
   const graphElRef = useRef(/** @type {HTMLElement|undefined} */ (undefined));
 
@@ -330,7 +342,8 @@ const ScoreGraph = props => {
         graphElRef.current,
         props.averageStatistics,
         props.statistics,
-        props.setSelectedBuildId
+        props.setSelectedBuildId,
+        props.setPinned
       );
 
     rerender();
@@ -357,7 +370,7 @@ const ScoreDeltaGraph = props => {
   return <div className="category-score-graph__score-delta-graph" ref={graphElRef} />;
 };
 
-/** @param {{selectedBuildId: string|undefined, averageStatistics: Array<StatisticWithBuild>}} props */
+/** @param {{selectedBuildId: string|undefined, averageStatistics: Array<StatisticWithBuild>, pinned: boolean}} props */
 const HoverCard = props => {
   const {selectedBuildId, averageStatistics: stats} = props;
   const statIndex = selectedBuildId ? stats.findIndex(s => s.buildId === selectedBuildId) : -1;
@@ -392,6 +405,7 @@ const HoverCard = props => {
     <div
       className={clsx('hover-card', {
         'hover-card--visible': !!props.selectedBuildId,
+        'hover-card--pinned': !!props.pinned,
       })}
     >
       {contents}
@@ -401,25 +415,49 @@ const HoverCard = props => {
 
 /** @param {{category: 'performance'|'pwa'|'seo'|'accessibility', statistics: Array<StatisticWithBuild>}} props */
 export const CategoryScoreGraph = props => {
+  const [pinned, setPinned] = useState(false);
   const [selectedBuildId, setSelectedBuildId] = useState(
     /** @type {undefined|string} */ (undefined)
   );
 
+  const id = `category-score-graph--${props.category}`;
   const allStats = props.statistics.filter(s => s.name.startsWith(`category_${props.category}`));
   const averageStats = allStats.filter(s => s.name.endsWith('_average'));
+
+  // Unpin when the user clicks out of the graph
+  useEffect(() => {
+    /** @param {Event} e */
+    const listener = e => {
+      const target = e.target;
+      if (!(target instanceof Element)) return;
+
+      if (!target.closest(`#${id}`)) {
+        setPinned(false);
+        setSelectedBuildId(undefined);
+      }
+    };
+
+    document.addEventListener('click', listener);
+    return () => document.removeEventListener('click', listener);
+  }, [setPinned]);
 
   if (!averageStats.length) return <span>No data available</span>;
 
   return (
-    <div className="category-score-graph">
+    <div id={id} className="category-score-graph">
       <h2>Overview</h2>
       <ScoreGraph
         statistics={allStats}
         averageStatistics={averageStats}
         setSelectedBuildId={setSelectedBuildId}
+        setPinned={setPinned}
       />
       <ScoreDeltaGraph averageStatistics={averageStats} />
-      <HoverCard selectedBuildId={selectedBuildId} averageStatistics={averageStats} />
+      <HoverCard
+        pinned={pinned}
+        selectedBuildId={selectedBuildId}
+        averageStatistics={averageStats}
+      />
       <div className="category-score-graph__date-range">
         <div style={{marginLeft: GRAPH_MARGIN}}>
           {new Date(averageStats[0].createdAt || '').toLocaleDateString()}

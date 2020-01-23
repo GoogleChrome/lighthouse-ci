@@ -11,6 +11,7 @@ import * as _ from '@lhci/utils/src/lodash.js';
 import './category-score-graph.css';
 import {useRef, useEffect, useState} from 'preact/hooks';
 import clsx from 'clsx';
+import {Gauge} from '../../components/gauge';
 
 const GRAPH_MARGIN = 10;
 const GRAPH_MARGIN_RIGHT = 50;
@@ -358,12 +359,20 @@ const ScoreDeltaGraph = props => {
 /** @param {{selectedBuildId: string|undefined, averageStatistics: Array<StatisticWithBuild>}} props */
 const HoverCard = props => {
   const {selectedBuildId, averageStatistics: stats} = props;
-  const statWithBuild = selectedBuildId && stats.find(s => s.buildId === selectedBuildId);
-  const build = statWithBuild && statWithBuild.build;
+  const statIndex = selectedBuildId ? stats.findIndex(s => s.buildId === selectedBuildId) : -1;
+  const stat = statIndex !== -1 ? stats[statIndex] : undefined;
 
   let contents = <Fragment />;
-  if (build) {
-    const createdAt = new Date(build.createdAt || '');
+  if (stat) {
+    const previousStat = statIndex > 0 ? stats[statIndex - 1] : undefined;
+    const createdAt = new Date(stat.build.createdAt || '');
+    /** @type {LHCI.NumericAuditDiff|undefined} */
+    const diff = previousStat && {
+      type: 'score',
+      auditId: '',
+      baseValue: previousStat.value,
+      compareValue: stat.value,
+    };
     contents = (
       <Fragment>
         <div className="hover-card__datetime">
@@ -372,6 +381,7 @@ const HoverCard = props => {
             {createdAt.getHours()}:{createdAt.getMinutes()}
           </span>
         </div>
+        <Gauge score={stat.value} diff={diff} />
       </Fragment>
     );
   }

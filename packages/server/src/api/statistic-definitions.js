@@ -50,6 +50,25 @@ function categoryScoreAverage(categoryId) {
   };
 }
 
+/**
+ * @param {string} categoryId
+ * @param {'min'|'max'} type
+ * @return {StatisticFn}
+ */
+function categoryScoreMinOrMax(categoryId, type) {
+  return lhrs => {
+    const values = lhrs
+      .map(lhr => lhr.categories[categoryId] && lhr.categories[categoryId].score)
+      .filter(
+        /** @return {value is number} */ value =>
+          typeof value === 'number' && Number.isFinite(value)
+      );
+
+    if (!values.length) return {value: -1};
+    return {value: Math[type](...values)};
+  };
+}
+
 /** @type {Record<LHCI.ServerCommand.StatisticName, StatisticFn>} */
 const definitions = {
   audit_interactive_average: auditNumericValueAverage('interactive'),
@@ -60,6 +79,16 @@ const definitions = {
   category_seo_average: categoryScoreAverage('seo'),
   category_accessibility_average: categoryScoreAverage('accessibility'),
   'category_best-practices_average': categoryScoreAverage('best-practices'),
+  category_performance_min: categoryScoreMinOrMax('performance', 'min'),
+  category_pwa_min: categoryScoreMinOrMax('pwa', 'min'),
+  category_seo_min: categoryScoreMinOrMax('seo', 'min'),
+  category_accessibility_min: categoryScoreMinOrMax('accessibility', 'min'),
+  'category_best-practices_min': categoryScoreMinOrMax('best-practices', 'min'),
+  category_performance_max: categoryScoreMinOrMax('performance', 'max'),
+  category_pwa_max: categoryScoreMinOrMax('pwa', 'max'),
+  category_seo_max: categoryScoreMinOrMax('seo', 'max'),
+  category_accessibility_max: categoryScoreMinOrMax('accessibility', 'max'),
+  'category_best-practices_max': categoryScoreMinOrMax('best-practices', 'max'),
 };
 
 // Keep the export separate from declaration to enable tsc to typecheck the `@type` annotation.

@@ -62,7 +62,17 @@ declare global {
         | 'category_pwa_average'
         | 'category_seo_average'
         | 'category_accessibility_average'
-        | 'category_best-practices_average';
+        | 'category_best-practices_average'
+        | 'category_performance_min'
+        | 'category_pwa_min'
+        | 'category_seo_min'
+        | 'category_accessibility_min'
+        | 'category_best-practices_min'
+        | 'category_performance_max'
+        | 'category_pwa_max'
+        | 'category_seo_max'
+        | 'category_accessibility_max'
+        | 'category_best-practices_max';
 
       export interface Statistic {
         id: string;

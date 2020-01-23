@@ -58,7 +58,8 @@ export const ProjectGraphs = props => {
     statsWithBuildsUnfiltered &&
     statsWithBuildsUnfiltered
       .filter(stat => stat.build.branch === branch)
-      .filter(stat => stat.url === url);
+      .filter(stat => stat.url === url)
+      .sort((a, b) => (a.build.createdAt || '').localeCompare(b.build.createdAt || ''));
 
   return (
     <div className="dashboard-graphs-redesign">

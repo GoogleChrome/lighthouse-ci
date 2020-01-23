@@ -88,16 +88,32 @@ function createRootSvg(rootEl) {
   };
 }
 
+/** @param {Array<StatisticWithBuild>} statistics @return {Record<string, {min: number, max: number}>} */
+export function buildMinMaxByBuildId(statistics) {
+  /** @type {Record<string, {min: number, max: number}>} */
+  const minMaxByBuild = {};
+  for (const stat of statistics) {
+    const entry = minMaxByBuild[stat.buildId] || {min: 0, max: 0};
+    if (stat.name.endsWith('_min')) entry.min = stat.value;
+    if (stat.name.endsWith('_max')) entry.max = stat.value;
+    minMaxByBuild[stat.buildId] = entry;
+  }
+
+  return minMaxByBuild;
+}
+
 /**
  *
  * @param {HTMLElement} rootEl
+ * @param {Array<StatisticWithBuild>} statisticsWithMinMax
  * @param {Array<StatisticWithBuild>} statistics
  */
-function renderScoreGraph(rootEl, statistics) {
+function renderScoreGraph(rootEl, statisticsWithMinMax, statistics) {
   d3.select(rootEl)
     .selectAll('*')
     .remove();
   const {svg, masks, width, graphWidth, graphHeight} = createRootSvg(rootEl);
+  const minMaxByBuild = buildMinMaxByBuildId(statisticsWithMinMax);
   const n = statistics.length - 1;
   const statName = statistics[0].name;
   const scoreLineMaskId = `scoreLineMask-${statName}`;
@@ -131,8 +147,8 @@ function renderScoreGraph(rootEl, statistics) {
     .y(d => yScale(d.value * 100));
   const scoreRange = statisticArea()
     .x((d, i) => xScale(i))
-    .y0(d => yScale(Math.max(d.value * 100 - 8, 0)))
-    .y1(d => yScale(Math.min(100, d.value * 100 + 8)));
+    .y0(d => yScale(minMaxByBuild[d.buildId].min * 100))
+    .y1(d => yScale(minMaxByBuild[d.buildId].max * 100));
 
   const guideLine = d3
     .line()
@@ -265,56 +281,58 @@ function renderScoreDeltaGraph(rootEl, statistics) {
     .attr('height', d => Math.abs(yScale(d) - yScale(0)));
 }
 
-/** @param {{statistics: Array<StatisticWithBuild>}} props */
+/** @param {{statistics: Array<StatisticWithBuild>, averageStatistics: Array<StatisticWithBuild>}} props */
 const ScoreGraph = props => {
   const graphElRef = useRef(/** @type {HTMLElement|undefined} */ (undefined));
 
   useEffect(() => {
     const rerender = () =>
-      graphElRef.current && renderScoreGraph(graphElRef.current, props.statistics);
+      graphElRef.current &&
+      renderScoreGraph(graphElRef.current, props.statistics, props.averageStatistics);
 
     rerender();
     window.addEventListener('resize', rerender);
     return () => window.removeEventListener('resize', rerender);
-  }, [props.statistics.length]);
+  }, [props.statistics.length, props.averageStatistics.length]);
 
   return <div className="category-score-graph__score-graph" ref={graphElRef} />;
 };
 
-/** @param {{statistics: Array<StatisticWithBuild>}} props */
+/** @param {{averageStatistics: Array<StatisticWithBuild>}} props */
 const ScoreDeltaGraph = props => {
   const graphElRef = useRef(/** @type {HTMLElement|undefined} */ (undefined));
 
   useEffect(() => {
     const rerender = () =>
-      graphElRef.current && renderScoreDeltaGraph(graphElRef.current, props.statistics);
+      graphElRef.current && renderScoreDeltaGraph(graphElRef.current, props.averageStatistics);
 
     rerender();
     window.addEventListener('resize', rerender);
     return () => window.removeEventListener('resize', rerender);
-  }, [props.statistics.length]);
+  }, [props.averageStatistics.length]);
 
   return <div className="category-score-graph__score-delta-graph" ref={graphElRef} />;
 };
 
 /** @param {{category: 'performance'|'pwa'|'seo'|'accessibility', statistics: Array<StatisticWithBuild>}} props */
 export const CategoryScoreGraph = props => {
-  const statistics = props.statistics.filter(s => s.name === `category_${props.category}_average`);
+  const allStats = props.statistics.filter(s => s.name.startsWith(`category_${props.category}`));
+  const averageStats = allStats.filter(s => s.name.endsWith('_average'));
 
-  if (!statistics.length) return <span>No data available</span>;
+  if (!averageStats.length) return <span>No data available</span>;
 
   return (
     <div className="category-score-graph">
       <h2>Overview</h2>
-      <ScoreGraph statistics={statistics} />
-      <ScoreDeltaGraph statistics={statistics} />
+      <ScoreGraph statistics={allStats} averageStatistics={averageStats} />
+      <ScoreDeltaGraph averageStatistics={averageStats} />
       <div className="category-score-graph__date-range">
         <div style={{marginLeft: GRAPH_MARGIN}}>
-          {new Date(statistics[0].createdAt || '').toLocaleDateString()}
+          {new Date(averageStats[0].createdAt || '').toLocaleDateString()}
         </div>
         <div style={{flexGrow: 1}} />
         <div style={{marginRight: GRAPH_MARGIN_RIGHT}}>
-          {new Date(statistics[statistics.length - 1].createdAt || '').toLocaleDateString()}
+          {new Date(averageStats[averageStats.length - 1].createdAt || '').toLocaleDateString()}
         </div>
       </div>
     </div>

@@ -5,7 +5,10 @@
  */
 
 import {h} from 'preact';
-import {computeScoreLineSegments} from '../../../../src/ui/routes/project-dashboard-redesign/category-score-graph';
+import {
+  computeScoreLineSegments,
+  buildMinMaxByBuildId,
+} from '../../../../src/ui/routes/project-dashboard-redesign/category-score-graph';
 import {cleanup} from '../../../test-utils.js';
 
 afterEach(cleanup);
@@ -31,6 +34,24 @@ describe('Category Score Graph', () => {
       const statistics = [{score: 0.13}, {score: 0.22}, {score: 0.48}, {score: 0.05}];
       const segments = computeScoreLineSegments(statistics);
       expect(segments).toEqual([statistics]);
+    });
+  });
+
+  describe('buildMinMaxByBuildId', () => {
+    it('should set the min/max values by build id', () => {
+      const statistics = [
+        {buildId: 'a', name: 'category_pwa_average', value: 0.4},
+        {buildId: 'a', name: 'category_pwa_min', value: 0.1},
+        {buildId: 'a', name: 'category_pwa_max', value: 0.7},
+        {buildId: 'b', name: 'category_pwa_min', value: 0.6},
+        {buildId: 'b', name: 'category_pwa_average', value: 0.8},
+        {buildId: 'b', name: 'category_pwa_max', value: 0.99},
+      ];
+
+      expect(buildMinMaxByBuildId(statistics)).toEqual({
+        a: {min: 0.1, max: 0.7},
+        b: {min: 0.6, max: 0.99},
+      });
     });
   });
 });

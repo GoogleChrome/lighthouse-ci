@@ -581,91 +581,49 @@ function runTests(state) {
 
     it('should get the statistics', async () => {
       const statistics = await client.getStatistics(projectA.id, buildA.id);
-      statistics.sort((a, b) => a.url.localeCompare(b.url) || a.name.localeCompare(b.name));
       statistics.forEach(stat => (stat.value = Math.round(stat.value * 1000) / 1000));
 
-      expect(statistics).toMatchObject([
-        {
-          url: 'https://example.com:PORT/',
-          name: 'audit_first-contentful-paint_average',
-          value: 2000,
-        },
-        {
-          url: 'https://example.com:PORT/',
-          name: 'audit_interactive_average',
-          value: 5500,
-        },
-        {
-          url: 'https://example.com:PORT/',
-          name: 'audit_speed-index_average',
-          value: 5000,
-        },
-        {
-          url: 'https://example.com:PORT/',
-          name: 'category_accessibility_average',
-          value: -1,
-        },
-        {
-          url: 'https://example.com:PORT/',
-          name: 'category_best-practices_average',
-          value: -1,
-        },
-        {
-          url: 'https://example.com:PORT/',
-          name: 'category_performance_average',
-          value: 0.45,
-        },
-        {
-          url: 'https://example.com:PORT/',
-          name: 'category_pwa_average',
-          value: 0.1,
-        },
-        {
-          url: 'https://example.com:PORT/',
-          name: 'category_seo_average',
-          value: 0.9,
-        },
-        {
-          url: 'https://example.com:PORT/blog',
-          name: 'audit_first-contentful-paint_average',
-          value: 1000,
-        },
-        {
-          url: 'https://example.com:PORT/blog',
-          name: 'audit_interactive_average',
-          value: 1000,
-        },
-        {
-          url: 'https://example.com:PORT/blog',
-          name: 'audit_speed-index_average',
-          value: 1000,
-        },
-        {
-          url: 'https://example.com:PORT/blog',
-          name: 'category_accessibility_average',
-          value: -1,
-        },
-        {
-          url: 'https://example.com:PORT/blog',
-          name: 'category_best-practices_average',
-          value: -1,
-        },
-        {
-          url: 'https://example.com:PORT/blog',
-          name: 'category_performance_average',
-          value: 0.9,
-        },
-        {
-          url: 'https://example.com:PORT/blog',
-          name: 'category_pwa_average',
-          value: 0.4,
-        },
-        {
-          url: 'https://example.com:PORT/blog',
-          name: 'category_seo_average',
-          value: 0.7,
-        },
-      ]);
+      const urlRootStats = statistics.filter(stat => stat.url === 'https://example.com:PORT/');
+      const urlBlogStats = statistics.filter(stat => stat.url === 'https://example.com:PORT/blog');
+      const fcpAverage = urlRootStats.find(s => s.name === 'audit_first-contentful-paint_average');
+      const a11yAverage = urlRootStats.find(s => s.name === 'category_accessibility_average');
+      const a11yMin = urlRootStats.find(s => s.name === 'category_accessibility_min');
+      const perfAverage = urlRootStats.find(s => s.name === 'category_performance_average');
+      const perfMin = urlRootStats.find(s => s.name === 'category_performance_min');
+      const perfMax = urlRootStats.find(s => s.name === 'category_performance_max');
+
+      expect(urlRootStats).toHaveLength(18);
+      expect(urlBlogStats).toHaveLength(urlRootStats.length);
+      expect(fcpAverage).toMatchObject({
+        url: 'https://example.com:PORT/',
+        name: 'audit_first-contentful-paint_average',
+        value: 2000,
+      });
+      expect(a11yAverage).toMatchObject({
+        url: 'https://example.com:PORT/',
+        name: 'category_accessibility_average',
+        value: -1,
+      });
+      expect(a11yMin).toMatchObject({
+        url: 'https://example.com:PORT/',
+        name: 'category_accessibility_min',
+        value: -1,
+      });
+      expect(perfAverage).toMatchObject({
+        url: 'https://example.com:PORT/',
+        name: 'category_performance_average',
+        value: 0.45,
+      });
+      expect(perfMin).toMatchObject({
+        url: 'https://example.com:PORT/',
+        name: 'category_performance_min',
+        value: 0.4,
+      });
+      expect(perfMax).toMatchObject({
+        url: 'https://example.com:PORT/',
+        name: 'category_performance_max',
+        value: 0.5,
+      });
     });
 
     it('should not recompute on every call', async () => {

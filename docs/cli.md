@@ -255,20 +255,25 @@ lhci assert
 Assert that the latest results meet expectations
 
 Options:
-  --help         Show help                                             [boolean]
-  --version      Show version number                                   [boolean]
-  --config       Path to JSON config file
-  --preset       The assertions preset to extend
-                           [choices: "lighthouse:all", "lighthouse:recommended"]
-  --assertions   The assertions to use.
-  --budgetsFile  The path (relative to cwd) to a budgets.json file.
+  --help                     Show help                                 [boolean]
+  --version                  Show version number                       [boolean]
+  --no-lighthouserc          Disables automatic usage of a .lighthouserc file.
+                                                                       [boolean]
+  --preset                   The assertions preset to extend
+      [choices: "lighthouse:all", "lighthouse:recommended", "lighthouse:no-pwa"]
+  --assertions               The assertions to use.
+  --budgetsFile              The path (relative to cwd) to a budgets.json file.
+  --includePassedAssertions  Whether to include the results of passed assertions
+                             in the output.                            [boolean]
 ```
 
 **Examples**
 
 ```bash
 lhci assert --config=./lighthouserc.json
+lhci assert --budgetsFile=./budgets.json
 lhci assert --preset=lighthouse:recommended --assertions.speed-index=off
+lhci assert --preset=lighthouse:recommended --includePassedAssertions
 ```
 
 ---

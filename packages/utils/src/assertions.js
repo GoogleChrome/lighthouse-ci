@@ -19,6 +19,7 @@ const {computeRepresentativeRuns} = require('./representative-runs.js');
  * @property {number} expected
  * @property {number} actual
  * @property {number[]} values
+ * @property {boolean} passed
  * @property {LHCI.AssertCommand.AssertionFailureLevel} [level]
  * @property {string} [auditId]
  * @property {string|undefined} [auditProperty]
@@ -41,12 +42,12 @@ const AUDIT_TYPE_VALUE_GETTERS = {
   maxNumericValue: result => result.numericValue,
 };
 
-/** @type {Record<AssertionType, {operator: string, passesFn(actual: number, expected: number): boolean}>} */
+/** @type {Record<AssertionType, {operator: string, passedFn(actual: number, expected: number): boolean}>} */
 const AUDIT_TYPE_OPERATORS = {
-  auditRan: {operator: '==', passesFn: (actual, expected) => actual === expected},
-  minScore: {operator: '>=', passesFn: (actual, expected) => actual >= expected},
-  maxLength: {operator: '<=', passesFn: (actual, expected) => actual <= expected},
-  maxNumericValue: {operator: '<=', passesFn: (actual, expected) => actual <= expected},
+  auditRan: {operator: '==', passedFn: (actual, expected) => actual === expected},
+  minScore: {operator: '>=', passedFn: (actual, expected) => actual >= expected},
+  maxLength: {operator: '<=', passedFn: (actual, expected) => actual <= expected},
+  maxNumericValue: {operator: '<=', passedFn: (actual, expected) => actual <= expected},
 };
 
 /**
@@ -101,16 +102,17 @@ function getAssertionResult(auditResults, aggregationMethod, assertionType, expe
     (filteredValues.length !== values.length && aggregationMethod === 'pessimistic')
   ) {
     const didRun = values.map(value => (isFiniteNumber(value) ? 1 : 0));
-    return [{name: 'auditRan', expected: 1, actual: 0, values: didRun, operator: '=='}];
+    return [
+      {name: 'auditRan', expected: 1, actual: 0, values: didRun, operator: '==', passed: false},
+    ];
   }
 
-  const {operator, passesFn} = AUDIT_TYPE_OPERATORS[assertionType];
+  const {operator, passedFn} = AUDIT_TYPE_OPERATORS[assertionType];
   const actualValue = getValueForAggregationMethod(
     filteredValues,
     aggregationMethod,
     assertionType
   );
-  if (passesFn(actualValue, expectedValue)) return [];
 
   return [
     {
@@ -119,6 +121,7 @@ function getAssertionResult(auditResults, aggregationMethod, assertionType, expe
       actual: actualValue,
       values: filteredValues,
       operator,
+      passed: passedFn(actualValue, expectedValue),
     },
   ];
 }
@@ -128,7 +131,7 @@ function getAssertionResult(auditResults, aggregationMethod, assertionType, expe
  * @param {LHCI.AssertCommand.AssertionOptions} options
  * @return {AssertionResultNoURL[]}
  */
-function getAssertionResults(possibleAuditResults, options) {
+function getStandardAssertionResults(possibleAuditResults, options) {
   const {minScore, maxLength, maxNumericValue, aggregationMethod = 'optimistic'} = options;
   if (possibleAuditResults.some(result => result === undefined)) {
     return [
@@ -138,6 +141,7 @@ function getAssertionResults(possibleAuditResults, options) {
         actual: 0,
         values: possibleAuditResults.map(result => (result === undefined ? 0 : 1)),
         operator: '>=',
+        passed: false,
       },
     ];
   }
@@ -259,7 +263,7 @@ function getCategoryAssertionResults(auditProperty, assertionOptions, lhrs) {
     };
   });
 
-  return getAssertionResults(psuedoAudits, assertionOptions).map(result => ({
+  return getStandardAssertionResults(psuedoAudits, assertionOptions).map(result => ({
     ...result,
     auditProperty: categoryId,
   }));
@@ -303,12 +307,12 @@ function getAssertionResultsForAudit(auditId, auditProperty, auditResults, asser
       return {...result, numericValue: item[itemKey]};
     });
 
-    return getAssertionResults(psuedoAuditResults, assertionOptions).map(result => ({
+    return getStandardAssertionResults(psuedoAuditResults, assertionOptions).map(result => ({
       ...result,
       auditProperty: auditProperty.join('.'),
     }));
   } else {
-    return getAssertionResults(auditResults, assertionOptions);
+    return getStandardAssertionResults(auditResults, assertionOptions);
   }
 }
 
@@ -369,7 +373,7 @@ function resolveAssertionOptionsAndLhrs(baseOptions, unfilteredLhrs) {
  * @param {LH.Result[]} unfilteredLhrs
  * @return {AssertionResult[]}
  */
-function getAllFilteredAssertionResults(baseOptions, unfilteredLhrs) {
+function getAllAssertionResultsForUrl(baseOptions, unfilteredLhrs) {
   const {
     assertions,
     auditsToAssert,
@@ -416,6 +420,8 @@ function getAllFilteredAssertionResults(baseOptions, unfilteredLhrs) {
 }
 
 /**
+ * Computes all assertion results for the given LHR-set and options.
+ *
  * @param {LHCI.AssertCommand.Options} options
  * @param {LH.Result[]} lhrs
  * @return {AssertionResult[]}
@@ -437,11 +443,12 @@ function getAllAssertionResults(options, lhrs) {
   const results = [];
   for (const lhrSet of groupedByURL) {
     for (const baseOptions of arrayOfOptions) {
-      results.push(...getAllFilteredAssertionResults(baseOptions, lhrSet));
+      results.push(...getAllAssertionResultsForUrl(baseOptions, lhrSet));
     }
   }
 
-  return results;
+  if (options.includePassedAssertions) return results;
+  return results.filter(result => !result.passed);
 }
 
 module.exports = {getAllAssertionResults};

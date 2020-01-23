@@ -28,6 +28,10 @@ function buildCommand(yargs) {
     budgetsFile: {
       description: 'The path (relative to cwd) to a budgets.json file.',
     },
+    includePassedAssertions: {
+      type: 'boolean',
+      description: 'Whether to include the results of passed assertions in the output.',
+    },
   });
 }
 
@@ -61,19 +65,27 @@ async function runCommand(options) {
   let hasFailure = false;
   for (const results of groupedResults) {
     const url = results[0].url;
+    // Sort the results by
+    //    - Failing audits with error level alphabetical
+    //    - Failing audits with warn level alphabetical
+    //    - Passing audits alphabetical
     const sortedResults = results.sort((a, b) => {
-      const {level: levelA = 'error', auditId: auditIdA = 'unknown'} = a;
-      const {level: levelB = 'error', auditId: auditIdB = 'unknown'} = b;
+      const {level: levelA = 'error', auditId: auditIdA = 'unknown', passed: passedA} = a;
+      const {level: levelB = 'error', auditId: auditIdB = 'unknown', passed: passedB} = b;
+      if (passedA !== passedB) return String(passedA).localeCompare(String(passedB));
+      if (passedA) return auditIdA.localeCompare(auditIdB);
       return levelA.localeCompare(levelB) || auditIdA.localeCompare(auditIdB);
     });
 
     process.stderr.write(`${sortedResults.length} result(s) for ${log.bold}${url}${log.reset}\n`);
 
     for (const result of sortedResults) {
-      hasFailure = hasFailure || result.level === 'error';
-      const label = result.level === 'warn' ? 'warning' : 'failure';
-      const icon = result.level === 'warn' ? '⚠️ ' : `${log.redify(log.cross)} `;
-      const idPart = `${log.bold}${result.auditId}${log.reset}`;
+      const {level, passed, auditId} = result;
+      const isFailure = !passed && level === 'error';
+      hasFailure = hasFailure || isFailure;
+      const label = passed ? 'passing' : level === 'warn' ? 'warning' : 'failure';
+      const icon = passed ? '✅ ' : level === 'warn' ? '⚠️ ' : `${log.redify(log.cross)} `;
+      const idPart = `${log.bold}${auditId}${log.reset}`;
       const propertyPart = result.auditProperty ? `.${result.auditProperty}` : '';
       const namePart = `${log.bold}${result.name}${log.reset}`;
 
@@ -90,7 +102,7 @@ async function runCommand(options) {
       process.stderr.write(`
   ${icon} ${idPart}${propertyPart} ${label} for ${namePart} assertion${humanFriendlyParts}
         expected: ${result.operator}${log.greenify(result.expected)}
-           found: ${log.redify(result.actual)}
+           found: ${passed ? log.greenify(result.actual) : log.redify(result.actual)}
       ${log.dim}all values: ${result.values.join(', ')}${log.reset}\n\n`);
     }
   }

@@ -28,6 +28,10 @@ function buildCommand(yargs) {
     budgetsFile: {
       description: 'The path (relative to cwd) to a budgets.json file.',
     },
+    includePassedAssertions: {
+      type: 'boolean',
+      description: 'Whether to include the results of passed assertions in the output.',
+    },
   });
 }
 

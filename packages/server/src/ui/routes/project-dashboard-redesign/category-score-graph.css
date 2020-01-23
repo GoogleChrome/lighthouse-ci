@@ -66,6 +66,21 @@
   stroke: none;
 }
 
+.category-score-graph__score-graph .tracking-line {
+  stroke: none;
+  stroke-width: 2px;
+}
+
+.category-score-graph--with-selected-build .tracking-line {
+  stroke: var(--base-border-color);
+}
+
+.category-score-graph__score-graph .score-point__hitbox {
+  /* transparent but absorb pointer events */
+  fill: rgba(0, 0, 0, 0);
+  cursor: pointer;
+}
+
 .category-score-graph__score-graph .y-axis text {
   font-family: var(--base-font-family);
   font-weight: var(--medium-font-weight);

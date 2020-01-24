@@ -11,7 +11,7 @@ import './lhr-viewer-button.css';
 // @ts-ignore - ts doesn't know how parcel works :)
 const LH_ICON_PATH = require('../favicon.svg');
 
-/** @param {{lhr: LH.Result, label?: string}} props */
+/** @param {{lhr: import('./lhr-viewer-link').LHResolver, label?: string}} props */
 export const LhrViewerButton = props => {
   const {lhr, label = 'Open Report'} = props;
   return (

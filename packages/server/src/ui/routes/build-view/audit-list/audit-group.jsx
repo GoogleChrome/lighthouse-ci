@@ -11,7 +11,7 @@ import {ScoreIcon} from '../../../components/score-icon';
 import clsx from 'clsx';
 import {AuditDiff} from './audit-diff';
 import {useState} from 'preact/hooks';
-import {createLhrOpenClickHandler} from '../../../components/lhr-viewer-link';
+import {openLhrInClassicViewer} from '../../../components/lhr-viewer-link';
 
 /** @typedef {{key?: string, group: {id: string, title: string}, selectedAuditId: string|null, setSelectedAuditId: (id: string|null) => void, pairs: Array<LHCI.AuditPair>, baseLhr?: LH.Result, showAsNarrow: boolean, showAsUnchanged: boolean}} Props */
 
@@ -89,7 +89,11 @@ const UnchangedAuditList = props => {
           <div
             key={audit.id}
             className={clsx('audit-group__audit', 'audit-group__audit--unchanged')}
-            onClick={createLhrOpenClickHandler(baseLhr)}
+            onClick={e => {
+              e.preventDefault();
+              e.stopPropagation();
+              openLhrInClassicViewer(baseLhr);
+            }}
           >
             <div className="audit-group__audit-score">
               <ScoreIcon score={audit.score || 0} />

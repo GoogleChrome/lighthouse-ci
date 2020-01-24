@@ -4,21 +4,7 @@
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
  */
 
-import {h} from 'preact';
-import {LhrViewerLink} from './lhr-viewer-link';
-import './lhr-viewer-button.css';
-
-// @ts-ignore - ts doesn't know how parcel works :)
-const LH_ICON_PATH = require('../favicon.svg');
-
-/** @param {{lhr: import('./lhr-viewer-link').LHResolver, label?: string}} props */
-export const LhrViewerButton = props => {
-  const {lhr, label = 'Open Report'} = props;
-  return (
-    <LhrViewerLink lhr={lhr}>
-      <div className="lhr-viewer-button" role="button">
-        <img src={LH_ICON_PATH} /> <span>{label}</span>
-      </div>
-    </LhrViewerLink>
-  );
-};
+.lhr-viewer-link--loading {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

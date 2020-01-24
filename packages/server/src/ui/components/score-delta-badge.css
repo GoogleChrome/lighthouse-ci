@@ -18,10 +18,10 @@
   text-align: center;
 }
 
-.score-delta-badge--improvement {
+.score-delta-badge.score-delta-badge--improvement {
   background-color: var(--improvement-color);
 }
 
-.score-delta-badge--regression {
+.score-delta-badge.score-delta-badge--regression {
   background-color: var(--regression-color);
 }

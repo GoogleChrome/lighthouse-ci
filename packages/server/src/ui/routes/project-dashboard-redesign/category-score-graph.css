@@ -117,7 +117,7 @@
 .hover-card {
   position: absolute;
   top: 50px;
-  width: 180px;
+  width: 200px;
 
   display: none;
   flex-direction: column;
@@ -153,4 +153,31 @@
 
 .hover-card .score-delta-badge {
   margin-bottom: var(--base-spacing);
+}
+
+.hover-card__actions {
+  width: 100%;
+  border-top: 1px solid var(--base-border-color);
+  display: flex;
+  flex-direction: row;
+}
+
+.hover-card__actions > a {
+  width: 50%;
+  padding: var(--base-spacing);
+
+  text-align: center;
+  font-size: var(--smaller-font-size);
+  font-weight: var(--medium-font-weight);
+  color: var(--base-text-color);
+}
+
+.hover-card__actions .lhr-viewer-button {
+  margin-right: 0;
+  padding: 0;
+}
+
+.hover-card__actions > a:last-child {
+  border-left: 1px solid var(--base-border-color);
+  line-height: var(--lhr-viewer-button-size);
 }

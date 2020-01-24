@@ -13,6 +13,8 @@ import {useRef, useEffect, useState} from 'preact/hooks';
 import clsx from 'clsx';
 import {Gauge} from '../../components/gauge';
 import {ScoreDeltaBadge} from '../../components/score-delta-badge';
+import {LhrViewerLink} from '../../components/lhr-viewer-link';
+import {api} from '../../hooks/use-api-data';
 
 const GRAPH_MARGIN = 10;
 const GRAPH_MARGIN_RIGHT = 50;
@@ -420,6 +422,22 @@ const HoverCard = props => {
         </div>
         <Gauge score={stat.value} diff={diff} />
         {diff ? <ScoreDeltaBadge diff={diff} /> : null}
+        <div className="hover-card__actions">
+          <a href="#">
+            <LhrViewerLink
+              lhr={async () => {
+                const [run] = await api.getRuns(stat.build.projectId, stat.buildId, {
+                  url: stat.url,
+                  representative: true,
+                });
+                return JSON.parse(run.lhr);
+              }}
+            >
+              Report
+            </LhrViewerLink>
+          </a>
+          <a href={`./compare/${_.shortId(stat.build.id)}`}>CI Diff</a>
+        </div>
       </Fragment>
     );
   }

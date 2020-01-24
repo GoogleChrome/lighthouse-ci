@@ -23,8 +23,8 @@
 }
 
 .lhr-viewer-button img {
-  height: 20px;
-  width: 20px;
+  height: var(--lhr-viewer-button-size);
+  width: var(--lhr-viewer-button-size);
 }
 
 .lhr-viewer-button span {

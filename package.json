@@ -62,7 +62,7 @@
     "jest-image-snapshot": "^2.9.0",
     "lerna": "^3.16.4",
     "mysql2": "^1.7.0",
-    "parcel-bundler": "^1.12.3",
+    "parcel": "^2.0.0-alpha.3.2",
     "pg": "^7.12.1",
     "pg-hstore": "^2.3.3",
     "prettier": "^1.16.4",

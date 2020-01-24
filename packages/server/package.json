@@ -12,8 +12,8 @@
   },
   "scripts": {
     "clean": "rm -rf ./dist",
-    "build": "parcel build ./src/ui/index.html --public-url=/app",
-    "build:watch": "parcel watch ./src/ui/index.html  --public-url=/app",
+    "build": "parcel build ./src/ui/index.html",
+    "build:watch": "parcel watch ./src/ui/index.html",
     "build:source-map-explorer": "npm run clean && npm run build && ../../scripts/source-map-explorer.sh"
   },
   "dependencies": {
@@ -34,6 +34,11 @@
     "preact": "^10.0.1",
     "preact-async-route": "^2.2.1",
     "preact-router": "^3.1.0"
+  },
+  "targets": {
+    "browser": {
+      "publicUrl": "/app"
+    }
   },
   "alias": {
     "isomorphic-fetch": "clsx"

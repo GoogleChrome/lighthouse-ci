@@ -236,7 +236,7 @@ Be sure to keep this token secret. Anyone in possession of this token will be ab
 
 Historical reports and advanced report diffing is available with the Lighthouse CI server. For setup of the server itself, see [our server recipe](./recipes/docker-server/README.md).
 
-Once the server is set up, create a a new project with the lhci wizard:
+Once the server is set up, create a new project with the lhci wizard:
 
 ```bash
 $ lhci wizard

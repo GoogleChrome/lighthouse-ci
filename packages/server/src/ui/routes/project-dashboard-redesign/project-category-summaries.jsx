@@ -9,8 +9,8 @@ import {useMemo, useState} from 'preact/hooks';
 import _ from '@lhci/utils/src/lodash.js';
 import {useBuildStatistics, useRepresentativeRun, useLhr} from '../../hooks/use-api-data';
 
-import './project-graphs-redesign.css';
-import {CategoryGraphs} from './category-graphs';
+import './project-category-summaries.css';
+import {CategoryCard} from './category-card';
 import {AsyncLoader} from '../../components/async-loader';
 
 /** @typedef {LHCI.ServerCommand.Statistic & {build: LHCI.ServerCommand.Build}} StatisticWithBuild */
@@ -32,7 +32,7 @@ const augmentStatsWithBuilds = (stats, builds) => {
 };
 
 /** @param {{builds: Array<LHCI.ServerCommand.Build>, statistics: Array<StatisticWithBuild>|undefined, statisticsLoadingState: import('../../hooks/use-api-data').LoadingState, run: LHCI.ServerCommand.Run|null, buildLimit: number, setBuildLimit: (n: number) => void}} props */
-const ProjectGraphs_ = props => {
+const ProjectCategorySummaries_ = props => {
   const lhr = useLhr(props.run);
   if (!lhr) {
     return <h1>No matching graph data available.</h1>;
@@ -42,7 +42,7 @@ const ProjectGraphs_ = props => {
     <Fragment>
       {Object.values(lhr.categories).map(category => {
         return (
-          <CategoryGraphs
+          <CategoryCard
             key={category.id}
             title={category.title}
             category={category}
@@ -59,7 +59,7 @@ const ProjectGraphs_ = props => {
 };
 
 /** @param {{project: LHCI.ServerCommand.Project, builds: Array<LHCI.ServerCommand.Build>, url: string, branch: string}} props */
-export const ProjectGraphs = props => {
+export const ProjectCategorySummaries = props => {
   const {project, builds, branch, url} = props;
   const [buildLimit, setBuildLimit] = useState(25);
   const buildIds = useMemo(
@@ -84,12 +84,12 @@ export const ProjectGraphs = props => {
       .sort((a, b) => (a.build.createdAt || '').localeCompare(b.build.createdAt || ''));
 
   return (
-    <div className="dashboard-graphs-redesign">
+    <div className="project-category-summaries">
       <AsyncLoader
         loadingState={runLoadingState}
         asyncData={run}
         render={run => (
-          <ProjectGraphs_
+          <ProjectCategorySummaries_
             run={run}
             builds={builds}
             statistics={statsWithBuilds}

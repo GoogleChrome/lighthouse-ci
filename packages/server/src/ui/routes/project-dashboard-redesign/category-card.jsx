@@ -9,21 +9,21 @@ import _ from '@lhci/utils/src/lodash.js';
 import {AsyncLoader} from '../../components/async-loader';
 import {Paper} from '../../components/paper.jsx';
 
-import './category-graphs.css';
-import {CategoryScoreGraph} from './category-score-graph';
+import './category-card.css';
+import {CategoryScoreGraph} from './graphs/category-score/category-score-graph';
 import clsx from 'clsx';
 
-/** @typedef {import('./project-graphs-redesign.jsx').StatisticWithBuild} StatisticWithBuild */
+/** @typedef {import('./project-category-summaries.jsx').StatisticWithBuild} StatisticWithBuild */
 
 const BUILD_LIMIT_OPTIONS = [{value: 25}, {value: 50}, {value: 100}, {value: 150, label: 'Max'}];
 
 /** @param {{title: string, category: LH.CategoryResult, statistics?: Array<StatisticWithBuild>, loadingState: import('../../components/async-loader').LoadingState, builds: LHCI.ServerCommand.Build[], buildLimit: number, setBuildLimit: (n: number) => void}} props */
-export const CategoryGraphs = props => {
+export const CategoryCard = props => {
   return (
-    <Paper className="category-graphs">
-      <div className="category-graphs__header">
-        <h3 className="category-graphs__title">{props.title}</h3>
-        <div className="category-graphs__build-limit">
+    <Paper className="category-card">
+      <div className="category-card__header">
+        <h3 className="category-card__title">{props.title}</h3>
+        <div className="category-card__build-limit">
           {BUILD_LIMIT_OPTIONS.map(option => (
             <span
               key={option.value}
@@ -37,7 +37,7 @@ export const CategoryGraphs = props => {
           ))}
         </div>
       </div>
-      <div className="category-graphs__body">
+      <div className="category-card__body">
         <AsyncLoader
           loadingState={props.loadingState}
           asyncData={props.statistics}

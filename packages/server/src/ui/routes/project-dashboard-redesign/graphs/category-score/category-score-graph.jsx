@@ -11,10 +11,10 @@ import * as _ from '@lhci/utils/src/lodash.js';
 import './category-score-graph.css';
 import {useRef, useEffect, useState} from 'preact/hooks';
 import clsx from 'clsx';
-import {Gauge} from '../../components/gauge';
-import {ScoreDeltaBadge} from '../../components/score-delta-badge';
-import {LhrViewerLink} from '../../components/lhr-viewer-link';
-import {api} from '../../hooks/use-api-data';
+import {Gauge} from '../../../../components/gauge';
+import {ScoreDeltaBadge} from '../../../../components/score-delta-badge';
+import {LhrViewerLink} from '../../../../components/lhr-viewer-link';
+import {api} from '../../../../hooks/use-api-data';
 
 const GRAPH_MARGIN = 10;
 const GRAPH_MARGIN_RIGHT = 50;
@@ -22,7 +22,7 @@ const DELTA_GRAPH_MIN = -50;
 const DELTA_GRAPH_MAX = 50;
 const HOVER_CARD_MARGIN = 100;
 
-/** @typedef {import('./project-graphs-redesign.jsx').StatisticWithBuild} StatisticWithBuild */
+/** @typedef {import('../../project-category-summaries.jsx').StatisticWithBuild} StatisticWithBuild */
 
 /** @param {Pick<StatisticWithBuild, 'value'>} statistic */
 function getClassNameFromStatistic(statistic) {

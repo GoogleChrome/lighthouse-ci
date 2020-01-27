@@ -16,7 +16,7 @@ import {
 } from '../../hooks/use-api-data';
 import {AsyncLoader, combineLoadingStates, combineAsyncData} from '../../components/async-loader';
 import {Page} from '../../layout/page.jsx';
-import {ProjectGraphs} from './project-graphs-redesign.jsx';
+import {ProjectCategorySummaries} from './project-category-summaries.jsx';
 
 import './project-dashboard.css';
 import {Dropdown} from '../../components/dropdown';
@@ -93,7 +93,7 @@ const ProjectDashboard_ = props => {
     >
       <div id="dashboard-redesign__scroll-height-detector" />
       <UrlAndBranchSelector {...props} />
-      <ProjectGraphs
+      <ProjectCategorySummaries
         project={props.project}
         builds={props.builds}
         url={props.selectedUrl}

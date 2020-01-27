@@ -4,13 +4,14 @@
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
  */
 
-import {h} from 'preact';
+import {h, Fragment} from 'preact';
 import {useMemo, useState} from 'preact/hooks';
 import _ from '@lhci/utils/src/lodash.js';
-import {useBuildStatistics} from '../../hooks/use-api-data';
+import {useBuildStatistics, useRepresentativeRun, useLhr} from '../../hooks/use-api-data';
 
 import './project-graphs-redesign.css';
 import {CategoryGraphs} from './category-graphs';
+import {AsyncLoader} from '../../components/async-loader';
 
 /** @typedef {LHCI.ServerCommand.Statistic & {build: LHCI.ServerCommand.Build}} StatisticWithBuild */
 
@@ -30,29 +31,50 @@ const augmentStatsWithBuilds = (stats, builds) => {
     .filter(/** @return {stat is StatisticWithBuild} */ stat => !!stat.build);
 };
 
-/** @param {{project: LHCI.ServerCommand.Project, builds: Array<LHCI.ServerCommand.Build>, runUrl?: string, branch?: string}} props */
+/** @param {{builds: Array<LHCI.ServerCommand.Build>, statistics: Array<StatisticWithBuild>|undefined, statisticsLoadingState: import('../../hooks/use-api-data').LoadingState, run: LHCI.ServerCommand.Run|null, buildLimit: number, setBuildLimit: (n: number) => void}} props */
+const ProjectGraphs_ = props => {
+  const lhr = useLhr(props.run);
+  if (!lhr) {
+    return <h1>No matching graph data available.</h1>;
+  }
+
+  return (
+    <Fragment>
+      {Object.values(lhr.categories).map(category => {
+        return (
+          <CategoryGraphs
+            key={category.id}
+            title={category.title}
+            category={category}
+            loadingState={props.statisticsLoadingState}
+            statistics={props.statistics}
+            builds={props.builds}
+            buildLimit={props.buildLimit}
+            setBuildLimit={props.setBuildLimit}
+          />
+        );
+      })}
+    </Fragment>
+  );
+};
+
+/** @param {{project: LHCI.ServerCommand.Project, builds: Array<LHCI.ServerCommand.Build>, url: string, branch: string}} props */
 export const ProjectGraphs = props => {
-  const {project, builds, branch: overrideBranch} = props;
-  const branch =
-    overrideBranch ||
-    (!builds.length || builds.some(build => build.branch === 'master')
-      ? 'master'
-      : builds[0].branch);
+  const {project, builds, branch, url} = props;
   const [buildLimit, setBuildLimit] = useState(25);
   const buildIds = useMemo(
     () =>
       builds
+        .filter(build => build.lifecycle === 'sealed')
         .filter(build => build.branch === branch)
         .sort((a, b) => new Date(b.runAt).getTime() - new Date(a.runAt).getTime())
         .map(build => build.id)
         .slice(0, buildLimit),
     [builds, branch, buildLimit]
   );
-  const [loadingState, stats] = useBuildStatistics(project.id, buildIds);
+  const [runLoadingState, run] = useRepresentativeRun(project.id, buildIds[0], url);
+  const [statLoadingState, stats] = useBuildStatistics(project.id, buildIds);
   const statsWithBuildsUnfiltered = augmentStatsWithBuilds(stats, builds);
-  const statForBranch =
-    statsWithBuildsUnfiltered && statsWithBuildsUnfiltered.find(s => s.build.branch);
-  const url = props.runUrl || (statForBranch && statForBranch.url) || '';
 
   const statsWithBuilds =
     statsWithBuildsUnfiltered &&
@@ -63,41 +85,19 @@ export const ProjectGraphs = props => {
 
   return (
     <div className="dashboard-graphs-redesign">
-      <CategoryGraphs
-        title="Performance"
-        category="performance"
-        loadingState={loadingState}
-        statistics={statsWithBuilds}
-        builds={builds}
-        buildLimit={buildLimit}
-        setBuildLimit={setBuildLimit}
-      />
-      <CategoryGraphs
-        title="Accessibility"
-        category="accessibility"
-        loadingState={loadingState}
-        statistics={statsWithBuilds}
-        builds={builds}
-        buildLimit={buildLimit}
-        setBuildLimit={setBuildLimit}
-      />
-      <CategoryGraphs
-        title="PWA"
-        category="pwa"
-        loadingState={loadingState}
-        statistics={statsWithBuilds}
-        builds={builds}
-        buildLimit={buildLimit}
-        setBuildLimit={setBuildLimit}
-      />
-      <CategoryGraphs
-        title="SEO"
-        category="seo"
-        loadingState={loadingState}
-        statistics={statsWithBuilds}
-        builds={builds}
-        buildLimit={buildLimit}
-        setBuildLimit={setBuildLimit}
+      <AsyncLoader
+        loadingState={runLoadingState}
+        asyncData={run}
+        render={run => (
+          <ProjectGraphs_
+            run={run}
+            builds={builds}
+            statistics={statsWithBuilds}
+            statisticsLoadingState={statLoadingState}
+            buildLimit={buildLimit}
+            setBuildLimit={setBuildLimit}
+          />
+        )}
       />
     </div>
   );

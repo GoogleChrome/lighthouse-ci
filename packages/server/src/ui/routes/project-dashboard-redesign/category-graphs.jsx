@@ -17,7 +17,7 @@ import clsx from 'clsx';
 
 const BUILD_LIMIT_OPTIONS = [{value: 25}, {value: 50}, {value: 100}, {value: 150, label: 'Max'}];
 
-/** @param {{title: string, category: 'performance'|'pwa'|'seo'|'accessibility', statistics?: Array<StatisticWithBuild>, loadingState: import('../../components/async-loader').LoadingState, builds: LHCI.ServerCommand.Build[], buildLimit: number, setBuildLimit: (n: number) => void}} props */
+/** @param {{title: string, category: LH.CategoryResult, statistics?: Array<StatisticWithBuild>, loadingState: import('../../components/async-loader').LoadingState, builds: LHCI.ServerCommand.Build[], buildLimit: number, setBuildLimit: (n: number) => void}} props */
 export const CategoryGraphs = props => {
   return (
     <Paper className="category-graphs">

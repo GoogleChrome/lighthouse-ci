@@ -29,8 +29,7 @@ const computeUrlAndBranchSelection = props => {
   const selectedUrl = props.runUrl || availableUrls[0].url;
   const selectedBranch =
     props.branch ||
-    (availableBranches.find(b => b.branch === 'master') ? 'master' : availableBranches[0].branch);
-
+    (availableBranches.some(b => b.branch === 'master') ? 'master' : availableBranches[0].branch);
   return {
     availableUrls,
     availableBranches,
@@ -97,7 +96,7 @@ const ProjectDashboard_ = props => {
       <ProjectGraphs
         project={props.project}
         builds={props.builds}
-        runUrl={props.selectedUrl}
+        url={props.selectedUrl}
         branch={props.selectedBranch}
       />
     </div>

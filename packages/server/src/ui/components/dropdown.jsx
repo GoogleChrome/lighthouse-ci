@@ -11,6 +11,9 @@ import './dropdown.css';
 /** @param {{options: Array<{value: string, label: string}>, value: string, setValue(v: string): void, className?: string, title?: string, label?: string}} props */
 export const Dropdown = props => {
   const {options, value, setValue, className, title, label} = props;
+  const computedOptions = options.some(option => option.value === value)
+    ? options
+    : [...options, {value, label: value}];
   return (
     <div
       className={clsx('dropdown', className)}
@@ -25,7 +28,7 @@ export const Dropdown = props => {
             setValue(evt.target.value);
           }}
         >
-          {options.map(option => {
+          {computedOptions.map(option => {
             return (
               <option key={option.value} value={option.value} selected={option.value === value}>
                 {option.label}

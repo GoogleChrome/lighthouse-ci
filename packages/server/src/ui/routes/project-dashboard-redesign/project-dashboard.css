@@ -14,6 +14,8 @@
   flex-direction: row;
   align-items: center;
   justify-content: center;
+
+  margin-bottom: var(--base-spacing);
 }
 
 .dashboard-redesign__url-branch-selector > * {

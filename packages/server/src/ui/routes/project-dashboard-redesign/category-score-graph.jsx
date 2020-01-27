@@ -462,15 +462,16 @@ const HoverCard = props => {
   );
 };
 
-/** @param {{category: 'performance'|'pwa'|'seo'|'accessibility', statistics: Array<StatisticWithBuild>}} props */
+/** @param {{category: LH.CategoryResult, statistics: Array<StatisticWithBuild>}} props */
 export const CategoryScoreGraph = props => {
   const [pinned, setPinned] = useState(false);
   const [selectedBuildId, setSelectedBuildId] = useState(
     /** @type {undefined|string} */ (undefined)
   );
 
-  const id = `category-score-graph--${props.category}`;
-  const allStats = props.statistics.filter(s => s.name.startsWith(`category_${props.category}`));
+  const categoryId = props.category.id;
+  const id = `category-score-graph--${categoryId}`;
+  const allStats = props.statistics.filter(s => s.name.startsWith(`category_${categoryId}`));
   const averageStats = allStats.filter(s => s.name.endsWith('_average'));
 
   // Unpin when the user clicks out of the graph

@@ -234,3 +234,39 @@ export function useBuildStatistics(projectId, buildIds) {
 
   return [loadingState, statistics];
 }
+
+/**
+ * @param {string|undefined} projectId
+ * @param {string|undefined} buildId
+ * @param {string|undefined} url
+ * @return {[LoadingState, LHCI.ServerCommand.Run | null | undefined]}
+ */
+export function useRepresentativeRun(projectId, buildId, url) {
+  // Construct this options object in a `useMemo` to prevent infinitely re-requesting.
+  const getRunsOptions = useMemo(() => ({url, representative: true}), [url]);
+  const [apiLoadingState, runs] = useApiData(
+    'getRuns',
+    projectId && buildId && url ? [projectId, buildId, getRunsOptions] : undefined
+  );
+
+  // If we couldn't find an ancestor build but we tried, consider it loaded with `null` to differentiate from `undefined`.
+  if (apiLoadingState === 'loaded' && (!runs || runs.length !== 1)) {
+    return ['loaded', null];
+  }
+
+  return [apiLoadingState, runs && runs[0]];
+}
+
+/**
+ * @param {LHCI.ServerCommand.Run|null|undefined} run
+ * @return {LH.Result|null|undefined}
+ */
+export function useLhr(run) {
+  if (!run) return run;
+
+  try {
+    return JSON.parse(run.lhr);
+  } catch (_) {
+    return null;
+  }
+}

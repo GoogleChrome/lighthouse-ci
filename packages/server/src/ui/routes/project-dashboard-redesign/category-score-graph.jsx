@@ -31,6 +31,14 @@ function getClassNameFromStatistic(statistic) {
   return 'score--average';
 }
 
+/** @param {Array<StatisticWithBuild>} statistics */
+function computeStatisticRerenderKey(statistics) {
+  return statistics
+    .map(s => s.id)
+    .sort()
+    .join(',');
+}
+
 /**
  * This function takes the score statistics and creates line segments that can be individually colored
  * based on their score. This is not currently used, but is an interesting alternative to masking.
@@ -374,7 +382,7 @@ const ScoreGraph = props => {
     rerender();
     window.addEventListener('resize', rerender);
     return () => window.removeEventListener('resize', rerender);
-  }, [props.statistics.length, props.averageStatistics.length]);
+  }, [computeStatisticRerenderKey(props.statistics)]);
 
   return <div className="category-score-graph__score-graph" ref={graphElRef} />;
 };
@@ -390,7 +398,7 @@ const ScoreDeltaGraph = props => {
     rerender();
     window.addEventListener('resize', rerender);
     return () => window.removeEventListener('resize', rerender);
-  }, [props.averageStatistics.length]);
+  }, [computeStatisticRerenderKey(props.averageStatistics)]);
 
   return <div className="category-score-graph__score-delta-graph" ref={graphElRef} />;
 };

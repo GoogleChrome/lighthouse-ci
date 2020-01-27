@@ -8,3 +8,31 @@
   display: flex;
   flex-direction: column;
 }
+
+.dashboard-redesign__url-branch-selector {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+.dashboard-redesign__url-branch-selector > * {
+  margin-right: var(--base-spacing);
+}
+
+.dashboard-redesign__url-branch-selector .dropdown--url select {
+  max-width: 300px;
+}
+
+.dashboard-redesign__url-branch-selector .dropdown--branch select {
+  max-width: 120px;
+}
+
+.dashboard-redesign--scrolled .dashboard-redesign__url-branch-selector {
+  position: fixed;
+  z-index: 11;
+  top: 0;
+  left: var(--page-header-height);
+  right: var(--page-header-height);
+  height: var(--page-header-height);
+}

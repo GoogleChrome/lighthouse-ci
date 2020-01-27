@@ -5,19 +5,101 @@
  */
 
 import {h} from 'preact';
+import {useState, useEffect} from 'preact/hooks';
+import {route} from 'preact-router';
 import _ from '@lhci/utils/src/lodash.js';
-import {useProjectBuilds, useProjectBySlug} from '../../hooks/use-api-data';
+import {
+  useProjectBuilds,
+  useProjectBySlug,
+  useProjectURLs,
+  useProjectBranches,
+} from '../../hooks/use-api-data';
 import {AsyncLoader, combineLoadingStates, combineAsyncData} from '../../components/async-loader';
 import {Page} from '../../layout/page.jsx';
 import {ProjectGraphs} from './project-graphs-redesign.jsx';
 
 import './project-dashboard.css';
+import {Dropdown} from '../../components/dropdown';
+import clsx from 'clsx';
 
-/** @param {{project: LHCI.ServerCommand.Project, builds: Array<LHCI.ServerCommand.Build>, runUrl?: string, branch?: string}} props */
-const ProjectDashboard_ = props => {
+/** @param {{urls: Array<{url: string}>, branches: Array<{branch: string}>, runUrl?: string, branch?: string}} props */
+const computeUrlAndBranchSelection = props => {
+  const availableUrls = props.urls.length ? props.urls : [{url: 'None'}];
+  const availableBranches = props.branches.length ? props.branches : [{branch: 'master'}];
+  const selectedUrl = props.runUrl || availableUrls[0].url;
+  const selectedBranch =
+    props.branch ||
+    (availableBranches.find(b => b.branch === 'master') ? 'master' : availableBranches[0].branch);
+
+  return {
+    availableUrls,
+    availableBranches,
+    selectedUrl,
+    selectedBranch,
+  };
+};
+
+/** @param {{availableUrls: Array<{url: string}>, availableBranches: Array<{branch: string}>, selectedUrl: string, selectedBranch: string}} props */
+const UrlAndBranchSelector = props => {
   return (
-    <div className="dashboard-redesign">
-      <ProjectGraphs {...props} />
+    <div className="dashboard-redesign__url-branch-selector">
+      <Dropdown
+        label="URL"
+        className="dropdown--url"
+        value={props.selectedUrl}
+        setValue={url => {
+          const to = new URL(window.location.href);
+          to.searchParams.set('runUrl', url);
+          route(`${to.pathname}${to.search}`);
+        }}
+        options={props.availableUrls.map(({url}) => ({value: url, label: url}))}
+      />
+      <Dropdown
+        label="Branch"
+        className="dropdown--branch"
+        value={props.selectedBranch}
+        setValue={branch => {
+          const to = new URL(window.location.href);
+          to.searchParams.set('branch', branch);
+          route(`${to.pathname}${to.search}`);
+        }}
+        options={props.availableBranches.map(({branch}) => ({value: branch, label: branch}))}
+      />
+    </div>
+  );
+};
+
+/** @param {{project: LHCI.ServerCommand.Project, builds: Array<LHCI.ServerCommand.Build>, availableUrls: Array<{url: string}>, availableBranches: Array<{branch: string}>, selectedUrl: string, selectedBranch: string}} props */
+const ProjectDashboard_ = props => {
+  const [isScrolledToGraphs, setIsScrolledToGraphs] = useState(false);
+
+  useEffect(() => {
+    const isScrolled = () => {
+      const scrollDetector = document.getElementById('dashboard-redesign__scroll-height-detector');
+      if (!(scrollDetector instanceof HTMLElement)) return false;
+      return window.scrollY > scrollDetector.offsetTop;
+    };
+    const listener = () => setIsScrolledToGraphs(isScrolled());
+
+    listener();
+    window.addEventListener('scroll', listener);
+    return () => window.removeEventListener('scroll', listener);
+  }, [setIsScrolledToGraphs]);
+
+  return (
+    <div
+      className={clsx('dashboard-redesign', {
+        'dashboard-redesign--scrolled': isScrolledToGraphs,
+      })}
+    >
+      <div id="dashboard-redesign__scroll-height-detector" />
+      <UrlAndBranchSelector {...props} />
+      <ProjectGraphs
+        project={props.project}
+        builds={props.builds}
+        runUrl={props.selectedUrl}
+        branch={props.selectedBranch}
+      />
     </div>
   );
 };
@@ -27,19 +109,40 @@ export const ProjectDashboard = props => {
   const projectApiData = useProjectBySlug(props.projectSlug);
   const projectId = projectApiData[1] && projectApiData[1].id;
   const projectBuildData = useProjectBuilds(projectId);
+  const projectUrlData = useProjectURLs(projectId);
+  const projectBranchData = useProjectBranches(projectId);
+
+  const loadingState = combineLoadingStates(
+    projectApiData,
+    projectBuildData,
+    projectUrlData,
+    projectBranchData
+  );
+
+  const asyncData = combineAsyncData(
+    projectApiData,
+    projectBuildData,
+    projectUrlData,
+    projectBranchData
+  );
 
   return (
     <Page>
       <AsyncLoader
-        loadingState={combineLoadingStates(projectApiData, projectBuildData)}
-        asyncData={combineAsyncData(projectApiData, projectBuildData)}
-        render={([project, builds]) =>
-          builds.length ? (
-            <ProjectDashboard_ project={project} builds={builds} {...props} />
-          ) : (
-            <span>No Data Yet!</span>
-          )
-        }
+        loadingState={loadingState}
+        asyncData={asyncData}
+        render={([project, builds, urls, branches]) => (
+          <ProjectDashboard_
+            project={project}
+            builds={builds}
+            {...computeUrlAndBranchSelection({
+              urls,
+              branches,
+              runUrl: props.runUrl,
+              branch: props.branch,
+            })}
+          />
+        )}
       />
     </Page>
   );

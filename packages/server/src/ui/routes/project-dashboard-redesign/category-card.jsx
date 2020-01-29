@@ -5,6 +5,7 @@
  */
 
 import {h, Fragment} from 'preact';
+import {useState} from 'preact/hooks';
 import _ from '@lhci/utils/src/lodash.js';
 import {AsyncLoader} from '../../components/async-loader';
 import {Paper} from '../../components/paper.jsx';
@@ -16,10 +17,11 @@ import {MetricLineGraph} from './graphs/metric-line-graph';
 
 /** @typedef {import('./project-category-summaries.jsx').StatisticWithBuild} StatisticWithBuild */
 /** @typedef {{category: LH.CategoryResult, categoryGroups: LH.Result['categoryGroups'], statistics?: Array<StatisticWithBuild>, loadingState: import('../../components/async-loader').LoadingState, builds: LHCI.ServerCommand.Build[], buildLimit: number, setBuildLimit: (n: number) => void}} Props */
+/** @typedef {Props & {statistics: Array<StatisticWithBuild>, selectedBuildId: string|undefined, setSelectedBuildId: import('preact/hooks/src').StateUpdater<string|undefined>}} PropsWithState */
 
 const BUILD_LIMIT_OPTIONS = [{value: 25}, {value: 50}, {value: 100}, {value: 150, label: 'Max'}];
 
-/** @param {Props & {statistics: Array<StatisticWithBuild>}} props */
+/** @param {PropsWithState} props */
 const PerformanceCategoryDetails = props => {
   /** @param {LHCI.ServerCommand.Statistic['name']} name */
   const stats = name => props.statistics.filter(s => s.name === name);
@@ -27,6 +29,8 @@ const PerformanceCategoryDetails = props => {
   return (
     <div className="performance-category-details__graphs">
       <MetricLineGraph
+        selectedBuildId={props.selectedBuildId}
+        setSelectedBuildId={props.setSelectedBuildId}
         metrics={[
           {
             abbreviation: 'FCP',
@@ -46,6 +50,8 @@ const PerformanceCategoryDetails = props => {
         ]}
       />
       <MetricLineGraph
+        selectedBuildId={props.selectedBuildId}
+        setSelectedBuildId={props.setSelectedBuildId}
         metrics={[
           {
             abbreviation: 'FCP',
@@ -68,7 +74,7 @@ const PerformanceCategoryDetails = props => {
   );
 };
 
-/** @param {Props & {statistics: Array<StatisticWithBuild>}} props */
+/** @param {PropsWithState} props */
 const CategoryDetails = props => {
   if (props.category.id === 'performance') return <PerformanceCategoryDetails {...props} />;
   return <Fragment />;
@@ -76,6 +82,10 @@ const CategoryDetails = props => {
 
 /** @param {Props} props */
 export const CategoryCard = props => {
+  const [selectedBuildId, setSelectedBuildId] = useState(
+    /** @type {undefined|string} */ (undefined)
+  );
+
   return (
     <Paper className="category-card">
       <div className="category-card__header">
@@ -101,8 +111,18 @@ export const CategoryCard = props => {
           renderLoading={() => <span>Loading, please wait...</span>}
           render={allStats => (
             <Fragment>
-              <CategoryScoreGraph {...props} statistics={allStats} />
-              <CategoryDetails {...props} statistics={allStats} />
+              <CategoryScoreGraph
+                {...props}
+                statistics={allStats}
+                selectedBuildId={selectedBuildId}
+                setSelectedBuildId={setSelectedBuildId}
+              />
+              <CategoryDetails
+                {...props}
+                statistics={allStats}
+                selectedBuildId={selectedBuildId}
+                setSelectedBuildId={setSelectedBuildId}
+              />
             </Fragment>
           )}
         />

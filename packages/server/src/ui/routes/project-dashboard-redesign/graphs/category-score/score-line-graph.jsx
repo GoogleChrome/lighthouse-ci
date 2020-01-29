@@ -57,10 +57,12 @@ export function renderScoreGraph(rootEl, data) {
   const statName = statistics[0].name;
   const scoreLineMaskId = `scoreLineMask-${statName}`;
   const debouncedClearBuildId = _.debounce(() => setSelectedBuildId(undefined), 250);
+
   /** @type {[number, number][]} */
   const passingGuideLine = [[0, 90], [n, 90]];
   /** @type {[number, number][]} */
   const failingGuideLine = [[0, 50], [n, 50]];
+
   const xScale = buildXScale(graphWidth, data);
   const yScale = d3
     .scaleLinear()
@@ -70,6 +72,7 @@ export function renderScoreGraph(rootEl, data) {
     .axisLeft(yScale)
     .ticks(6)
     .tickSize(0);
+
   /** @type {() => import('d3').Line<StatisticWithBuild>} */
   const statisticLine = d3.line;
   /** @type {() => import('d3').Area<StatisticWithBuild>} */
@@ -82,10 +85,12 @@ export function renderScoreGraph(rootEl, data) {
     .x((d, i) => xScale(i))
     .y0(d => yScale(minMaxByBuild[d.buildId].min * 100))
     .y1(d => yScale(minMaxByBuild[d.buildId].max * 100));
+
   const guideLine = d3
     .line()
     .x(d => xScale(d[0]))
     .y(d => yScale(d[1]));
+
   masks
     .append('mask')
     .attr('id', scoreLineMaskId)
@@ -93,6 +98,7 @@ export function renderScoreGraph(rootEl, data) {
     .datum(statistics)
     .attr('d', scoreLine)
     .style('stroke', 'white');
+
   // The numbers on the y-axis to the right-hand side
   svg
     .append('g')
@@ -212,7 +218,6 @@ export function updateScoreGraph(rootEl, data) {
   const xScale = buildXScale(graphWidth, data);
 
   const selectedIndex = data.statistics.findIndex(stat => stat.buildId === data.selectedBuildId);
-  if (selectedIndex === -1) return;
 
   updateScoreGraphElements(rootEl, graphWidth, xScale, selectedIndex);
 }
@@ -231,13 +236,14 @@ function updateScoreGraphElements(rootEl, graphWidth, xScale, selectedIndex) {
   // Update the position of the tracking line
   const trackingLineEl = rootParentEl.querySelector('.tracking-line');
   if (trackingLineEl instanceof SVGElement) {
-    trackingLineEl.setAttribute('style', `transform: translateX(${xScale(selectedIndex)}px)`);
+    const translateX = selectedIndex === -1 ? -9999 : xScale(selectedIndex);
+    trackingLineEl.setAttribute('style', `transform: translateX(${translateX}px)`);
   }
 
   // Update the position of the hover card
   const hoverCard = rootParentEl.querySelector('.hover-card');
   if (hoverCard instanceof HTMLElement) {
-    const leftPx = xScale(selectedIndex) + HOVER_CARD_MARGIN;
+    const leftPx = selectedIndex === -1 ? -9999 : xScale(selectedIndex) + HOVER_CARD_MARGIN;
     if (leftPx + 200 < graphWidth) {
       hoverCard.style.left = leftPx + 'px';
       hoverCard.style.right = '';

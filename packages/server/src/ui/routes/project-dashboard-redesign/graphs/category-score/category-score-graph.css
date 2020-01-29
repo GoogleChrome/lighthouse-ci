@@ -67,12 +67,8 @@
 }
 
 .category-score-graph__score-graph .tracking-line {
-  stroke: none;
-  stroke-width: 2px;
-}
-
-.category-score-graph--with-selected-build .tracking-line {
   stroke: var(--base-border-color);
+  stroke-width: 1px;
 }
 
 .category-score-graph__score-graph .score-point__hitbox {

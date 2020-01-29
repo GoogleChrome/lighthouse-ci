@@ -8,7 +8,7 @@ import {h} from 'preact';
 import * as d3 from 'd3';
 import * as _ from '@lhci/utils/src/lodash.js';
 
-import {D3Graph, createRootSvg} from '../../../components/d3-graph';
+import {D3Graph, createRootSvg, findRootSvg} from '../../../components/d3-graph';
 import {computeStatisticRerenderKey} from './graph-utils';
 
 import './metric-line-graph.css';
@@ -31,7 +31,20 @@ const STROKE_DASHARRAY_OPTIONS = [
 /**
  * @typedef LineGraphData
  * @prop {Array<MetricLineDef>} metrics
+ * @prop {string|undefined} selectedBuildId
+ * @prop {import('preact/hooks/src').StateUpdater<string|undefined>} setSelectedBuildId
  */
+
+/**
+ * @param {number} graphWidth
+ * @param {LineGraphData} data
+ */
+function buildXScale(graphWidth, data) {
+  return d3
+    .scaleLinear()
+    .domain([0, data.metrics[0].statistics.length - 1])
+    .range([0, graphWidth]);
+}
 
 /**
  * @param {HTMLElement} rootEl
@@ -39,16 +52,12 @@ const STROKE_DASHARRAY_OPTIONS = [
  */
 function renderLineGraph(rootEl, data) {
   const {metrics} = data;
-  const {svg, width, graphWidth, graphHeight} = createRootSvg(rootEl, GRAPH_MARGIN);
+  const {svg, graphWidth, graphHeight} = createRootSvg(rootEl, GRAPH_MARGIN);
 
-  const n = metrics[0].statistics.length - 1;
   const yMax = Math.max(...metrics.map(m => Math.max(...m.statistics.map(s => s.value))));
-  const yMaxSeconds = Math.ceil(yMax / 1000);
+  const yMaxSeconds = Math.ceil((yMax * 1.1) / 1000);
 
-  const xScale = d3
-    .scaleLinear()
-    .domain([0, n])
-    .range([0, graphWidth]);
+  const xScale = buildXScale(graphWidth, data);
   const yScale = d3
     .scaleLinear()
     .domain([0, yMaxSeconds])
@@ -68,6 +77,16 @@ function renderLineGraph(rootEl, data) {
     .attr('style', `transform: translateX(${-GRAPH_MARGIN.left / 2}px)`)
     .call(yAxis);
 
+  // The tracking line for the hover/click effects
+  svg
+    .append('line')
+    .attr('class', 'tracking-line')
+    .style('transform', 'translateX(-9999px)')
+    .attr('x1', xScale(0))
+    .attr('y1', yScale(0))
+    .attr('x2', xScale(0))
+    .attr('y2', yScale(yMaxSeconds));
+
   for (const metric of metrics) {
     const index = metrics.indexOf(metric);
     const dasharray = STROKE_DASHARRAY_OPTIONS[index % STROKE_DASHARRAY_OPTIONS.length];
@@ -85,7 +104,44 @@ function renderLineGraph(rootEl, data) {
   }
 }
 
-/** @param {{metrics: Array<MetricLineDef>}} props */
+/**
+ * @param {HTMLElement} rootEl
+ * @param {LineGraphData} data
+ */
+function updateLineGraph(rootEl, data) {
+  const {graphWidth} = findRootSvg(rootEl, GRAPH_MARGIN);
+  const xScale = buildXScale(graphWidth, data);
+
+  const selectedIndex = data.metrics[0].statistics.findIndex(
+    stat => stat.buildId === data.selectedBuildId
+  );
+
+  updateLineGraphElements(rootEl, graphWidth, xScale, selectedIndex);
+}
+
+/**
+ *
+ * @param {HTMLElement} rootEl
+ * @param {number} graphWidth
+ * @param {(n: number) => number} xScale
+ * @param {number} selectedIndex
+ */
+function updateLineGraphElements(rootEl, graphWidth, xScale, selectedIndex) {
+  const rootParentEl = rootEl.closest('.metric-line-graph');
+  if (!(rootParentEl instanceof HTMLElement)) throw new Error('Missing metric-line-graph');
+
+  // Update the position of the tracking line
+  const trackingLineEl = rootParentEl.querySelector('.tracking-line');
+  if (trackingLineEl instanceof SVGElement) {
+    if (selectedIndex === -1) {
+      trackingLineEl.setAttribute('style', `transform: translateX(-9999px)`);
+    } else {
+      trackingLineEl.setAttribute('style', `transform: translateX(${xScale(selectedIndex)}px)`);
+    }
+  }
+}
+
+/** @param {LineGraphData} props */
 export const MetricLineGraph = props => {
   const firstStat = props.metrics[0].statistics[0];
   const lastStat = props.metrics[0].statistics[props.metrics[0].statistics.length - 1];
@@ -96,11 +152,13 @@ export const MetricLineGraph = props => {
         className="metric-line-graph__graph"
         data={props}
         render={renderLineGraph}
+        update={updateLineGraph}
         computeRerenderKey={data =>
           computeStatisticRerenderKey(
             data.metrics.map(m => m.statistics).reduce((a, b) => a.concat(b))
           )
         }
+        computeUpdateKey={data => `${data.selectedBuildId}`}
       />
 
       <div className="metric-line-graph__date-range">

@@ -53,12 +53,10 @@ const HoverCardWithDiff = props => {
   );
 };
 
-/** @param {{category: LH.CategoryResult, statistics: Array<StatisticWithBuild>}} props */
+/** @param {{category: LH.CategoryResult, statistics: Array<StatisticWithBuild>, selectedBuildId: string|undefined, setSelectedBuildId: import('preact/hooks/src').StateUpdater<string|undefined>}} props */
 export const CategoryScoreGraph = props => {
   const [pinned, setPinned] = useState(false);
-  const [selectedBuildId, setSelectedBuildId] = useState(
-    /** @type {undefined|string} */ (undefined)
-  );
+  const {selectedBuildId, setSelectedBuildId} = props;
 
   const categoryId = props.category.id;
   const id = `category-score-graph--${categoryId}`;

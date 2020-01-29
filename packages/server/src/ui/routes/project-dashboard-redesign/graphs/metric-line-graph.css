@@ -77,3 +77,8 @@
 
   color: var(--base-text-color);
 }
+
+.metric-line-graph .tracking-line {
+  stroke: var(--base-border-color);
+  stroke-width: 1px;
+}

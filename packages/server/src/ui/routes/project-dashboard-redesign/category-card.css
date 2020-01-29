@@ -49,3 +49,10 @@
 .category-card__build-limit .build-limit-option--selected {
   color: var(--base-text-color);
 }
+
+.performance-category-details__graphs {
+  width: 100%;
+
+  display: flex;
+  flex-direction: row;
+}

@@ -5,13 +5,18 @@
  */
 
 .metric-line-graph {
-  height: 250px;
   width: 50%;
+}
+
+.metric-line-graph__graph {
+  height: 250px;
+  width: 100%;
 }
 
 .metric-line-graph .metric-line-graph__line {
   fill: none;
-  stroke: black;
+  stroke: var(--secondary-text-color);
+  stroke-width: 1px;
 }
 
 .metric-line-graph .y-axis path {
@@ -24,4 +29,51 @@
   font-weight: var(--medium-font-weight);
   font-size: var(--subtext-font-size);
   color: var(--secondary-text-color);
+}
+
+.metric-line-graph__date-range {
+  display: flex;
+  flex-direction: row;
+
+  color: var(--secondary-text-color);
+  font-size: var(--subtext-font-size);
+}
+
+.metric-line-graph__legend {
+  margin-top: var(--base-spacing);
+  margin-bottom: var(--base-spacing);
+}
+
+.metric-line-graph__legend > div {
+  display: flex;
+  flex-direction: row;
+  position: relative;
+  margin-bottom: var(--base-spacing);
+}
+
+.metric-line-graph__legend-line {
+  position: absolute;
+  top: 50%;
+}
+
+.metric-line-graph__legend-line line {
+  stroke: var(--secondary-text-color);
+  stroke-width: 2px;
+}
+
+.metric-line-graph__legend-label {
+  padding-left: var(--base-spacing);
+  font-family: var(--base-font-family);
+  font-size: var(--smaller-font-size);
+  font-weight: var(--medium-font-weight);
+
+  color: var(--secondary-text-color);
+}
+
+.metric-line-graph__legend-label > span {
+  display: inline-block;
+  width: 40px;
+  padding-right: var(--base-spacing);
+
+  color: var(--base-text-color);
 }

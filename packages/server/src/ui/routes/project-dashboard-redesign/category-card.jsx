@@ -21,14 +21,50 @@ const BUILD_LIMIT_OPTIONS = [{value: 25}, {value: 50}, {value: 100}, {value: 150
 
 /** @param {Props & {statistics: Array<StatisticWithBuild>}} props */
 const PerformanceCategoryDetails = props => {
-  const fcpStats = props.statistics.filter(
-    stat => stat.name === 'audit_first-contentful-paint_average'
-  );
+  /** @param {LHCI.ServerCommand.Statistic['name']} name */
+  const stats = name => props.statistics.filter(s => s.name === name);
 
   return (
-    <Fragment>
-      <MetricLineGraph metrics={[{statistics: fcpStats, label: 'FCP'}]} />
-    </Fragment>
+    <div className="performance-category-details__graphs">
+      <MetricLineGraph
+        metrics={[
+          {
+            abbreviation: 'FCP',
+            label: 'First Contentful Paint',
+            statistics: stats('audit_first-contentful-paint_average'),
+          },
+          {
+            abbreviation: 'TTI',
+            label: 'Time to Interactive',
+            statistics: stats('audit_interactive_average'),
+          },
+          {
+            abbreviation: 'SI',
+            label: 'Speed Index',
+            statistics: stats('audit_speed-index_average'),
+          },
+        ]}
+      />
+      <MetricLineGraph
+        metrics={[
+          {
+            abbreviation: 'FCP',
+            label: 'First Contentful Paint',
+            statistics: stats('audit_first-contentful-paint_average'),
+          },
+          {
+            abbreviation: 'TTI',
+            label: 'Time to Interactive',
+            statistics: stats('audit_interactive_average').map(s => ({...s, value: s.value * 5})),
+          },
+          {
+            abbreviation: 'SI',
+            label: 'Speed Index',
+            statistics: stats('audit_speed-index_average').map(s => ({...s, value: s.value * 1})),
+          },
+        ]}
+      />
+    </div>
   );
 };
 

@@ -13,11 +13,20 @@ import {computeStatisticRerenderKey} from './graph-utils';
 
 import './metric-line-graph.css';
 
-const GRAPH_MARGIN = {top: 20, right: 50, bottom: 20, left: 20};
+const GRAPH_MARGIN = {top: 20, right: 20, bottom: 20, left: 50};
+
+const LEGEND_LINE_WIDTH = 20;
+
+const STROKE_DASHARRAY_OPTIONS = [
+  '', // solid
+  '1, 1', // dotted
+  '3, 3', // dashed
+  '4, 2, 1, 1, 1, 2', // dash dash dot dot dot dot dot
+];
 
 /** @typedef {import('../project-category-summaries.jsx').StatisticWithBuild} StatisticWithBuild */
 
-/** @typedef {{statistics: Array<StatisticWithBuild>, label: string}} MetricLineDef */
+/** @typedef {{statistics: Array<StatisticWithBuild>, abbreviation: string, label: string}} MetricLineDef */
 
 /**
  * @typedef LineGraphData
@@ -45,7 +54,7 @@ function renderLineGraph(rootEl, data) {
     .domain([0, yMaxSeconds])
     .range([graphHeight, 0]);
   const yAxis = d3
-    .axisLeft(yScale)
+    .axisRight(yScale)
     .ticks(Math.min(yMaxSeconds, 10))
     .tickFormat(d => d3.format('.0f')(d) + 's')
     .tickSize(0);
@@ -56,10 +65,12 @@ function renderLineGraph(rootEl, data) {
   svg
     .append('g')
     .attr('class', 'y-axis')
-    .attr('style', `transform: translateX(${width - GRAPH_MARGIN.right / 2}px)`)
+    .attr('style', `transform: translateX(${-GRAPH_MARGIN.left / 2}px)`)
     .call(yAxis);
 
   for (const metric of metrics) {
+    const index = metrics.indexOf(metric);
+    const dasharray = STROKE_DASHARRAY_OPTIONS[index % STROKE_DASHARRAY_OPTIONS.length];
     const metricLine = statisticLine()
       .curve(d3.curveMonotoneX)
       .x(d => xScale(metric.statistics.indexOf(d)))
@@ -68,6 +79,7 @@ function renderLineGraph(rootEl, data) {
     svg
       .append('path')
       .datum(metric.statistics)
+      .style('stroke-dasharray', dasharray)
       .attr('class', 'metric-line-graph__line')
       .attr('d', metricLine);
   }
@@ -75,16 +87,64 @@ function renderLineGraph(rootEl, data) {
 
 /** @param {{metrics: Array<MetricLineDef>}} props */
 export const MetricLineGraph = props => {
+  const firstStat = props.metrics[0].statistics[0];
+  const lastStat = props.metrics[0].statistics[props.metrics[0].statistics.length - 1];
+
   return (
-    <D3Graph
-      className="metric-line-graph"
-      data={props}
-      render={renderLineGraph}
-      computeRerenderKey={data =>
-        computeStatisticRerenderKey(
-          data.metrics.map(m => m.statistics).reduce((a, b) => a.concat(b))
-        )
-      }
-    />
+    <div className="metric-line-graph">
+      <D3Graph
+        className="metric-line-graph__graph"
+        data={props}
+        render={renderLineGraph}
+        computeRerenderKey={data =>
+          computeStatisticRerenderKey(
+            data.metrics.map(m => m.statistics).reduce((a, b) => a.concat(b))
+          )
+        }
+      />
+
+      <div className="metric-line-graph__date-range">
+        <div style={{marginLeft: GRAPH_MARGIN.left}}>
+          {new Date(firstStat.createdAt || '').toLocaleDateString()}
+        </div>
+        <div style={{flexGrow: 1}} />
+        <div style={{marginRight: GRAPH_MARGIN.right}}>
+          {new Date(lastStat.createdAt || '').toLocaleDateString()}
+        </div>
+      </div>
+
+      <div className="metric-line-graph__legend" style={{marginLeft: GRAPH_MARGIN.left / 2}}>
+        {props.metrics.map((metric, i) => {
+          return (
+            <div key={metric.label}>
+              <svg
+                className="metric-line-graph__legend-line"
+                version="1.1"
+                xmlns="http://www.w3.org/2000/svg"
+                width={LEGEND_LINE_WIDTH}
+                height="2"
+              >
+                <line
+                  x1="0"
+                  y1="0"
+                  x2={LEGEND_LINE_WIDTH}
+                  y2="0"
+                  style={{
+                    strokeDasharray: STROKE_DASHARRAY_OPTIONS[i % STROKE_DASHARRAY_OPTIONS.length],
+                  }}
+                />
+              </svg>
+              <div
+                className="metric-line-graph__legend-label"
+                style={{marginLeft: LEGEND_LINE_WIDTH}}
+              >
+                <span>{metric.abbreviation}</span>
+                {metric.label}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
   );
 };

@@ -22,6 +22,10 @@
       "storage": {
         "sqlDatabasePath": "cli-test-fixtures.tmp.sql"
       }
+    },
+    "wizard": {
+      "serverBaseUrl": "https://github.com/GoogleChrome/lighthouse-ci",
+      "extraHeaders":" {\"Authorization\": \"Basic bGlnaHRob3VzZTpjaQo=\"}"
     }
   }
 }

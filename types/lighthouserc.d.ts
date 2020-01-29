@@ -12,6 +12,7 @@ declare global {
       collect?: Partial<CollectCommand.Options>;
       upload?: Partial<UploadCommand.Options>;
       server?: Partial<ServerCommand.Options>;
+      wizard?: Partial<WizardCommand.Options>;
     }
 
     export interface LighthouseRc {

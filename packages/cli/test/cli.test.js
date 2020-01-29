@@ -98,6 +98,34 @@ describe('Lighthouse CI CLI', () => {
         .replace(log.reset, '');
       projectToken = tokenSentence.match(/Use token ([\w-]+)/)[1];
     }, 30000);
+
+    it('should create a new project with config file', async () => {
+      const wizardProcess = spawn('node', [CLI_PATH, 'wizard', `--config=${rcFile}`]);
+      wizardProcess.stdoutMemory = '';
+      wizardProcess.stderrMemory = '';
+      wizardProcess.stdout.on('data', chunk => (wizardProcess.stdoutMemory += chunk.toString()));
+      wizardProcess.stderr.on('data', chunk => (wizardProcess.stderrMemory += chunk.toString()));
+
+      await waitForCondition(() => wizardProcess.stdoutMemory.includes('Which wizard'));
+      await writeAllInputs(wizardProcess, [
+        '', // Just ENTER key to select "new-project"
+        `http://localhost:${server.port}`, // The base URL to talk to
+        'AwesomeCIProjectName', // Project name
+        'https://example.com', // External build URL
+      ]);
+
+      expect(wizardProcess.stdoutMemory).toContain('Use token');
+      expect(wizardProcess.stderrMemory).toEqual('');
+      const tokenSentence = wizardProcess.stdoutMemory
+        .match(/Use token [\s\S]+/im)[0]
+        .replace(log.bold, '')
+        .replace(log.reset, '');
+      projectToken = tokenSentence.match(/Use token ([\w-]+)/)[1];
+      
+      expect(wizardProcess.stdoutMemory).toContain('\"serverBaseUrl\":\"https://github.com/GoogleChrome/lighthouse-ci\"')
+      expect(wizardProcess.stdoutMemory).toContain('\"extraHeaders\":\" {\\\"Authorization\\\": \\\"Basic bGlnaHRob3VzZTpjaQo=\\\"}\"}')
+
+    }, 30000);
   });
 
   describe('healthcheck', () => {
@@ -209,7 +237,7 @@ describe('Lighthouse CI CLI', () => {
         Saved LHR to http://localhost:XXXX (<UUID>)
         Saved LHR to http://localhost:XXXX (<UUID>)
         Done saving build results to Lighthouse CI
-        View build diff at http://localhost:XXXX/app/projects/awesomeciprojectname/compare/<UUID>
+        View build diff at http://localhost:XXXX/app/projects/awesomeciprojectname-s/compare/<UUID>
         No GitHub token set, skipping.
         "
       `);
@@ -223,7 +251,7 @@ describe('Lighthouse CI CLI', () => {
       const links = fs.readFileSync(linksFile, 'utf8');
       expect(cleanStdOutput(links)).toMatchInlineSnapshot(`
         "{
-          \\"http://localhost:XXXX/app/\\": \\"http://localhost:XXXX/app/projects/awesomeciprojectname/compare/<UUID>?compareUrl=http%3A%2F%2Flocalhost%3APORT%2Fapp%2F\\"
+          \\"http://localhost:XXXX/app/\\": \\"http://localhost:XXXX/app/projects/awesomeciprojectname-s/compare/<UUID>?compareUrl=http%3A%2F%2Flocalhost%3APORT%2Fapp%2F\\"
         }"
       `);
     });

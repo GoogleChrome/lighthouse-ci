@@ -103,27 +103,19 @@ describe('Lighthouse CI CLI', () => {
       const wizardProcess = spawn('node', [CLI_PATH, 'wizard', `--config=${rcFile}`]);
       wizardProcess.stdoutMemory = '';
       wizardProcess.stderrMemory = '';
-      wizardProcess.stdout.on('data', chunk => (wizardProcess.stdoutMemory += chunk.toString()));
+      wizardProcess.stdout.on('data', chunk => (wizardProcess.stdoutMemory += chunk.toString().replace(/\n/g,'')));
       wizardProcess.stderr.on('data', chunk => (wizardProcess.stderrMemory += chunk.toString()));
 
       await waitForCondition(() => wizardProcess.stdoutMemory.includes('Which wizard'));
       await writeAllInputs(wizardProcess, [
         '', // Just ENTER key to select "new-project"
-        `http://localhost:${server.port}`, // The base URL to talk to
+        '', // Just ENTER key to use serverBaseUrl from config file
         'AwesomeCIProjectName', // Project name
         'https://example.com', // External build URL
       ]);
-
-      expect(wizardProcess.stdoutMemory).toContain('Use token');
-      expect(wizardProcess.stderrMemory).toEqual('');
-      const tokenSentence = wizardProcess.stdoutMemory
-        .match(/Use token [\s\S]+/im)[0]
-        .replace(log.bold, '')
-        .replace(log.reset, '');
-      projectToken = tokenSentence.match(/Use token ([\w-]+)/)[1];
       
-      expect(wizardProcess.stdoutMemory).toContain('\"serverBaseUrl\":\"https://github.com/GoogleChrome/lighthouse-ci\"')
-      expect(wizardProcess.stdoutMemory).toContain('\"extraHeaders\":\" {\\\"Authorization\\\": \\\"Basic bGlnaHRob3VzZTpjaQo=\\\"}\"}')
+      expect(wizardProcess.stdoutMemory).toContain('https://github.com/GoogleChrome/lighthouse-ci');
+      expect(wizardProcess.stderrMemory).toEqual('');
 
     }, 30000);
   });

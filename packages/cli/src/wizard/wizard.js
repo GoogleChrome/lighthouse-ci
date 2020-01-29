@@ -50,7 +50,10 @@ async function runNewProjectWizard(options) {
     },
   ]);
 
-  const api = new ApiClient({rootURL: responses.serverBaseUrl || options.serverBaseUrl, extraHeaders: options.extraHeaders || {}});
+  const api = new ApiClient({
+    rootURL: responses.serverBaseUrl || options.serverBaseUrl,
+    extraHeaders: options.extraHeaders || {},
+  });
   const project = await api.createProject({
     name: responses.projectName,
     externalUrl: responses.projectExternalUrl,
@@ -72,9 +75,9 @@ async function runCommand(options) {
   const wizardConfiguration = rcFile ? flattenRcToConfig(rcFile) : {};
   options = {
     ...options,
-    ...wizardConfiguration.wizard
-  }
-  
+    ...wizardConfiguration.wizard,
+  };
+
   const whichWizardPrompt = await inquirer.prompt([
     {
       type: 'list',

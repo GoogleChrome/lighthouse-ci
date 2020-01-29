@@ -40,8 +40,29 @@ export function createRootSvg(rootEl, margin) {
 }
 
 /**
+ * @param {HTMLElement} rootEl
+ * @param {{top: number, right: number, bottom: number, left: number}} margin
+ */
+export function findRootSvg(rootEl, margin) {
+  const height = rootEl.clientHeight;
+  const width = rootEl.clientWidth;
+  const graphWidth = width - margin.left - margin.right;
+  const graphHeight = height - margin.top - margin.bottom;
+  const svgRoot = d3.select(rootEl).select('svg');
+
+  return {
+    width,
+    height,
+    graphWidth,
+    graphHeight,
+    masks: svgRoot.select('defs'),
+    svg: svgRoot.select('g'),
+  };
+}
+
+/**
  * @template T
- * @param {{className?: string, data: T, render: (el: HTMLElement, data: T) => void, computeRerenderKey: (data: T) => string}} props
+ * @param {{className?: string, data: T, render: (el: HTMLElement, data: T) => void, computeRerenderKey: (data: T) => string, update?: (el: HTMLElement, data: T) => void, computeUpdateKey?: (data: T) => string}} props
  */
 export const D3Graph = props => {
   const graphElRef = useRef(/** @type {HTMLElement|undefined} */ (undefined));
@@ -53,6 +74,11 @@ export const D3Graph = props => {
     window.addEventListener('resize', rerender);
     return () => window.removeEventListener('resize', rerender);
   }, [props.computeRerenderKey(props.data)]);
+
+  useEffect(() => {
+    if (!props.update || !graphElRef.current) return;
+    props.update(graphElRef.current, props.data);
+  }, [props.computeUpdateKey ? props.computeUpdateKey(props.data) : '']);
 
   return <div className={props.className} ref={graphElRef} />;
 };

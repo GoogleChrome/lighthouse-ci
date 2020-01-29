@@ -61,6 +61,8 @@
   font-size: var(--smaller-font-size);
   font-weight: var(--medium-font-weight);
   color: var(--base-text-color);
+
+  cursor: pointer;
 }
 
 .hover-card__actions .lhr-viewer-button {

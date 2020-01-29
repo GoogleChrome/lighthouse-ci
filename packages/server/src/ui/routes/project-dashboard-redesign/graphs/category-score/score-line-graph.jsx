@@ -2,7 +2,7 @@ import clsx from 'clsx';
 import * as d3 from 'd3';
 import * as _ from '@lhci/utils/src/lodash.js';
 
-import {createRootSvg} from '../../../../components/d3-graph';
+import {createRootSvg, findRootSvg} from '../../../../components/d3-graph';
 import {GRAPH_MARGIN} from './category-score-graph';
 import {getClassNameFromStatistic} from '../graph-utils';
 import {HOVER_CARD_MARGIN} from '../hover-card';
@@ -23,9 +23,21 @@ export function buildMinMaxByBuildId(statistics) {
 }
 
 /**
+ * @param {number} graphWidth
+ * @param {ScoreGraphData} data
+ */
+function buildXScale(graphWidth, data) {
+  return d3
+    .scaleLinear()
+    .domain([0, data.statistics.length - 1])
+    .range([0, graphWidth]);
+}
+
+/**
  * @typedef ScoreGraphData
  * @prop {Array<StatisticWithBuild>} statistics
  * @prop {Array<StatisticWithBuild>} statisticsWithMinMax
+ * @prop {string|undefined} selectedBuildId
  * @prop {import('preact/hooks/src').StateUpdater<string|undefined>} setSelectedBuildId
  * @prop {import('preact/hooks/src').StateUpdater<boolean>} setPinned
  */
@@ -38,11 +50,7 @@ export function renderScoreGraph(rootEl, data) {
   const {statistics, statisticsWithMinMax, setSelectedBuildId, setPinned} = data;
   const rootParentEl = rootEl.closest('.category-score-graph');
   if (!(rootParentEl instanceof HTMLElement)) throw new Error('Missing category-score-graph');
-  const getTrackingLineEl = () => {
-    const trackingLineEl = rootParentEl.querySelector('.tracking-line');
-    if (!(trackingLineEl instanceof SVGElement)) throw new Error('Missing tracking line!');
-    return trackingLineEl;
-  };
+
   const {svg, masks, width, graphWidth, graphHeight} = createRootSvg(rootEl, GRAPH_MARGIN);
   const minMaxByBuild = buildMinMaxByBuildId(statisticsWithMinMax);
   const n = statistics.length - 1;
@@ -53,10 +61,7 @@ export function renderScoreGraph(rootEl, data) {
   const passingGuideLine = [[0, 90], [n, 90]];
   /** @type {[number, number][]} */
   const failingGuideLine = [[0, 50], [n, 50]];
-  const xScale = d3
-    .scaleLinear()
-    .domain([0, n])
-    .range([0, graphWidth]);
+  const xScale = buildXScale(graphWidth, data);
   const yScale = d3
     .scaleLinear()
     .domain([0, 100])
@@ -94,24 +99,28 @@ export function renderScoreGraph(rootEl, data) {
     .attr('class', 'y-axis')
     .attr('style', `transform: translateX(${width - GRAPH_MARGIN.right / 2}px)`)
     .call(yAxis);
+
   // The grey error bar area behind the score line
   svg
     .append('path')
     .datum(statistics)
     .attr('class', 'score-error-range')
     .attr('d', scoreRange);
+
   // Passing/Average horizontal score guide
   svg
     .append('path')
     .datum(passingGuideLine)
     .attr('class', 'score-guide')
     .attr('d', guideLine);
+
   // Average/Failing horizontal score guide
   svg
     .append('path')
     .datum(failingGuideLine)
     .attr('class', 'score-guide')
     .attr('d', guideLine);
+
   // Passing score line mask fill
   svg
     .append('rect')
@@ -121,6 +130,7 @@ export function renderScoreGraph(rootEl, data) {
     .attr('height', yScale(90) - yScale(100))
     .attr('mask', `url(#${scoreLineMaskId})`)
     .attr('class', clsx('score-line-fill', getClassNameFromStatistic({value: 1})));
+
   // Average score line mask fill
   svg
     .append('rect')
@@ -130,6 +140,7 @@ export function renderScoreGraph(rootEl, data) {
     .attr('height', yScale(50) - yScale(90))
     .attr('mask', `url(#${scoreLineMaskId})`)
     .attr('class', clsx('score-line-fill', getClassNameFromStatistic({value: 0.75})));
+
   // Failing score line mask fill
   svg
     .append('rect')
@@ -139,6 +150,7 @@ export function renderScoreGraph(rootEl, data) {
     .attr('height', yScale(0) - yScale(50))
     .attr('mask', `url(#${scoreLineMaskId})`)
     .attr('class', clsx('score-line-fill', getClassNameFromStatistic({value: 0})));
+
   // The tracking line for the hover/click effects
   svg
     .append('line')
@@ -148,6 +160,7 @@ export function renderScoreGraph(rootEl, data) {
     .attr('y1', yScale(0))
     .attr('x2', xScale(0))
     .attr('y2', yScale(100));
+
   // The individual score points
   svg
     .selectAll('.score-point')
@@ -158,6 +171,7 @@ export function renderScoreGraph(rootEl, data) {
     .attr('cx', (d, i) => xScale(i))
     .attr('cy', d => yScale(d.value * 100))
     .attr('r', 3);
+
   // The click and mouseover hitboxes for the score points
   svg
     .selectAll('.score-point__hitbox')
@@ -181,24 +195,57 @@ export function renderScoreGraph(rootEl, data) {
       if (rootParentEl.querySelector('.hover-card--pinned')) return;
       // Set the selected build
       setSelectedBuildId(d.buildId);
-      // Update the position of the tracking line
-      getTrackingLineEl().setAttribute('style', `transform: translateX(${xScale(i)}px)`);
-      const hoverCard = rootParentEl.querySelector('.hover-card');
-      if (!(hoverCard instanceof HTMLElement)) return;
-      // Update the position of the hover card
-      const leftPx = xScale(i) + HOVER_CARD_MARGIN;
-      if (leftPx + 200 < graphWidth) {
-        hoverCard.style.left = leftPx + 'px';
-        hoverCard.style.right = '';
-      } else {
-        const rightPx =
-          graphWidth - (leftPx - HOVER_CARD_MARGIN) + GRAPH_MARGIN.right + HOVER_CARD_MARGIN;
-        hoverCard.style.left = '';
-        hoverCard.style.right = rightPx + 'px';
-      }
+      updateScoreGraphElements(rootEl, graphWidth, xScale, i);
     })
     .on('mouseout', () => {
       if (rootParentEl.querySelector('.hover-card--pinned')) return;
       debouncedClearBuildId();
     });
+}
+
+/**
+ * @param {HTMLElement} rootEl
+ * @param {ScoreGraphData} data
+ */
+export function updateScoreGraph(rootEl, data) {
+  const {graphWidth} = findRootSvg(rootEl, GRAPH_MARGIN);
+  const xScale = buildXScale(graphWidth, data);
+
+  const selectedIndex = data.statistics.findIndex(stat => stat.buildId === data.selectedBuildId);
+  if (selectedIndex === -1) return;
+
+  updateScoreGraphElements(rootEl, graphWidth, xScale, selectedIndex);
+}
+
+/**
+ *
+ * @param {HTMLElement} rootEl
+ * @param {number} graphWidth
+ * @param {(n: number) => number} xScale
+ * @param {number} selectedIndex
+ */
+function updateScoreGraphElements(rootEl, graphWidth, xScale, selectedIndex) {
+  const rootParentEl = rootEl.closest('.category-score-graph');
+  if (!(rootParentEl instanceof HTMLElement)) throw new Error('Missing category-score-graph');
+
+  // Update the position of the tracking line
+  const trackingLineEl = rootParentEl.querySelector('.tracking-line');
+  if (trackingLineEl instanceof SVGElement) {
+    trackingLineEl.setAttribute('style', `transform: translateX(${xScale(selectedIndex)}px)`);
+  }
+
+  // Update the position of the hover card
+  const hoverCard = rootParentEl.querySelector('.hover-card');
+  if (hoverCard instanceof HTMLElement) {
+    const leftPx = xScale(selectedIndex) + HOVER_CARD_MARGIN;
+    if (leftPx + 200 < graphWidth) {
+      hoverCard.style.left = leftPx + 'px';
+      hoverCard.style.right = '';
+    } else {
+      const rightPx =
+        graphWidth - (leftPx - HOVER_CARD_MARGIN) + GRAPH_MARGIN.right + HOVER_CARD_MARGIN;
+      hoverCard.style.left = '';
+      hoverCard.style.right = rightPx + 'px';
+    }
+  }
 }

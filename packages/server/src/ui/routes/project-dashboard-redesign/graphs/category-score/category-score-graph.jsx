@@ -13,7 +13,7 @@ import clsx from 'clsx';
 import {Gauge} from '../../../../components/gauge';
 import {ScoreDeltaBadge} from '../../../../components/score-delta-badge';
 import {D3Graph} from '../../../../components/d3-graph';
-import {renderScoreGraph} from './score-line-graph';
+import {renderScoreGraph, updateScoreGraph} from './score-line-graph';
 import {renderScoreDeltaGraph} from './score-delta-bar-graph';
 import {HoverCard} from '../hover-card';
 import {computeStatisticRerenderKey} from '../graph-utils';
@@ -98,11 +98,14 @@ export const CategoryScoreGraph = props => {
         data={{
           statistics: averageStats,
           statisticsWithMinMax: allStats,
+          selectedBuildId: selectedBuildId,
           setSelectedBuildId: setSelectedBuildId,
           setPinned: setPinned,
         }}
         render={renderScoreGraph}
         computeRerenderKey={data => computeStatisticRerenderKey(data.statisticsWithMinMax)}
+        update={updateScoreGraph}
+        computeUpdateKey={data => `${data.selectedBuildId}`}
       />
       <D3Graph
         className="category-score-graph__score-delta-graph"

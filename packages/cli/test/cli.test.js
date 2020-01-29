@@ -237,7 +237,7 @@ describe('Lighthouse CI CLI', () => {
         Saved LHR to http://localhost:XXXX (<UUID>)
         Saved LHR to http://localhost:XXXX (<UUID>)
         Done saving build results to Lighthouse CI
-        View build diff at http://localhost:XXXX/app/projects/awesomeciprojectname-s/compare/<UUID>
+        View build diff at http://localhost:XXXX/app/projects/awesomeciprojectname/compare/<UUID>
         No GitHub token set, skipping.
         "
       `);
@@ -251,7 +251,7 @@ describe('Lighthouse CI CLI', () => {
       const links = fs.readFileSync(linksFile, 'utf8');
       expect(cleanStdOutput(links)).toMatchInlineSnapshot(`
         "{
-          \\"http://localhost:XXXX/app/\\": \\"http://localhost:XXXX/app/projects/awesomeciprojectname-s/compare/<UUID>?compareUrl=http%3A%2F%2Flocalhost%3APORT%2Fapp%2F\\"
+          \\"http://localhost:XXXX/app/\\": \\"http://localhost:XXXX/app/projects/awesomeciprojectname/compare/<UUID>?compareUrl=http%3A%2F%2Flocalhost%3APORT%2Fapp%2F\\"
         }"
       `);
     });

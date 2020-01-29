@@ -15,12 +15,13 @@ import {Gauge} from '../../../../components/gauge';
 import {ScoreDeltaBadge} from '../../../../components/score-delta-badge';
 import {LhrViewerLink} from '../../../../components/lhr-viewer-link';
 import {api} from '../../../../hooks/use-api-data';
+import {createRootSvg, D3Graph} from '../../../../components/d3-graph';
 
-const GRAPH_MARGIN = 10;
-const GRAPH_MARGIN_RIGHT = 50;
 const DELTA_GRAPH_MIN = -50;
 const DELTA_GRAPH_MAX = 50;
 const HOVER_CARD_MARGIN = 100;
+
+const GRAPH_MARGIN = {top: 10, right: 50, bottom: 10, left: 10};
 
 /** @typedef {import('../../project-category-summaries.jsx').StatisticWithBuild} StatisticWithBuild */
 
@@ -78,30 +79,6 @@ export function computeScoreLineSegments(statistics) {
   return segments.filter(segment => segment.length > 1);
 }
 
-/** @param {HTMLElement} rootEl */
-function createRootSvg(rootEl) {
-  const height = rootEl.clientHeight;
-  const width = rootEl.clientWidth;
-  const graphWidth = width - GRAPH_MARGIN - GRAPH_MARGIN_RIGHT;
-  const graphHeight = height - GRAPH_MARGIN * 2;
-  const svgRoot = d3
-    .select(rootEl)
-    .append('svg')
-    .attr('width', width)
-    .attr('height', height);
-
-  return {
-    width,
-    height,
-    graphWidth,
-    graphHeight,
-    masks: svgRoot.append('defs'),
-    svg: svgRoot
-      .append('g')
-      .attr('style', `transform: translate(${GRAPH_MARGIN}px, ${GRAPH_MARGIN}px)`),
-  };
-}
-
 /** @param {Array<StatisticWithBuild>} statistics @return {Record<string, {min: number, max: number}>} */
 export function buildMinMaxByBuildId(statistics) {
   /** @type {Record<string, {min: number, max: number}>} */
@@ -117,14 +94,19 @@ export function buildMinMaxByBuildId(statistics) {
 }
 
 /**
- *
- * @param {HTMLElement} rootEl
- * @param {Array<StatisticWithBuild>} statistics
- * @param {Array<StatisticWithBuild>} statisticsWithMinMax
- * @param {import('preact/hooks/src').StateUpdater<string|undefined>} setSelectedBuildId
- * @param {import('preact/hooks/src').StateUpdater<boolean>} setPinned
+ * @typedef ScoreGraphData
+ * @prop {Array<StatisticWithBuild>} statistics
+ * @prop {Array<StatisticWithBuild>} statisticsWithMinMax
+ * @prop {import('preact/hooks/src').StateUpdater<string|undefined>} setSelectedBuildId
+ * @prop {import('preact/hooks/src').StateUpdater<boolean>} setPinned
  */
-function renderScoreGraph(rootEl, statistics, statisticsWithMinMax, setSelectedBuildId, setPinned) {
+
+/**
+ * @param {HTMLElement} rootEl
+ * @param {ScoreGraphData} data
+ */
+function renderScoreGraph(rootEl, data) {
+  const {statistics, statisticsWithMinMax, setSelectedBuildId, setPinned} = data;
   const rootParentEl = rootEl.closest('.category-score-graph');
   if (!(rootParentEl instanceof HTMLElement)) throw new Error('Missing category-score-graph');
   const getTrackingLineEl = () => {
@@ -133,10 +115,7 @@ function renderScoreGraph(rootEl, statistics, statisticsWithMinMax, setSelectedB
     return trackingLineEl;
   };
 
-  d3.select(rootEl)
-    .selectAll('*')
-    .remove();
-  const {svg, masks, width, graphWidth, graphHeight} = createRootSvg(rootEl);
+  const {svg, masks, width, graphWidth, graphHeight} = createRootSvg(rootEl, GRAPH_MARGIN);
   const minMaxByBuild = buildMinMaxByBuildId(statisticsWithMinMax);
   const n = statistics.length - 1;
   const statName = statistics[0].name;
@@ -192,7 +171,7 @@ function renderScoreGraph(rootEl, statistics, statisticsWithMinMax, setSelectedB
   svg
     .append('g')
     .attr('class', 'y-axis')
-    .attr('style', `transform: translateX(${width - GRAPH_MARGIN_RIGHT / 2}px)`)
+    .attr('style', `transform: translateX(${width - GRAPH_MARGIN.right / 2}px)`)
     .call(yAxis);
 
   // The grey error bar area behind the score line
@@ -304,7 +283,7 @@ function renderScoreGraph(rootEl, statistics, statisticsWithMinMax, setSelectedB
         hoverCard.style.right = '';
       } else {
         const rightPx =
-          graphWidth - (leftPx - HOVER_CARD_MARGIN) + GRAPH_MARGIN_RIGHT + HOVER_CARD_MARGIN;
+          graphWidth - (leftPx - HOVER_CARD_MARGIN) + GRAPH_MARGIN.right + HOVER_CARD_MARGIN;
         hoverCard.style.left = '';
         hoverCard.style.right = rightPx + 'px';
       }
@@ -327,7 +306,7 @@ function renderScoreDeltaGraph(rootEl, statistics) {
   const deltas = statistics
     .map((stat, i) => (i === 0 ? 0 : (stat.value - statistics[i - 1].value) * 100))
     .map(delta => Math.min(Math.max(delta, DELTA_GRAPH_MIN), DELTA_GRAPH_MAX));
-  const {svg, graphWidth, graphHeight} = createRootSvg(rootEl);
+  const {svg, graphWidth, graphHeight} = createRootSvg(rootEl, GRAPH_MARGIN);
 
   const xScale = d3
     .scaleLinear()
@@ -363,45 +342,6 @@ function renderScoreDeltaGraph(rootEl, statistics) {
     .attr('width', graphWidth / deltas.length / 4)
     .attr('height', d => Math.abs(yScale(d) - yScale(0)));
 }
-
-/** @param {{statistics: Array<StatisticWithBuild>, averageStatistics: Array<StatisticWithBuild>, setSelectedBuildId: import('preact/hooks/src').StateUpdater<string|undefined>, setPinned: import('preact/hooks/src').StateUpdater<boolean>}} props */
-const ScoreGraph = props => {
-  const graphElRef = useRef(/** @type {HTMLElement|undefined} */ (undefined));
-
-  useEffect(() => {
-    const rerender = () =>
-      graphElRef.current &&
-      renderScoreGraph(
-        graphElRef.current,
-        props.averageStatistics,
-        props.statistics,
-        props.setSelectedBuildId,
-        props.setPinned
-      );
-
-    rerender();
-    window.addEventListener('resize', rerender);
-    return () => window.removeEventListener('resize', rerender);
-  }, [computeStatisticRerenderKey(props.statistics)]);
-
-  return <div className="category-score-graph__score-graph" ref={graphElRef} />;
-};
-
-/** @param {{averageStatistics: Array<StatisticWithBuild>}} props */
-const ScoreDeltaGraph = props => {
-  const graphElRef = useRef(/** @type {HTMLElement|undefined} */ (undefined));
-
-  useEffect(() => {
-    const rerender = () =>
-      graphElRef.current && renderScoreDeltaGraph(graphElRef.current, props.averageStatistics);
-
-    rerender();
-    window.addEventListener('resize', rerender);
-    return () => window.removeEventListener('resize', rerender);
-  }, [computeStatisticRerenderKey(props.averageStatistics)]);
-
-  return <div className="category-score-graph__score-delta-graph" ref={graphElRef} />;
-};
 
 /** @param {{selectedBuildId: string|undefined, averageStatistics: Array<StatisticWithBuild>, pinned: boolean}} props */
 const HoverCard = props => {
@@ -502,24 +442,34 @@ export const CategoryScoreGraph = props => {
       })}
     >
       <h2>Overview</h2>
-      <ScoreGraph
-        statistics={allStats}
-        averageStatistics={averageStats}
-        setSelectedBuildId={setSelectedBuildId}
-        setPinned={setPinned}
+      <D3Graph
+        className="category-score-graph__score-graph"
+        data={{
+          statistics: averageStats,
+          statisticsWithMinMax: allStats,
+          setSelectedBuildId: setSelectedBuildId,
+          setPinned: setPinned,
+        }}
+        render={renderScoreGraph}
+        computeRerenderKey={data => computeStatisticRerenderKey(data.statisticsWithMinMax)}
       />
-      <ScoreDeltaGraph averageStatistics={averageStats} />
+      <D3Graph
+        className="category-score-graph__score-delta-graph"
+        data={averageStats}
+        render={renderScoreDeltaGraph}
+        computeRerenderKey={computeStatisticRerenderKey}
+      />
       <HoverCard
         pinned={pinned}
         selectedBuildId={selectedBuildId}
         averageStatistics={averageStats}
       />
       <div className="category-score-graph__date-range">
-        <div style={{marginLeft: GRAPH_MARGIN}}>
+        <div style={{marginLeft: GRAPH_MARGIN.left}}>
           {new Date(averageStats[0].createdAt || '').toLocaleDateString()}
         </div>
         <div style={{flexGrow: 1}} />
-        <div style={{marginRight: GRAPH_MARGIN_RIGHT}}>
+        <div style={{marginRight: GRAPH_MARGIN.right}}>
           {new Date(averageStats[averageStats.length - 1].createdAt || '').toLocaleDateString()}
         </div>
       </div>

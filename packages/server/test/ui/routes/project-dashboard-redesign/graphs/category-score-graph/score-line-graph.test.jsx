@@ -5,38 +5,12 @@
  */
 
 import {h} from 'preact';
-import {
-  computeScoreLineSegments,
-  buildMinMaxByBuildId,
-} from '../../../../src/ui/routes/project-dashboard-redesign/category-score-graph';
-import {cleanup} from '../../../test-utils.js';
+import {buildMinMaxByBuildId} from '../../../../../../src/ui/routes/project-dashboard-redesign/graphs/category-score/score-line-graph';
+import {cleanup} from '../../../../../test-utils.js';
 
 afterEach(cleanup);
 
 describe('Category Score Graph', () => {
-  describe('computeScoreLineSegments', () => {
-    it('should return the line segments to be colored', () => {
-      const pass = {value: 0.95};
-      const average = {value: 0.75};
-      const fail = {value: 0.25};
-      const statistics = [pass, fail, fail, fail, average, fail, pass, pass, average];
-      const segments = computeScoreLineSegments(statistics);
-      expect(segments).toEqual([
-        [pass, fail, fail, fail],
-        [fail, average],
-        [average, fail],
-        [fail, pass, pass],
-        [pass, average],
-      ]);
-    });
-
-    it('should handle score class and not exact score', () => {
-      const statistics = [{score: 0.13}, {score: 0.22}, {score: 0.48}, {score: 0.05}];
-      const segments = computeScoreLineSegments(statistics);
-      expect(segments).toEqual([statistics]);
-    });
-  });
-
   describe('buildMinMaxByBuildId', () => {
     it('should set the min/max values by build id', () => {
       const statistics = [

@@ -1,0 +1,74 @@
+/**
+ * @license Copyright 2020 Google Inc. All Rights Reserved.
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
+ */
+
+.hover-card {
+  position: absolute;
+  top: 50px;
+  width: 200px;
+
+  display: none;
+  flex-direction: column;
+  align-items: center;
+
+  background: var(--highlighted-background-color);
+  box-shadow: 0px 1px 6px rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+
+  z-index: 9;
+}
+
+.hover-card--visible {
+  display: flex;
+}
+
+.hover-card__datetime {
+  width: 100%;
+  padding: var(--base-spacing);
+
+  font-size: var(--smaller-font-size);
+  font-weight: var(--medium-font-weight);
+}
+
+.hover-card__time {
+  float: right;
+  color: var(--secondary-text-color);
+}
+
+.hover-card .gauge {
+  margin-bottom: var(--base-spacing);
+}
+
+.hover-card .score-delta-badge {
+  margin-bottom: var(--base-spacing);
+}
+
+.hover-card__actions {
+  width: 100%;
+  border-top: 1px solid var(--base-border-color);
+  display: flex;
+  flex-direction: row;
+}
+
+.hover-card__actions > a,
+.hover-card__actions > span {
+  width: 50%;
+  padding: var(--base-spacing);
+
+  text-align: center;
+  font-size: var(--smaller-font-size);
+  font-weight: var(--medium-font-weight);
+  color: var(--base-text-color);
+}
+
+.hover-card__actions .lhr-viewer-button {
+  margin-right: 0;
+  padding: 0;
+}
+
+.hover-card__actions > a:last-child {
+  border-left: 1px solid var(--base-border-color);
+  line-height: var(--lhr-viewer-button-size);
+}

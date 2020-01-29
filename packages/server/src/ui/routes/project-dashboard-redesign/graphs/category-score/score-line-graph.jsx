@@ -3,7 +3,8 @@ import * as d3 from 'd3';
 import * as _ from '@lhci/utils/src/lodash.js';
 
 import {createRootSvg} from '../../../../components/d3-graph';
-import {GRAPH_MARGIN, getClassNameFromStatistic} from './category-score-graph';
+import {GRAPH_MARGIN} from './category-score-graph';
+import {getClassNameFromStatistic} from '../graph-utils';
 import {HOVER_CARD_MARGIN} from '../hover-card';
 
 /** @typedef {import('../../project-category-summaries.jsx').StatisticWithBuild} StatisticWithBuild */
@@ -28,6 +29,7 @@ export function buildMinMaxByBuildId(statistics) {
  * @prop {import('preact/hooks/src').StateUpdater<string|undefined>} setSelectedBuildId
  * @prop {import('preact/hooks/src').StateUpdater<boolean>} setPinned
  */
+
 /**
  * @param {HTMLElement} rootEl
  * @param {ScoreGraphData} data
@@ -71,6 +73,7 @@ export function renderScoreGraph(rootEl, data) {
     .x(d => xScale(statistics.indexOf(d)))
     .y(d => yScale(d.value * 100));
   const scoreRange = statisticArea()
+    .curve(d3.curveMonotoneX)
     .x((d, i) => xScale(i))
     .y0(d => yScale(minMaxByBuild[d.buildId].min * 100))
     .y1(d => yScale(minMaxByBuild[d.buildId].max * 100));

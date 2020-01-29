@@ -15,6 +15,7 @@ const {createLHR} = require('./lhr-generator.js');
 //    - Not applicable audits
 //    - Informative audits
 //    - 0-value numericValue
+//    - LCP/CLS/TBT
 
 /** @typedef {import('./lhr-generator').AuditGenDef} AuditGenDef */
 

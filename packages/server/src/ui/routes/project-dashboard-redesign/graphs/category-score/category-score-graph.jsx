@@ -16,25 +16,11 @@ import {D3Graph} from '../../../../components/d3-graph';
 import {renderScoreGraph} from './score-line-graph';
 import {renderScoreDeltaGraph} from './score-delta-bar-graph';
 import {HoverCard} from '../hover-card';
+import {computeStatisticRerenderKey} from '../graph-utils';
 
 export const GRAPH_MARGIN = {top: 10, right: 50, bottom: 10, left: 10};
 
 /** @typedef {import('../../project-category-summaries.jsx').StatisticWithBuild} StatisticWithBuild */
-
-/** @param {Pick<StatisticWithBuild, 'value'>} statistic */
-export function getClassNameFromStatistic(statistic) {
-  if (statistic.value >= 0.9) return 'score--pass';
-  if (statistic.value < 0.5) return 'score--fail';
-  return 'score--average';
-}
-
-/** @param {Array<StatisticWithBuild>} statistics */
-function computeStatisticRerenderKey(statistics) {
-  return statistics
-    .map(s => s.id)
-    .sort()
-    .join(',');
-}
 
 /** @param {{selectedBuildId: string|undefined, averageStatistics: Array<StatisticWithBuild>, pinned: boolean}} props */
 const HoverCardWithDiff = props => {

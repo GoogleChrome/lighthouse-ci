@@ -12,17 +12,38 @@ import {Paper} from '../../components/paper.jsx';
 import './category-card.css';
 import {CategoryScoreGraph} from './graphs/category-score/category-score-graph';
 import clsx from 'clsx';
+import {MetricLineGraph} from './graphs/metric-line-graph';
 
 /** @typedef {import('./project-category-summaries.jsx').StatisticWithBuild} StatisticWithBuild */
+/** @typedef {{category: LH.CategoryResult, categoryGroups: LH.Result['categoryGroups'], statistics?: Array<StatisticWithBuild>, loadingState: import('../../components/async-loader').LoadingState, builds: LHCI.ServerCommand.Build[], buildLimit: number, setBuildLimit: (n: number) => void}} Props */
 
 const BUILD_LIMIT_OPTIONS = [{value: 25}, {value: 50}, {value: 100}, {value: 150, label: 'Max'}];
 
-/** @param {{title: string, category: LH.CategoryResult, statistics?: Array<StatisticWithBuild>, loadingState: import('../../components/async-loader').LoadingState, builds: LHCI.ServerCommand.Build[], buildLimit: number, setBuildLimit: (n: number) => void}} props */
+/** @param {Props & {statistics: Array<StatisticWithBuild>}} props */
+const PerformanceCategoryDetails = props => {
+  const fcpStats = props.statistics.filter(
+    stat => stat.name === 'audit_first-contentful-paint_average'
+  );
+
+  return (
+    <Fragment>
+      <MetricLineGraph metrics={[{statistics: fcpStats, label: 'FCP'}]} />
+    </Fragment>
+  );
+};
+
+/** @param {Props & {statistics: Array<StatisticWithBuild>}} props */
+const CategoryDetails = props => {
+  if (props.category.id === 'performance') return <PerformanceCategoryDetails {...props} />;
+  return <Fragment />;
+};
+
+/** @param {Props} props */
 export const CategoryCard = props => {
   return (
     <Paper className="category-card">
       <div className="category-card__header">
-        <h3 className="category-card__title">{props.title}</h3>
+        <h3 className="category-card__title">{props.category.title}</h3>
         <div className="category-card__build-limit">
           {BUILD_LIMIT_OPTIONS.map(option => (
             <span
@@ -45,6 +66,7 @@ export const CategoryCard = props => {
           render={allStats => (
             <Fragment>
               <CategoryScoreGraph {...props} statistics={allStats} />
+              <CategoryDetails {...props} statistics={allStats} />
             </Fragment>
           )}
         />

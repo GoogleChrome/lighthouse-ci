@@ -81,6 +81,7 @@ declare global {
           | 'first-cpu-idle'
           | 'interactive'
           | 'first-meaningful-paint'
+          | 'speed-index'
           | 'max-potential-fid';
 
         /** Supported values for the resourceType property of a ResourceBudget. */

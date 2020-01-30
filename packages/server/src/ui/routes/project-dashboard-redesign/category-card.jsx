@@ -21,6 +21,16 @@ import {MetricLineGraph} from './graphs/metric-line-graph';
 
 const BUILD_LIMIT_OPTIONS = [{value: 25}, {value: 50}, {value: 100}, {value: 150, label: 'Max'}];
 
+/** @type {Record<LHCI.AssertCommand.Budget.TimingMetric, [number, number]>} */
+const SCORE_LEVEL_METRIC_THRESHOLDS = {
+  'first-contentful-paint': [2000, 4000],
+  'first-meaningful-paint': [2000, 4000],
+  'first-cpu-idle': [3000, 7500],
+  interactive: [3000, 7500],
+  'speed-index': [3000, 6000],
+  'max-potential-fid': [100, 250],
+};
+
 /** @param {PropsWithState} props */
 const PerformanceCategoryDetails = props => {
   /** @param {LHCI.ServerCommand.Statistic['name']} name */
@@ -38,16 +48,19 @@ const PerformanceCategoryDetails = props => {
             abbreviation: 'FCP',
             label: 'First Contentful Paint',
             statistics: stats('audit_first-contentful-paint_average'),
+            scoreLevels: SCORE_LEVEL_METRIC_THRESHOLDS['first-contentful-paint'],
           },
           {
             abbreviation: 'TTI',
             label: 'Time to Interactive',
             statistics: stats('audit_interactive_average'),
+            scoreLevels: SCORE_LEVEL_METRIC_THRESHOLDS['interactive'],
           },
           {
             abbreviation: 'SI',
             label: 'Speed Index',
             statistics: stats('audit_speed-index_average'),
+            scoreLevels: SCORE_LEVEL_METRIC_THRESHOLDS['speed-index'],
           },
         ]}
       />
@@ -61,16 +74,19 @@ const PerformanceCategoryDetails = props => {
             abbreviation: 'FCP',
             label: 'First Contentful Paint',
             statistics: stats('audit_first-contentful-paint_average'),
+            scoreLevels: SCORE_LEVEL_METRIC_THRESHOLDS['first-contentful-paint'],
           },
           {
             abbreviation: 'TTI',
             label: 'Time to Interactive',
-            statistics: stats('audit_interactive_average').map(s => ({...s, value: s.value * 5})),
+            statistics: stats('audit_interactive_average'),
+            scoreLevels: SCORE_LEVEL_METRIC_THRESHOLDS['interactive'],
           },
           {
             abbreviation: 'SI',
             label: 'Speed Index',
             statistics: stats('audit_speed-index_average'),
+            scoreLevels: SCORE_LEVEL_METRIC_THRESHOLDS['speed-index'],
           },
         ]}
       />

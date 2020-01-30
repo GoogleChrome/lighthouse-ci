@@ -11,6 +11,13 @@ const _ = require('./lodash.js');
 /** @typedef {'better'|'worse'|'added'|'removed'|'ambiguous'|'no change'} RowLabel */
 /** @typedef {{item: Record<string, any>, kind?: string, index: number}} DetailItemEntry */
 
+const SCORE_LEVEL_METRIC_THRESHOLDS = {
+  'first-contentful-paint': [2000, 4000],
+  'largest-contentful-paint': [2000, 4000],
+  interactive: [3000, 7500],
+  'speed-index': [3000, 6000],
+};
+
 /**
  * @param {number} delta
  * @param {'audit'|'score'} deltaType
@@ -135,6 +142,14 @@ function getScoreLevel(score) {
   if (typeof score !== 'number') return 'error';
   if (score >= 0.9) return 'pass';
   if (score >= 0.5) return 'average';
+  return 'fail';
+}
+
+/** @param {number|null|undefined} value @param {[number, number]} cutoffs */
+function getMetricScoreLevel(value, cutoffs) {
+  if (typeof value !== 'number') return 'error';
+  if (value <= cutoffs[0]) return 'pass';
+  if (value <= cutoffs[1]) return 'average';
   return 'fail';
 }
 
@@ -636,6 +651,7 @@ module.exports = {
   getRowLabel,
   getRowLabelForIndex,
   getMostSevereDiffLabel,
+  getMetricScoreLevel,
   zipBaseAndCompareItems,
   synthesizeItemKeyDiffs,
   sortZippedBaseAndCompareItems,

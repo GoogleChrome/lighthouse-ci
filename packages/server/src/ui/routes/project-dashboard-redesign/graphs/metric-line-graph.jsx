@@ -20,6 +20,7 @@ import {HoverCard} from './hover-card';
 import {useState} from 'preact/hooks';
 import clsx from 'clsx';
 import {Nbsp} from '../../../components/nbsp';
+import {getMetricScoreLevel} from '@lhci/utils/src/audit-diff-finder';
 
 const GRAPH_MARGIN = {top: 20, right: 20, bottom: 20, left: 50};
 
@@ -29,12 +30,12 @@ const STROKE_DASHARRAY_OPTIONS = [
   '', // solid
   '1, 1', // dotted
   '3, 3', // dashed
-  '4, 2, 1, 1, 1, 2', // dash dash dot dot dot dot dot
+  '4, 2, 1, 1, 1, 2', // dash dot dot
 ];
 
 /** @typedef {import('../project-category-summaries.jsx').StatisticWithBuild} StatisticWithBuild */
 
-/** @typedef {{statistics: Array<StatisticWithBuild>, abbreviation: string, label: string}} MetricLineDef */
+/** @typedef {{statistics: Array<StatisticWithBuild>, abbreviation: string, label: string, scoreLevels: [number, number]}} MetricLineDef */
 
 /**
  * @typedef LineGraphData
@@ -188,7 +189,9 @@ const HoverCardWithMetricValue = props => {
   if (selectedMetric && statistic) {
     children = (
       <div className="metric-line-graph__hover-card-data">
-        <div>
+        <div
+          className={`text--${getMetricScoreLevel(statistic.value, selectedMetric.scoreLevels)}`}
+        >
           {statistic.value.toLocaleString(undefined, {maximumFractionDigits: 0})}
           <Nbsp />
           ms

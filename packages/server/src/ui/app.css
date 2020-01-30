@@ -180,6 +180,18 @@ h6 {
   color: var(--regression-color);
 }
 
+.text--pass {
+  color: var(--pass-color);
+}
+
+.text--average {
+  color: var(--average-color);
+}
+
+.text--fail {
+  color: var(--fail-color);
+}
+
 a {
   text-decoration: none;
 }

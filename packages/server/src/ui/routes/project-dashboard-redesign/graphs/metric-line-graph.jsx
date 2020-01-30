@@ -17,6 +17,8 @@ import {
 
 import './metric-line-graph.css';
 import {HoverCard} from './hover-card';
+import {useState} from 'preact/hooks';
+import clsx from 'clsx';
 
 const GRAPH_MARGIN = {top: 20, right: 20, bottom: 20, left: 50};
 
@@ -38,8 +40,10 @@ const STROKE_DASHARRAY_OPTIONS = [
  * @prop {Array<MetricLineDef>} metrics
  * @prop {boolean} pinned
  * @prop {string|undefined} selectedBuildId
+ * @prop {number} selectedMetricIndex
  * @prop {import('preact/hooks/src').StateUpdater<string|undefined>} setSelectedBuildId
  * @prop {import('preact/hooks/src').StateUpdater<boolean>} setPinned
+ * @prop {import('preact/hooks/src').StateUpdater<number>} setMetricIndex
  */
 
 /**
@@ -95,8 +99,8 @@ function renderLineGraph(rootEl, data) {
     .attr('y2', graphHeight);
 
   for (const metric of metrics) {
-    const index = metrics.indexOf(metric);
-    const dasharray = STROKE_DASHARRAY_OPTIONS[index % STROKE_DASHARRAY_OPTIONS.length];
+    const metricIndex = metrics.indexOf(metric);
+    const dasharray = STROKE_DASHARRAY_OPTIONS[metricIndex % STROKE_DASHARRAY_OPTIONS.length];
     const metricLine = statisticLine()
       .curve(d3.curveMonotoneX)
       .x(d => xScale(metric.statistics.indexOf(d)))
@@ -106,7 +110,7 @@ function renderLineGraph(rootEl, data) {
       .append('path')
       .datum(metric.statistics)
       .style('stroke-dasharray', dasharray)
-      .attr('class', 'metric-line-graph__line')
+      .attr('class', `metric-line-graph__line metric-line--${metricIndex}`)
       .attr('d', metricLine);
   }
 
@@ -118,6 +122,24 @@ function renderLineGraph(rootEl, data) {
     data.setSelectedBuildId,
     data.setPinned
   );
+
+  /** @param {number} statIndex @param {number} targetValue */
+  const updateMetricIndex = (statIndex, targetValue) => {
+    const metricOptions = metrics.map(m => m.statistics[statIndex]);
+    const metricDistances = metricOptions.map(stat =>
+      stat ? Math.abs(stat.value - targetValue) : Infinity
+    );
+    const closestMetricIndex = metricDistances.indexOf(Math.min(...metricDistances));
+    data.setMetricIndex(closestMetricIndex);
+  };
+
+  svg.selectAll('.graph-hitbox').on('mousemove', (_, i) => {
+    const graphContainer = svg.node();
+    if (!graphContainer) return;
+    const graphY = d3.mouse(graphContainer)[1];
+    const yValue = yScale.invert(graphY);
+    updateMetricIndex(i, yValue * 1000);
+  });
 }
 
 /**
@@ -140,19 +162,32 @@ function updateLineGraph(rootEl, data) {
     xScale,
     selectedIndex
   );
+
+  updateHighlightedMetricLine(rootEl, data.selectedMetricIndex);
 }
 
-/** @param {LineGraphData} props */
+/** @param {HTMLElement} rootEl @param {number} metricIndex */
+function updateHighlightedMetricLine(rootEl, metricIndex) {
+  const currentSelection = rootEl.querySelector('.metric-line-graph__line--selected');
+  const nextSelection = rootEl.querySelector(`.metric-line--${metricIndex}`);
+  if (currentSelection === nextSelection) return;
+
+  if (currentSelection) currentSelection.classList.toggle('metric-line-graph__line--selected');
+  if (nextSelection) nextSelection.classList.toggle('metric-line-graph__line--selected');
+}
+
+/** @param {StrictOmit<LineGraphData, 'setMetricIndex'|'selectedMetricIndex'>} props */
 export const MetricLineGraph = props => {
   const firstStat = props.metrics[0].statistics[0];
   const lastStat = props.metrics[0].statistics[props.metrics[0].statistics.length - 1];
+  const [selectedMetricIndex, setMetricIndex] = useState(-1);
 
   return (
-    <div className="metric-line-graph graph-root-el">
+    <div className="metric-line-graph graph-root-el" onMouseLeave={() => setMetricIndex(-1)}>
       <HoverCard pinned={props.pinned} url={firstStat.url} />
       <D3Graph
         className="metric-line-graph__graph"
-        data={props}
+        data={{...props, setMetricIndex, selectedMetricIndex}}
         render={renderLineGraph}
         update={updateLineGraph}
         computeRerenderKey={data =>
@@ -160,7 +195,7 @@ export const MetricLineGraph = props => {
             data.metrics.map(m => m.statistics).reduce((a, b) => a.concat(b))
           )
         }
-        computeUpdateKey={data => `${data.selectedBuildId}`}
+        computeUpdateKey={data => `${data.selectedBuildId}-${data.selectedMetricIndex}`}
       />
 
       <div className="metric-line-graph__date-range">
@@ -173,10 +208,14 @@ export const MetricLineGraph = props => {
         </div>
       </div>
 
-      <div className="metric-line-graph__legend" style={{marginLeft: GRAPH_MARGIN.left / 2}}>
+      <div
+        className="metric-line-graph__legend"
+        style={{marginLeft: GRAPH_MARGIN.left / 2}}
+        onMouseLeave={() => setMetricIndex(-1)}
+      >
         {props.metrics.map((metric, i) => {
           return (
-            <div key={metric.label}>
+            <div key={metric.label} onMouseOver={() => setMetricIndex(i)}>
               <svg
                 className="metric-line-graph__legend-line"
                 version="1.1"
@@ -195,7 +234,9 @@ export const MetricLineGraph = props => {
                 />
               </svg>
               <div
-                className="metric-line-graph__legend-label"
+                className={clsx('metric-line-graph__legend-label', {
+                  'legend-label--highlighted': selectedMetricIndex === i,
+                })}
                 style={{marginLeft: LEGEND_LINE_WIDTH}}
               >
                 <span>{metric.abbreviation}</span>

@@ -19,6 +19,11 @@
   stroke-width: 1px;
 }
 
+.metric-line-graph .metric-line-graph__line--selected {
+  stroke: var(--base-text-color);
+  stroke-width: 2px;
+}
+
 .metric-line-graph .y-axis path {
   fill: none;
   stroke: none;
@@ -75,6 +80,10 @@
   width: 40px;
   padding-right: var(--base-spacing);
 
+  color: var(--base-text-color);
+}
+
+.legend-label--highlighted {
   color: var(--base-text-color);
 }
 

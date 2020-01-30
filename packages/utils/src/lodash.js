@@ -71,9 +71,10 @@ function groupIntoMap(items, keyFn) {
 }
 
 /**
- * @param {() => void} fn
+ * @template {any[]} T
+ * @param {(...args: T) => void} fn
  * @param {number} time
- * @return {{(): void; cancel: () => void;}}
+ * @return {{(...args: T): void; cancel: () => void;}}
  */
 function debounce(fn, time) {
   /** @type {NodeJS.Timeout|undefined} */
@@ -83,9 +84,10 @@ function debounce(fn, time) {
     timeout = undefined;
   };
 
-  const debouncedFn = () => {
+  /** @param {T} args */
+  const debouncedFn = (...args) => {
     if (timeout) clearTimeout(timeout);
-    timeout = setTimeout(fn, time);
+    timeout = setTimeout(() => fn(...args), time);
   };
 
   debouncedFn.cancel = cancel;
@@ -183,6 +185,32 @@ module.exports = {
     return [...groupIntoMap(items, keyFn).values()];
   },
   groupIntoMap,
+  /**
+   * @template TArr
+   * @param {Array<TArr>} items
+   * @param {(o: TArr) => number} keyFn
+   */
+  maxBy(items, keyFn) {
+    let maxItem = undefined;
+    let maxValue = -Infinity;
+    for (const item of items) {
+      const value = keyFn(item);
+      if (value > maxValue) {
+        maxItem = item;
+        maxValue = value;
+      }
+    }
+
+    return maxItem;
+  },
+  /**
+   * @template TArr
+   * @param {Array<TArr>} items
+   * @param {(o: TArr) => number} keyFn
+   */
+  minBy(items, keyFn) {
+    return this.maxBy(items, o => -keyFn(o));
+  },
   /**
    * @template T
    * @param {T} object

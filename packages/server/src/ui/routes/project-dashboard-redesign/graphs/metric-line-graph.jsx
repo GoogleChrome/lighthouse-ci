@@ -4,7 +4,7 @@
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
  */
 
-import {h} from 'preact';
+import {h, Fragment} from 'preact';
 import * as d3 from 'd3';
 import * as _ from '@lhci/utils/src/lodash.js';
 
@@ -19,6 +19,7 @@ import './metric-line-graph.css';
 import {HoverCard} from './hover-card';
 import {useState} from 'preact/hooks';
 import clsx from 'clsx';
+import {Nbsp} from '../../../components/nbsp';
 
 const GRAPH_MARGIN = {top: 20, right: 20, bottom: 20, left: 50};
 
@@ -176,6 +177,37 @@ function updateHighlightedMetricLine(rootEl, metricIndex) {
   if (nextSelection) nextSelection.classList.toggle('metric-line-graph__line--selected');
 }
 
+/** @param {StrictOmit<LineGraphData, 'setMetricIndex'>} props */
+const HoverCardWithMetricValue = props => {
+  const selectedMetric = props.metrics[props.selectedMetricIndex];
+  const statistics = selectedMetric && selectedMetric.statistics;
+  const statistic = statistics && statistics.find(s => s.buildId === props.selectedBuildId);
+  const build = statistic && statistic.build;
+
+  let children = <Fragment />;
+  if (selectedMetric && statistic) {
+    children = (
+      <div className="metric-line-graph__hover-card-data">
+        <div>
+          {statistic.value.toLocaleString(undefined, {maximumFractionDigits: 0})}
+          <Nbsp />
+          ms
+        </div>
+        <div>{selectedMetric.label}</div>
+      </div>
+    );
+  }
+
+  return (
+    <HoverCard
+      pinned={props.pinned}
+      url={(statistic && statistic.url) || ''}
+      build={build}
+      children={children}
+    />
+  );
+};
+
 /** @param {StrictOmit<LineGraphData, 'setMetricIndex'|'selectedMetricIndex'>} props */
 export const MetricLineGraph = props => {
   const firstStat = props.metrics[0].statistics[0];
@@ -184,7 +216,7 @@ export const MetricLineGraph = props => {
 
   return (
     <div className="metric-line-graph graph-root-el" onMouseLeave={() => setMetricIndex(-1)}>
-      <HoverCard pinned={props.pinned} url={firstStat.url} />
+      <HoverCardWithMetricValue {...props} selectedMetricIndex={selectedMetricIndex} />
       <D3Graph
         className="metric-line-graph__graph"
         data={{...props, setMetricIndex, selectedMetricIndex}}

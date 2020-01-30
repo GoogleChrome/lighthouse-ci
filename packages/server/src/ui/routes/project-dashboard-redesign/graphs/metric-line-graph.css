@@ -5,6 +5,7 @@
  */
 
 .metric-line-graph {
+  position: relative;
   width: 50%;
 }
 
@@ -90,4 +91,18 @@
 .metric-line-graph .tracking-line {
   stroke: var(--base-border-color);
   stroke-width: 1px;
+}
+
+.metric-line-graph__hover-card-data {
+  width: 100%;
+  padding: var(--base-spacing);
+  padding-top: 0;
+}
+
+.metric-line-graph__hover-card-data > div:first-child {
+  font-size: var(--title-font-size);
+}
+
+.metric-line-graph__hover-card-data > div:last-child {
+  font-size: var(--smaller-font-size);
 }

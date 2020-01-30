@@ -16,7 +16,7 @@ export const HOVER_CARD_WIDTH = 200;
 
 export const HOVER_CARD_MARGIN = 100;
 
-/** @param {{url: string, build?: LHCI.ServerCommand.Build, children?: LHCI.PreactNode, pinned: boolean}} props */
+/** @param {{url: string, build?: LHCI.ServerCommand.Build, children?: LHCI.PreactNode, pinned: boolean, className?: string}} props */
 export const HoverCard = props => {
   const {url, build, children, pinned} = props;
 
@@ -50,7 +50,7 @@ export const HoverCard = props => {
 
   return (
     <div
-      className={clsx('hover-card', {
+      className={clsx('hover-card', props.className, {
         'hover-card--visible': !!build,
         'hover-card--pinned': !!pinned,
       })}

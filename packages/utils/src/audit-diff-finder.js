@@ -11,13 +11,6 @@ const _ = require('./lodash.js');
 /** @typedef {'better'|'worse'|'added'|'removed'|'ambiguous'|'no change'} RowLabel */
 /** @typedef {{item: Record<string, any>, kind?: string, index: number}} DetailItemEntry */
 
-const SCORE_LEVEL_METRIC_THRESHOLDS = {
-  'first-contentful-paint': [2000, 4000],
-  'largest-contentful-paint': [2000, 4000],
-  interactive: [3000, 7500],
-  'speed-index': [3000, 6000],
-};
-
 /**
  * @param {number} delta
  * @param {'audit'|'score'} deltaType

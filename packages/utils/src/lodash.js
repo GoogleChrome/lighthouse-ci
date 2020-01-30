@@ -251,4 +251,8 @@ module.exports = {
   shortId(uuid) {
     return uuid.replace(/-/g, '').slice(0, 12);
   },
+  uniqueId: (() => {
+    let id = 1;
+    return () => id++;
+  })(),
 };

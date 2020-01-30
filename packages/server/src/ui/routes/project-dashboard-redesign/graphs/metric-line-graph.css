@@ -20,9 +20,25 @@
   stroke-width: 1px;
 }
 
-.metric-line-graph .metric-line-graph__line--selected {
-  stroke: var(--base-text-color);
+.metric-line-graph .metric-line-mask {
+  stroke: black;
   stroke-width: 2px;
+}
+
+.metric-line-graph .metric-line-mask--selected {
+  stroke: white;
+}
+
+.metric-line-graph__mask-fill--pass {
+  fill: var(--pass-color);
+}
+
+.metric-line-graph__mask-fill--average {
+  fill: var(--average-color);
+}
+
+.metric-line-graph__mask-fill--fail {
+  fill: var(--fail-color);
 }
 
 .metric-line-graph .y-axis path {
@@ -91,6 +107,15 @@
 .metric-line-graph .tracking-line {
   stroke: var(--base-border-color);
   stroke-width: 1px;
+}
+
+.metric-line-graph:first-child .hover-card {
+  left: 100% !important;
+}
+
+.metric-line-graph:last-child .hover-card {
+  left: initial !important;
+  right: 100% !important;
 }
 
 .metric-line-graph__hover-card-data {

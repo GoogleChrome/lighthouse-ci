@@ -65,7 +65,7 @@ function buildXScale(graphWidth, data) {
  */
 function renderLineGraph(rootEl, data) {
   const {metrics} = data;
-  const {svg, graphWidth, graphHeight} = createRootSvg(rootEl, GRAPH_MARGIN);
+  const {svg, masks, graphWidth, graphHeight} = createRootSvg(rootEl, GRAPH_MARGIN);
 
   const yMax = Math.max(...metrics.map(m => Math.max(...m.statistics.map(s => s.value))));
   const yMaxSeconds = Math.ceil((yMax * 1.1) / 1000);
@@ -102,18 +102,52 @@ function renderLineGraph(rootEl, data) {
 
   for (const metric of metrics) {
     const metricIndex = metrics.indexOf(metric);
+    const lineMaskId = `metricLineMask-${_.uniqueId()}`;
     const dasharray = STROKE_DASHARRAY_OPTIONS[metricIndex % STROKE_DASHARRAY_OPTIONS.length];
     const metricLine = statisticLine()
       .curve(d3.curveMonotoneX)
       .x(d => xScale(metric.statistics.indexOf(d)))
       .y(d => yScale(d.value / 1000));
 
+    // The plain gray line of the metric values
     svg
       .append('path')
       .datum(metric.statistics)
       .style('stroke-dasharray', dasharray)
-      .attr('class', `metric-line-graph__line metric-line--${metricIndex}`)
+      .attr('class', `metric-line-graph__line`)
       .attr('d', metricLine);
+
+    // The mask of the colorful version displayed on hover
+    masks
+      .append('mask')
+      .attr('id', lineMaskId)
+      .append('path')
+      .datum(metric.statistics)
+      .style('stroke-dasharray', dasharray)
+      .attr('class', `metric-line-mask metric-line-mask--${metricIndex}`)
+      .attr('d', metricLine);
+
+    // The mask fills to colorize the masked line
+    const passThreshold = yScale(metric.scoreLevels[0] / 1000);
+    const averageThreshold = yScale(metric.scoreLevels[1] / 1000);
+    const scoreSectionMaskFills = [
+      {type: 'pass', start: yScale(0), end: passThreshold},
+      {type: 'average', start: passThreshold, end: averageThreshold},
+      {type: 'fail', start: averageThreshold, end: yScale(yMaxSeconds)},
+    ];
+
+    for (const scoreSectionMaskFill of scoreSectionMaskFills) {
+      if (scoreSectionMaskFill.start < 0) continue;
+
+      svg
+        .append('rect')
+        .attr('x', 0)
+        .attr('y', scoreSectionMaskFill.end)
+        .attr('width', graphWidth)
+        .attr('height', scoreSectionMaskFill.start - scoreSectionMaskFill.end)
+        .attr('mask', `url(#${lineMaskId})`)
+        .attr('class', `metric-line-graph__mask-fill--${scoreSectionMaskFill.type}`);
+    }
   }
 
   appendHoverCardHitboxElements(
@@ -170,12 +204,12 @@ function updateLineGraph(rootEl, data) {
 
 /** @param {HTMLElement} rootEl @param {number} metricIndex */
 function updateHighlightedMetricLine(rootEl, metricIndex) {
-  const currentSelection = rootEl.querySelector('.metric-line-graph__line--selected');
-  const nextSelection = rootEl.querySelector(`.metric-line--${metricIndex}`);
+  const currentSelection = rootEl.querySelector('.metric-line-mask--selected');
+  const nextSelection = rootEl.querySelector(`.metric-line-mask--${metricIndex}`);
   if (currentSelection === nextSelection) return;
 
-  if (currentSelection) currentSelection.classList.toggle('metric-line-graph__line--selected');
-  if (nextSelection) nextSelection.classList.toggle('metric-line-graph__line--selected');
+  if (currentSelection) currentSelection.classList.toggle('metric-line-mask--selected');
+  if (nextSelection) nextSelection.classList.toggle('metric-line-mask--selected');
 }
 
 /** @param {StrictOmit<LineGraphData, 'setMetricIndex'>} props */
@@ -202,12 +236,9 @@ const HoverCardWithMetricValue = props => {
   }
 
   return (
-    <HoverCard
-      pinned={props.pinned}
-      url={(statistic && statistic.url) || ''}
-      build={build}
-      children={children}
-    />
+    <HoverCard pinned={props.pinned} url={(statistic && statistic.url) || ''} build={build}>
+      {children}
+    </HoverCard>
   );
 };
 

@@ -42,7 +42,9 @@ export function appendHoverCardHitboxElements(
   setPinned
 ) {
   const {svg, graphWidth, graphHeight} = findRootSvg(rootEl, margin);
+  const categoryCardEl = rootEl.closest('.category-card');
   const graphRootEl = rootEl.closest('.graph-root-el');
+  if (!(categoryCardEl instanceof HTMLElement)) throw new Error('Missing category-card');
   if (!(graphRootEl instanceof HTMLElement)) throw new Error('Missing graph-root-el');
 
   const n = statistics.length - 1;
@@ -60,6 +62,8 @@ export function appendHoverCardHitboxElements(
     .attr('width', graphWidth / n)
     .attr('height', graphHeight)
     .on('click', () => {
+      if (!categoryCardEl.querySelector('.hover-card--visible')) return;
+
       setPinned(current => {
         const next = !current;
         if (!next) debouncedClearBuildId();

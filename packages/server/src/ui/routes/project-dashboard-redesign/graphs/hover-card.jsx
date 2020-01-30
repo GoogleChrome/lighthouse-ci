@@ -12,6 +12,8 @@ import {LhrViewerLink} from '../../../components/lhr-viewer-link';
 import {api} from '../../../hooks/use-api-data';
 import './hover-card.css';
 
+export const HOVER_CARD_WIDTH = 200;
+
 export const HOVER_CARD_MARGIN = 100;
 
 /** @param {{url: string, build?: LHCI.ServerCommand.Build, children?: LHCI.PreactNode, pinned: boolean}} props */

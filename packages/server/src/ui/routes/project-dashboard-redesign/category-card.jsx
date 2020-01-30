@@ -5,7 +5,7 @@
  */
 
 import {h, Fragment} from 'preact';
-import {useState} from 'preact/hooks';
+import {useState, useEffect} from 'preact/hooks';
 import _ from '@lhci/utils/src/lodash.js';
 import {AsyncLoader} from '../../components/async-loader';
 import {Paper} from '../../components/paper.jsx';
@@ -17,7 +17,7 @@ import {MetricLineGraph} from './graphs/metric-line-graph';
 
 /** @typedef {import('./project-category-summaries.jsx').StatisticWithBuild} StatisticWithBuild */
 /** @typedef {{category: LH.CategoryResult, categoryGroups: LH.Result['categoryGroups'], statistics?: Array<StatisticWithBuild>, loadingState: import('../../components/async-loader').LoadingState, builds: LHCI.ServerCommand.Build[], buildLimit: number, setBuildLimit: (n: number) => void}} Props */
-/** @typedef {Props & {statistics: Array<StatisticWithBuild>, selectedBuildId: string|undefined, setSelectedBuildId: import('preact/hooks/src').StateUpdater<string|undefined>}} PropsWithState */
+/** @typedef {Props & {statistics: Array<StatisticWithBuild>, selectedBuildId: string|undefined, setSelectedBuildId: import('preact/hooks/src').StateUpdater<string|undefined>, pinned: boolean, setPinned: import('preact/hooks/src').StateUpdater<boolean>}} PropsWithState */
 
 const BUILD_LIMIT_OPTIONS = [{value: 25}, {value: 50}, {value: 100}, {value: 150, label: 'Max'}];
 
@@ -29,6 +29,8 @@ const PerformanceCategoryDetails = props => {
   return (
     <div className="performance-category-details__graphs">
       <MetricLineGraph
+        pinned={props.pinned}
+        setPinned={props.setPinned}
         selectedBuildId={props.selectedBuildId}
         setSelectedBuildId={props.setSelectedBuildId}
         metrics={[
@@ -50,6 +52,8 @@ const PerformanceCategoryDetails = props => {
         ]}
       />
       <MetricLineGraph
+        pinned={props.pinned}
+        setPinned={props.setPinned}
         selectedBuildId={props.selectedBuildId}
         setSelectedBuildId={props.setSelectedBuildId}
         metrics={[
@@ -66,7 +70,7 @@ const PerformanceCategoryDetails = props => {
           {
             abbreviation: 'SI',
             label: 'Speed Index',
-            statistics: stats('audit_speed-index_average').map(s => ({...s, value: s.value * 1})),
+            statistics: stats('audit_speed-index_average'),
           },
         ]}
       />
@@ -82,9 +86,30 @@ const CategoryDetails = props => {
 
 /** @param {Props} props */
 export const CategoryCard = props => {
+  const [pinned, setPinned] = useState(false);
   const [selectedBuildId, setSelectedBuildId] = useState(
     /** @type {undefined|string} */ (undefined)
   );
+
+  const categoryId = props.category.id;
+  const id = `category-card__body--${categoryId}`;
+
+  // Unpin when the user clicks out of the card
+  useEffect(() => {
+    /** @param {Event} e */
+    const listener = e => {
+      const target = e.target;
+      if (!(target instanceof Element)) return;
+
+      if (!target.closest(`#${id}`) || !target.closest('.graph-root-el')) {
+        setPinned(false);
+        setSelectedBuildId(undefined);
+      }
+    };
+
+    document.addEventListener('click', listener);
+    return () => document.removeEventListener('click', listener);
+  }, [setPinned]);
 
   return (
     <Paper className="category-card">
@@ -104,27 +129,28 @@ export const CategoryCard = props => {
           ))}
         </div>
       </div>
-      <div className="category-card__body">
+      <div id={id} className="category-card__body">
         <AsyncLoader
           loadingState={props.loadingState}
           asyncData={props.statistics}
           renderLoading={() => <span>Loading, please wait...</span>}
-          render={allStats => (
-            <Fragment>
-              <CategoryScoreGraph
-                {...props}
-                statistics={allStats}
-                selectedBuildId={selectedBuildId}
-                setSelectedBuildId={setSelectedBuildId}
-              />
-              <CategoryDetails
-                {...props}
-                statistics={allStats}
-                selectedBuildId={selectedBuildId}
-                setSelectedBuildId={setSelectedBuildId}
-              />
-            </Fragment>
-          )}
+          render={statistics => {
+            const propsWithState = {
+              ...props,
+              statistics,
+              selectedBuildId,
+              setSelectedBuildId,
+              pinned,
+              setPinned,
+            };
+
+            return (
+              <Fragment>
+                <CategoryScoreGraph {...propsWithState} />
+                <CategoryDetails {...propsWithState} />
+              </Fragment>
+            );
+          }}
         />
       </div>
     </Paper>

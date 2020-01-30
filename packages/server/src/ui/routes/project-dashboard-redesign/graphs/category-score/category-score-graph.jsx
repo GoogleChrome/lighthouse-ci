@@ -8,7 +8,6 @@ import {h, Fragment} from 'preact';
 import * as _ from '@lhci/utils/src/lodash.js';
 
 import './category-score-graph.css';
-import {useEffect, useState} from 'preact/hooks';
 import clsx from 'clsx';
 import {Gauge} from '../../../../components/gauge';
 import {ScoreDeltaBadge} from '../../../../components/score-delta-badge';
@@ -53,43 +52,18 @@ const HoverCardWithDiff = props => {
   );
 };
 
-/** @param {{category: LH.CategoryResult, statistics: Array<StatisticWithBuild>, selectedBuildId: string|undefined, setSelectedBuildId: import('preact/hooks/src').StateUpdater<string|undefined>}} props */
+/** @param {{category: LH.CategoryResult, statistics: Array<StatisticWithBuild>, selectedBuildId: string|undefined, setSelectedBuildId: import('preact/hooks/src').StateUpdater<string|undefined>, pinned: boolean, setPinned: import('preact/hooks/src').StateUpdater<boolean>}} props */
 export const CategoryScoreGraph = props => {
-  const [pinned, setPinned] = useState(false);
-  const {selectedBuildId, setSelectedBuildId} = props;
+  const {selectedBuildId, setSelectedBuildId, pinned, setPinned} = props;
 
   const categoryId = props.category.id;
-  const id = `category-score-graph--${categoryId}`;
   const allStats = props.statistics.filter(s => s.name.startsWith(`category_${categoryId}`));
   const averageStats = allStats.filter(s => s.name.endsWith('_average'));
-
-  // Unpin when the user clicks out of the graph
-  useEffect(() => {
-    /** @param {Event} e */
-    const listener = e => {
-      const target = e.target;
-      if (!(target instanceof Element)) return;
-
-      if (!target.closest(`#${id}`)) {
-        setPinned(false);
-        setSelectedBuildId(undefined);
-      }
-    };
-
-    document.addEventListener('click', listener);
-    return () => document.removeEventListener('click', listener);
-  }, [setPinned]);
 
   if (!averageStats.length) return <span>No data available</span>;
 
   return (
-    <div
-      id={id}
-      className={clsx('category-score-graph', {
-        'category-score-graph--with-selected-build': !!selectedBuildId,
-        'category-score-graph--pinned': !!pinned,
-      })}
-    >
+    <div className={clsx('category-score-graph', 'graph-root-el')}>
       <h2>Overview</h2>
       <D3Graph
         className="category-score-graph__score-graph"

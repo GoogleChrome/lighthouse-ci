@@ -74,3 +74,8 @@
   border-left: 1px solid var(--base-border-color);
   line-height: var(--lhr-viewer-button-size);
 }
+
+.graph-hitbox {
+  fill: rgba(0, 0, 0, 0);
+  cursor: pointer;
+}

@@ -9,9 +9,14 @@ import * as d3 from 'd3';
 import * as _ from '@lhci/utils/src/lodash.js';
 
 import {D3Graph, createRootSvg, findRootSvg} from '../../../components/d3-graph';
-import {computeStatisticRerenderKey} from './graph-utils';
+import {
+  computeStatisticRerenderKey,
+  updateGraphHoverElements,
+  appendHoverCardHitboxElements,
+} from './graph-utils';
 
 import './metric-line-graph.css';
+import {HoverCard} from './hover-card';
 
 const GRAPH_MARGIN = {top: 20, right: 20, bottom: 20, left: 50};
 
@@ -31,8 +36,10 @@ const STROKE_DASHARRAY_OPTIONS = [
 /**
  * @typedef LineGraphData
  * @prop {Array<MetricLineDef>} metrics
+ * @prop {boolean} pinned
  * @prop {string|undefined} selectedBuildId
  * @prop {import('preact/hooks/src').StateUpdater<string|undefined>} setSelectedBuildId
+ * @prop {import('preact/hooks/src').StateUpdater<boolean>} setPinned
  */
 
 /**
@@ -82,10 +89,10 @@ function renderLineGraph(rootEl, data) {
     .append('line')
     .attr('class', 'tracking-line')
     .style('transform', 'translateX(-9999px)')
-    .attr('x1', xScale(0))
-    .attr('y1', yScale(0))
-    .attr('x2', xScale(0))
-    .attr('y2', yScale(yMaxSeconds));
+    .attr('x1', 0)
+    .attr('y1', 0)
+    .attr('x2', 0)
+    .attr('y2', graphHeight);
 
   for (const metric of metrics) {
     const index = metrics.indexOf(metric);
@@ -102,6 +109,15 @@ function renderLineGraph(rootEl, data) {
       .attr('class', 'metric-line-graph__line')
       .attr('d', metricLine);
   }
+
+  appendHoverCardHitboxElements(
+    rootEl,
+    GRAPH_MARGIN,
+    metrics[0].statistics,
+    xScale,
+    data.setSelectedBuildId,
+    data.setPinned
+  );
 }
 
 /**
@@ -116,29 +132,14 @@ function updateLineGraph(rootEl, data) {
     stat => stat.buildId === data.selectedBuildId
   );
 
-  updateLineGraphElements(rootEl, graphWidth, xScale, selectedIndex);
-}
-
-/**
- *
- * @param {HTMLElement} rootEl
- * @param {number} graphWidth
- * @param {(n: number) => number} xScale
- * @param {number} selectedIndex
- */
-function updateLineGraphElements(rootEl, graphWidth, xScale, selectedIndex) {
-  const rootParentEl = rootEl.closest('.metric-line-graph');
-  if (!(rootParentEl instanceof HTMLElement)) throw new Error('Missing metric-line-graph');
-
-  // Update the position of the tracking line
-  const trackingLineEl = rootParentEl.querySelector('.tracking-line');
-  if (trackingLineEl instanceof SVGElement) {
-    if (selectedIndex === -1) {
-      trackingLineEl.setAttribute('style', `transform: translateX(-9999px)`);
-    } else {
-      trackingLineEl.setAttribute('style', `transform: translateX(${xScale(selectedIndex)}px)`);
-    }
-  }
+  updateGraphHoverElements(
+    rootEl,
+    graphWidth,
+    GRAPH_MARGIN.left,
+    GRAPH_MARGIN.right,
+    xScale,
+    selectedIndex
+  );
 }
 
 /** @param {LineGraphData} props */
@@ -147,7 +148,8 @@ export const MetricLineGraph = props => {
   const lastStat = props.metrics[0].statistics[props.metrics[0].statistics.length - 1];
 
   return (
-    <div className="metric-line-graph">
+    <div className="metric-line-graph graph-root-el">
+      <HoverCard pinned={props.pinned} url={firstStat.url} />
       <D3Graph
         className="metric-line-graph__graph"
         data={props}

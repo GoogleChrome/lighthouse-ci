@@ -100,11 +100,13 @@ describe('Lighthouse CI CLI', () => {
     }, 30000);
 
     it('should create a new project with config file', async () => {
-      const wizardTempConfigFile = { "ci": {"wizard": {"serverBaseUrl": `http://localhost:${server.port}`}}};
+      const wizardTempConfigFile = {
+        ci: {wizard: {serverBaseUrl: `http://localhost:${server.port}`}},
+      };
       const tmpFolder = fs.mkdtempSync(`${os.tmpdir()}${path.sep}`);
-      const wizardRcFile = `${tmpFolder}/wizard.json`
+      const wizardRcFile = `${tmpFolder}/wizard.json`;
       fs.writeFileSync(wizardRcFile, JSON.stringify(wizardTempConfigFile), {encoding: 'utf8'});
-      
+
       const wizardProcess = spawn('node', [CLI_PATH, 'wizard', `--config=${wizardRcFile}`]);
       wizardProcess.stdoutMemory = '';
       wizardProcess.stderrMemory = '';

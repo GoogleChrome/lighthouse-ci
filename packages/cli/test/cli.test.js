@@ -100,7 +100,12 @@ describe('Lighthouse CI CLI', () => {
     }, 30000);
 
     it('should create a new project with config file', async () => {
-      const wizardProcess = spawn('node', [CLI_PATH, 'wizard', `--config=${rcFile}`]);
+      const wizardTempConfigFile = { "ci": {"wizard": {"serverBaseUrl": `http://localhost:${server.port}`}}};
+      const tmpFolder = fs.mkdtempSync(`${os.tmpdir()}${path.sep}`);
+      const wizardRcFile = `${tmpFolder}/wizard.json`
+      fs.writeFileSync(wizardRcFile, JSON.stringify(wizardTempConfigFile), {encoding: 'utf8'});
+      
+      const wizardProcess = spawn('node', [CLI_PATH, 'wizard', `--config=${wizardRcFile}`]);
       wizardProcess.stdoutMemory = '';
       wizardProcess.stderrMemory = '';
       wizardProcess.stdout.on(
@@ -117,8 +122,8 @@ describe('Lighthouse CI CLI', () => {
         'https://example.com', // External build URL
       ]);
 
-      expect(wizardProcess.stdoutMemory).toContain('https://github.com/GoogleChrome/lighthouse-ci');
-      // expect(wizardProcess.stderrMemory).toEqual(''); // Ignore error - test focused on reading config file only
+      expect(wizardProcess.stdoutMemory).toContain(`http://localhost:${server.port}`);
+      expect(wizardProcess.stderrMemory).toEqual('');
     }, 30000);
   });
 

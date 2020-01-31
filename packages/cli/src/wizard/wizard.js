@@ -7,11 +7,6 @@
 
 const inquirer = require('inquirer');
 const ApiClient = require('@lhci/utils/src/api-client.js');
-const {
-  loadRcFile,
-  flattenRcToConfig,
-  resolveRcFilePath,
-} = require('@lhci/utils/src/lighthouserc.js');
 const _ = require('@lhci/utils/src/lodash.js');
 const log = require('lighthouse-logger');
 
@@ -19,9 +14,7 @@ const log = require('lighthouse-logger');
  * @param {import('yargs').Argv} yargs
  */
 function buildCommand(yargs) {
-  return yargs.options({
-    config: {description: 'The lighthouserc.json file preferences.'},
-  });
+  return yargs;
 }
 
 /**
@@ -70,14 +63,6 @@ async function runNewProjectWizard(options) {
  * @return {Promise<void>}
  */
 async function runCommand(options) {
-  const rcFilePath = resolveRcFilePath(options.config);
-  const rcFile = rcFilePath && loadRcFile(rcFilePath);
-  const wizardConfiguration = rcFile ? flattenRcToConfig(rcFile) : {};
-  options = {
-    ...options,
-    ...wizardConfiguration.wizard,
-  };
-
   const whichWizardPrompt = await inquirer.prompt([
     {
       type: 'list',

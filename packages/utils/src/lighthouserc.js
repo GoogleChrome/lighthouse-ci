@@ -135,7 +135,7 @@ function hasOptedOutOfRcDetection(argv = process.argv, env = process.env) {
 function convertRcFileToYargsOptions(rcFile, pathToRcFile) {
   const ci = flattenRcToConfig(rcFile);
   /** @type {LHCI.YargsOptions} */
-  let merged = {...ci.assert, ...ci.collect, ...ci.upload, ...ci.server};
+  let merged = {...ci.wizard, ...ci.assert, ...ci.collect, ...ci.upload, ...ci.server};
   if (ci.extends) {
     const extendedRcFilePath = path.resolve(path.dirname(pathToRcFile), ci.extends);
     const extensionBase = loadAndParseRcFile(extendedRcFilePath);

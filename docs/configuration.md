@@ -60,7 +60,7 @@ module.exports = {
     },
     wizard: {
       // wizard options here
-    }
+    },
   },
 };
 ```
@@ -104,7 +104,7 @@ ci:
 
   server:
     # server options here
-  
+
   wizard:
     # wizard options here
 ```
@@ -289,14 +289,14 @@ module.exports = {
 };
 ```
 
-### Custom headers for running the wizard
+### Custom Headers for Wizard
 
 If you're running the `lhci server` behind a reverse proxy or any other component that requires some extra headers you can configure them in the wizard section `extraHeaders`.
 
 ```json
 {
   "ci": {
-    "wizzard": {
+    "wizard": {
       "extraHeaders": "{\"Authorization\": \"Basic content\"}"
     }
   }
@@ -305,16 +305,15 @@ If you're running the `lhci server` behind a reverse proxy or any other componen
 
 > **_NOTE:_** The `wizard` options will be overwritten by the `upload` options, to be sure that the wizard options will be used, create a separate config file.
 
-
-### Default lhci server location for running the wizard
+### Default LHCI Server for Wizard
 
 If you're running the `lhci wizard` multiple times, you can configure a default `serverBaseUrl` to avoid typing it in at each `lhci wizard` run.
 
 ```json
 {
   "ci": {
-    "wizzard": {
-      "serverBaseUrl": "https://localhost:3000/",
+    "wizard": {
+      "serverBaseUrl": "https://localhost:3000/"
     }
   }
 }

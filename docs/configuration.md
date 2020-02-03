@@ -291,7 +291,7 @@ module.exports = {
 
 ### Custom headers for running the wizard
 
-If you're running the `lhci server` behind an reverse proxy or any other component that requires some `extra headers` you can configure them in the wizard section `extraHeaders`.
+If you're running the `lhci server` behind a reverse proxy or any other component that requires some extra headers you can configure them in the wizard section `extraHeaders`.
 
 ```json
 {

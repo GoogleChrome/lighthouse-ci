@@ -98,6 +98,35 @@ describe('Lighthouse CI CLI', () => {
         .replace(log.reset, '');
       projectToken = tokenSentence.match(/Use token ([\w-]+)/)[1];
     }, 30000);
+
+    it('should create a new project with config file', async () => {
+      const wizardTempConfigFile = {
+        ci: {wizard: {serverBaseUrl: `http://localhost:${server.port}`}},
+      };
+      const tmpFolder = fs.mkdtempSync(`${os.tmpdir()}${path.sep}`);
+      const wizardRcFile = `${tmpFolder}/wizard.json`;
+      fs.writeFileSync(wizardRcFile, JSON.stringify(wizardTempConfigFile), {encoding: 'utf8'});
+
+      const wizardProcess = spawn('node', [CLI_PATH, 'wizard', `--config=${wizardRcFile}`]);
+      wizardProcess.stdoutMemory = '';
+      wizardProcess.stderrMemory = '';
+      wizardProcess.stdout.on(
+        'data',
+        chunk => (wizardProcess.stdoutMemory += chunk.toString().replace(/\n/g, ''))
+      );
+      wizardProcess.stderr.on('data', chunk => (wizardProcess.stderrMemory += chunk.toString()));
+
+      await waitForCondition(() => wizardProcess.stdoutMemory.includes('Which wizard'));
+      await writeAllInputs(wizardProcess, [
+        '', // Just ENTER key to select "new-project"
+        '', // Just ENTER key to use serverBaseUrl from config file
+        'AwesomeCIProjectName', // Project name
+        'https://example.com', // External build URL
+      ]);
+
+      expect(wizardProcess.stdoutMemory).toContain(`http://localhost:${server.port}`);
+      expect(wizardProcess.stderrMemory).toEqual('');
+    }, 30000);
   });
 
   describe('healthcheck', () => {

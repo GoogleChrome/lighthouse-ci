@@ -7,6 +7,7 @@
 
 const inquirer = require('inquirer');
 const ApiClient = require('@lhci/utils/src/api-client.js');
+const _ = require('@lhci/utils/src/lodash.js');
 const log = require('lighthouse-logger');
 
 /**
@@ -26,8 +27,7 @@ async function runNewProjectWizard(options) {
       type: 'input',
       name: 'serverBaseUrl',
       message: 'What is the URL of your LHCI server?',
-      when: () => !options.serverBaseUrl,
-      default: 'https://your-lhci-server.example.com/',
+      default: options.serverBaseUrl || 'https://your-lhci-server.example.com/',
     },
     {
       type: 'input',
@@ -43,7 +43,10 @@ async function runNewProjectWizard(options) {
     },
   ]);
 
-  const api = new ApiClient({rootURL: responses.serverBaseUrl || options.serverBaseUrl});
+  const api = new ApiClient({
+    rootURL: responses.serverBaseUrl || options.serverBaseUrl,
+    extraHeaders: options.extraHeaders || {},
+  });
   const project = await api.createProject({
     name: responses.projectName,
     externalUrl: responses.projectExternalUrl,

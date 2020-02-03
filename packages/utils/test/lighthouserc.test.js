@@ -154,6 +154,72 @@ describe('lighthouserc.js', () => {
         expect(rc.loadAndParseRcFile(rcYamlFilePath)).toEqual(parsedContent);
       });
     });
+
+    describe('should load overlapping upload and wizard configuration', () => {
+      const content = {
+        ci: {
+          upload: {
+            serverBaseUrl: 'http://localhost:9009',
+            extraHeaders: '{"Authorization": "Basic bGlnaHRob3VzZTpjaQo="}',
+          },
+          wizard: {
+            serverBaseUrl: 'https://localhost:9010',
+            extraHeaders: '{"Authorization": "Basic noContent"}',
+          },
+        },
+      };
+
+      const parsedContent = {
+        serverBaseUrl: 'http://localhost:9009',
+        extraHeaders: '{"Authorization": "Basic bGlnaHRob3VzZTpjaQo="}',
+      };
+
+      it('Js', () => {
+        writeJsFile(rcJsFilePath, content);
+        expect(rc.loadAndParseRcFile(rcJsFilePath)).toEqual(parsedContent);
+      });
+
+      it('JSON', () => {
+        writeJSONFile(rcJSONFilePath, content);
+        expect(rc.loadAndParseRcFile(rcJSONFilePath)).toEqual(parsedContent);
+      });
+
+      it('YAML', () => {
+        writeYAMLFile(rcYamlFilePath, content);
+        expect(rc.loadAndParseRcFile(rcYamlFilePath)).toEqual(parsedContent);
+      });
+    });
+
+    describe('should load wizard configuration', () => {
+      const content = {
+        ci: {
+          wizard: {
+            serverBaseUrl: 'http://localhost:9009',
+            extraHeaders: '{"Authorization": "Basic bGlnaHRob3VzZTpjaQo="}',
+          },
+        },
+      };
+
+      const parsedContent = {
+        serverBaseUrl: 'http://localhost:9009',
+        extraHeaders: '{"Authorization": "Basic bGlnaHRob3VzZTpjaQo="}',
+      };
+
+      it('Js', () => {
+        writeJsFile(rcJsFilePath, content);
+        expect(rc.loadAndParseRcFile(rcJsFilePath)).toEqual(parsedContent);
+      });
+
+      it('JSON', () => {
+        writeJSONFile(rcJSONFilePath, content);
+        expect(rc.loadAndParseRcFile(rcJSONFilePath)).toEqual(parsedContent);
+      });
+
+      it('YAML', () => {
+        writeYAMLFile(rcYamlFilePath, content);
+        expect(rc.loadAndParseRcFile(rcYamlFilePath)).toEqual(parsedContent);
+      });
+    });
   });
 
   describe('#findRcFile', () => {

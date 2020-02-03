@@ -320,7 +320,7 @@ If you're running the `lhci wizard` multiple times, you can configure a default 
 }
 ```
 
-> **_NOTE:_** The `wizard` options will be overriten by the `upload` options, to be sure that the wizard options will be used, create a seperate config file
+> **_NOTE:_** The `wizard` options will be overwritten by the `upload` options, to be sure that the wizard options will be used, create a separate config file.
 
 ### YAML Advanced config
 

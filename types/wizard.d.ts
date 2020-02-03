@@ -8,7 +8,6 @@ declare global {
   namespace LHCI {
     namespace WizardCommand {
       export interface Options {
-        config?: string;
         extraHeaders?: Record<string, string>;
         serverBaseUrl?: string;
       }

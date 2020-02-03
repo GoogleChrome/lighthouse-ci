@@ -308,7 +308,7 @@ If you're running the `lhci server` behind an reverse proxy or any other compone
 
 ### Default lhci server location for running the wizard
 
-If you're running the `lhci wizard` multiple times, you can configure a default `serverBaseUrl` that you have to type them in at each `lhci wizard` run.
+If you're running the `lhci wizard` multiple times, you can configure a default `serverBaseUrl` to avoid typing it in at each `lhci wizard` run.
 
 ```json
 {

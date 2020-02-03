@@ -303,7 +303,7 @@ If you're running the `lhci server` behind a reverse proxy or any other componen
 }
 ```
 
-> **_NOTE:_** The `wizard` options will be overriten by the `upload` options, to be sure that the wizard options will be used, create a seperate config file
+> **_NOTE:_** The `wizard` options will be overwritten by the `upload` options, to be sure that the wizard options will be used, create a separate config file.
 
 
 ### Default lhci server location for running the wizard

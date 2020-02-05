@@ -194,7 +194,7 @@ module.exports = {
   setupImageSnapshots: () => {
     const toMatchImageSnapshot = configureToMatchImageSnapshot({
       // FIXME: we're more forgiving in Travis where font rendering on linux creates small changes
-      failureThreshold: process.env.TRAVIS ? 0.05 : 0.001,
+      failureThreshold: process.env.TRAVIS && require('os').platform() !== 'darwin' ? 0.05 : 0.001,
       failureThresholdType: 'percent',
     });
 

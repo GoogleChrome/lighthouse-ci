@@ -5,12 +5,12 @@
  */
 
 import {h} from 'preact';
-import {Gauge} from './gauge';
+import {ScoreDeltaBadge} from './score-delta-badge';
 
 export default {
-  title: 'Components/Gauge',
-  component: Gauge,
-  parameters: {dimensions: {width: 140, height: 140}},
+  title: 'Components/Score Delta Badge',
+  component: ScoreDeltaBadge,
+  parameters: {dimensions: {width: 120, height: 60}},
 };
 
 /** @type {LHCI.NumericAuditDiff} */
@@ -18,13 +18,9 @@ const numericDiff = {
   type: 'score',
   auditId: '',
   baseValue: 0.5,
-  compareValue: 0.95,
+  compareValue: 0.5,
 };
 
-export const Default = () => <Gauge score={0.95} />;
-export const WithImprovement = () => (
-  <Gauge score={0.7} diff={{...numericDiff, compareValue: 0.7}} />
-);
-export const WithRegression = () => (
-  <Gauge score={0.3} diff={{...numericDiff, compareValue: 0.3}} />
-);
+export const Netural = () => <ScoreDeltaBadge diff={numericDiff} />;
+export const Improvement = () => <ScoreDeltaBadge diff={{...numericDiff, compareValue: 0.7}} />;
+export const Regression = () => <ScoreDeltaBadge diff={{...numericDiff, compareValue: 0.3}} />;

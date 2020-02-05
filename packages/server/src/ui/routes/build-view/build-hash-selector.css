@@ -22,6 +22,11 @@
   box-shadow: 0 1px 1px var(--base-border-color);
 }
 
+#storybook-test-root .build-hash-selector {
+  top: 0;
+  max-height: calc(100vh - 5px);
+}
+
 .build-hash-selector-obscure-background {
   position: fixed;
   z-index: 9;

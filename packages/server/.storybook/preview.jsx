@@ -13,6 +13,7 @@ require('../src/ui/app.css');
 const {addDecorator} = require('@storybook/preact');
 addDecorator(storyFn => (
   <div
+    id="storybook-test-root"
     style={{
       width: '100%',
       height: '100%',

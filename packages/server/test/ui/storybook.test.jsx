@@ -11,5 +11,12 @@ import {imageSnapshot} from '@storybook/addon-storyshots-puppeteer';
 initStoryshots({
   configPath: path.join(__dirname, '../../.storybook'),
   suite: 'Image Storyshots',
-  test: imageSnapshot({storybookUrl: `http://localhost:${process.env.STORYBOOK_PORT}`}),
+  test: imageSnapshot({
+    storybookUrl: `http://localhost:${process.env.STORYBOOK_PORT}`,
+    getMatchOptions: () => ({
+      // FIXME: we're more forgiving in Travis where font rendering on linux creates small changes
+      failureThreshold: process.env.TRAVIS && require('os').platform() !== 'darwin' ? 0.05 : 0.001,
+      failureThresholdType: 'percent',
+    }),
+  }),
 });

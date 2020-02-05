@@ -11,9 +11,10 @@
     "access": "public"
   },
   "scripts": {
-    "clean": "rm -rf ./dist",
-    "build": "parcel build ./src/ui/index.html --public-url=/app",
-    "build:watch": "parcel watch ./src/ui/index.html  --public-url=/app",
+    "clean": "rm -rf ./dist ./storybook-static",
+    "build": "npm run build:parcel && npm run build:storybook",
+    "build:parcel": "parcel build ./src/ui/index.html --public-url=/app",
+    "build:watch": "parcel watch ./src/ui/index.html --public-url=/app",
     "build:source-map-explorer": "npm run clean && npm run build && ../../scripts/source-map-explorer.sh",
     "build:storybook": "build-storybook --no-dll",
     "start:storybook": "start-storybook -p 6006 --no-dll"

@@ -11,5 +11,5 @@ import {imageSnapshot} from '@storybook/addon-storyshots-puppeteer';
 initStoryshots({
   configPath: path.join(__dirname, '../../.storybook'),
   suite: 'Image Storyshots',
-  test: imageSnapshot(),
+  test: imageSnapshot({storybookUrl: `http://localhost:${process.env.STORYBOOK_PORT}`}),
 });

@@ -5,11 +5,23 @@
  */
 
 import * as path from 'path';
-import initStoryshots from '@storybook/addon-storyshots';
+import initStoryshots_ from '@storybook/addon-storyshots';
 import {imageSnapshot} from '@storybook/addon-storyshots-puppeteer';
 
 const DEFAULT_WIDTH = 800;
 const DEFAULT_HEIGHT = 600;
+
+let initStoryshots = initStoryshots_;
+
+if (process.env.TRAVIS && require('os').platform() !== 'darwin') {
+  initStoryshots = () => {
+    describe('Storyshots', () => {
+      it.skip('disabled in travis on non-mac for subtle font rendering issues', () => {
+        expect(true).toBe(false);
+      });
+    });
+  };
+}
 
 initStoryshots({
   configPath: path.join(__dirname, '../../.storybook'),
@@ -31,12 +43,24 @@ initStoryshots({
         });
       }
 
-      const {width = DEFAULT_WIDTH, height = DEFAULT_HEIGHT} = dimensions;
+      let {width = DEFAULT_WIDTH, height = DEFAULT_HEIGHT} = dimensions;
+      if (parameters.padding) {
+        width += parameters.padding * 2;
+        height += parameters.padding * 2;
+        await page.evaluate(
+          px => (document.getElementById('storybook-test-root').style.padding = `${px}px`),
+          parameters.padding
+        );
+      }
+
+      if (parameters.waitFor) {
+        await page.waitFor(parameters.waitFor);
+      }
+
       await page.setViewport({width, height});
     },
     getMatchOptions: () => ({
-      // FIXME: we're more forgiving in Travis where font rendering on linux creates small changes
-      failureThreshold: process.env.TRAVIS && require('os').platform() !== 'darwin' ? 0.05 : 0.001,
+      failureThreshold: 0.0015,
       failureThresholdType: 'percent',
     }),
     getScreenshotOptions: () => ({

@@ -9,6 +9,10 @@
   width: 50%;
 }
 
+#storybook-test-root .metric-line-graph {
+  width: 100%;
+}
+
 .metric-line-graph__graph {
   height: 250px;
   width: 100%;
@@ -116,6 +120,12 @@
 .metric-line-graph:last-child .hover-card {
   left: initial !important;
   right: 100% !important;
+}
+
+#storybook-test-root .metric-line-graph:last-child .hover-card {
+  left: initial !important;
+  top: 10px;
+  right: 10px !important;
 }
 
 .metric-line-graph__hover-card-data {

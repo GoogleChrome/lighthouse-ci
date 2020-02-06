@@ -17,7 +17,6 @@ addDecorator(storyFn => (
     style={{
       width: '100%',
       minHeight: '100vh',
-      padding: '5vh 5vw',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',

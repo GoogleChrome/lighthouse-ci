@@ -8,8 +8,8 @@ import * as path from 'path';
 import initStoryshots from '@storybook/addon-storyshots';
 import {imageSnapshot} from '@storybook/addon-storyshots-puppeteer';
 
-const DEFAULT_WIDTH = 400;
-const DEFAULT_HEIGHT = 300;
+const DEFAULT_WIDTH = 800;
+const DEFAULT_HEIGHT = 600;
 
 initStoryshots({
   configPath: path.join(__dirname, '../../.storybook'),
@@ -20,6 +20,8 @@ initStoryshots({
       const parameters = options.context.parameters;
       let dimensions = parameters.dimensions || {};
       if (parameters.dimensions === 'auto' || !parameters.dimensions) {
+        await page.setViewport({width: DEFAULT_WIDTH, height: DEFAULT_HEIGHT});
+        await page.evaluate(() => new Promise(r => window.requestAnimationFrame(r)));
         dimensions = await page.evaluate(() => {
           const elements = [...document.querySelectorAll('#storybook-test-root *')];
           return {
@@ -36,6 +38,10 @@ initStoryshots({
       // FIXME: we're more forgiving in Travis where font rendering on linux creates small changes
       failureThreshold: process.env.TRAVIS && require('os').platform() !== 'darwin' ? 0.05 : 0.001,
       failureThresholdType: 'percent',
+    }),
+    getScreenshotOptions: () => ({
+      encoding: 'base64',
+      fullPage: false,
     }),
   }),
 });

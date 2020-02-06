@@ -43,6 +43,7 @@ declare global {
           valueType?: DetailsType;
           itemType?: DetailsType;
           label?: string;
+          text?: string;
         }>;
       };
       scoreDisplayMode?:

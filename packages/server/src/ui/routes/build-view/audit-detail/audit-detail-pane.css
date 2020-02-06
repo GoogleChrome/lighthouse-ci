@@ -20,6 +20,15 @@
   border-left: 1px solid var(--base-border-color);
 }
 
+#storybook-test-root .audit-detail-pane {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: initial;
+  height: max-content;
+  overflow-y: visible;
+}
+
 .audit-detail-pane__close {
   position: fixed;
   z-index: 10;
@@ -36,6 +45,10 @@
 
   background: var(--secondary-background-color);
   cursor: pointer;
+}
+
+#storybook-test-root .audit-detail-pane__close {
+  top: 10px;
 }
 
 .audit-detail-pane__close i.material-icons {

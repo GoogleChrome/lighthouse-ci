@@ -55,7 +55,7 @@ export const TableDetails = props => {
               const itemType = heading.valueType || heading.itemType || 'unknown';
               return (
                 <Fragment key={i}>
-                  <th className={`table-column--${itemType}`}>{heading.label}</th>
+                  <th className={`table-column--${itemType}`}>{heading.label || heading.text}</th>
                   {insertRowLabelAfterIndex === i ? <th /> : null}
                 </Fragment>
               );

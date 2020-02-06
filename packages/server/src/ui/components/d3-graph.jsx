@@ -66,19 +66,26 @@ export function findRootSvg(rootEl, margin) {
  */
 export const D3Graph = props => {
   const graphElRef = useRef(/** @type {HTMLElement|undefined} */ (undefined));
+  const updateKey = props.computeUpdateKey ? props.computeUpdateKey(props.data) : '';
+  const rerender = () => {
+    if (!graphElRef.current) return;
+    props.render(graphElRef.current, props.data);
+    if (props.update) props.update(graphElRef.current, props.data);
+  };
 
   useEffect(() => {
-    const rerender = () => graphElRef.current && props.render(graphElRef.current, props.data);
-
     rerender();
+  }, [props.computeRerenderKey(props.data)]);
+
+  useEffect(() => {
     window.addEventListener('resize', rerender);
     return () => window.removeEventListener('resize', rerender);
-  }, [props.computeRerenderKey(props.data)]);
+  }, [updateKey]);
 
   useEffect(() => {
     if (!props.update || !graphElRef.current) return;
     props.update(graphElRef.current, props.data);
-  }, [props.computeUpdateKey ? props.computeUpdateKey(props.data) : '']);
+  }, [updateKey]);
 
   return <div className={props.className} ref={graphElRef} />;
 };

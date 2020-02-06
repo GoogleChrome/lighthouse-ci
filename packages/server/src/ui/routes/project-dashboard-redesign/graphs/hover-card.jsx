@@ -22,13 +22,13 @@ export const HoverCard = props => {
 
   let contents = <Fragment />;
   if (build) {
-    const createdAt = new Date(build.createdAt || '');
+    const runAt = new Date(build.runAt || '');
     contents = (
       <Fragment>
         <div className="hover-card__datetime">
-          <span className="hover-card__date">{createdAt.toLocaleDateString()}</span>
+          <span className="hover-card__date">{runAt.toLocaleDateString()}</span>
           <span className="hover-card__time">
-            {createdAt.getHours()}:{createdAt.getMinutes()}
+            {runAt.getHours()}:{runAt.getMinutes()}
           </span>
         </div>
         {children}

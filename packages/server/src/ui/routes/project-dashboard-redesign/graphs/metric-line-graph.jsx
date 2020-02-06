@@ -43,6 +43,7 @@ const STROKE_DASHARRAY_OPTIONS = [
  * @prop {boolean} pinned
  * @prop {string|undefined} selectedBuildId
  * @prop {number} selectedMetricIndex
+ * @prop {number|undefined} [__selectedMetricIndexForTest]
  * @prop {import('preact/hooks/src').StateUpdater<string|undefined>} setSelectedBuildId
  * @prop {import('preact/hooks/src').StateUpdater<boolean>} setPinned
  * @prop {import('preact/hooks/src').StateUpdater<number>} setMetricIndex
@@ -246,7 +247,7 @@ const HoverCardWithMetricValue = props => {
 export const MetricLineGraph = props => {
   const firstStat = props.metrics[0].statistics[0];
   const lastStat = props.metrics[0].statistics[props.metrics[0].statistics.length - 1];
-  const [selectedMetricIndex, setMetricIndex] = useState(-1);
+  const [selectedMetricIndex, setMetricIndex] = useState(props.__selectedMetricIndexForTest || -1);
 
   return (
     <div className="metric-line-graph graph-root-el" onMouseLeave={() => setMetricIndex(-1)}>

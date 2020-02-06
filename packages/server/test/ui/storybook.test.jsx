@@ -18,7 +18,18 @@ initStoryshots({
     storybookUrl: `http://localhost:${process.env.STORYBOOK_PORT}`,
     beforeScreenshot: async (page, options) => {
       const parameters = options.context.parameters;
-      const {width = DEFAULT_WIDTH, height = DEFAULT_HEIGHT} = parameters.dimensions || {};
+      let dimensions = parameters.dimensions || {};
+      if (parameters.dimensions === 'auto' || !parameters.dimensions) {
+        dimensions = await page.evaluate(() => {
+          const elements = [...document.querySelectorAll('#storybook-test-root *')];
+          return {
+            width: Math.max(...elements.map(el => el.clientWidth)),
+            height: Math.max(...elements.map(el => el.clientHeight)),
+          };
+        });
+      }
+
+      const {width = DEFAULT_WIDTH, height = DEFAULT_HEIGHT} = dimensions;
       await page.setViewport({width, height});
     },
     getMatchOptions: () => ({

@@ -125,6 +125,10 @@
   height: var(--large-icon-size);
 }
 
+.audit-group__diff-badge-group:last-child {
+  margin-right: 20px;
+}
+
 .audit-group__diff-badges {
   position: absolute;
   top: calc(-1 * var(--badge-height) / 5);

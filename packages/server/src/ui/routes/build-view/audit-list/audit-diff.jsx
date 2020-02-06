@@ -156,8 +156,6 @@ export const ItemDiff = props => {
           ) : null}
         </div>
       </div>
-      {/* Apply a bit of a spacer to prevent the overflow from leaking outside the boundaries of the box. */}
-      <div style={{width: 10}} />
     </Fragment>
   );
 };

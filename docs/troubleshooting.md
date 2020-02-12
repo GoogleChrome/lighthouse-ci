@@ -52,7 +52,7 @@ This is a precautionary measure to prevent the effective deletion of historical 
 
 If the URLs that you audit contain random components (ports, UUIDs, hashes, etc), then you'll need to tell LHCI how to normalize your data when you upload it with the `--url-replacement-patterns` option.
 
-When using this option, you'll lose the default `:PORT` and `UUID` replacements, so be sure to copy those into your configuration if necessary. [See the example in the lighthuose-ci repo itself](https://github.com/GoogleChrome/lighthouse-ci/blob/master/lighthouserc.json) for how to configure these patterns.
+When using this option, you'll lose the default `:PORT` and `UUID` replacements, so be sure to copy those into your configuration if necessary. [See the example in the lighthuose-ci repo itself](https://github.com/GoogleChrome/lighthouse-ci/blob/5485be50406f7b600b679bd447b493b6544b2682/lighthouserc.json#L32-L36) for how to configure these patterns.
 
 ## I'm seeing differences in the results even though I didn't change anything.
 

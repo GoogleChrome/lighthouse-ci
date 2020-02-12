@@ -280,7 +280,7 @@ lhci assert --preset=lighthouse:recommended --includePassedAssertions
 
 ### `server`
 
-Starts the LHCI server. This command is unique in that it is likely run on infrastructure rather than in your build process. Learn more about the [LHCI server](./server.md) and how to setup your personal LHCI server accessible over the internet.
+Starts the LHCI server. This command is unique in that it is likely run on infrastructure rather than in your build process. Learn more about the [LHCI server](./getting-started.md#the-lighthouse-ci-server) and [how to setup your personal LHCI server](./recipes/heroku-server/README.md) accessible over the internet.
 
 ```bash
 

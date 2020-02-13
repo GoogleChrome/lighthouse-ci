@@ -31,7 +31,7 @@ describe('createLHR', () => {
           id: 'seo',
           title: 'SEO',
           score: 1,
-          auditRefs: [{id: 'seo-audit', group: 'seo', weight: 1}],
+          auditRefs: [{id: 'seo-audit', group: 'seo-content', weight: 1}],
         },
       },
     });

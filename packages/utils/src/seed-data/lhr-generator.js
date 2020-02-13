@@ -35,8 +35,9 @@ function getGroupForAuditId(auditId) {
   if (auditId === 'max-potential-fid') return 'metrics';
   if (auditId.startsWith('diagnostic-')) return 'diagnostics';
   if (auditId.startsWith('uses-')) return 'load-opportunities';
-  if (auditId.startsWith('a11y')) return 'accessibility';
-  if (auditId.startsWith('seo')) return 'seo';
+  if (auditId.startsWith('a11y-aria')) return 'a11y-aria';
+  if (auditId.startsWith('a11y')) return 'a11y-best-practices';
+  if (auditId.startsWith('seo')) return 'seo-content';
   if (auditId.startsWith('best-practices')) return 'best-practices';
   if (auditId.startsWith('pwa-fast-reliable')) return 'pwa-fast-reliable';
   if (auditId.startsWith('pwa-installable')) return 'pwa-installable';

@@ -12,8 +12,6 @@ const PRandom = require('./prandom.js');
 const {createLHR} = require('./lhr-generator.js');
 
 // To include in next LHR update...
-//    - Not applicable audits
-//    - Informative audits
 //    - 0-value numericValue
 //    - LCP/CLS/TBT
 
@@ -165,6 +163,9 @@ function createDefaultDataset() {
       items: fiftyFiftyImages,
     },
 
+    'a11y-aria-label': {passRate: 0.5, items: elements},
+    'a11y-aria-name': {passRate: 0.5, items: elements},
+    'a11y-aria-title': {passRate: 0.5, items: elements},
     'a11y-color-contrast': {passRate: 0.5, items: elements},
     'a11y-labels': {passRate: 0.5, items: elements},
     'a11y-duplicate-id': {passRate: 0.5, items: elements},
@@ -517,8 +518,12 @@ function createLoadTestDataset() {
               if (typeof audit.numericValue === 'number') {
                 audit.numericValue = audit.numericValue * multiplier;
               }
-              if (typeof audit.score === 'number') {
-                audit.score = audit.score * multiplier;
+              if (audit.scoreDisplayMode === 'binary') {
+                audit.score = Math.random() > 0.5 ? 1 : 0;
+                if (Math.random() < 0.2) {
+                  audit.score = null;
+                  audit.scoreDisplayMode = Math.random() > 0.5 ? 'notApplicable' : 'informative';
+                }
               }
             }
 

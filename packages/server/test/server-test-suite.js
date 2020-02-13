@@ -425,11 +425,31 @@ function runTests(state) {
         interactive: {numericValue: 5000},
         'speed-index': {numericValue: 5000},
         'first-contentful-paint': {numericValue: 2000},
+        'a11y-audit-na': {score: null, scoreDisplayMode: 'notApplicable'},
+        'a11y-audit-pass': {score: 1, scoreDisplayMode: 'binary'},
+        'a11y-audit-fail': {score: 0, scoreDisplayMode: 'binary'},
       },
       categories: {
         performance: {score: 0.5},
         pwa: {score: 0.1},
         seo: {score: 0.9},
+        a11y: {
+          score: 0.5,
+          auditRefs: [
+            // Best practices is 1-1-1
+            {id: 'a11y-audit-pass', group: 'a11y-best-practices'},
+            {id: 'a11y-audit-fail', group: 'a11y-best-practices'},
+            {id: 'a11y-audit-na', group: 'a11y-best-practices'},
+            // Language is 2-1-0
+            {id: 'a11y-audit-pass', group: 'a11y-language'},
+            {id: 'a11y-audit-pass', group: 'a11y-language'},
+            {id: 'a11y-audit-fail', group: 'a11y-language'},
+            // Aria is 0-2-1
+            {id: 'a11y-audit-fail', group: 'a11y-aria'},
+            {id: 'a11y-audit-fail', group: 'a11y-aria'},
+            {id: 'a11y-audit-na', group: 'a11y-aria'},
+          ],
+        },
       },
     };
 
@@ -585,6 +605,10 @@ function runTests(state) {
 
       const urlRootStats = statistics.filter(stat => stat.url === 'https://example.com:PORT/');
       const urlBlogStats = statistics.filter(stat => stat.url === 'https://example.com:PORT/blog');
+
+      expect(urlRootStats).toHaveLength(60);
+      expect(urlBlogStats).toHaveLength(urlRootStats.length);
+
       const fcpAverage = urlRootStats.find(s => s.name === 'audit_first-contentful-paint_average');
       const a11yAverage = urlRootStats.find(s => s.name === 'category_accessibility_average');
       const a11yMin = urlRootStats.find(s => s.name === 'category_accessibility_min');
@@ -592,8 +616,6 @@ function runTests(state) {
       const perfMin = urlRootStats.find(s => s.name === 'category_performance_min');
       const perfMax = urlRootStats.find(s => s.name === 'category_performance_max');
 
-      expect(urlRootStats).toHaveLength(18);
-      expect(urlBlogStats).toHaveLength(urlRootStats.length);
       expect(fcpAverage).toMatchObject({
         url: 'https://example.com:PORT/',
         name: 'audit_first-contentful-paint_average',
@@ -624,6 +646,34 @@ function runTests(state) {
         name: 'category_performance_max',
         value: 0.5,
       });
+
+      // prettier-ignore
+      const auditGroupAPass = urlRootStats.find(s => s.name === 'auditgroup_a11y-best-practices_pass');
+      // prettier-ignore
+      const auditGroupAFail = urlRootStats.find(s => s.name === 'auditgroup_a11y-best-practices_fail');
+      const auditGroupANa = urlRootStats.find(s => s.name === 'auditgroup_a11y-best-practices_na');
+      const auditGroupBPass = urlRootStats.find(s => s.name === 'auditgroup_a11y-language_pass');
+      const auditGroupBFail = urlRootStats.find(s => s.name === 'auditgroup_a11y-language_fail');
+      const auditGroupBNa = urlRootStats.find(s => s.name === 'auditgroup_a11y-language_na');
+      const auditGroupCPass = urlRootStats.find(s => s.name === 'auditgroup_a11y-aria_pass');
+      const auditGroupCFail = urlRootStats.find(s => s.name === 'auditgroup_a11y-aria_fail');
+      const auditGroupCNa = urlRootStats.find(s => s.name === 'auditgroup_a11y-aria_na');
+      const auditGroupDPass = urlRootStats.find(s => s.name === 'auditgroup_a11y-navigation_pass');
+      const auditGroupDFail = urlRootStats.find(s => s.name === 'auditgroup_a11y-navigation_fail');
+      const auditGroupDNa = urlRootStats.find(s => s.name === 'auditgroup_a11y-navigation_na');
+
+      expect(auditGroupAPass.value).toEqual(1);
+      expect(auditGroupAFail.value).toEqual(1);
+      expect(auditGroupANa.value).toEqual(1);
+      expect(auditGroupBPass.value).toEqual(2);
+      expect(auditGroupBFail.value).toEqual(1);
+      expect(auditGroupBNa.value).toEqual(0);
+      expect(auditGroupCPass.value).toEqual(0);
+      expect(auditGroupCFail.value).toEqual(2);
+      expect(auditGroupCNa.value).toEqual(1);
+      expect(auditGroupDPass.value).toEqual(-1);
+      expect(auditGroupDFail.value).toEqual(-1);
+      expect(auditGroupDNa.value).toEqual(-1);
     });
 
     it('should not recompute on every call', async () => {

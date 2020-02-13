@@ -249,7 +249,7 @@ export function useRepresentativeRun(projectId, buildId, url) {
     projectId && buildId && url ? [projectId, buildId, getRunsOptions] : undefined
   );
 
-  // If we couldn't find an ancestor build but we tried, consider it loaded with `null` to differentiate from `undefined`.
+  // If we couldn't find a run but we tried, consider it loaded with `null` to differentiate from `undefined`.
   if (apiLoadingState === 'loaded' && (!runs || runs.length !== 1)) {
     return ['loaded', null];
   }

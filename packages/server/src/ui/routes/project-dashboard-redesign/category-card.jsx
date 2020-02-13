@@ -16,8 +16,9 @@ import clsx from 'clsx';
 import {MetricLineGraph} from './graphs/metric-line-graph';
 
 /** @typedef {import('./project-category-summaries.jsx').StatisticWithBuild} StatisticWithBuild */
-/** @typedef {{category: LH.CategoryResult, categoryGroups: LH.Result['categoryGroups'], statistics?: Array<StatisticWithBuild>, loadingState: import('../../components/async-loader').LoadingState, builds: LHCI.ServerCommand.Build[], buildLimit: number, setBuildLimit: (n: number) => void}} Props */
-/** @typedef {Props & {statistics: Array<StatisticWithBuild>, selectedBuildId: string|undefined, setSelectedBuildId: import('preact/hooks/src').StateUpdater<string|undefined>, pinned: boolean, setPinned: import('preact/hooks/src').StateUpdater<boolean>}} PropsWithState */
+/** @typedef {import('../../hooks/use-api-data').LoadingState} LoadingState */
+/** @typedef {{category: LH.CategoryResult, categoryGroups: LH.Result['categoryGroups'], statistics?: Array<StatisticWithBuild>, loadingState: import('../../components/async-loader').LoadingState, builds: LHCI.ServerCommand.Build[], buildLimit: number, setBuildLimit: (n: number) => void, lhr: LH.Result}} Props */
+/** @typedef {Props & {statistics: Array<StatisticWithBuild>, latestBuild: LHCI.ServerCommand.Build|undefined, selectedBuildId: string|undefined, setSelectedBuildId: import('preact/hooks/src').StateUpdater<string|undefined>, pinned: boolean, setPinned: import('preact/hooks/src').StateUpdater<boolean>}} PropsWithState */
 
 const BUILD_LIMIT_OPTIONS = [{value: 25}, {value: 50}, {value: 100}, {value: 150, label: 'Max'}];
 
@@ -29,6 +30,13 @@ const SCORE_LEVEL_METRIC_THRESHOLDS = {
   interactive: [3000, 7500],
   'speed-index': [3000, 6000],
   'max-potential-fid': [100, 250],
+};
+
+/** @type {Record<string,string>} */
+const AUDIT_GROUP_PREFIX_BY_CATEGORY_ID = {
+  accessibility: 'a11y-',
+  seo: 'seo-',
+  pwa: 'pwa-',
 };
 
 /** @param {PropsWithState} props */
@@ -95,9 +103,61 @@ const PerformanceCategoryDetails = props => {
 };
 
 /** @param {PropsWithState} props */
+const BasicCategoryDetails = props => {
+  const prefix = AUDIT_GROUP_PREFIX_BY_CATEGORY_ID[props.category.id];
+  if (!prefix || !props.latestBuild) return <Fragment />;
+
+  const selectedBuildId = props.selectedBuildId || props.latestBuild.id;
+  const lhr = props.lhr;
+  const statistics = props.statistics.filter(
+    s =>
+      s.value !== -1 && s.name.startsWith(`auditgroup_${prefix}`) && selectedBuildId === s.buildId
+  );
+  if (!statistics.length) return <Fragment />;
+
+  const groups = _.groupBy(statistics, item => item.name.split('_')[1])
+    .map(group => {
+      const groupId = group[0].name.split('_')[1];
+      const lhrGroup = lhr.categoryGroups && lhr.categoryGroups[groupId];
+      if (!lhrGroup) return {title: '', pass: 0, fail: 0, na: 0};
+      const pass = group.find(item => item.name.endsWith('pass'));
+      const fail = group.find(item => item.name.endsWith('fail'));
+      const na = group.find(item => item.name.endsWith('na'));
+
+      return {
+        ...lhrGroup,
+        id: groupId,
+        pass: pass && pass.value,
+        fail: fail && fail.value,
+        na: na && na.value,
+      };
+    })
+    .filter(group => group.title)
+    .sort((a, b) => a.title.localeCompare(b.title));
+
+  return (
+    <div className="basic-category-details">
+      {groups.map(group => (
+        <div className="basic-category-auditgroup">
+          <div className="basic-category-auditgroup__title">{group.title}</div>
+          <div className="basic-category-auditgroup__count-block text--pass">
+            <span>{group.pass}</span>
+            <span>Passed</span>
+          </div>
+          <div className="basic-category-auditgroup__count-block text--fail">
+            <span>{group.fail}</span>
+            <span>Failed</span>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+};
+
+/** @param {PropsWithState} props */
 const CategoryDetails = props => {
   if (props.category.id === 'performance') return <PerformanceCategoryDetails {...props} />;
-  return <Fragment />;
+  return <BasicCategoryDetails {...props} />;
 };
 
 /** @param {Props} props */
@@ -154,6 +214,8 @@ export const CategoryCard = props => {
             const propsWithState = {
               ...props,
               statistics,
+              latestBuild:
+                statistics[statistics.length - 1] && statistics[statistics.length - 1].build,
               selectedBuildId,
               setSelectedBuildId,
               pinned,

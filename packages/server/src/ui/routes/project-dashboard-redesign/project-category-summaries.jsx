@@ -44,6 +44,7 @@ const ProjectCategorySummaries_ = props => {
         return (
           <CategoryCard
             key={category.id}
+            lhr={lhr}
             category={category}
             categoryGroups={lhr.categoryGroups}
             loadingState={props.statisticsLoadingState}

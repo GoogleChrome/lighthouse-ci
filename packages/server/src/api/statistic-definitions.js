@@ -93,9 +93,11 @@ function auditGroupCountOfMedianLhr(groupId, type) {
         if (count === -1) count = 0;
 
         const {score, scoreDisplayMode} = audit;
+        if (scoreDisplayMode === 'informative' && type === 'na') count++;
         if (scoreDisplayMode === 'notApplicable' && type === 'na') count++;
         if (scoreDisplayMode === 'binary' && score === 1 && type === 'pass') count++;
         if (scoreDisplayMode === 'binary' && score !== 1 && type === 'fail') count++;
+        if (scoreDisplayMode === 'error' && type === 'fail') count++;
       }
     }
 

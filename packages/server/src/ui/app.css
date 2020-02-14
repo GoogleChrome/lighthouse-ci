@@ -116,6 +116,7 @@
   --paper-min-width: 200px;
 
   --dashboard-graph-min-height: 300px;
+  --dashboard-donut-graph-size: 60px;
 
   --warning-message-icon-height: 40px;
 }

@@ -14,6 +14,7 @@ import './category-card.css';
 import {CategoryScoreGraph} from './graphs/category-score/category-score-graph';
 import clsx from 'clsx';
 import {MetricLineGraph} from './graphs/metric-line-graph';
+import {DonutGraph} from './graphs/donut-graph';
 
 /** @typedef {import('./project-category-summaries.jsx').StatisticWithBuild} StatisticWithBuild */
 /** @typedef {import('../../hooks/use-api-data').LoadingState} LoadingState */
@@ -138,7 +139,7 @@ const BasicCategoryDetails = props => {
   return (
     <div className="basic-category-details">
       {groups.map(group => (
-        <div className="basic-category-auditgroup">
+        <div key={group.title} className="basic-category-auditgroup">
           <div className="basic-category-auditgroup__title">{group.title}</div>
           <div className="basic-category-auditgroup__count-block text--pass">
             <span>{group.pass}</span>
@@ -148,6 +149,11 @@ const BasicCategoryDetails = props => {
             <span>{group.fail}</span>
             <span>Failed</span>
           </div>
+          <DonutGraph
+            passCount={group.pass || 0}
+            failCount={group.fail || 0}
+            naCount={group.na || 0}
+          />
         </div>
       ))}
     </div>

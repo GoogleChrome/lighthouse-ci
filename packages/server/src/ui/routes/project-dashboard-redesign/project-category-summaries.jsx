@@ -31,7 +31,7 @@ const augmentStatsWithBuilds = (stats, builds) => {
     .filter(/** @return {stat is StatisticWithBuild} */ stat => !!stat.build);
 };
 
-/** @param {{builds: Array<LHCI.ServerCommand.Build>, statistics: Array<StatisticWithBuild>|undefined, statisticsLoadingState: import('../../hooks/use-api-data').LoadingState, run: LHCI.ServerCommand.Run|null, buildLimit: number, setBuildLimit: (n: number) => void}} props */
+/** @param {{builds: Array<LHCI.ServerCommand.Build>, statistics: Array<StatisticWithBuild>|undefined, statisticsLoadingState: import('../../hooks/use-api-data').LoadingState, run: LHCI.ServerCommand.Run|null, buildLimit: number, setBuildLimit: (n: number) => void, url: string}} props */
 const ProjectCategorySummaries_ = props => {
   const lhr = useLhr(props.run);
   if (!lhr) {
@@ -52,6 +52,7 @@ const ProjectCategorySummaries_ = props => {
             builds={props.builds}
             buildLimit={props.buildLimit}
             setBuildLimit={props.setBuildLimit}
+            url={props.url}
           />
         );
       })}
@@ -92,6 +93,7 @@ export const ProjectCategorySummaries = props => {
         render={run => (
           <ProjectCategorySummaries_
             run={run}
+            url={url}
             builds={builds}
             statistics={statsWithBuilds}
             statisticsLoadingState={statLoadingState}

@@ -56,6 +56,7 @@
   width: calc(50% - 2 * var(--base-spacing));
   /* Note this value must be set in JavaScript as well for the Plot height. */
   min-height: var(--dashboard-graph-min-height);
+  overflow: hidden;
 }
 
 .dashboard-graph__title {

@@ -9,5 +9,5 @@
   border: 1px solid var(--base-border-color);
   padding: var(--paper-padding);
   margin: var(--base-spacing);
-  overflow: auto;
+  overflow: visible;
 }

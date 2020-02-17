@@ -15,11 +15,16 @@ import {CategoryScoreGraph} from './graphs/category-score/category-score-graph';
 import clsx from 'clsx';
 import {MetricLineGraph} from './graphs/metric-line-graph';
 import {DonutGraph} from './graphs/donut-graph';
+import {useRepresentativeRun, useLhr} from '../../hooks/use-api-data';
+import {HoverCard} from './graphs/hover-card';
+import {ScoreIcon} from '../../components/score-icon';
 
 /** @typedef {import('./project-category-summaries.jsx').StatisticWithBuild} StatisticWithBuild */
 /** @typedef {import('../../hooks/use-api-data').LoadingState} LoadingState */
-/** @typedef {{category: LH.CategoryResult, categoryGroups: LH.Result['categoryGroups'], statistics?: Array<StatisticWithBuild>, loadingState: import('../../components/async-loader').LoadingState, builds: LHCI.ServerCommand.Build[], buildLimit: number, setBuildLimit: (n: number) => void, lhr: LH.Result}} Props */
+/** @typedef {{category: LH.CategoryResult, categoryGroups: LH.Result['categoryGroups'], statistics?: Array<StatisticWithBuild>, loadingState: import('../../components/async-loader').LoadingState, builds: LHCI.ServerCommand.Build[], buildLimit: number, setBuildLimit: (n: number) => void, lhr: LH.Result, url: string}} Props */
 /** @typedef {Props & {statistics: Array<StatisticWithBuild>, latestBuild: LHCI.ServerCommand.Build|undefined, selectedBuildId: string|undefined, setSelectedBuildId: import('preact/hooks/src').StateUpdater<string|undefined>, pinned: boolean, setPinned: import('preact/hooks/src').StateUpdater<boolean>}} PropsWithState */
+/** @typedef {{id: string, title?: string, pass: number, fail: number, na: number}} AuditGroupCounts */
+/** @typedef {PropsWithState & {groupId: string, variant: 'pass'|'fail'}} PropsForHoverCard */
 
 const BUILD_LIMIT_OPTIONS = [{value: 25}, {value: 50}, {value: 100}, {value: 150, label: 'Max'}];
 
@@ -103,6 +108,99 @@ const PerformanceCategoryDetails = props => {
   );
 };
 
+/** @param {{group: AuditGroupCounts, build: LHCI.ServerCommand.Build, url: string, variant: 'pass'|'fail'}} props */
+const AuditListDisplayCard = props => {
+  const [loadingState, run] = useRepresentativeRun(
+    props.build.projectId,
+    props.build.id,
+    props.url
+  );
+  const maybeLhr = useLhr(run);
+  return (
+    <HoverCard
+      className="audit-list-hover-card"
+      url={props.url}
+      build={props.build}
+      pinned={false}
+      hideActions
+    >
+      <AsyncLoader
+        loadingState={loadingState}
+        asyncData={maybeLhr}
+        render={lhr => {
+          if (!lhr) return <span>Failed to load results.</span>;
+          /** @type {Set<LH.AuditResult['scoreDisplayMode']>} */
+          const ignoredScoreDisplayModes = new Set(['manual', 'notApplicable', 'informative']);
+
+          /** @type {Array<LH.AuditResult>} */
+          const audits = [];
+          for (const category of Object.values(lhr.categories)) {
+            for (const auditRef of category.auditRefs) {
+              if (auditRef.group !== props.group.id) continue;
+              const audit = lhr.audits[auditRef.id];
+              if (!audit || ignoredScoreDisplayModes.has(audit.scoreDisplayMode)) continue;
+              if (props.variant === 'pass' && audit.score !== 1) continue;
+              if (props.variant === 'fail' && audit.score === 1) continue;
+              audits.push(audit);
+            }
+          }
+
+          if (!audits.length) return <span>No matching audits found.</span>;
+          return (
+            <div className="audit-list-hover-card__list">
+              {audits.map(audit => (
+                <div key={audit.id} className="audit-list-hover-card__list-item">
+                  <ScoreIcon score={audit.score || 0} />
+                  <div className="audit-list-hover-card__list-item-title">{audit.title}</div>
+                </div>
+              ))}
+            </div>
+          );
+        }}
+      />
+    </HoverCard>
+  );
+};
+
+/** @param {{group: AuditGroupCounts, build: LHCI.ServerCommand.Build, url: string}} props */
+const BasicCategoryDetailsAuditGroup = props => {
+  const group = props.group;
+  const [hoverCardDisplay, setHoverCardDisplay] = useState(/** @type {''|'pass'|'fail'} */ (''));
+
+  return (
+    <div key={group.title} className="basic-category-auditgroup">
+      <div className="basic-category-auditgroup__title">{group.title}</div>
+      <div
+        className="basic-category-auditgroup__count-block"
+        onMouseEnter={() => setHoverCardDisplay('pass')}
+        onMouseLeave={() => setHoverCardDisplay('')}
+      >
+        <span className="text--pass">{group.pass}</span>
+        <span className="basic-category-auditgroup__count-block-label">Passed</span>
+        {group.pass && hoverCardDisplay === 'pass' ? (
+          <AuditListDisplayCard {...props} variant="pass" />
+        ) : (
+          <Fragment />
+        )}
+      </div>
+      <div
+        className="basic-category-auditgroup__count-block"
+        onMouseEnter={() => setHoverCardDisplay('fail')}
+        onMouseLeave={() => setHoverCardDisplay('')}
+      >
+        <span className="text--fail">{group.fail}</span>
+        <span className="basic-category-auditgroup__count-block-label">Failed</span>
+        {group.fail && hoverCardDisplay === 'fail' ? (
+          <AuditListDisplayCard {...props} variant="fail" />
+        ) : (
+          <Fragment />
+        )}
+      </div>
+      <DonutGraph passCount={group.pass || 0} failCount={group.fail || 0} naCount={group.na || 0} />
+    </div>
+  );
+};
+
 /** @param {PropsWithState} props */
 const BasicCategoryDetails = props => {
   const prefix = AUDIT_GROUP_PREFIX_BY_CATEGORY_ID[props.category.id];
@@ -115,12 +213,12 @@ const BasicCategoryDetails = props => {
       s.value !== -1 && s.name.startsWith(`auditgroup_${prefix}`) && selectedBuildId === s.buildId
   );
   if (!statistics.length) return <Fragment />;
-
+  const build = statistics[0].build;
   const groups = _.groupBy(statistics, item => item.name.split('_')[1])
     .map(group => {
       const groupId = group[0].name.split('_')[1];
       const lhrGroup = lhr.categoryGroups && lhr.categoryGroups[groupId];
-      if (!lhrGroup) return {title: '', pass: 0, fail: 0, na: 0};
+      if (!lhrGroup) return {id: '', title: '', pass: 0, fail: 0, na: 0};
       const pass = group.find(item => item.name.endsWith('pass'));
       const fail = group.find(item => item.name.endsWith('fail'));
       const na = group.find(item => item.name.endsWith('na'));
@@ -128,9 +226,9 @@ const BasicCategoryDetails = props => {
       return {
         ...lhrGroup,
         id: groupId,
-        pass: pass && pass.value,
-        fail: fail && fail.value,
-        na: na && na.value,
+        pass: pass ? pass.value : -1,
+        fail: fail ? fail.value : -1,
+        na: na ? na.value : -1,
       };
     })
     .filter(group => group.title)
@@ -139,22 +237,12 @@ const BasicCategoryDetails = props => {
   return (
     <div className="basic-category-details">
       {groups.map(group => (
-        <div key={group.title} className="basic-category-auditgroup">
-          <div className="basic-category-auditgroup__title">{group.title}</div>
-          <div className="basic-category-auditgroup__count-block text--pass">
-            <span>{group.pass}</span>
-            <span>Passed</span>
-          </div>
-          <div className="basic-category-auditgroup__count-block text--fail">
-            <span>{group.fail}</span>
-            <span>Failed</span>
-          </div>
-          <DonutGraph
-            passCount={group.pass || 0}
-            failCount={group.fail || 0}
-            naCount={group.na || 0}
-          />
-        </div>
+        <BasicCategoryDetailsAuditGroup
+          key={group.id}
+          group={group}
+          build={build}
+          url={props.url}
+        />
       ))}
     </div>
   );

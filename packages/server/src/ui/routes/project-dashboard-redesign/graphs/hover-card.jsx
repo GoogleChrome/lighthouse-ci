@@ -19,7 +19,7 @@ export const HOVER_CARD_MARGIN = 100;
 /** @param {number} value */
 const padWith0 = value => value.toString().padStart(2, '0');
 
-/** @param {{url: string, build?: LHCI.ServerCommand.Build, children?: LHCI.PreactNode, pinned: boolean, className?: string}} props */
+/** @param {{url: string, build?: LHCI.ServerCommand.Build, children?: LHCI.PreactNode, pinned: boolean, hideActions?: boolean, className?: string}} props */
 export const HoverCard = props => {
   const {url, build, children, pinned} = props;
 
@@ -35,18 +35,22 @@ export const HoverCard = props => {
           </span>
         </div>
         {children}
-        <div className="hover-card__actions">
-          <LhrViewerLink
-            lhr={async () => {
-              const getRunOptions = {url, representative: true};
-              const [run] = await api.getRuns(build.projectId, build.id, getRunOptions);
-              return JSON.parse(run.lhr);
-            }}
-          >
-            Report
-          </LhrViewerLink>
-          <a href={`./compare/${_.shortId(build.id)}`}>CI Diff</a>
-        </div>
+        {props.hideActions ? (
+          <Fragment />
+        ) : (
+          <div className="hover-card__actions">
+            <LhrViewerLink
+              lhr={async () => {
+                const getRunOptions = {url, representative: true};
+                const [run] = await api.getRuns(build.projectId, build.id, getRunOptions);
+                return JSON.parse(run.lhr);
+              }}
+            >
+              Report
+            </LhrViewerLink>
+            <a href={`./compare/${_.shortId(build.id)}`}>CI Diff</a>
+          </div>
+        )}
       </Fragment>
     );
   }

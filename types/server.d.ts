@@ -132,6 +132,7 @@ declare global {
         branch?: string;
         hash?: string;
         limit?: number;
+        lifecycle?: Build['lifecycle'];
       }
 
       export interface GetRunsOptions {

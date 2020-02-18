@@ -208,6 +208,11 @@ function runTests(state) {
       expect(builds).toEqual([buildB]);
     });
 
+    it('should list builds filtered by lifecycle', async () => {
+      const builds = await client.getBuilds(projectA.id, {lifecycle: 'sealed'});
+      expect(builds).toEqual([]);
+    });
+
     it('should list builds for another project', async () => {
       const builds = await client.getBuilds(projectB.id);
       expect(builds).toEqual([buildD]);
@@ -573,10 +578,11 @@ function runTests(state) {
       await client.sealBuild(projectA.id, buildA.id);
 
       // Build should now be sealed
-      expect(await client.findBuildById(projectA.id, buildA.id)).toHaveProperty(
-        'lifecycle',
-        'sealed'
-      );
+      const updatedBuild = await client.findBuildById(projectA.id, buildA.id);
+      expect(updatedBuild).toHaveProperty('lifecycle', 'sealed');
+
+      // Querying for build by sealed lifecycle should now work
+      expect(await client.getBuilds(projectA.id, {lifecycle: 'sealed'})).toEqual([updatedBuild]);
 
       // Runs should have been marked representative
       expect(await client.getRuns(projectA.id, buildA.id)).toMatchObject([

@@ -135,12 +135,14 @@ Instead of configuring using Lighthouse CI assertions against Lighthouse audits,
 
 If you'd like to consolidate multiple assertion configuration files and avoid multiple calls to `lhci assert`, you can also configure your budgets alongside your other Lighthouse CI assertions instead. Budget assertions follow the form `resource-summary:<resourceType>:(size|count)`.
 
+**Note:** when using the Lighthouse CI style assertions the `maxNumericValue` unit for file size is in _bytes_ while the budget.json unit for file size is in _kilobytes_.
+
 ```json
 {
   "assertions": {
     "first-contentful-paint": ["warn", {"maxNumericValue": 4000}],
     "viewport": "error",
-    "resource-summary:document:size": ["error", {"maxNumericValue": 400}],
+    "resource-summary:document:size": ["error", {"maxNumericValue": 14000}],
     "resource-summary:font:count": ["warn", {"maxNumericValue": 1}],
     "resource-summary:third-party:count": ["warn", {"maxNumericValue": 5}]
   }

@@ -193,6 +193,10 @@ h6 {
   color: var(--fail-color);
 }
 
+.text--smaller {
+  font-size: var(--smaller-font-size);
+}
+
 a {
   text-decoration: none;
 }

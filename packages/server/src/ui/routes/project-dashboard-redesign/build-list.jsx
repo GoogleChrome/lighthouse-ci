@@ -72,7 +72,12 @@ export const ProjectBuildList = props => {
   return (
     <Paper className="dashboard-build-list">
       <div className="dashboard-build-list__header">
-        <h2>{props.project.name} Builds</h2>
+        <h2>
+          {props.project.name} Builds{' '}
+          <span className="text--secondary text--smaller">
+            {filterText ? `(${props.builds.length - filteredBuilds.length} filtered out)` : ''}
+          </span>
+        </h2>
         <div className="dashboard-build-list__filter">
           <label>
             Filter{' '}

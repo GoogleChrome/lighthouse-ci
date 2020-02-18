@@ -11,8 +11,8 @@ const path = require('path');
 const {runCLI} = require('./test-utils.js');
 
 describe('Lighthouse CI healthcheck CLI', () => {
-  const fixtureDir = path.join(__dirname, 'fixtures/autorun-static-dir');
-  const rcFile = path.join(fixtureDir, 'lighthouserc.json');
+  const autorunFixtureDir = path.join(__dirname, 'fixtures/autorun-static-dir');
+  const rcFile = path.join(autorunFixtureDir, 'lighthouserc.json');
 
   describe('configuration', () => {
     it('should find an rc file with explicit path', () => {
@@ -29,9 +29,25 @@ describe('Lighthouse CI healthcheck CLI', () => {
       expect(stderr).toMatchInlineSnapshot(`""`);
     });
 
+    it('should find an rc file with explicit relative path', () => {
+      const {stdout, stderr, status} = runCLI(['healthcheck', `--config=../lighthouserc.js`], {
+        cwd: autorunFixtureDir,
+      });
+      expect(status).toEqual(0);
+      expect(stdout).toMatchInlineSnapshot(`
+        "✅  .lighthouseci/ directory writable
+        ✅  Configuration file found
+        ✅  Chrome installation found
+        ⚠️   GitHub token not set
+        Healthcheck passed!
+        "
+      `);
+      expect(stderr).toMatchInlineSnapshot(`""`);
+    });
+
     it('should find an rc file by autodetect', () => {
       const {stdout, stderr, status} = runCLI(['healthcheck'], {
-        cwd: fixtureDir,
+        cwd: autorunFixtureDir,
         env: {LHCI_NO_LIGHTHOUSERC: undefined}, // override the clean test env
       });
 
@@ -66,7 +82,7 @@ describe('Lighthouse CI healthcheck CLI', () => {
 
     it('should opt-out of autodetect via env variable', () => {
       const {stdout, stderr, status} = runCLI(['healthcheck'], {
-        cwd: fixtureDir,
+        cwd: autorunFixtureDir,
         env: {LHCI_NO_LIGHTHOUSERC: '1'},
       });
 
@@ -83,7 +99,7 @@ describe('Lighthouse CI healthcheck CLI', () => {
 
     it('should opt-out of autodetect via flag', () => {
       const {stdout, stderr, status} = runCLI(['healthcheck', '--no-lighthouserc'], {
-        cwd: fixtureDir,
+        cwd: autorunFixtureDir,
         env: {LHCI_NO_LIGHTHOUSERC: undefined},
       });
 

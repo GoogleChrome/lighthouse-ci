@@ -159,17 +159,24 @@ function flattenRcToConfig(rc) {
   };
 }
 
-/** @param {string|undefined} pathToRcFile */
+/**
+ * @param {string|undefined} pathToRcFile
+ * @return {string|undefined}
+ */
 function resolveRcFilePath(pathToRcFile) {
-  if (pathToRcFile) return pathToRcFile;
+  if (typeof pathToRcFile === 'string') return path.resolve(process.cwd(), pathToRcFile);
   return hasOptedOutOfRcDetection() ? undefined : findRcFile();
 }
+
+// AFAIK this can't be expressed in JSDoc yet, so fallback to coercive typedef
+// @see https://github.com/microsoft/TypeScript/issues/24929
+/** @typedef {((s: string) => string) & ((s: undefined) => string|undefined) & ((s: string|undefined) => string|undefined)} ResolveRcFilePathTrueType */
 
 module.exports = {
   loadRcFile,
   loadAndParseRcFile,
   findRcFile,
-  resolveRcFilePath,
+  resolveRcFilePath: /** @type {ResolveRcFilePathTrueType} */ (resolveRcFilePath),
   flattenRcToConfig,
   hasOptedOutOfRcDetection,
 };

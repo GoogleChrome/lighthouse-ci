@@ -13,6 +13,7 @@ const {
   loadAndParseRcFile,
   hasOptedOutOfRcDetection,
   findRcFile,
+  resolveRcFilePath,
 } = require('@lhci/utils/src/lighthouserc.js');
 const assertCmd = require('./assert/assert.js');
 const autorunCmd = require('./autorun/autorun.js');
@@ -30,7 +31,7 @@ updateNotifier({pkg}).notify({defer: false});
 function createYargsConfigArguments() {
   const simpleArgv = yargsParser(process.argv.slice(2), {envPrefix: 'LHCI'});
   /** @type {[string, (path: string) => LHCI.YargsOptions]} */
-  const configOption = ['config', loadAndParseRcFile];
+  const configOption = ['config', pathToFile => loadAndParseRcFile(resolveRcFilePath(pathToFile))];
   // If they're using the config option or opting out of auto-detection, use the config option.
   if (simpleArgv.config || hasOptedOutOfRcDetection()) return configOption;
   const rcFile = findRcFile();

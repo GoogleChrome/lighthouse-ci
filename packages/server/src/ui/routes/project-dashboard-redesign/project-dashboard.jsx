@@ -21,6 +21,7 @@ import {ProjectCategorySummaries} from './project-category-summaries.jsx';
 import './project-dashboard.css';
 import {Dropdown} from '../../components/dropdown';
 import clsx from 'clsx';
+import {ProjectBuildList} from './build-list';
 
 /** @param {{urls: Array<{url: string}>, branches: Array<{branch: string}>, runUrl?: string, branch?: string}} props */
 const computeUrlAndBranchSelection = props => {
@@ -91,6 +92,7 @@ const ProjectDashboard_ = props => {
         'dashboard-redesign--scrolled': isScrolledToGraphs,
       })}
     >
+      <ProjectBuildList project={props.project} builds={props.builds} />
       <div id="dashboard-redesign__scroll-height-detector" />
       <UrlAndBranchSelector {...props} />
       <ProjectCategorySummaries

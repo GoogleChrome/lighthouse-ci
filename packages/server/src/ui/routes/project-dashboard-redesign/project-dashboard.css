@@ -38,3 +38,8 @@
   right: var(--page-header-height);
   height: var(--page-header-height);
 }
+
+/** fill in some of the space that dissappears when it flips to position: fixed */
+.dashboard-redesign--scrolled #dashboard-redesign__scroll-height-detector {
+  height: calc(var(--base-spacing) + var(--base-font-size));
+}

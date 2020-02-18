@@ -1,0 +1,100 @@
+/**
+ * @license Copyright 2020 Google Inc. All Rights Reserved.
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
+ */
+
+.dashboard-build-list__header {
+  margin-bottom: var(--base-spacing);
+
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.dashboard-build-list__header > h2 {
+  flex-grow: 1;
+}
+
+.dashboard-build-list__filter {
+  padding: calc(var(--base-spacing) / 2) 0;
+  border-bottom: 1px solid var(--strong-border-color);
+}
+
+.dashboard-build-list__filter label {
+  color: var(--secondary-text-color);
+  font-weight: var(--medium-font-weight);
+}
+
+.dashboard-build-list__filter input {
+  font-size: var(--base-font-size);
+  border: none;
+}
+
+.dashboard-build-list__pagination {
+  min-width: 100px;
+  margin-left: var(--base-spacing);
+
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.dashboard-build-list__pagination button {
+  padding: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.dashboard-build-list .build-list {
+  width: 100%;
+  max-width: 100%;
+}
+
+.dashboard-build-list .build-list {
+  border-collapse: collapse;
+}
+
+.dashboard-build-list .build-list td {
+  padding: var(--base-spacing);
+}
+
+.dashboard-build-list .build-list tr:nth-child(odd) {
+  background-color: var(--base-background-color);
+}
+
+.dashboard-build-list .build-list tr:hover {
+  cursor: pointer;
+  background-color: var(--color-gray-100);
+}
+
+.dashboard-build-list .build-list i {
+  margin: 0 calc(var(--base-spacing) / 2);
+}
+
+.build-list__commit {
+  max-width: 30vw;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.build-list__commit,
+.build-list__branch {
+  font-weight: var(--medium-font-weight);
+}
+
+.build-list__date {
+  color: var(--secondary-text-color);
+  white-space: nowrap;
+}
+
+.build-list__hash {
+  width: 145px;
+}
+
+.build-list__hash .pill {
+  width: fit-content;
+}

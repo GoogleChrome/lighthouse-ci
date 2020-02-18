@@ -91,7 +91,8 @@ export function useProjectBySlug(projectSlug) {
  * @return {[LoadingState, Array<LHCI.ServerCommand.Build> | undefined]}
  */
 export function useProjectBuilds(projectId) {
-  const options = useMemo(() => ({limit: 1000}), []);
+  const lifecycle = /** @type {'sealed'} */ ('sealed');
+  const options = useMemo(() => ({limit: 1000, lifecycle}), []);
   return useApiData('getBuilds', projectId ? [projectId, options] : undefined);
 }
 

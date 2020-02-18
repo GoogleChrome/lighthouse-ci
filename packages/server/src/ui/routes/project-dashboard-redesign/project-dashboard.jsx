@@ -22,6 +22,7 @@ import './project-dashboard.css';
 import {Dropdown} from '../../components/dropdown';
 import clsx from 'clsx';
 import {ProjectBuildList} from './build-list';
+import {ProjectGettingStarted} from '../project-dashboard/getting-started';
 
 /** @param {{urls: Array<{url: string}>, branches: Array<{branch: string}>, runUrl?: string, branch?: string}} props */
 const computeUrlAndBranchSelection = props => {
@@ -132,18 +133,22 @@ export const ProjectDashboard = props => {
       <AsyncLoader
         loadingState={loadingState}
         asyncData={asyncData}
-        render={([project, builds, urls, branches]) => (
-          <ProjectDashboard_
-            project={project}
-            builds={builds}
-            {...computeUrlAndBranchSelection({
-              urls,
-              branches,
-              runUrl: props.runUrl,
-              branch: props.branch,
-            })}
-          />
-        )}
+        render={([project, builds, urls, branches]) =>
+          builds.length ? (
+            <ProjectDashboard_
+              project={project}
+              builds={builds}
+              {...computeUrlAndBranchSelection({
+                urls,
+                branches,
+                runUrl: props.runUrl,
+                branch: props.branch,
+              })}
+            />
+          ) : (
+            <ProjectGettingStarted project={project} />
+          )
+        }
       />
     </Page>
   );

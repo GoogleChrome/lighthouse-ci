@@ -14,7 +14,7 @@ import './category-card.css';
 import {CategoryScoreGraph} from './graphs/category-score/category-score-graph';
 import clsx from 'clsx';
 import {MetricLineGraph} from './graphs/metric-line-graph';
-import {DonutGraph} from './graphs/donut-graph';
+import {DonutGraph, DonutGraphLegend} from './graphs/donut-graph';
 import {useRepresentativeRun, useLhr} from '../../hooks/use-api-data';
 import {HoverCard} from './graphs/hover-card';
 import {ScoreIcon} from '../../components/score-icon';
@@ -244,6 +244,7 @@ const BasicCategoryDetails = props => {
           url={props.url}
         />
       ))}
+      <DonutGraphLegend halfWidth={groups.length % 2 === 1} />
     </div>
   );
 };

@@ -19,7 +19,8 @@
   stroke-width: 1px;
 }
 
-.donut-arc--pass {
+.donut-arc--pass,
+.donut-legend-circle--pass {
   stroke: var(--pass-color);
 }
 
@@ -27,7 +28,8 @@
   stroke: var(--pass-color);
 }
 
-.donut-arc--fail {
+.donut-arc--fail,
+.donut-legend-circle--fail {
   stroke: var(--fail-color);
 }
 
@@ -35,7 +37,32 @@
   stroke: var(--fail-color);
 }
 
-.donut-arc--na {
+.donut-arc--na,
+.donut-legend-circle--na {
   stroke: var(--neutral-highlight-color);
   fill: var(--secondary-background-color);
+}
+
+.donut-graph-legend {
+  --legend-circle-size: 24px;
+
+  width: 100%;
+  padding-top: var(--base-spacing);
+  padding-bottom: var(--base-spacing);
+
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+  justify-content: flex-end;
+}
+
+.donut-graph-legend__label {
+  line-height: var(--legend-circle-size);
+  margin-left: calc(var(--base-spacing) / 2);
+}
+
+.donut-graph-legend__legend-circle {
+  margin-left: var(--base-spacing);
+  width: var(--legend-circle-size);
+  height: var(--legend-circle-size);
 }

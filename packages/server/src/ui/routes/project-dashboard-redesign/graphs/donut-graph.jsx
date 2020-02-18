@@ -19,6 +19,13 @@ const GRAPH_MARGIN = {
   right: 5,
 };
 
+const LEGEND_CIRCLE_MARGIN = {
+  top: 2,
+  bottom: 2,
+  left: 2,
+  right: 2,
+};
+
 /**
  * @typedef DonutGraphData
  * @prop {number} passCount
@@ -27,6 +34,7 @@ const GRAPH_MARGIN = {
  */
 
 /** @typedef {{count: number, type: 'pass'|'fail'|'na'}} CountPoint  */
+/** @typedef {{type: CountPoint['type']}} LegendCircleData */
 
 /** @param {ReturnType<typeof createRootSvg>['masks']} masks @param {string} maskId */
 function renderPatternMasks(masks, maskId) {
@@ -102,6 +110,26 @@ function renderDonutGraph(rootEl, data) {
     );
 }
 
+/**
+ * @param {HTMLElement} rootEl
+ * @param {LegendCircleData} data
+ */
+function renderDonutGraphLegendCircle(rootEl, data) {
+  const {svg, masks, graphWidth} = createRootSvg(rootEl, LEGEND_CIRCLE_MARGIN);
+  const radius = graphWidth / 2;
+
+  const maskId = _.uniqueId();
+  renderPatternMasks(masks, maskId.toString());
+
+  svg
+    .append('circle')
+    .attr('class', () => `donut-legend-circle donut-legend-circle--${data.type}`)
+    .attr('fill', () => `url(#donut-pattern-${data.type}-${maskId})`)
+    .attr('cx', radius)
+    .attr('cy', radius)
+    .attr('r', radius);
+}
+
 /** @param {DonutGraphData} props */
 export const DonutGraph = props => {
   return (
@@ -112,6 +140,35 @@ export const DonutGraph = props => {
         render={renderDonutGraph}
         computeRerenderKey={data => `${data.passCount},${data.failCount},${data.naCount}`}
       />
+    </div>
+  );
+};
+
+/** @param {{halfWidth: boolean}} props */
+export const DonutGraphLegend = props => {
+  return (
+    <div className="donut-graph-legend" style={{width: props.halfWidth ? '50%' : '100%'}}>
+      <D3Graph
+        className="donut-graph-legend__legend-circle"
+        data={{type: 'pass'}}
+        render={renderDonutGraphLegendCircle}
+        computeRerenderKey={() => ''}
+      />
+      <div className="donut-graph-legend__label">Passed</div>
+      <D3Graph
+        className="donut-graph-legend__legend-circle"
+        data={{type: 'fail'}}
+        render={renderDonutGraphLegendCircle}
+        computeRerenderKey={() => ''}
+      />
+      <div className="donut-graph-legend__label">Failed</div>
+      <D3Graph
+        className="donut-graph-legend__legend-circle"
+        data={{type: 'na'}}
+        render={renderDonutGraphLegendCircle}
+        computeRerenderKey={() => ''}
+      />
+      <div className="donut-graph-legend__label">Not Applicable</div>
     </div>
   );
 };

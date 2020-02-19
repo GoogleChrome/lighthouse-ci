@@ -65,4 +65,21 @@ kubectl get service
 # lhci-server   LoadBalancer   10.X.X.X       X.X.X.X        80:XXXXX/TCP   2m
 ```
 
+### Docker Compose
+
+You can create a docker-compose.yml file to orchestrate an LHCI server in cloud services or along with your existing app docker containers. Execute `docker-compose up` relative to the file's location.
+
+```bash
+version: '3'
+services:
+  lhserver:
+    image: patrickhulce/lhci-server
+    ports:
+      - '9001:9001'
+    volumes:
+      - lhci-data:/data
+volumes:
+  lhci-data:
+```
+
 Note that the server has no authentication mechanisms and that anyone with HTTP access to the server will be able to view and create data. If your server contains sensitive information, consider protecting it within a firewall that is only accessible to your internal network.

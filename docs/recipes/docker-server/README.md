@@ -67,7 +67,7 @@ kubectl get service
 
 ### Docker Compose
 
-You can create a docker-compose.yml file. Execute `docker-compose up` relative to the file's location.
+You can create a docker-compose.yml file to orchestrate an LHCI server in cloud services or along with your existing app docker containers. Execute `docker-compose up` relative to the file's location.
 
 ```bash
 version: '3'

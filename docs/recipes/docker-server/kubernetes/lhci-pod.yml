@@ -7,7 +7,7 @@ metadata:
 spec:
   containers:
     - name: lhci-server
-      image: docker.io/patrickhulce/lhci-server:0.3.8
+      image: docker.io/patrickhulce/lhci-server:0.3.9
       volumeMounts:
         - mountPath: '/data'
           name: lhci-data-volume

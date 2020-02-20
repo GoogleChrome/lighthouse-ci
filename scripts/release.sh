@@ -26,6 +26,7 @@ yarn build
 
 # Release
 hulk npm-publish --lerna
+git checkout lerna.json # lerna prettifies the JSON and isn't useful
 
 # Do related releases
 ./scripts/deploy-gh-pages.sh

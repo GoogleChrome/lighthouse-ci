@@ -5,8 +5,8 @@
     "start": "lhci server --config=./lighthouserc.json"
   },
   "dependencies": {
-    "@lhci/cli": "0.3.8",
-    "@lhci/server": "0.3.8",
+    "@lhci/cli": "0.3.9",
+    "@lhci/server": "0.3.9",
     "pg": "^7.12.1",
     "pg-hstore": "^2.3.3",
     "sqlite3": "^4.0.6"

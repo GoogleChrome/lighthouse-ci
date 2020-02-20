@@ -76,9 +76,13 @@
   right: 0;
   bottom: var(--base-spacing);
   text-align: center;
-}
 
-.page-sidebar__version {
   color: var(--inverted-secondary-text-color);
   font-size: var(--subtext-font-size);
+}
+
+.page-sidebar__issue-link,
+.page-sidebar__issue-link:visited {
+  color: var(--inverted-text-color);
+  text-decoration: none;
 }

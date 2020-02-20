@@ -52,10 +52,21 @@ export const PageSidebar = props => {
         />
       </div>
       <div className="page-sidebar__footer">
-        <div className="page-sidebar__version">
+        <span className="page-sidebar__version">
           {/* This environment variable is set by npm/yarn on any script command. */}v
           {process.env.npm_package_version}
-        </div>
+        </span>{' '}
+        |{' '}
+        <a
+          className="page-sidebar__issue-link"
+          href={`https://github.com/GoogleChrome/lighthouse-ci/releases/tag/v${
+            process.env.npm_package_version
+          }`}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Release Notes
+        </a>
       </div>
     </div>
   );

@@ -24,6 +24,18 @@ const ProjectDashboard_ = props => {
   return (
     <div className="dashboard">
       <DocumentTitle title={`${project.name} Dashboard`} />
+      <div style={{position: 'absolute', top: 60, width: '100%', textAlign: 'center', zIndex: 9}}>
+        Protip: Test out the{' '}
+        <a href={`/app/projects/${project.slug}/dashboard`}>newly redesigned dashboard</a> and{' '}
+        <a
+          href="https://github.com/GoogleChrome/lighthouse-ci/issues/new"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          let us know
+        </a>{' '}
+        what you think!
+      </div>
       <div className="dashboard__recent-activity">
         <h2>{project.name}</h2>
         <div className="dashboard__build-list-scroll-container">

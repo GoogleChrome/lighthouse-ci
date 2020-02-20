@@ -14,8 +14,8 @@ read -n 1 -p "Press any key to continue, Ctrl+C to exit..."
 
 printf "\nUpdating local files...\n\n"
 
-sed "s/$CURRENT_VERSION/$NEXT_VERSION/" Dockerfile
-git diff .
+sed -i "" "s/$CURRENT_VERSION/$NEXT_VERSION/" Dockerfile
+git --no-pager diff .
 
 printf "Continue publishing $NEXT_VERSION?\n"
 read -n 1 -p "Press any key to continue, Ctrl+C to exit..."

@@ -25,7 +25,7 @@ yarn clean
 yarn build
 
 # Release
-hulk npm-publish
+hulk npm-publish --lerna
 
 # Do related releases
 ./scripts/deploy-gh-pages.sh

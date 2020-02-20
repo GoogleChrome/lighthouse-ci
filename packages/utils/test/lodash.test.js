@@ -80,6 +80,56 @@ describe('lodash.js', () => {
     });
   });
 
+  describe('#isEqual', () => {
+    it('should work on inequal simple types', () => {
+      expect(_.isEqual(0, 5)).toEqual(false);
+      expect(_.isEqual(0, '0')).toEqual(false);
+      expect(_.isEqual(0, null)).toEqual(false);
+      expect(_.isEqual(NaN, null)).toEqual(false);
+      expect(_.isEqual(undefined, null)).toEqual(false);
+      expect(_.isEqual('foo', 'bar')).toEqual(false);
+    });
+
+    it('should work on equal simple types', () => {
+      expect(_.isEqual(0, 0)).toEqual(true);
+      expect(_.isEqual(12, 12)).toEqual(true);
+      expect(_.isEqual(NaN, NaN)).toEqual(true);
+      expect(_.isEqual(null, null)).toEqual(true);
+      expect(_.isEqual(undefined, undefined)).toEqual(true);
+      expect(_.isEqual('foo', 'foo')).toEqual(true);
+    });
+
+    it('should work on objects', () => {
+      expect(_.isEqual({x: 1}, {y: 1})).toEqual(false);
+      expect(_.isEqual({x: 1}, {x: 1})).toEqual(true);
+
+      expect(_.isEqual({x: 1, y: 2}, {y: 2})).toEqual(false);
+      expect(_.isEqual({x: 1, y: 2}, {y: 2, x: 1})).toEqual(true);
+
+      expect(_.isEqual({x: undefined}, {})).toEqual(false);
+      expect(_.isEqual({x: undefined}, {x: undefined})).toEqual(true);
+
+      expect(_.isEqual({x: {y: 1}}, {x: {y: 2}})).toEqual(false);
+      expect(_.isEqual({x: {y: 1}}, {x: {y: 1}})).toEqual(true);
+
+      expect(_.isEqual({}, null)).toEqual(false);
+      expect(_.isEqual(null, {})).toEqual(false);
+      expect(_.isEqual({}, {})).toEqual(true);
+    });
+
+    it('should work on arrays', () => {
+      expect(_.isEqual([1], [2])).toEqual(false);
+      expect(_.isEqual([1], [1])).toEqual(true);
+
+      expect(_.isEqual([[1]], [[2]])).toEqual(false);
+      expect(_.isEqual([[1]], [[1]])).toEqual(true);
+
+      expect(_.isEqual([[1, 2]], [[1, 2, 3]])).toEqual(false);
+      expect(_.isEqual([[1, 2, 3]], [[1, 2]])).toEqual(false);
+      expect(_.isEqual([[1, 2]], [[1, 2]])).toEqual(true);
+    });
+  });
+
   describe('#kebabCase', () => {
     it('should convert strings to kebab-case', () => {
       // WAI

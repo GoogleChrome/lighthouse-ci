@@ -317,6 +317,8 @@ export const CategoryCard = props => {
               setPinned,
             };
 
+            if (!statistics.length) return <span>No data available</span>;
+
             return (
               <Fragment>
                 <CategoryScoreGraph {...propsWithState} />

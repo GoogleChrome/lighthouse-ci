@@ -62,7 +62,7 @@ const isFiniteNumber = x => typeof x === 'number' && Number.isFinite(x);
  */
 function normalizeAssertion(assertion) {
   if (!assertion) return ['off', {}];
-  if (typeof assertion === 'string') return [assertion, {}];
+  if (typeof assertion === 'string' || typeof assertion === 'number') return [assertion, {}];
   return assertion;
 }
 

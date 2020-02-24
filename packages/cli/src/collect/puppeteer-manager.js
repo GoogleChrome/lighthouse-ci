@@ -5,6 +5,7 @@
  */
 'use strict';
 
+const fs = require('fs');
 const path = require('path');
 
 /** @typedef {(browser: import('puppeteer').Browser, context: {url: string, options: LHCI.CollectCommand.Options}) => void} PuppeteerScript */
@@ -18,18 +19,40 @@ class PuppeteerManager {
     this._browser = null;
   }
 
+  /**
+   * Returns the puppeteer module. First attempts to require `puppeteer` and then `puppeteer-core`
+   * if puppeteer is not available. They are the exact same API but puppeteer-core requires explicit
+   * setting of `collect.chromePath`.
+   * @return {typeof import('puppeteer')|undefined}
+   */
+  _requirePuppeteer() {
+    try {
+      return require('puppeteer');
+    } catch (_) {}
+
+    try {
+      // @ts-ignore - puppeteer-core is API-compatible with puppeteer
+      return require('puppeteer-core');
+    } catch (_) {}
+  }
+
   /** @return {Promise<import('puppeteer').Browser>} */
   async _getBrowser() {
     if (!this.isActive()) throw new Error('Should not launch a browser when inactive');
     if (this._browser) return this._browser;
 
     // Delay require to only run after user requests puppeteer functionality.
-    const puppeteer = require('puppeteer');
+    const puppeteer = this._requirePuppeteer();
+    if (!puppeteer) {
+      throw new Error(`Unable to require 'puppeteer' for script, have you run 'npm i puppeteer'?`);
+    }
+
     this._browser = await puppeteer.launch({
       ...(this._options.puppeteerLaunchOptions || {}),
       pipe: false,
       devtools: false,
       headless: !this._options.headful,
+      // The default value for `chromePath` is determined by yargs using the `getChromiumPath` method.
       executablePath: this._options.chromePath,
     });
 
@@ -39,6 +62,17 @@ class PuppeteerManager {
   /** @return {boolean} */
   isActive() {
     return !!this._options.puppeteerScript;
+  }
+
+  /** @return {string|undefined} */
+  getChromiumPath() {
+    // If we're not using puppeteer, return undefined.
+    if (!this._options.puppeteerScript) return undefined;
+
+    // Otherwise, check to see if the expected puppeteer download exists.
+    const puppeteer = this._requirePuppeteer();
+    const chromiumPath = puppeteer && puppeteer.executablePath();
+    return chromiumPath && fs.existsSync(chromiumPath) ? chromiumPath : undefined;
   }
 
   /** @return {Promise<number>} */

@@ -6,6 +6,7 @@
 'use strict';
 
 const path = require('path');
+const yargsParser = require('yargs-parser');
 const ChromeLauncher = require('chrome-launcher').Launcher;
 const FallbackServer = require('./fallback-server.js');
 const LighthouseRunner = require('./lighthouse-runner.js');
@@ -20,6 +21,9 @@ const {
  * @param {import('yargs').Argv} yargs
  */
 function buildCommand(yargs) {
+  /** @type {any} */
+  const naiveOptions = yargsParser(process.argv);
+
   return yargs.options({
     method: {type: 'string', choices: ['node'], default: 'node'},
     headful: {type: 'boolean', description: 'Run with a headful Chrome'},
@@ -37,7 +41,10 @@ function buildCommand(yargs) {
     },
     chromePath: {
       description: 'The path to the Chrome or Chromium executable to use for collection.',
-      default: process.env.CHROME_PATH || ChromeLauncher.getInstallations()[0],
+      default:
+        process.env.CHROME_PATH ||
+        new PuppeteerManager(naiveOptions).getChromiumPath() ||
+        ChromeLauncher.getInstallations()[0],
     },
     puppeteerScript: {
       description:

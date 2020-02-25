@@ -30,8 +30,28 @@
   justify-content: center;
 }
 
-.category-card__title {
+.category-card__visualization-types {
+  margin-top: calc(var(--paper-padding) * -1);
+  margin-bottom: calc(var(--paper-padding) * -1);
   flex-grow: 1;
+
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
+.category-card__visualization-type {
+  height: 100%;
+  padding: var(--paper-padding);
+
+  color: var(--secondary-text-color);
+  font-weight: var(--medium-font-weight);
+  cursor: pointer;
+}
+
+.category-card__visualization-type--active {
+  color: var(--base-text-color);
+  border-bottom: 1px solid var(--strong-border-color);
 }
 
 .category-card__build-limit {

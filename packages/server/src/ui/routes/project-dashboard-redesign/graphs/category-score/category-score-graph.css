@@ -28,6 +28,10 @@
   height: 175px;
 }
 
+.category-score-graph--distribution .category-score-graph__score-graph {
+  height: 250px;
+}
+
 .category-score-graph__score-graph .score-line-fill.score--pass {
   fill: var(--pass-color);
 }
@@ -96,10 +100,35 @@
   stroke: var(--secondary-background-color);
 }
 
-.category-score-graph__date-range {
+.category-score-graph__x-axis {
+  position: relative;
+  height: calc(var(--subtext-font-size) * 1.5);
+
   display: flex;
   flex-direction: row;
 
   color: var(--secondary-text-color);
   font-size: var(--subtext-font-size);
+}
+
+.category-score-graph--distribution .category-score-graph__x-axis div {
+  position: absolute;
+
+  font-weight: var(--medium-font-weight);
+}
+
+.category-score-graph--distribution .category-score-graph__x-axis div div {
+  transform: translate(-50%);
+}
+
+.histogram-bar--pass {
+  fill: var(--pass-color);
+}
+
+.histogram-bar--average {
+  fill: var(--average-color);
+}
+
+.histogram-bar--fail {
+  fill: var(--fail-color);
 }

@@ -6,11 +6,11 @@
 
 import {h} from 'preact';
 import {action} from '@storybook/addon-actions';
-import {CategoryScoreGraph} from './category-score-graph';
+import {CategoryScoreTimelineGraph} from './category-score-graph';
 
 export default {
   title: 'Project Dashboard/Category Score Graph',
-  component: CategoryScoreGraph,
+  component: CategoryScoreTimelineGraph,
   parameters: {dimensions: 'auto', padding: 10},
 };
 
@@ -94,12 +94,16 @@ const Wrapper = ({children}) => (
 
 export const Default = () => (
   <Wrapper>
-    <CategoryScoreGraph {...defaultProps} />
+    <CategoryScoreTimelineGraph {...defaultProps} />
   </Wrapper>
 );
 
 export const DefaultWithHoverCard = () => (
   <Wrapper>
-    <CategoryScoreGraph {...defaultProps} selectedBuildId={statistics[28].buildId} pinned={true} />
+    <CategoryScoreTimelineGraph
+      {...defaultProps}
+      selectedBuildId={statistics[28].buildId}
+      pinned={true}
+    />
   </Wrapper>
 );

@@ -11,7 +11,10 @@ import {AsyncLoader} from '../../components/async-loader';
 import {Paper} from '../../components/paper.jsx';
 
 import './category-card.css';
-import {CategoryScoreGraph} from './graphs/category-score/category-score-graph';
+import {
+  CategoryScoreTimelineGraph,
+  CategoryScoreDistributionGraph,
+} from './graphs/category-score/category-score-graph';
 import clsx from 'clsx';
 import {MetricLineGraph} from './graphs/metric-line-graph';
 import {DonutGraph, DonutGraphLegend} from './graphs/donut-graph';
@@ -22,7 +25,7 @@ import {ScoreIcon} from '../../components/score-icon';
 /** @typedef {import('./project-category-summaries.jsx').StatisticWithBuild} StatisticWithBuild */
 /** @typedef {import('../../hooks/use-api-data').LoadingState} LoadingState */
 /** @typedef {{category: LH.CategoryResult, categoryGroups: LH.Result['categoryGroups'], statistics?: Array<StatisticWithBuild>, loadingState: import('../../components/async-loader').LoadingState, builds: LHCI.ServerCommand.Build[], buildLimit: number, setBuildLimit: (n: number) => void, lhr: LH.Result, url: string}} Props */
-/** @typedef {Props & {statistics: Array<StatisticWithBuild>, latestBuild: LHCI.ServerCommand.Build|undefined, selectedBuildId: string|undefined, setSelectedBuildId: import('preact/hooks/src').StateUpdater<string|undefined>, pinned: boolean, setPinned: import('preact/hooks/src').StateUpdater<boolean>}} PropsWithState */
+/** @typedef {Props & {statistics: Array<StatisticWithBuild>, latestBuild: LHCI.ServerCommand.Build|undefined, selectedBuildId: string|undefined, setSelectedBuildId: import('preact/hooks/src').StateUpdater<string|undefined>, pinned: boolean, setPinned: import('preact/hooks/src').StateUpdater<boolean>, visualizationType: 'timeline'|'distribution'}} PropsWithState */
 /** @typedef {{id: string, title?: string, pass: number, fail: number, na: number}} AuditGroupCounts */
 /** @typedef {PropsWithState & {groupId: string, variant: 'pass'|'fail'}} PropsForHoverCard */
 
@@ -261,6 +264,9 @@ export const CategoryCard = props => {
   const [selectedBuildId, setSelectedBuildId] = useState(
     /** @type {undefined|string} */ (undefined)
   );
+  const [visualizationType, setVisualizationType] = useState(
+    /** @type {'timeline'|'distribution'} */ ('timeline')
+  );
 
   const categoryId = props.category.id;
   const id = `category-card__body--${categoryId}`;
@@ -286,6 +292,24 @@ export const CategoryCard = props => {
     <Paper className="category-card">
       <div className="category-card__header">
         <h3 className="category-card__title">{props.category.title}</h3>
+        <div className="category-card__visualization-types">
+          <div
+            className={clsx('category-card__visualization-type', {
+              'category-card__visualization-type--active': visualizationType === 'timeline',
+            })}
+            onClick={() => setVisualizationType('timeline')}
+          >
+            Timeline
+          </div>
+          <div
+            className={clsx('category-card__visualization-type', {
+              'category-card__visualization-type--active': visualizationType === 'distribution',
+            })}
+            onClick={() => setVisualizationType('distribution')}
+          >
+            Distribution
+          </div>
+        </div>
         <div className="category-card__build-limit">
           {BUILD_LIMIT_OPTIONS.map(option => (
             <span
@@ -315,13 +339,18 @@ export const CategoryCard = props => {
               setSelectedBuildId,
               pinned,
               setPinned,
+              visualizationType,
             };
 
             if (!statistics.length) return <span>No data available</span>;
 
             return (
               <Fragment>
-                <CategoryScoreGraph {...propsWithState} />
+                {visualizationType === 'timeline' ? (
+                  <CategoryScoreTimelineGraph {...propsWithState} />
+                ) : (
+                  <CategoryScoreDistributionGraph {...propsWithState} />
+                )}
                 <CategoryDetails {...propsWithState} />
               </Fragment>
             );

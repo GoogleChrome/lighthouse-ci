@@ -78,7 +78,7 @@ function renderLineGraph(rootEl, data) {
     .range([graphHeight, 0]);
   const yAxis = d3
     .axisRight(yScale)
-    .ticks(Math.min(yMaxSeconds, 10))
+    .ticks(Math.min(yMaxSeconds, 6))
     .tickFormat(d => d3.format('.0f')(d) + 's')
     .tickSize(0);
   /** @type {() => import('d3').Line<StatisticWithBuild>} */

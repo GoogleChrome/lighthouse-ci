@@ -12,6 +12,7 @@ import clsx from 'clsx';
 import {Gauge} from '../../../../components/gauge';
 import {ScoreDeltaBadge} from '../../../../components/score-delta-badge';
 import {D3Graph} from '../../../../components/d3-graph';
+import {renderScoreDistributionGraph} from './score-distribution-graph';
 import {renderScoreGraph, updateScoreGraph} from './score-line-graph';
 import {renderScoreDeltaGraph} from './score-delta-bar-graph';
 import {HoverCard} from '../hover-card';
@@ -53,7 +54,7 @@ const HoverCardWithDiff = props => {
 };
 
 /** @param {{category: LH.CategoryResult, statistics: Array<StatisticWithBuild>, selectedBuildId: string|undefined, setSelectedBuildId: import('preact/hooks/src').StateUpdater<string|undefined>, pinned: boolean, setPinned: import('preact/hooks/src').StateUpdater<boolean>}} props */
-export const CategoryScoreGraph = props => {
+export const CategoryScoreTimelineGraph = props => {
   const {selectedBuildId, setSelectedBuildId, pinned, setPinned} = props;
 
   const categoryId = props.category.id;
@@ -90,13 +91,49 @@ export const CategoryScoreGraph = props => {
         selectedBuildId={selectedBuildId}
         averageStatistics={averageStats}
       />
-      <div className="category-score-graph__date-range">
+      <div className="category-score-graph__x-axis">
         <div style={{marginLeft: GRAPH_MARGIN.left}}>
           {new Date(averageStats[0].createdAt || '').toLocaleDateString()}
         </div>
         <div style={{flexGrow: 1}} />
         <div style={{marginRight: GRAPH_MARGIN.right}}>
           {new Date(averageStats[averageStats.length - 1].createdAt || '').toLocaleDateString()}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+/** @param {{category: LH.CategoryResult, statistics: Array<StatisticWithBuild>, selectedBuildId: string|undefined, setSelectedBuildId: import('preact/hooks/src').StateUpdater<string|undefined>, pinned: boolean, setPinned: import('preact/hooks/src').StateUpdater<boolean>}} props */
+export const CategoryScoreDistributionGraph = props => {
+  const categoryId = props.category.id;
+  const allStats = props.statistics.filter(s => s.name.startsWith(`category_${categoryId}`));
+
+  if (!allStats.length) return <span>No data available</span>;
+
+  return (
+    <div
+      className={clsx(
+        'category-score-graph',
+        'category-score-graph--distribution',
+        'graph-root-el'
+      )}
+    >
+      <h2>Overview</h2>
+      <D3Graph
+        className="category-score-graph__score-graph"
+        data={{
+          statistics: allStats,
+        }}
+        render={renderScoreDistributionGraph}
+        computeRerenderKey={data => computeStatisticRerenderKey(data.statistics)}
+      />
+      <div className="category-score-graph__x-axis">
+        <div style={{top: 0, bottom: 0, left: GRAPH_MARGIN.left, right: GRAPH_MARGIN.right}}>
+          <div style={{left: '0%', transform: 'initial'}}>0</div>
+          <div style={{left: '50%'}}>50</div>
+          <div style={{left: '90%'}}>90</div>
+          <div style={{right: 0, transform: 'initial'}}>100</div>
         </div>
       </div>
     </div>

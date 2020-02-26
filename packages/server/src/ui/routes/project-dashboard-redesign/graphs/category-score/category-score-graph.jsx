@@ -5,6 +5,8 @@
  */
 
 import {h, Fragment} from 'preact';
+import {useState} from 'preact/hooks';
+import * as d3 from 'd3';
 import * as _ from '@lhci/utils/src/lodash.js';
 
 import './category-score-graph.css';
@@ -48,6 +50,37 @@ const HoverCardWithDiff = props => {
 
   return (
     <HoverCard url={(stat && stat.url) || ''} build={stat && stat.build} pinned={props.pinned}>
+      {children}
+    </HoverCard>
+  );
+};
+
+/** @param {{selectedBinIndex: number, binnedStatistics: Array<import('d3').Bin<StatisticWithBuild, number>>, pinned: boolean}} props */
+const HoverCardWithDistribution = props => {
+  const {selectedBinIndex, binnedStatistics: bins} = props;
+  const bin = selectedBinIndex !== -1 ? bins[selectedBinIndex] : undefined;
+  const statWithBuild = bin && bin[0];
+
+  let children = <Fragment />;
+  if (bin) {
+    children = (
+      <Fragment>
+        {bin.map(stat => (
+          <div className="distribution-example" key={stat.id}>
+            <span>{Math.round(stat.value * 100)}</span> {stat.build.commitMessage}
+          </div>
+        ))}
+      </Fragment>
+    );
+  }
+
+  return (
+    <HoverCard
+      url={(statWithBuild && statWithBuild.url) || ''}
+      build={statWithBuild && statWithBuild.build}
+      pinned={props.pinned}
+      hideActions
+    >
       {children}
     </HoverCard>
   );
@@ -104,12 +137,20 @@ export const CategoryScoreTimelineGraph = props => {
   );
 };
 
-/** @param {{category: LH.CategoryResult, statistics: Array<StatisticWithBuild>, selectedBuildId: string|undefined, setSelectedBuildId: import('preact/hooks/src').StateUpdater<string|undefined>, pinned: boolean, setPinned: import('preact/hooks/src').StateUpdater<boolean>}} props */
+/** @param {{category: LH.CategoryResult, statistics: Array<StatisticWithBuild>, pinned: boolean, setPinned: import('preact/hooks/src').StateUpdater<boolean>}} props */
 export const CategoryScoreDistributionGraph = props => {
+  const [selectedBinIndex, setSelectedBinIndex] = useState(-1);
   const categoryId = props.category.id;
-  const allStats = props.statistics.filter(s => s.name.startsWith(`category_${categoryId}`));
+  const statistics = props.statistics.filter(s => s.name.startsWith(`category_${categoryId}`));
 
-  if (!allStats.length) return <span>No data available</span>;
+  if (!statistics.length) return <span>No data available</span>;
+
+  /** @type {() => import('d3').HistogramGeneratorNumber<StatisticWithBuild, number>} */
+  const statisticHistogram = d3.histogram;
+  const binnedStatistics = statisticHistogram()
+    .domain([0, 1])
+    .value(stat => stat.value)
+    .thresholds(50)(statistics);
 
   return (
     <div
@@ -123,10 +164,19 @@ export const CategoryScoreDistributionGraph = props => {
       <D3Graph
         className="category-score-graph__score-graph"
         data={{
-          statistics: allStats,
+          statistics,
+          binnedStatistics,
+          selectedBinIndex: selectedBinIndex,
+          setSelectedBinIndex: setSelectedBinIndex,
+          setPinned: props.setPinned,
         }}
         render={renderScoreDistributionGraph}
         computeRerenderKey={data => computeStatisticRerenderKey(data.statistics)}
+      />
+      <HoverCardWithDistribution
+        pinned={props.pinned}
+        selectedBinIndex={selectedBinIndex}
+        binnedStatistics={binnedStatistics}
       />
       <div className="category-score-graph__x-axis">
         <div style={{top: 0, bottom: 0, left: GRAPH_MARGIN.left, right: GRAPH_MARGIN.right}}>

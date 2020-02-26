@@ -8,14 +8,19 @@ import clsx from 'clsx';
 import * as d3 from 'd3';
 import * as _ from '@lhci/utils/src/lodash.js';
 
-import {createRootSvg} from '../../../../components/d3-graph';
+import {createRootSvg, findRootSvg} from '../../../../components/d3-graph';
 import {GRAPH_MARGIN} from './category-score-graph';
+import {updateGraphHoverElements, appendHoverCardHitboxElements} from '../graph-utils';
 
 /** @typedef {import('../../project-category-summaries.jsx').StatisticWithBuild} StatisticWithBuild */
 
 /**
  * @typedef ScoreGraphData
  * @prop {Array<StatisticWithBuild>} statistics
+ * @prop {Array<import('d3').Bin<StatisticWithBuild, number>>} binnedStatistics
+ * @prop {number} selectedBinIndex
+ * @prop {import('preact/hooks/src').StateUpdater<number>} setSelectedBinIndex
+ * @prop {import('preact/hooks/src').StateUpdater<boolean>} setPinned
  */
 
 /**
@@ -23,25 +28,22 @@ import {GRAPH_MARGIN} from './category-score-graph';
  * @param {ScoreGraphData} data
  */
 export function renderScoreDistributionGraph(rootEl, data) {
-  const {statistics} = data;
+  const {binnedStatistics} = data;
 
   const {svg, width, graphWidth, graphHeight} = createRootSvg(rootEl, GRAPH_MARGIN);
-
-  /** @type {() => import('d3').HistogramGeneratorNumber<StatisticWithBuild, number>} */
-  const statisticHistogram = d3.histogram;
-  const binnedStatistics = statisticHistogram()
-    .domain([0, 1])
-    .value(stat => stat.value)
-    .thresholds(50)(statistics);
 
   const xScale = d3
     .scaleLinear()
     .domain([0, 1])
     .range([0, graphWidth]);
+  const xScaleForHover = d3
+    .scaleLinear()
+    .domain([0, binnedStatistics.length])
+    .range([0, graphWidth]);
   const yScale = d3
     .scaleLinear()
     .domain([0, Math.max(...binnedStatistics.map(bin => bin.length))])
-    .range([graphHeight, 0]);
+    .range([graphHeight, 10]);
   const yAxis = d3
     .axisLeft(yScale)
     .ticks(3)
@@ -53,6 +55,16 @@ export function renderScoreDistributionGraph(rootEl, data) {
     .attr('class', 'y-axis')
     .attr('style', `transform: translateX(${width - GRAPH_MARGIN.right / 2}px)`)
     .call(yAxis);
+
+  // The tracking line for the hover/click effects
+  svg
+    .append('line')
+    .attr('class', 'tracking-line')
+    .style('transform', 'translateX(-9999px)')
+    .attr('x1', 0)
+    .attr('y1', 0)
+    .attr('x2', 0)
+    .attr('y2', graphHeight);
 
   // The histogram bars
   svg
@@ -71,4 +83,35 @@ export function renderScoreDistributionGraph(rootEl, data) {
     .attr('y', bin => Math.min(yScale(bin.length), yScale(0) - 2))
     .attr('width', ({x0 = 0, x1 = 0}) => xScale(x1) - xScale(x0) - (xScale(x1) - xScale(x0)) / 2)
     .attr('height', bin => Math.max(yScale(0) - yScale(bin.length), 2));
+
+  appendHoverCardHitboxElements(
+    rootEl,
+    GRAPH_MARGIN,
+    binnedStatistics.map(bin => Object.assign(bin, {buildId: bin[0] && bin[0].buildId})),
+    xScaleForHover,
+    bin => data.setSelectedBinIndex(bin ? binnedStatistics.indexOf(bin) : -1),
+    data.setPinned
+  );
+}
+
+/**
+ * @param {HTMLElement} rootEl
+ * @param {ScoreGraphData} data
+ */
+export function updateScoreDistributionGraph(rootEl, data) {
+  const {graphWidth} = findRootSvg(rootEl, GRAPH_MARGIN);
+
+  const xScaleForHover = d3
+    .scaleLinear()
+    .domain([0, data.binnedStatistics.length])
+    .range([0, graphWidth]);
+
+  updateGraphHoverElements(
+    rootEl,
+    graphWidth,
+    GRAPH_MARGIN.left,
+    GRAPH_MARGIN.right,
+    xScaleForHover,
+    data.selectedBinIndex
+  );
 }

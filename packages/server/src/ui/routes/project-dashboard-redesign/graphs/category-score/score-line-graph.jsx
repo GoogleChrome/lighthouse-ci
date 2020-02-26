@@ -189,7 +189,7 @@ export function renderScoreGraph(rootEl, data) {
     GRAPH_MARGIN,
     statistics,
     xScale,
-    setSelectedBuildId,
+    stat => data.setSelectedBuildId(stat && stat.buildId),
     setPinned
   );
 }

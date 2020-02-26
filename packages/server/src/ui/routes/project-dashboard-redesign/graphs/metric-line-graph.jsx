@@ -156,7 +156,7 @@ function renderLineGraph(rootEl, data) {
     GRAPH_MARGIN,
     metrics[0].statistics,
     xScale,
-    data.setSelectedBuildId,
+    stat => data.setSelectedBuildId(stat && stat.buildId),
     data.setPinned
   );
 

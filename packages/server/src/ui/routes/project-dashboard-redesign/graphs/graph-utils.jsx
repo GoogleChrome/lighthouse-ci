@@ -26,19 +26,20 @@ export function computeStatisticRerenderKey(statistics) {
 }
 
 /**
+ * @template T
  * @param {HTMLElement} rootEl
  * @param {{top: number, left: number, right: number, bottom: number}} margin
- * @param {Array<StatisticWithBuild>} statistics
+ * @param {Array<T>} dataItems
  * @param {(n: number) => number} xScale
- * @param {import('preact/hooks/src').StateUpdater<string|undefined>} setSelectedBuildId
+ * @param {(item: T | undefined) => void} setSelectedId
  * @param {import('preact/hooks/src').StateUpdater<boolean>} setPinned
  */
 export function appendHoverCardHitboxElements(
   rootEl,
   margin,
-  statistics,
+  dataItems,
   xScale,
-  setSelectedBuildId,
+  setSelectedId,
   setPinned
 ) {
   const {svg, graphWidth, graphHeight} = findRootSvg(rootEl, margin);
@@ -47,17 +48,23 @@ export function appendHoverCardHitboxElements(
   if (!(categoryCardEl instanceof HTMLElement)) throw new Error('Missing category-card');
   if (!(graphRootEl instanceof HTMLElement)) throw new Error('Missing graph-root-el');
 
-  const n = statistics.length - 1;
-  const debouncedClearBuildId = _.debounce(() => setSelectedBuildId(undefined), 250);
+  const isDistribution = graphRootEl.classList.contains('category-score-graph--distribution');
+  const n = dataItems.length - 1;
+  const debouncedClearSelection = _.debounce(() => setSelectedId(undefined), 250);
+
+  // Distributions are bar graphs with visual display aligned to xScale bins.
+  // Other graphs are line graphs with visual display aligned to the border of xScale bins.
+  // We need to shift the hitbox of line graphs by -1/2 a bin.
+  const xShift = isDistribution ? 0 : -graphWidth / n / 2;
 
   // The click and mouseover hitboxes
   svg
     .selectAll('.graph-hitbox')
-    .data(statistics)
+    .data(dataItems)
     .enter()
     .append('rect')
     .attr('class', 'graph-hitbox')
-    .attr('x', (d, i) => xScale(i) - graphWidth / n / 2)
+    .attr('x', (d, i) => xScale(i) + xShift)
     .attr('y', 0)
     .attr('width', graphWidth / n)
     .attr('height', graphHeight)
@@ -66,20 +73,20 @@ export function appendHoverCardHitboxElements(
 
       setPinned(current => {
         const next = !current;
-        if (!next) debouncedClearBuildId();
+        if (!next) debouncedClearSelection();
         return next;
       });
     })
     .on('mouseover', (d, i) => {
-      debouncedClearBuildId.cancel();
+      debouncedClearSelection.cancel();
       if (graphRootEl.querySelector('.hover-card--pinned')) return;
       // Set the selected build
-      setSelectedBuildId(d.buildId);
+      setSelectedId(d);
       updateGraphHoverElements(rootEl, graphWidth, margin.left, margin.right, xScale, i);
     })
     .on('mouseout', () => {
       if (graphRootEl.querySelector('.hover-card--pinned')) return;
-      debouncedClearBuildId();
+      debouncedClearSelection();
     });
 }
 
@@ -101,11 +108,15 @@ export function updateGraphHoverElements(
 ) {
   const graphRootEl = rootEl.closest('.graph-root-el');
   if (!(graphRootEl instanceof HTMLElement)) throw new Error('Missing graph-root-el');
+  const isDistribution = graphRootEl.classList.contains('category-score-graph--distribution');
 
   // Update the position of the tracking line
   const trackingLineEl = graphRootEl.querySelector('.tracking-line');
   if (trackingLineEl instanceof SVGElement) {
-    const translateX = selectedIndex === -1 ? -9999 : xScale(selectedIndex);
+    // Tracking line should go through the dot of line graphs but through the *center* of bar graphs
+    const visualCueLeft = selectedIndex === -1 ? -9999 : xScale(selectedIndex);
+    const hitboxWidth = xScale(1) - xScale(0);
+    const translateX = isDistribution ? visualCueLeft + hitboxWidth / 2 : visualCueLeft;
     trackingLineEl.setAttribute('style', `transform: translateX(${translateX}px)`);
   }
 

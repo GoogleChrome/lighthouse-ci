@@ -28,6 +28,7 @@ jobs:
       os: windows
       before_install:
         - export LHCI_GITHUB_TOKEN="" # prevent any accidental leaking of the token
+        - export LHCI_GITHUB_APP_TOKEN="" # prevent any accidental leaking of the token
         - choco install googlechrome --ignore-checksums
       before_script:
         - ps -W | sort

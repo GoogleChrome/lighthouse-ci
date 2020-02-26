@@ -11,10 +11,10 @@ import {HOVER_CARD_MARGIN, HOVER_CARD_WIDTH} from './hover-card.jsx';
 /** @typedef {import('../project-category-summaries.jsx').StatisticWithBuild} StatisticWithBuild */
 
 /** @param {Pick<StatisticWithBuild, 'value'>} statistic */
-export function getClassNameFromStatistic(statistic) {
-  if (statistic.value >= 0.9) return 'score--pass';
-  if (statistic.value < 0.5) return 'score--fail';
-  return 'score--average';
+export function getClassNameFromStatistic(statistic, prefix = 'score') {
+  if (statistic.value >= 0.9) return `${prefix}--pass`;
+  if (statistic.value < 0.5) return `${prefix}--fail`;
+  return `${prefix}--average`;
 }
 
 /** @param {Array<StatisticWithBuild>} statistics */

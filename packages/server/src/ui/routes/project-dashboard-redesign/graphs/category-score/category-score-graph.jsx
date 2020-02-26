@@ -18,7 +18,7 @@ import {renderScoreDistributionGraph} from './score-distribution-graph';
 import {renderScoreGraph, updateScoreGraph} from './score-line-graph';
 import {renderScoreDeltaGraph} from './score-delta-bar-graph';
 import {HoverCard} from '../hover-card';
-import {computeStatisticRerenderKey} from '../graph-utils';
+import {computeStatisticRerenderKey, getClassNameFromStatistic} from '../graph-utils';
 
 export const GRAPH_MARGIN = {top: 10, right: 50, bottom: 10, left: 10};
 
@@ -62,14 +62,25 @@ const HoverCardWithDistribution = props => {
   const statWithBuild = bin && bin[0];
 
   let children = <Fragment />;
-  if (bin) {
+  if (bin && bin.length) {
+    const uniqueBuilds = _.uniqBy(bin, stat => stat.buildId);
+    const ellipsisChild =
+      uniqueBuilds.length > 5 ? (
+        <div className="distribution-example">
+          <span>...</span>
+        </div>
+      ) : null;
     children = (
       <Fragment>
-        {bin.map(stat => (
+        {uniqueBuilds.slice(0, 5).map(stat => (
           <div className="distribution-example" key={stat.id}>
-            <span>{Math.round(stat.value * 100)}</span> {stat.build.commitMessage}
+            <span className={getClassNameFromStatistic(stat, 'text')}>
+              {Math.round(stat.value * 100)}
+            </span>
+            {stat.build.commitMessage}
           </div>
         ))}
+        {ellipsisChild}
       </Fragment>
     );
   }

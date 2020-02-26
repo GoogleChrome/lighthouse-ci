@@ -10,7 +10,11 @@ import * as _ from '@lhci/utils/src/lodash.js';
 
 import {createRootSvg, findRootSvg} from '../../../../components/d3-graph';
 import {GRAPH_MARGIN} from './category-score-graph';
-import {updateGraphHoverElements, appendHoverCardHitboxElements} from '../graph-utils';
+import {
+  updateGraphHoverElements,
+  appendHoverCardHitboxElements,
+  getClassNameFromStatistic,
+} from '../graph-utils';
 
 /** @typedef {import('../../project-category-summaries.jsx').StatisticWithBuild} StatisticWithBuild */
 
@@ -72,12 +76,8 @@ export function renderScoreDistributionGraph(rootEl, data) {
     .data(binnedStatistics)
     .enter()
     .append('rect')
-    .attr('class', ({x0 = 0, x1 = 0}) =>
-      clsx('histogram-bar', {
-        'histogram-bar--pass': x0 >= 0.9,
-        'histogram-bar--average': x0 < 0.9 && x1 > 0.5,
-        'histogram-bar--fail': x1 <= 0.5,
-      })
+    .attr('class', ({x0 = 0}) =>
+      clsx('histogram-bar', getClassNameFromStatistic({value: x0}, 'histogram-bar'))
     )
     .attr('x', ({x0 = 0, x1 = 0}) => xScale(x0) + (xScale(x1) - xScale(x0)) / 4)
     .attr('y', bin => Math.min(yScale(bin.length), yScale(0) - 2))

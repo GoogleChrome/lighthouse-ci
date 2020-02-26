@@ -142,6 +142,16 @@ function getUrlLabelForGithub(rawUrl, options) {
 }
 
 /**
+ *
+ * @param {string} urlLabel
+ * @param {LHCI.UploadCommand.Options} options
+ */
+function getGitHubContext(urlLabel, options) {
+  const prefix = options.githubAppToken ? 'lhci-app' : 'lhci';
+  return `${prefix}/url${urlLabel}`;
+}
+
+/**
  * @param {LHCI.UploadCommand.Options} options
  * @param {Map<string, string>} targetUrlMap
  * @return {Promise<void>}
@@ -169,7 +179,7 @@ async function runGithubStatusCheck(options, targetUrlMap) {
       const failedResults = group.filter(result => result.level === 'error');
       const warnResults = group.filter(result => result.level === 'warn');
       const state = failedResults.length ? 'failure' : 'success';
-      const context = `lhci/url${urlLabel}`;
+      const context = getGitHubContext(urlLabel, options);
       const warningsLabel = warnResults.length ? ` with ${warnResults.length} warning(s)` : '';
       const description = failedResults.length
         ? `Failed ${failedResults.length} assertion(s)`
@@ -200,7 +210,7 @@ async function runGithubStatusCheck(options, targetUrlMap) {
       const rawUrl = lhr.finalUrl;
       const urlLabel = getUrlLabelForGithub(rawUrl, options);
       const state = 'success';
-      const context = `lhci/url${urlLabel}`;
+      const context = getGitHubContext(urlLabel, options);
       const categoriesDescription = Object.values(lhr.categories)
         .map(category => `${category.title}: ${Math.round(category.score * 100)}`)
         .join(', ');

@@ -10,6 +10,15 @@ import {HOVER_CARD_MARGIN, HOVER_CARD_WIDTH} from './hover-card.jsx';
 
 /** @typedef {import('../project-category-summaries.jsx').StatisticWithBuild} StatisticWithBuild */
 
+/**
+ * @param {[number, number]} domain
+ * @param {number} count
+ * @return {number[]}
+ */
+export function getExactTicks(domain, count) {
+  return _.range(domain[0], domain[1], (domain[1] - domain[0]) / count);
+}
+
 /** @param {Pick<StatisticWithBuild, 'value'>} statistic */
 export function getClassNameFromStatistic(statistic, prefix = 'score') {
   if (statistic.value >= 0.9) return `${prefix}--pass`;

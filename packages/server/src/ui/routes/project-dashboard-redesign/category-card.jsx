@@ -21,6 +21,7 @@ import {DonutGraph, DonutGraphLegend} from './graphs/donut-graph';
 import {useRepresentativeRun, useLhr} from '../../hooks/use-api-data';
 import {HoverCard} from './graphs/hover-card';
 import {ScoreIcon} from '../../components/score-icon';
+import {MetricDistributionGraph} from './graphs/metric-distribution-graph';
 
 /** @typedef {import('./project-category-summaries.jsx').StatisticWithBuild} StatisticWithBuild */
 /** @typedef {import('../../hooks/use-api-data').LoadingState} LoadingState */
@@ -49,64 +50,106 @@ const AUDIT_GROUP_PREFIX_BY_CATEGORY_ID = {
 };
 
 /** @param {PropsWithState} props */
-const PerformanceCategoryDetails = props => {
+const MetricLineGraphs = props => {
   /** @param {LHCI.ServerCommand.Statistic['name']} name */
   const stats = name => props.statistics.filter(s => s.name === name);
 
   return (
+    <Fragment>
+      <MetricLineGraph
+        pinned={props.pinned}
+        setPinned={props.setPinned}
+        selectedBuildId={props.selectedBuildId}
+        setSelectedBuildId={props.setSelectedBuildId}
+        metrics={[
+          {
+            abbreviation: 'FCP',
+            label: 'First Contentful Paint',
+            statistics: stats('audit_first-contentful-paint_average'),
+            scoreLevels: SCORE_LEVEL_METRIC_THRESHOLDS['first-contentful-paint'],
+          },
+          {
+            abbreviation: 'TTI',
+            label: 'Time to Interactive',
+            statistics: stats('audit_interactive_average'),
+            scoreLevels: SCORE_LEVEL_METRIC_THRESHOLDS['interactive'],
+          },
+          {
+            abbreviation: 'SI',
+            label: 'Speed Index',
+            statistics: stats('audit_speed-index_average'),
+            scoreLevels: SCORE_LEVEL_METRIC_THRESHOLDS['speed-index'],
+          },
+        ]}
+      />
+      <MetricLineGraph
+        pinned={props.pinned}
+        setPinned={props.setPinned}
+        selectedBuildId={props.selectedBuildId}
+        setSelectedBuildId={props.setSelectedBuildId}
+        metrics={[
+          {
+            abbreviation: 'FCP',
+            label: 'First Contentful Paint',
+            statistics: stats('audit_first-contentful-paint_average'),
+            scoreLevels: SCORE_LEVEL_METRIC_THRESHOLDS['first-contentful-paint'],
+          },
+          {
+            abbreviation: 'TTI',
+            label: 'Time to Interactive',
+            statistics: stats('audit_interactive_average'),
+            scoreLevels: SCORE_LEVEL_METRIC_THRESHOLDS['interactive'],
+          },
+          {
+            abbreviation: 'SI',
+            label: 'Speed Index',
+            statistics: stats('audit_speed-index_average'),
+            scoreLevels: SCORE_LEVEL_METRIC_THRESHOLDS['speed-index'],
+          },
+        ]}
+      />
+    </Fragment>
+  );
+};
+
+/** @param {PropsWithState} props */
+const MetricDistributionGraphs = props => {
+  /** @param {LHCI.ServerCommand.Statistic['name']} name */
+  const stats = name => props.statistics.filter(s => s.name === name);
+
+  return (
+    <Fragment>
+      <MetricDistributionGraph
+        abbreviation={'FCP'}
+        label={'First Contentful Paint'}
+        statistics={stats('audit_first-contentful-paint_average')}
+        scoreLevels={SCORE_LEVEL_METRIC_THRESHOLDS['first-contentful-paint']}
+      />
+      <MetricDistributionGraph
+        abbreviation={'SI'}
+        label={'Speed Index'}
+        statistics={stats('audit_speed-index_average')}
+        scoreLevels={SCORE_LEVEL_METRIC_THRESHOLDS['speed-index']}
+      />
+      <MetricDistributionGraph
+        abbreviation={'TTI'}
+        label={'Time to Interactive'}
+        statistics={stats('audit_interactive_average')}
+        scoreLevels={SCORE_LEVEL_METRIC_THRESHOLDS['interactive']}
+      />
+    </Fragment>
+  );
+};
+
+/** @param {PropsWithState} props */
+const PerformanceCategoryDetails = props => {
+  return (
     <div className="performance-category-details__graphs">
-      <MetricLineGraph
-        pinned={props.pinned}
-        setPinned={props.setPinned}
-        selectedBuildId={props.selectedBuildId}
-        setSelectedBuildId={props.setSelectedBuildId}
-        metrics={[
-          {
-            abbreviation: 'FCP',
-            label: 'First Contentful Paint',
-            statistics: stats('audit_first-contentful-paint_average'),
-            scoreLevels: SCORE_LEVEL_METRIC_THRESHOLDS['first-contentful-paint'],
-          },
-          {
-            abbreviation: 'TTI',
-            label: 'Time to Interactive',
-            statistics: stats('audit_interactive_average'),
-            scoreLevels: SCORE_LEVEL_METRIC_THRESHOLDS['interactive'],
-          },
-          {
-            abbreviation: 'SI',
-            label: 'Speed Index',
-            statistics: stats('audit_speed-index_average'),
-            scoreLevels: SCORE_LEVEL_METRIC_THRESHOLDS['speed-index'],
-          },
-        ]}
-      />
-      <MetricLineGraph
-        pinned={props.pinned}
-        setPinned={props.setPinned}
-        selectedBuildId={props.selectedBuildId}
-        setSelectedBuildId={props.setSelectedBuildId}
-        metrics={[
-          {
-            abbreviation: 'FCP',
-            label: 'First Contentful Paint',
-            statistics: stats('audit_first-contentful-paint_average'),
-            scoreLevels: SCORE_LEVEL_METRIC_THRESHOLDS['first-contentful-paint'],
-          },
-          {
-            abbreviation: 'TTI',
-            label: 'Time to Interactive',
-            statistics: stats('audit_interactive_average'),
-            scoreLevels: SCORE_LEVEL_METRIC_THRESHOLDS['interactive'],
-          },
-          {
-            abbreviation: 'SI',
-            label: 'Speed Index',
-            statistics: stats('audit_speed-index_average'),
-            scoreLevels: SCORE_LEVEL_METRIC_THRESHOLDS['speed-index'],
-          },
-        ]}
-      />
+      {props.visualizationType === 'timeline' ? (
+        <MetricLineGraphs {...props} />
+      ) : (
+        <MetricDistributionGraphs {...props} />
+      )}
     </div>
   );
 };

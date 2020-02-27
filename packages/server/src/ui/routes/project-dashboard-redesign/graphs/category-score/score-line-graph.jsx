@@ -56,7 +56,7 @@ function buildXScale(graphWidth, data) {
  * @param {ScoreGraphData} data
  */
 export function renderScoreGraph(rootEl, data) {
-  const {statistics, statisticsWithMinMax, setSelectedBuildId, setPinned} = data;
+  const {statistics, statisticsWithMinMax, setPinned} = data;
 
   const {svg, masks, width, graphWidth, graphHeight} = createRootSvg(rootEl, GRAPH_MARGIN);
   const minMaxByBuild = buildMinMaxByBuildId(statisticsWithMinMax);

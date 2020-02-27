@@ -32,6 +32,8 @@
   stroke: var(--neutral-color);
   stroke-linecap: round;
   stroke-width: var(--gauge-stroke-width);
+
+  transition: stroke-dasharray 0.5s;
 }
 
 .gauge-arc__indicator {
@@ -58,6 +60,8 @@
   bottom: 0;
 
   transform-origin: center;
+
+  transition: transform 0.5s;
 }
 
 .gauge--improvement .gauge-arc__indicator {

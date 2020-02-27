@@ -1,0 +1,56 @@
+/**
+ * @license Copyright 2020 Google Inc. All Rights Reserved.
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
+ */
+
+.metric-distribution-graph {
+  position: relative;
+  width: 50%;
+}
+
+#storybook-test-root .metric-distribution-graph {
+  width: 100%;
+}
+
+.metric-distribution-graph__title {
+  padding: var(--paper-padding);
+  padding-bottom: 0;
+
+  color: var(--secondary-text-color);
+}
+
+.metric-distribution-graph__title > span {
+  margin-right: calc(var(--base-spacing) / 2);
+
+  color: var(--base-text-color);
+  font-weight: var(--medium-font-weight);
+}
+
+.metric-distribution-graph__graph {
+  height: 200px;
+  width: 100%;
+}
+
+.metric-distribution-graph .y-axis path {
+  fill: none;
+  stroke: none;
+}
+
+.metric-distribution-graph .y-axis text {
+  font-family: var(--base-font-family);
+  font-weight: var(--medium-font-weight);
+  font-size: var(--subtext-font-size);
+  color: var(--secondary-text-color);
+}
+
+.metric-distribution-graph__x-axis {
+  margin-bottom: var(--base-spacing);
+
+  display: flex;
+  flex-direction: row;
+
+  color: var(--secondary-text-color);
+  font-size: var(--subtext-font-size);
+  font-weight: var(--medium-font-weight);
+}

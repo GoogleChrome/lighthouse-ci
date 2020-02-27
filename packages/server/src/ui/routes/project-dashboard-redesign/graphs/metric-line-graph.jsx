@@ -267,11 +267,11 @@ export const MetricLineGraph = props => {
 
       <div className="metric-line-graph__date-range">
         <div style={{marginLeft: GRAPH_MARGIN.left}}>
-          {new Date(firstStat.createdAt || '').toLocaleDateString()}
+          {new Date(firstStat.build.createdAt || '').toLocaleDateString()}
         </div>
         <div style={{flexGrow: 1}} />
         <div style={{marginRight: GRAPH_MARGIN.right}}>
-          {new Date(lastStat.createdAt || '').toLocaleDateString()}
+          {new Date(lastStat.build.createdAt || '').toLocaleDateString()}
         </div>
       </div>
 

@@ -13,7 +13,7 @@ module.exports = {
    * @param {typeof import('sequelize')} Sequelize
    * @param {LHCI.ServerCommand.StorageOptions} options
    */
-  up: async (queryInterface, Sequelize) => {
+  up: async (queryInterface, Sequelize, options) => {
     await queryInterface.createTable('projects', {
       id: {type: Sequelize.UUID(), primaryKey: true},
       name: {type: Sequelize.STRING(40)},
@@ -42,7 +42,7 @@ module.exports = {
       buildId: {type: Sequelize.UUID()},
       representative: {type: Sequelize.BOOLEAN},
       url: {type: Sequelize.STRING({length: 256})},
-      lhr: {type: Sequelize.TEXT},
+      lhr: {type: options.sqlDialect === 'sqlite' ? Sequelize.TEXT : Sequelize.TEXT('long')},
       createdAt: {type: Sequelize.DATE(6)},
       updatedAt: {type: Sequelize.DATE(6)},
     });

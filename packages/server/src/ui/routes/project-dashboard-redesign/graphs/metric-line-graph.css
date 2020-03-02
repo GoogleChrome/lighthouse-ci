@@ -108,11 +108,6 @@
   color: var(--base-text-color);
 }
 
-.metric-line-graph .tracking-line {
-  stroke: var(--base-border-color);
-  stroke-width: 1px;
-}
-
 .metric-line-graph:first-child .hover-card {
   left: 100% !important;
 }

@@ -20,9 +20,14 @@ export function getExactTicks(domain, count) {
 }
 
 /** @param {Pick<StatisticWithBuild, 'value'>} statistic */
-export function getClassNameFromStatistic(statistic, prefix = 'score') {
-  if (statistic.value >= 0.9) return `${prefix}--pass`;
-  if (statistic.value < 0.5) return `${prefix}--fail`;
+export function getClassNameFromStatistic(
+  statistic,
+  prefix = 'score',
+  passThreshold = 0.9,
+  failThreshold = 0.5
+) {
+  if (statistic.value >= passThreshold) return `${prefix}--pass`;
+  if (statistic.value < failThreshold) return `${prefix}--fail`;
   return `${prefix}--average`;
 }
 
@@ -57,7 +62,9 @@ export function appendHoverCardHitboxElements(
   if (!(categoryCardEl instanceof HTMLElement)) throw new Error('Missing category-card');
   if (!(graphRootEl instanceof HTMLElement)) throw new Error('Missing graph-root-el');
 
-  const isDistribution = graphRootEl.classList.contains('category-score-graph--distribution');
+  const isDistribution =
+    graphRootEl.classList.contains('category-score-graph--distribution') ||
+    graphRootEl.classList.contains('metric-distribution-graph');
   const n = dataItems.length - 1;
   const debouncedClearSelection = _.debounce(() => setSelectedId(undefined), 250);
 
@@ -117,7 +124,9 @@ export function updateGraphHoverElements(
 ) {
   const graphRootEl = rootEl.closest('.graph-root-el');
   if (!(graphRootEl instanceof HTMLElement)) throw new Error('Missing graph-root-el');
-  const isDistribution = graphRootEl.classList.contains('category-score-graph--distribution');
+  const isDistribution =
+    graphRootEl.classList.contains('category-score-graph--distribution') ||
+    graphRootEl.classList.contains('metric-distribution-graph');
 
   // Update the position of the tracking line
   const trackingLineEl = graphRootEl.querySelector('.tracking-line');

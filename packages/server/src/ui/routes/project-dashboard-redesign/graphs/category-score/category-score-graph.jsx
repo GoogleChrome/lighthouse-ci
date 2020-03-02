@@ -14,7 +14,10 @@ import clsx from 'clsx';
 import {Gauge} from '../../../../components/gauge';
 import {ScoreDeltaBadge} from '../../../../components/score-delta-badge';
 import {D3Graph} from '../../../../components/d3-graph';
-import {renderScoreDistributionGraph} from './score-distribution-graph';
+import {
+  renderScoreDistributionGraph,
+  updateScoreDistributionGraph,
+} from './score-distribution-graph';
 import {renderScoreGraph, updateScoreGraph} from './score-line-graph';
 import {renderScoreDeltaGraph} from './score-delta-bar-graph';
 import {HoverCard} from '../hover-card';
@@ -193,6 +196,8 @@ export const CategoryScoreDistributionGraph = props => {
         }}
         render={renderScoreDistributionGraph}
         computeRerenderKey={data => computeStatisticRerenderKey(data.statistics)}
+        update={updateScoreDistributionGraph}
+        computeUpdateKey={data => data.selectedBinIndex.toString()}
       />
       <HoverCardWithDistribution
         pinned={props.pinned}

@@ -9,6 +9,7 @@ import {useState} from 'preact/hooks';
 import * as d3 from 'd3';
 import * as _ from '@lhci/utils/src/lodash.js';
 
+import '../../category-card.css';
 import './category-score-graph.css';
 import clsx from 'clsx';
 import {Gauge} from '../../../../components/gauge';

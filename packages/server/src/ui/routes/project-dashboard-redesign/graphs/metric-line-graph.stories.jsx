@@ -31,6 +31,8 @@ const createBuild = id => ({
   hash: '',
   branch: 'master',
   runAt: runAt(id),
+  createdAt: runAt(id),
+  updatedAt: runAt(id),
 });
 
 /** @param {{id: number, value: number}} props @return {import('./metric-line-graph').StatisticWithBuild} */

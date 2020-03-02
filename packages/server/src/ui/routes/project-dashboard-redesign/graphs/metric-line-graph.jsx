@@ -15,6 +15,7 @@ import {
   appendHoverCardHitboxElements,
 } from './graph-utils';
 
+import '../category-card.css';
 import './metric-line-graph.css';
 import {HoverCard} from './hover-card';
 import {useState} from 'preact/hooks';

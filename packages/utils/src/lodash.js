@@ -283,6 +283,11 @@ module.exports = {
   shortId(uuid) {
     return uuid.replace(/-/g, '').slice(0, 12);
   },
+  /** @param {string} string @param {number} number @param {string} [pluralForm] */
+  pluralize(string, number, pluralForm) {
+    pluralForm = pluralForm || `${string}s`;
+    return number === 1 ? string : pluralForm;
+  },
   uniqueId: (() => {
     let id = 1;
     return () => id++;

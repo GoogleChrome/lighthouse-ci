@@ -33,6 +33,8 @@ const createBuild = id => ({
   hash: '',
   branch: 'master',
   runAt: runAt(id),
+  createdAt: runAt(id),
+  updatedAt: runAt(id),
 });
 
 /** @param {{id: number, min?: number, max?: number, avg: number}} props @return {Array<import('./category-score-graph').StatisticWithBuild>} */

@@ -7,6 +7,7 @@
     "clean": "lerna exec --parallel 'rm -rf ./dist'",
     "ci:dogfood": "./scripts/ci-dogfood.sh",
     "build": "lerna run --scope @lhci/server --scope @lhci/viewer build",
+    "build:storybook": "lerna run --scope @lhci/server build:storybook",
     "build:watch": "lerna run --scope @lhci/server build:watch --stream",
     "build:source-map-explorer": "lerna run --scope @lhci/server build:source-map-explorer",
     "start": "./packages/cli/src/cli.js",

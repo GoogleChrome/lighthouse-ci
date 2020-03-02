@@ -70,11 +70,6 @@
   stroke: none;
 }
 
-.category-score-graph__score-graph .tracking-line {
-  stroke: var(--base-border-color);
-  stroke-width: 1px;
-}
-
 .category-score-graph__score-graph .y-axis text {
   font-family: var(--base-font-family);
   font-weight: var(--medium-font-weight);
@@ -131,31 +126,4 @@
 
 .histogram-bar--fail {
   fill: var(--fail-color);
-}
-
-.distribution-summary,
-.distribution-example {
-  width: 100%;
-  padding: calc(var(--base-spacing) / 2) var(--base-spacing);
-
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  font-weight: var(--medium-font-weight);
-}
-
-.distribution-summary > span {
-  color: var(--secondary-text-color);
-  font-weight: var(--base-font-weight);
-}
-
-.distribution-example:last-child {
-  padding-bottom: var(--base-spacing);
-}
-
-.distribution-example span {
-  margin-right: calc(var(--base-spacing) / 2);
-
-  font-family: var(--monospace-font-family);
-  font-size: var(--monospace-font-size);
 }

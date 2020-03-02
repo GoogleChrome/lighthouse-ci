@@ -133,6 +133,7 @@
   fill: var(--fail-color);
 }
 
+.distribution-summary,
 .distribution-example {
   width: 100%;
   padding: calc(var(--base-spacing) / 2) var(--base-spacing);
@@ -141,6 +142,11 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   font-weight: var(--medium-font-weight);
+}
+
+.distribution-summary > span {
+  color: var(--secondary-text-color);
+  font-weight: var(--base-font-weight);
 }
 
 .distribution-example:last-child {

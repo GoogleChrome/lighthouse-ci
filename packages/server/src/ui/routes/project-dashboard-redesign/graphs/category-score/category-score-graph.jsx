@@ -63,16 +63,23 @@ const HoverCardWithDistribution = props => {
 
   let children = <Fragment />;
   if (bin && bin.length) {
-    const uniqueBuilds = _.uniqBy(bin, stat => stat.buildId);
+    const {x0 = 0, x1 = 0} = bin;
     const ellipsisChild =
-      uniqueBuilds.length > 5 ? (
+      bin.length > 5 ? (
         <div className="distribution-example">
           <span>...</span>
         </div>
       ) : null;
+
     children = (
       <Fragment>
-        {uniqueBuilds.slice(0, 5).map(stat => (
+        <div className="distribution-summary">
+          <div className="text--smaller text--secondary">
+            {Math.round(x0 * 100)} - {Math.round(x1 * 100)}
+          </div>
+          {bin.length} <span>{_.pluralize('example', bin.length)}</span>
+        </div>
+        {bin.slice(0, 5).map(stat => (
           <div className="distribution-example" key={stat.id}>
             <span className={getClassNameFromStatistic(stat, 'text')}>
               {Math.round(stat.value * 100)}
@@ -90,6 +97,7 @@ const HoverCardWithDistribution = props => {
       url={(statWithBuild && statWithBuild.url) || ''}
       build={statWithBuild && statWithBuild.build}
       pinned={props.pinned}
+      hideBuildDate
       hideActions
     >
       {children}

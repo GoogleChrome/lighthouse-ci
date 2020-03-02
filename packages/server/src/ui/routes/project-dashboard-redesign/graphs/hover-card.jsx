@@ -19,7 +19,7 @@ export const HOVER_CARD_MARGIN = 100;
 /** @param {number} value */
 const padWith0 = value => value.toString().padStart(2, '0');
 
-/** @param {{url: string, build?: LHCI.ServerCommand.Build, children?: LHCI.PreactNode, pinned: boolean, hideActions?: boolean, className?: string}} props */
+/** @param {{url: string, build?: LHCI.ServerCommand.Build, children?: LHCI.PreactNode, pinned: boolean, hideBuildDate?: boolean, hideActions?: boolean, className?: string}} props */
 export const HoverCard = props => {
   const {url, build, children, pinned} = props;
 
@@ -28,12 +28,16 @@ export const HoverCard = props => {
     const runAt = new Date(build.runAt || '');
     contents = (
       <Fragment>
-        <div className="hover-card__datetime">
-          <span className="hover-card__date">{runAt.toLocaleDateString()}</span>
-          <span className="hover-card__time">
-            {padWith0(runAt.getHours())}:{padWith0(runAt.getMinutes())}
-          </span>
-        </div>
+        {props.hideBuildDate ? (
+          <Fragment />
+        ) : (
+          <div className="hover-card__datetime">
+            <span className="hover-card__date">{runAt.toLocaleDateString()}</span>
+            <span className="hover-card__time">
+              {padWith0(runAt.getHours())}:{padWith0(runAt.getMinutes())}
+            </span>
+          </div>
+        )}
         {children}
         {props.hideActions ? (
           <Fragment />

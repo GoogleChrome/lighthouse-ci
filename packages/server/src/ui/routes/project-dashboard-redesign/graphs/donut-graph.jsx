@@ -116,7 +116,7 @@ function renderDonutGraph(rootEl, data) {
  */
 function renderDonutGraphLegendCircle(rootEl, data) {
   const {svg, masks, graphWidth} = createRootSvg(rootEl, LEGEND_CIRCLE_MARGIN);
-  const radius = graphWidth / 2;
+  const radius = Math.max(graphWidth / 2, 1);
 
   const maskId = _.uniqueId();
   renderPatternMasks(masks, maskId.toString());

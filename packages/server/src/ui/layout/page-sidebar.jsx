@@ -32,7 +32,7 @@ export const PageSidebar = props => {
           asyncData={projects}
           render={projects => {
             return (
-              <ul role="navigation">
+              <ul>
                 {projects.map(project => (
                   <li key={project.id}>
                     <Link

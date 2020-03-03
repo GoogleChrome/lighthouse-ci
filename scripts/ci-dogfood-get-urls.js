@@ -23,6 +23,7 @@ async function main() {
     [
       new URL(`/app`, rootURL),
       new URL(`/app/projects/${project.slug}`, rootURL),
+      new URL(`/app/projects/${project.slug}/dashboard`, rootURL),
       new URL(`/app/projects/${project.slug}/compare/${_.shortId(build.id)}`, rootURL),
     ].join('\n')
   );

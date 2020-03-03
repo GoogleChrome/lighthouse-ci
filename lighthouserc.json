@@ -8,13 +8,9 @@
         "uses-rel-preload": "off",
         "uses-responsive-images": "off",
         "uses-rel-preconnect": "off",
-        "font-display": "off",
         "offscreen-images": "off",
 
-        "meta-description": "off",
-        "listitem": "off",
         "label": "off",
-        "html-has-lang": "off",
         "content-width": "off",
         "color-contrast": "off",
         "bypass": "off",

@@ -179,7 +179,6 @@ class StorageMethod {
   }
 
   /**
-   * @protected
    * @param {StrictOmit<LHCI.ServerCommand.Statistic, 'id'>} unsavedStatistic
    * @param {*} [extras]
    * @return {Promise<LHCI.ServerCommand.Statistic>}

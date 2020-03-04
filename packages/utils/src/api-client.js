@@ -273,7 +273,6 @@ class ApiClient {
   }
 
   /**
-   * @protected
    * @param {StrictOmit<LHCI.ServerCommand.Project, 'id'|'token'>} unsavedProject
    * @return {Promise<LHCI.ServerCommand.Project>}
    */
@@ -283,7 +282,6 @@ class ApiClient {
   }
 
   /**
-   * @protected
    * @param {StrictOmit<LHCI.ServerCommand.Statistic, 'id'>} unsavedStatistic
    * @return {Promise<LHCI.ServerCommand.Statistic>}
    */

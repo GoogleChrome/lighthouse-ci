@@ -79,6 +79,6 @@
     "puppeteer": "^1.18.1",
     "rimraf": "^3.0.0",
     "sqlite3": "^4.0.6",
-    "typescript": "^3.5.3"
+    "typescript": "^3.8.3"
   }
 }

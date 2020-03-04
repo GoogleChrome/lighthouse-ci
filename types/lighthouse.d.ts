@@ -78,7 +78,7 @@ declare global {
       timing: {total: number; entries: any[]};
       i18n: {
         rendererFormattedStrings: Record<string, string>;
-        icuMessagePaths: Record<string, string>;
+        icuMessagePaths: Record<string, any[]>;
       };
       stackPacks?: any[];
     }

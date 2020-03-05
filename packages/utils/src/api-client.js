@@ -173,7 +173,7 @@ class ApiClient {
   }
 
   /**
-   * @param {StrictOmit<LHCI.ServerCommand.Project, 'id'|'token'>} unsavedProject
+   * @param {StrictOmit<LHCI.ServerCommand.Project, 'id'|'token'|'adminToken'>} unsavedProject
    * @return {Promise<LHCI.ServerCommand.Project>}
    */
   async createProject(unsavedProject) {
@@ -273,7 +273,7 @@ class ApiClient {
   }
 
   /**
-   * @param {StrictOmit<LHCI.ServerCommand.Project, 'id'|'token'>} unsavedProject
+   * @param {StrictOmit<LHCI.ServerCommand.Project, 'id'|'token'|'adminToken'>} unsavedProject
    * @return {Promise<LHCI.ServerCommand.Project>}
    */
   // eslint-disable-next-line no-unused-vars

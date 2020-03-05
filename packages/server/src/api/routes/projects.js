@@ -20,7 +20,7 @@ function createRouter(context) {
     '/',
     handleAsyncError(async (_, res) => {
       const projects = await context.storageMethod.getProjects();
-      res.json(projects.map(project => ({...project, token: ''})));
+      res.json(projects.map(project => ({...project, token: '', adminToken: ''})));
     })
   );
 
@@ -51,7 +51,7 @@ function createRouter(context) {
     handleAsyncError(async (req, res) => {
       const project = await context.storageMethod.findProjectBySlug(req.params.projectSlug);
       if (!project) return res.sendStatus(404);
-      res.json({...project, token: ''});
+      res.json({...project, token: '', adminToken: ''});
     })
   );
 
@@ -61,7 +61,7 @@ function createRouter(context) {
     handleAsyncError(async (req, res) => {
       const project = await context.storageMethod.findProjectById(req.params.projectId);
       if (!project) return res.sendStatus(404);
-      res.json({...project, token: ''});
+      res.json({...project, token: '', adminToken: ''});
     })
   );
 

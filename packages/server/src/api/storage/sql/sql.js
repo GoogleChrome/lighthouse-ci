@@ -270,7 +270,7 @@ class SqlStorageMethod {
   }
 
   /**
-   * @param {StrictOmit<LHCI.ServerCommand.Project, 'id'|'token'>} unsavedProject
+   * @param {StrictOmit<LHCI.ServerCommand.Project, 'id'|'token'|'adminToken'>} unsavedProject
    * @return {Promise<LHCI.ServerCommand.Project>}
    */
   async createProject(unsavedProject) {
@@ -278,13 +278,18 @@ class SqlStorageMethod {
   }
 
   /**
-   * @param {StrictOmit<LHCI.ServerCommand.Project, 'id'|'token'>} unsavedProject
+   * @param {StrictOmit<LHCI.ServerCommand.Project, 'id'|'token'|'adminToken'>} unsavedProject
    * @return {Promise<LHCI.ServerCommand.Project>}
    */
   async _createProject(unsavedProject) {
     const {projectModel} = this._sql();
     if (unsavedProject.name.length < 4) throw new E422('Project name too short');
-    const project = await projectModel.create({...unsavedProject, token: uuid.v4(), id: uuid.v4()});
+    const project = await projectModel.create({
+      ...unsavedProject,
+      adminToken: StorageMethod.generateAdminToken(),
+      token: uuid.v4(),
+      id: uuid.v4(),
+    });
     return clone(project);
   }
 

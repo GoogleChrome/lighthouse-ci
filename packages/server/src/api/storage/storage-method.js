@@ -13,6 +13,7 @@ const {
   definitions: statisticDefinitions,
   VERSION: STATISTIC_VERSION,
 } = require('../statistic-definitions.js');
+const {E404} = require('../express-utils.js');
 
 class StorageMethod {
   /**
@@ -133,6 +134,16 @@ class StorageMethod {
   /**
    * @param {string} projectId
    * @param {string} buildId
+   * @return {Promise<void>}
+   */
+  // eslint-disable-next-line no-unused-vars
+  async deleteBuild(projectId, buildId) {
+    throw new Error('Unimplemented');
+  }
+
+  /**
+   * @param {string} projectId
+   * @param {string} buildId
    * @param {LHCI.ServerCommand.GetRunsOptions} [options]
    * @return {Promise<LHCI.ServerCommand.Run[]>}
    */
@@ -217,7 +228,7 @@ class StorageMethod {
    */
   static async getOrCreateStatistics(storageMethod, projectId, buildId) {
     const build = await storageMethod.findBuildById(projectId, buildId);
-    if (!build) throw new Error('Cannot create statistics for non-existent build');
+    if (!build) throw new E404('No build with that ID');
     // If the build hasn't been sealed yet then we can't compute statistics for it yet.
     if (build.lifecycle !== 'sealed') return [];
 

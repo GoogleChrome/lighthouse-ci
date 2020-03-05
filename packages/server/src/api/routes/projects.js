@@ -6,7 +6,7 @@
 'use strict';
 
 const express = require('express');
-const {handleAsyncError} = require('../express-utils.js');
+const {handleAsyncError, validateAdminTokenMiddleware} = require('../express-utils.js');
 
 /**
  * @param {{storageMethod: LHCI.ServerCommand.StorageMethod}} context
@@ -103,6 +103,16 @@ function createRouter(context) {
       unsavedBuild.projectId = req.params.projectId;
       const build = await context.storageMethod.createBuild(unsavedBuild);
       res.json(build);
+    })
+  );
+
+  // DELETE /projects/<id>/builds/<id>
+  router.delete(
+    '/:projectId/builds/:buildId',
+    validateAdminTokenMiddleware(context),
+    handleAsyncError(async (req, res) => {
+      await context.storageMethod.deleteBuild(req.params.projectId, req.params.buildId);
+      res.sendStatus(204);
     })
   );
 

@@ -14,12 +14,18 @@ class ApiClient {
    */
   constructor(options) {
     this._rootURL = options.rootURL;
+    /** @type {Record<string, string>} */
     this._extraHeaders = options.extraHeaders || {};
     this._fetch = options.fetch || fetch;
     this._URL = options.URL || URL;
 
     /** @type {LHCI.ServerCommand.StorageMethod} */
     const typecheck = this; // eslint-disable-line no-unused-vars
+  }
+
+  /** @param {string|undefined} token */
+  setAdminToken(token) {
+    this._extraHeaders = {...this._extraHeaders, 'x-lhci-admin-token': token || ''};
   }
 
   /**
@@ -58,7 +64,6 @@ class ApiClient {
       throw error;
     }
 
-    if (response.status === 204) return;
     const json = await response.json();
     return json;
   }
@@ -114,6 +119,19 @@ class ApiClient {
    */
   async _put(url, body) {
     return this._fetchWithRequestBody('PUT', url, body);
+  }
+
+  /**
+   * @param {string} rawUrl
+   * @return {Promise<void>}
+   */
+  async _delete(rawUrl) {
+    const headers = {...this._extraHeaders};
+    const response = await this._fetch(this._normalizeURL(rawUrl).href, {
+      method: 'DELETE',
+      headers,
+    });
+    return this._convertFetchResponseToReturnValue(response);
   }
 
   /**
@@ -213,6 +231,15 @@ class ApiClient {
    */
   async sealBuild(projectId, buildId) {
     return this._put(`/v1/projects/${projectId}/builds/${buildId}/lifecycle`, 'sealed');
+  }
+
+  /**
+   * @param {string} projectId
+   * @param {string} buildId
+   * @return {Promise<void>}
+   */
+  async deleteBuild(projectId, buildId) {
+    return this._delete(`/v1/projects/${projectId}/builds/${buildId}`);
   }
 
   /**

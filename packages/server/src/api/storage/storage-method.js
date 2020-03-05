@@ -38,6 +38,15 @@ class StorageMethod {
   }
 
   /**
+   * @param {string} projectId
+   * @return {Promise<void>}
+   */
+  // eslint-disable-next-line no-unused-vars
+  async deleteProject(projectId) {
+    throw new Error('Unimplemented');
+  }
+
+  /**
    * @param {string} token
    * @return {Promise<LHCI.ServerCommand.Project | undefined>}
    */

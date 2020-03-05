@@ -841,6 +841,20 @@ function runTests(state) {
       const runs = await client.getRuns(buildA.projectId, buildA.id);
       expect(runs).toEqual([]);
     });
+
+    it('should delete a project', async () => {
+      client.setAdminToken(projectA.adminToken);
+      await client.deleteProject(buildA.projectId);
+
+      const project = await client.findProjectById(projectA.id);
+      expect(project).toEqual(undefined);
+
+      const buildsA = await client.getBuilds(projectA.id);
+      expect(buildsA).toEqual([]);
+
+      const buildsB = await client.getBuilds(projectB.id);
+      expect(buildsB).toHaveLength(1);
+    });
   });
 }
 

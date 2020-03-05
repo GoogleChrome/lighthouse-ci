@@ -200,6 +200,14 @@ class ApiClient {
 
   /**
    * @param {string} projectId
+   * @return {Promise<void>}
+   */
+  async deleteProject(projectId) {
+    return this._delete(`/v1/projects/${projectId}`);
+  }
+
+  /**
+   * @param {string} projectId
    * @param {LHCI.ServerCommand.GetBuildsOptions} [options]
    * @return {Promise<LHCI.ServerCommand.Build[]>}
    */

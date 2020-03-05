@@ -801,6 +801,46 @@ function runTests(state) {
         body: '{"message":"Invalid LHR"}',
       });
     });
+
+    // TODO: make this consistent behavior with runs which returns []
+    it('should fail to create statistics on non-existent build', async () => {
+      await expect(client.getStatistics(projectA.id, 'MISSING')).rejects.toMatchObject({
+        status: 404,
+        body: '{"message":"No build with that ID"}',
+      });
+    });
+
+    it('should fail to take privileged actions without a token', async () => {
+      await expect(client.deleteBuild(projectA.id, buildA.id)).rejects.toMatchObject({
+        status: 403,
+        body: '{"message":"Invalid token"}',
+      });
+
+      expect(await client.findBuildById(projectA.id, buildA.id)).toBeDefined();
+    });
+
+    it('should fail to take privileged actions with an invalid token', async () => {
+      client.setAdminToken(projectB.adminToken);
+      await expect(client.deleteBuild(projectA.id, buildA.id)).rejects.toMatchObject({
+        status: 403,
+        body: '{"message":"Invalid token"}',
+      });
+
+      expect(await client.findBuildById(projectA.id, buildA.id)).toBeDefined();
+    });
+  });
+
+  describe('cleanup', () => {
+    it('should delete a build', async () => {
+      client.setAdminToken(projectA.adminToken);
+      await client.deleteBuild(buildA.projectId, buildA.id);
+
+      const build = await client.findBuildById(projectA.id, buildA.id);
+      expect(build).toEqual(undefined);
+
+      const runs = await client.getRuns(buildA.projectId, buildA.id);
+      expect(runs).toEqual([]);
+    });
   });
 }
 

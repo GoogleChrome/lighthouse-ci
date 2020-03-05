@@ -5,9 +5,11 @@
  */
 'use strict';
 
+class E404 extends Error {}
 class E422 extends Error {}
 
 module.exports = {
+  E404,
   E422,
   /**
    * @param {import('express-serve-static-core').RequestHandler} handler
@@ -27,6 +29,28 @@ module.exports = {
     };
   },
   /**
+   * @param {{storageMethod: LHCI.ServerCommand.StorageMethod}} context
+   * @return {import('express-serve-static-core').RequestHandler}
+   */
+  validateAdminTokenMiddleware(context) {
+    return (req, res, next) => {
+      Promise.resolve()
+        .then(async () => {
+          const project = await context.storageMethod.findProjectById(req.params.projectId);
+          if (!project) throw new Error('Invalid token');
+
+          const adminToken = req.header('x-lhci-admin-token');
+          if (adminToken !== project.adminToken) throw new Error('Invalid token');
+
+          next();
+        })
+        .catch(err => {
+          res.status(403);
+          res.send(JSON.stringify({message: err.message}));
+        });
+    };
+  },
+  /**
    * @param {Error} err
    * @param {import('express-serve-static-core').Request} req
    * @param {import('express-serve-static-core').Response} res
@@ -35,6 +59,12 @@ module.exports = {
   errorMiddleware(err, req, res, next) {
     if (err instanceof E422) {
       res.status(422);
+      res.send(JSON.stringify({message: err.message}));
+      return;
+    }
+
+    if (err instanceof E404) {
+      res.status(404);
       res.send(JSON.stringify({message: err.message}));
       return;
     }

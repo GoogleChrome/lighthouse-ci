@@ -384,6 +384,31 @@ class SqlStorageMethod {
   /**
    * @param {string} projectId
    * @param {string} buildId
+   * @return {Promise<void>}
+   */
+  async deleteBuild(projectId, buildId) {
+    const {sequelize, buildModel, runModel, statisticModel} = this._sql();
+    const build = await this._findByPk(buildModel, buildId);
+    if (!build) throw new E422('Invalid build ID');
+    if (build.projectId !== projectId) throw new E422('Invalid project ID');
+
+    const transaction = await sequelize.transaction();
+
+    try {
+      await statisticModel.destroy({where: {projectId, buildId}, transaction});
+      await runModel.destroy({where: {projectId, buildId}, transaction});
+      await buildModel.destroy({where: {id: buildId}, transaction});
+
+      await transaction.commit();
+    } catch (err) {
+      await transaction.rollback();
+      throw err;
+    }
+  }
+
+  /**
+   * @param {string} projectId
+   * @param {string} buildId
    * @return {Promise<LHCI.ServerCommand.Build | undefined>}
    */
   async findBuildById(projectId, buildId) {

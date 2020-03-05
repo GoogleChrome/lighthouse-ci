@@ -54,8 +54,11 @@ async function runNewProjectWizard(options) {
   });
 
   const token = project.token;
+  const adminToken = project.adminToken;
+  const adminWarning = 'to manage data. KEEP THIS SECRET!';
   process.stdout.write(`Created project ${project.name} (${project.id})!\n`);
-  process.stdout.write(`Use token ${log.bold}${token}${log.reset} to connect.\n`);
+  process.stdout.write(`Use token ${log.bold}${token}${log.reset} to add data.\n`);
+  process.stdout.write(`Use admin token ${log.bold}${adminToken}${log.reset} ${adminWarning}\n`);
 }
 
 /**

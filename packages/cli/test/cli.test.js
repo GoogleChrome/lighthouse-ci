@@ -35,6 +35,7 @@ describe('Lighthouse CI CLI', () => {
 
   let server;
   let projectToken;
+  let projectAdminToken;
   let urlToCollect;
 
   afterAll(async () => {
@@ -90,6 +91,7 @@ describe('Lighthouse CI CLI', () => {
         'https://example.com', // External build URL
       ]);
 
+      // Extract the regular token
       expect(wizardProcess.stdoutMemory).toContain('Use token');
       expect(wizardProcess.stderrMemory).toEqual('');
       const tokenSentence = wizardProcess.stdoutMemory
@@ -97,6 +99,15 @@ describe('Lighthouse CI CLI', () => {
         .replace(log.bold, '')
         .replace(log.reset, '');
       projectToken = tokenSentence.match(/Use token ([\w-]+)/)[1];
+
+      // Extract the admin token
+      expect(wizardProcess.stdoutMemory).toContain('Use admintoken');
+      expect(wizardProcess.stderrMemory).toEqual('');
+      const adminSentence = wizardProcess.stdoutMemory
+        .match(/Use admin token [\s\S]+/im)[0]
+        .replace(log.bold, '')
+        .replace(log.reset, '');
+      projectAdminToken = adminSentence.match(/Use admin token (\w+)/)[1];
     }, 30000);
 
     it('should create a new project with config file', async () => {

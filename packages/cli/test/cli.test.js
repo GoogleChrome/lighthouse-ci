@@ -16,6 +16,7 @@ const {spawn} = require('child_process');
 const fetch = require('isomorphic-fetch');
 const log = require('lighthouse-logger');
 const puppeteer = require('puppeteer');
+const ApiClient = require('../../utils/src/api-client.js');
 const {
   startServer,
   cleanStdOutput,
@@ -101,7 +102,7 @@ describe('Lighthouse CI CLI', () => {
       projectToken = tokenSentence.match(/Use token ([\w-]+)/)[1];
 
       // Extract the admin token
-      expect(wizardProcess.stdoutMemory).toContain('Use admintoken');
+      expect(wizardProcess.stdoutMemory).toContain('Use admin token');
       expect(wizardProcess.stderrMemory).toEqual('');
       const adminSentence = wizardProcess.stdoutMemory
         .match(/Use admin token [\s\S]+/im)[0]
@@ -131,7 +132,7 @@ describe('Lighthouse CI CLI', () => {
       await writeAllInputs(wizardProcess, [
         '', // Just ENTER key to select "new-project"
         '', // Just ENTER key to use serverBaseUrl from config file
-        'AwesomeCIProjectName', // Project name
+        'OtherCIProjectName', // Project name
         'https://example.com', // External build URL
       ]);
 
@@ -487,6 +488,22 @@ describe('Lighthouse CI CLI', () => {
     it('should list the projects', async () => {
       const contents = await page.evaluate('document.body.innerHTML');
       expect(contents).toContain('AwesomeCIProjectName');
+      expect(contents).toContain('OtherCIProjectName');
+    });
+
+    it('should delete the project', async () => {
+      const client = new ApiClient({rootURL: `http://localhost:${server.port}`});
+      client.setAdminToken(projectAdminToken);
+      const project = await client.findProjectByToken(projectToken);
+      await client.deleteProject(project.id);
+    });
+
+    it('should list the projects again', async () => {
+      page = await browser.newPage();
+      await page.goto(`http://localhost:${server.port}/app`, {waitUntil: 'networkidle0'});
+      const contents = await page.evaluate('document.body.innerHTML');
+      expect(contents).not.toContain('AwesomeCIProjectName');
+      expect(contents).toContain('OtherCIProjectName');
     });
   });
 });

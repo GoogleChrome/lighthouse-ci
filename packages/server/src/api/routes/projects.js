@@ -65,6 +65,16 @@ function createRouter(context) {
     })
   );
 
+  // DELETE /projects/:id
+  router.delete(
+    '/:projectId',
+    validateAdminTokenMiddleware(context),
+    handleAsyncError(async (req, res) => {
+      await context.storageMethod.deleteProject(req.params.projectId);
+      res.sendStatus(204);
+    })
+  );
+
   // GET /projects/<id>/builds
   router.get(
     '/:projectId/builds',

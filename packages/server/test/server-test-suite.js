@@ -38,16 +38,16 @@ function runTests(state) {
   });
 
   describe('/v1/projects', () => {
-    let projectAToken;
     it('should create a project', async () => {
       const payload = {name: 'Lighthouse', externalUrl: 'https://github.com/lighthouse'};
       projectA = await client.createProject(payload);
-      projectAToken = projectA.token;
       expect(projectA).toHaveProperty('id');
       expect(projectA).toHaveProperty('token');
+      expect(projectA).toHaveProperty('adminToken');
       expect(projectA).toHaveProperty('slug', 'lighthouse');
       expect(projectA).toMatchObject(payload);
-      expect(projectAToken).toMatch(/^\w{8}-\w{4}/);
+      expect(projectA.token).toMatch(/^\w{8}-\w{4}/);
+      expect(projectA.adminToken).toMatch(/^\w{40}$/);
     });
 
     it('should create a 2nd project', async () => {
@@ -61,22 +61,25 @@ function runTests(state) {
 
     it('should list projects', async () => {
       const projects = await client.getProjects();
-      expect(projects).toEqual([{...projectB, token: ''}, {...projectA, token: ''}]);
+      expect(projects).toEqual([
+        {...projectB, adminToken: '', token: ''},
+        {...projectA, adminToken: '', token: ''},
+      ]);
     });
 
     it('should fetch a project by a token', async () => {
-      const project = await client.findProjectByToken(projectAToken);
+      const project = await client.findProjectByToken(projectA.token);
       expect(project).toEqual(projectA);
     });
 
     it('should fetch a project by ID', async () => {
       const project = await client.findProjectById(projectA.id);
-      expect(project).toEqual({...projectA, token: ''});
+      expect(project).toEqual({...projectA, adminToken: '', token: ''});
     });
 
     it('should fetch a project by slug', async () => {
       const project = await client.findProjectBySlug('lighthouse');
-      expect(project).toEqual({...projectA, token: ''});
+      expect(project).toEqual({...projectA, adminToken: '', token: ''});
     });
 
     describe('slugs', () => {
@@ -87,7 +90,11 @@ function runTests(state) {
           const project = await client.createProject(payload);
           expect(project).toHaveProperty('slug');
           expect(slugs).not.toContain(project.slug);
-          expect(await client.findProjectBySlug(project.slug)).toEqual({...project, token: ''});
+          expect(await client.findProjectBySlug(project.slug)).toEqual({
+            ...project,
+            adminToken: '',
+            token: '',
+          });
           slugs.add(project.slug);
         }
       });

@@ -345,6 +345,15 @@ class ApiClient {
     throw new Error('Unimplemented');
   }
 
+  /**
+   * @param {string} projectId
+   * @return {Promise<string>}
+   */
+  // eslint-disable-next-line no-unused-vars
+  async _resetAdminToken(projectId) {
+    throw new Error('Unimplemented');
+  }
+
   async close() {}
 }
 

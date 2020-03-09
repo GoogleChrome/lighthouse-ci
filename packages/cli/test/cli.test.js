@@ -139,6 +139,38 @@ describe('Lighthouse CI CLI', () => {
       expect(wizardProcess.stdoutMemory).toContain(`http://localhost:${server.port}`);
       expect(wizardProcess.stderrMemory).toEqual('');
     }, 30000);
+
+    it('should reset the admin token', async () => {
+      const storage = {storageMethod: 'sql', sqlDialect: 'sqlite', sqlDatabasePath: server.sqlFile};
+      const wizardTempConfigFile = {ci: {wizard: {wizard: 'reset-admin-token', storage}}};
+      const tmpFolder = fs.mkdtempSync(`${os.tmpdir()}${path.sep}`);
+      const wizardRcFile = `${tmpFolder}/wizard.json`;
+      fs.writeFileSync(wizardRcFile, JSON.stringify(wizardTempConfigFile), {encoding: 'utf8'});
+
+      const wizardProcess = spawn('node', [CLI_PATH, 'wizard', `--config=${wizardRcFile}`]);
+      wizardProcess.stdoutMemory = '';
+      wizardProcess.stderrMemory = '';
+      wizardProcess.stdout.on(
+        'data',
+        chunk => (wizardProcess.stdoutMemory += chunk.toString().replace(/\n/g, ''))
+      );
+      wizardProcess.stderr.on('data', chunk => (wizardProcess.stderrMemory += chunk.toString()));
+
+      await waitForCondition(() => wizardProcess.stdoutMemory.includes('Which project'));
+      await writeAllInputs(wizardProcess, [
+        '', // Just ENTER key to select the first project
+        'AwesomeCIProjectName', // Project name
+      ]);
+
+      // Extract the admin token
+      expect(wizardProcess.stdoutMemory).toContain('Use admin token');
+      expect(wizardProcess.stderrMemory).toEqual('');
+      const adminSentence = wizardProcess.stdoutMemory
+        .match(/Use admin token [\s\S]+/im)[0]
+        .replace(log.bold, '')
+        .replace(log.reset, '');
+      projectAdminToken = adminSentence.match(/Use admin token (\w+)/)[1];
+    }, 30000);
   });
 
   describe('healthcheck', () => {

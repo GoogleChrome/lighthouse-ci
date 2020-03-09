@@ -7,6 +7,7 @@
 
 const inquirer = require('inquirer');
 const ApiClient = require('@lhci/utils/src/api-client.js');
+const StorageMethod = require('@lhci/server/src/api/storage/storage-method.js');
 const _ = require('@lhci/utils/src/lodash.js');
 const log = require('lighthouse-logger');
 
@@ -65,19 +66,72 @@ async function runNewProjectWizard(options) {
  * @param {LHCI.WizardCommand.Options} options
  * @return {Promise<void>}
  */
-async function runCommand(options) {
-  const whichWizardPrompt = await inquirer.prompt([
+async function runResetAdminTokenWizard(options) {
+  if (!options.storage) {
+    throw new Error('Cannot run admin token wizard without a storage configuration');
+  }
+
+  const storageMethod = StorageMethod.from(options.storage);
+  await storageMethod.initialize(options.storage);
+  const projects = await storageMethod.getProjects();
+
+  process.stdout.write(`\nYou are about to reset the administrator token for a LHCI project.\n`);
+  process.stdout.write(`WARNING: all current administrators will be locked out and will need to `);
+  process.stdout.write(`re-enter the new administrator token to retain admin privileges.\n\n`);
+  process.stdout.write(`THIS ACTION CANNOT BE UNDONE\nPress Ctrl+C at any time to cancel.\n\n`);
+
+  const {project, confirmationName} = await inquirer.prompt([
     {
       type: 'list',
-      name: 'wizard',
-      message: 'Which wizard do you want to run?',
-      choices: ['new-project'],
+      name: 'project',
+      message: 'Which project would you like to reset?',
+      choices: projects
+        .map(project => ({
+          name: project.name,
+          value: project,
+        }))
+        .sort((a, b) => a.name.localeCompare(b.name)),
+    },
+    {
+      type: 'input',
+      name: 'confirmationName',
+      message: answers => `Type "${answers.project.name}" to confirm the token reset.`,
     },
   ]);
+
+  if (project.name !== confirmationName && project.name !== `"${confirmationName}"`) {
+    process.stdout.write(`${confirmationName} did not match ${project.name}, cancelling.`);
+    return;
+  }
+
+  const adminToken = await storageMethod._resetAdminToken(project.id);
+  const adminWarning = 'to manage data. KEEP THIS SECRET!';
+  process.stdout.write(`Reset token for project ${project.name} (${project.id})!\n`);
+  process.stdout.write(`Use admin token ${log.bold}${adminToken}${log.reset} ${adminWarning}\n`);
+}
+
+/**
+ * @param {LHCI.WizardCommand.Options} options
+ * @return {Promise<void>}
+ */
+async function runCommand(options) {
+  const whichWizardPrompt = options.wizard
+    ? options
+    : await inquirer.prompt([
+        {
+          type: 'list',
+          name: 'wizard',
+          message: 'Which wizard do you want to run?',
+          choices: ['new-project', 'reset-admin-token'],
+        },
+      ]);
 
   switch (whichWizardPrompt.wizard) {
     case 'new-project':
       await runNewProjectWizard(options);
+      break;
+    case 'reset-admin-token':
+      await runResetAdminTokenWizard(options);
       break;
     default:
       throw new Error(`Unrecognized wizard: ${whichWizardPrompt.wizard}`);

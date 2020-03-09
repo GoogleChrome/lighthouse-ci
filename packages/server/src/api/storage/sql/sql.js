@@ -620,6 +620,17 @@ class SqlStorageMethod {
     const {statisticModel} = this._sql();
     await statisticModel.update({version: 0}, {where: {projectId, buildId}});
   }
+
+  /**
+   * @param {string} projectId
+   * @return {Promise<string>}
+   */
+  async _resetAdminToken(projectId) {
+    const {projectModel} = this._sql();
+    const newToken = StorageMethod.generateAdminToken();
+    await projectModel.update({adminToken: newToken}, {where: {id: projectId}});
+    return newToken;
+  }
 }
 
 module.exports = SqlStorageMethod;

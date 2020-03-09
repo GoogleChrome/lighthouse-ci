@@ -20,6 +20,8 @@
     "server": {
       "port": 9009,
       "storage": {
+        "storageMethod": "sql",
+        "sqlDialect": "sqlite",
         "sqlDatabasePath": "cli-test-fixtures.tmp.sql"
       }
     }

@@ -62,6 +62,11 @@ function buildCommand(yargs) {
       type: 'string',
       description: '[lhci only] The Lighthouse CI server token for the project.',
     },
+    ignoreDuplicateBuildFailure: {
+      type: 'boolean',
+      description:
+        '[lhci only] Whether to ignore failures (still exit with code 0) caused by uploads of a duplicate build.',
+    },
     githubToken: {
       type: 'string',
       description: 'The GitHub token to use to apply a status check.',
@@ -422,7 +427,16 @@ async function runCommand(options) {
 
   switch (options.target) {
     case 'lhci':
-      return runLHCITarget(options);
+      try {
+        return await runLHCITarget(options);
+      } catch (err) {
+        if (options.ignoreDuplicateBuildFailure && /Build already exists/.test(err.message)) {
+          print('Build already exists but ignore requested via options, skipping upload...');
+          return;
+        }
+
+        throw err;
+      }
     case 'temporary-public-storage':
       return runTemporaryPublicStorageTarget(options);
     default:

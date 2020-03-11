@@ -271,7 +271,8 @@ function getAncestorHash(hash = 'HEAD') {
     : getAncestorHashForBranch(hash);
 }
 
-function getGitHubRepoSlug() {
+/** @param {string|undefined} apiHost */
+function getGitHubRepoSlug(apiHost = undefined) {
   const envSlug = getEnvVarIfSet([
     // Manual override
     'LHCI_BUILD_CONTEXT__GITHUB_REPO_SLUG',
@@ -292,6 +293,14 @@ function getGitHubRepoSlug() {
   if (remote && remote.includes('github.com')) {
     const remoteMatch = remote.match(/github\.com.([^/]+\/.+)\.git/);
     if (remoteMatch) return remoteMatch[1];
+  }
+
+  if (remote && apiHost && !apiHost.includes('github.com')) {
+    const hostMatch = apiHost.match(/:\/\/(.*?)(\/|$)/);
+    if (!hostMatch) return undefined;
+    const remoteRegex = new RegExp(`${hostMatch[1]}(:|\\/)([^/]+\\/.+)\\.git`);
+    const remoteMatch = remote.match(remoteRegex);
+    if (remoteMatch) return remoteMatch[2];
   }
 }
 

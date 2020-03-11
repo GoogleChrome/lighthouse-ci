@@ -69,7 +69,7 @@ function runTests(state) {
 
     it('should fetch a project by a token', async () => {
       const project = await client.findProjectByToken(projectA.token);
-      expect(project).toEqual(projectA);
+      expect(project).toEqual({...projectA, adminToken: ''});
     });
 
     it('should fetch a project by ID', async () => {

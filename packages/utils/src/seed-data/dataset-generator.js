@@ -194,6 +194,7 @@ function createDefaultDataset() {
         name: 'Lighthouse Viewer',
         externalUrl: 'https://travis-ci.org/GoogleChrome/lighthouse',
         token: '',
+        adminToken: '',
         slug: '',
       },
       {
@@ -201,6 +202,7 @@ function createDefaultDataset() {
         name: 'Lighthouse Dashboard',
         externalUrl: 'https://travis-ci.org/GoogleChrome/lighthouse-ci',
         token: '',
+        adminToken: '',
         slug: '',
       },
     ],
@@ -458,6 +460,7 @@ function createLoadTestDataset() {
     name: 'Example',
     externalUrl: 'https://www.example.com',
     token: '',
+    adminToken: '',
     slug: '',
   };
   /** @type {Array<LHCI.ServerCommand.Build>} */

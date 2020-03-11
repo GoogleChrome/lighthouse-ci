@@ -5,7 +5,6 @@
  */
 'use strict';
 
-const crypto = require('crypto');
 const _ = require('@lhci/utils/src/lodash.js');
 const PRandom = require('@lhci/utils/src/seed-data/prandom.js');
 const {computeRepresentativeRuns} = require('@lhci/utils/src/representative-runs.js');
@@ -356,14 +355,6 @@ class StorageMethod {
 
     if (existingProject) throw new Error('Unable to generate unique slug');
     return storageMethod._createProject({...unsavedProject, slug});
-  }
-
-  /** Generates a cryptographically psuedorandom alphanumeric string of length 40. @return {string} */
-  static generateAdminToken() {
-    return crypto
-      .randomBytes(30)
-      .toString('base64')
-      .replace(/[^a-z0-9]/gi, 'l');
   }
 
   /**

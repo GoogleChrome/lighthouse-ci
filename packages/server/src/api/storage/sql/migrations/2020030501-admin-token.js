@@ -5,7 +5,7 @@
  */
 'use strict';
 
-const StorageMethod = require('../../storage-method');
+const {hashAdminToken, generateAdminToken} = require('../../auth.js');
 
 /* eslint-disable new-cap */
 
@@ -15,10 +15,12 @@ module.exports = {
    * @param {typeof import('sequelize')} Sequelize
    */
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.addColumn('projects', 'adminToken', {type: Sequelize.STRING(40)});
+    await queryInterface.addColumn('projects', 'adminToken', {type: Sequelize.STRING(64)});
     await queryInterface.bulkUpdate(
       'projects',
-      {adminToken: StorageMethod.generateAdminToken()},
+      // Because of the useless salt, this will be an invalid admin token that requires resetting
+      // via the wizard command, but our goal is exactly to create an initial token no one can guess.
+      {adminToken: hashAdminToken(generateAdminToken(), '0')},
       {adminToken: null},
       {type: Sequelize.QueryTypes.BULKUPDATE}
     );

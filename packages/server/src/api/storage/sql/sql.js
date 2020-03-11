@@ -10,6 +10,7 @@ const uuid = require('uuid');
 const Umzug = require('umzug');
 const Sequelize = require('sequelize');
 const {omit, padEnd} = require('@lhci/utils/src/lodash.js');
+const {hashAdminToken, generateAdminToken} = require('../auth.js');
 const {E422} = require('../../express-utils.js');
 const StorageMethod = require('../storage-method.js');
 const projectModelDefn = require('./project-model.js');
@@ -308,13 +309,18 @@ class SqlStorageMethod {
   async _createProject(unsavedProject) {
     const {projectModel} = this._sql();
     if (unsavedProject.name.length < 4) throw new E422('Project name too short');
+    const projectId = uuid.v4();
+    const adminToken = generateAdminToken();
     const project = await projectModel.create({
       ...unsavedProject,
-      adminToken: StorageMethod.generateAdminToken(),
+      adminToken: hashAdminToken(adminToken, projectId),
       token: uuid.v4(),
-      id: uuid.v4(),
+      id: projectId,
     });
-    return clone(project);
+
+    // Replace the adminToken with the original non-hashed version.
+    // This will be the only time it's readable other than reset.
+    return {...clone(project), adminToken};
   }
 
   /**
@@ -627,8 +633,11 @@ class SqlStorageMethod {
    */
   async _resetAdminToken(projectId) {
     const {projectModel} = this._sql();
-    const newToken = StorageMethod.generateAdminToken();
-    await projectModel.update({adminToken: newToken}, {where: {id: projectId}});
+    const newToken = generateAdminToken();
+    await projectModel.update(
+      {adminToken: hashAdminToken(newToken, projectId)},
+      {where: {id: projectId}}
+    );
     return newToken;
   }
 }

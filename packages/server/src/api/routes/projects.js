@@ -41,7 +41,7 @@ function createRouter(context) {
       const token = req.body.token;
       const project = await context.storageMethod.findProjectByToken(token);
       if (!project) return res.sendStatus(404);
-      res.json(project);
+      res.json({...project, adminToken: ''});
     })
   );
 

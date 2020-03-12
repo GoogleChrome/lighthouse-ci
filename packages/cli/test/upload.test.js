@@ -38,6 +38,9 @@ describe('Lighthouse CI upload CLI', () => {
   let project;
 
   beforeAll(async () => {
+    process.env.LHCI_BUILD_CONTEXT__CURRENT_HASH = 'e7f1b0fa3aebb6ef95e44c0d0b820433ffdd2e63';
+    process.env.LHCI_BUILD_CONTEXT__ANCESTOR_HASH = 'e7f1b0fa3aebb6ef95e44c0d0b820433ffdd2e63';
+
     writeLhr();
     server = await startServer();
     serverBaseUrl = `http://localhost:${server.port}/`;
@@ -47,6 +50,9 @@ describe('Lighthouse CI upload CLI', () => {
   });
 
   afterAll(async () => {
+    process.env.LHCI_BUILD_CONTEXT__CURRENT_HASH = undefined;
+    process.env.LHCI_BUILD_CONTEXT__ANCESTOR_HASH = undefined;
+
     if (server) {
       server.process.kill();
       await safeDeleteFile(server.sqlFile);
@@ -63,8 +69,6 @@ describe('Lighthouse CI upload CLI', () => {
       }
     );
 
-    expect(await apiClient.getBuilds(project.id)).toHaveLength(1);
-
     expect(stdout).toMatchInlineSnapshot(`
       "Saving CI project Test (<UUID>)
       Saving CI build (<UUID>)
@@ -76,6 +80,8 @@ describe('Lighthouse CI upload CLI', () => {
     `);
     expect(stderr).toMatchInlineSnapshot(`""`);
     expect(status).toEqual(0);
+
+    expect(await apiClient.getBuilds(project.id)).toHaveLength(1);
   }, 15000);
 
   it('should fail a duplicate upload for a build', async () => {
@@ -88,16 +94,11 @@ describe('Lighthouse CI upload CLI', () => {
       }
     );
 
-    expect(await apiClient.getBuilds(project.id)).toHaveLength(1);
-
     expect(stdout).toMatchInlineSnapshot(`""`);
-    expect(stderr).toMatchInlineSnapshot(`
-      "Error: Unexpected status code 422
-        {\\"message\\":\\"Build already exists for hash \\\\\\"<UUID>f667\\\\\\"\\"}
-          at ApiClient._convertFetchResponseToReturnValue (/Users/patrick/Code/OpenSource/lighthouse-ci/packages/utils/src/api-client.js:61:21)
-          at process._tickCallback (internal/process/next_tick.js:68:7)"
-    `);
+    expect(stderr).toMatch(/Build already exists for hash/);
     expect(status).toEqual(1);
+
+    expect(await apiClient.getBuilds(project.id)).toHaveLength(1);
   }, 15000);
 
   it('should ignore a duplicate upload for a build with flag', async () => {
@@ -115,12 +116,12 @@ describe('Lighthouse CI upload CLI', () => {
       }
     );
 
-    expect(await apiClient.getBuilds(project.id)).toHaveLength(1);
-
     expect(stdout).toMatchInlineSnapshot(
       `"Build already exists but ignore requested via options, skipping upload..."`
     );
     expect(stderr).toMatchInlineSnapshot(`""`);
     expect(status).toEqual(0);
+
+    expect(await apiClient.getBuilds(project.id)).toHaveLength(1);
   }, 15000);
 });

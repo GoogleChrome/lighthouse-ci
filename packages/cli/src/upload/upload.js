@@ -174,9 +174,9 @@ function getGitHubContext(urlLabel, options) {
  * @return {Promise<void>}
  */
 async function runGithubStatusCheck(options, targetUrlMap) {
-  const hash = getCurrentHash();
-  const slug = getGitHubRepoSlug();
   const {githubToken, githubAppToken, githubApiHost} = options;
+  const hash = getCurrentHash();
+  const slug = getGitHubRepoSlug(githubApiHost);
 
   if (!githubToken && !githubAppToken) return print('No GitHub token set, skipping.\n');
   print('GitHub token found, attempting to set status...\n');

@@ -152,6 +152,25 @@ describe('build-context.js', () => {
   });
 
   describe('#getGitHubRepoSlug', () => {
+    const DEFAULT_API_HOST = 'https://api.github.com';
+
+    it('should return undefined when there is no valid slug on github', () => {
+      process.env.LHCI_BUILD_CONTEXT__GIT_REMOTE = `${DEFAULT_API_HOST}/broken/url/repo`;
+      expect(buildContext.getGitHubRepoSlug()).toEqual(undefined);
+    });
+
+    it('should return undefined when there is no valid slug on custom', () => {
+      const apiHost = 'https://github.example.com';
+      process.env.LHCI_BUILD_CONTEXT__GIT_REMOTE = `${apiHost}/broken/url/repo`;
+      expect(buildContext.getGitHubRepoSlug(apiHost)).toEqual(undefined);
+    });
+
+    it('should return undefined when there is no valid URL on custom', () => {
+      const apiHost = 'https://github.example.com';
+      process.env.LHCI_BUILD_CONTEXT__GIT_REMOTE = `random/broken/url/repo`;
+      expect(buildContext.getGitHubRepoSlug(apiHost)).toEqual(undefined);
+    });
+
     it('should work for circle CI', () => {
       process.env.CIRCLE_PROJECT_USERNAME = 'SuperLighthouse';
       process.env.CIRCLE_PROJECT_REPONAME = 'lhci';
@@ -161,6 +180,24 @@ describe('build-context.js', () => {
     it('should respect env override', () => {
       process.env.LHCI_BUILD_CONTEXT__GITHUB_REPO_SLUG = 'SuperLighthouse/manual';
       expect(buildContext.getGitHubRepoSlug()).toEqual('SuperLighthouse/manual');
+    });
+
+    it('should work when enterprise API host is provided with ssh remote', () => {
+      const apiHost = 'https://github.example.com';
+      process.env.LHCI_BUILD_CONTEXT__GIT_REMOTE = 'git@github.example.com:corp/repo.git';
+      expect(buildContext.getGitHubRepoSlug(apiHost)).toEqual('corp/repo');
+    });
+
+    it('should work when enterprise API host is provided with https remote', () => {
+      const apiHost = 'https://github.example.com';
+      process.env.LHCI_BUILD_CONTEXT__GIT_REMOTE = `${apiHost}/corp/repo.git`;
+      expect(buildContext.getGitHubRepoSlug(apiHost)).toEqual('corp/repo');
+    });
+
+    it('should work when default API host is provided', () => {
+      expect(buildContext.getGitHubRepoSlug(DEFAULT_API_HOST)).toEqual(
+        'GoogleChrome/lighthouse-ci'
+      );
     });
 
     it('should fallback to getGitRemote result', () => {

@@ -35,6 +35,7 @@ const print = message => {
   process.stdout.write(message);
 };
 
+const DEFAULT_GITHUB_API_HOST = 'https://api.github.com';
 const DIFF_VIEWER_URL = 'https://googlechrome.github.io/lighthouse-ci/viewer/';
 const TEMPORARY_PUBLIC_STORAGE_URL =
   'https://us-central1-lighthouse-infrastructure.cloudfunctions.net/saveHtmlReport';
@@ -71,6 +72,12 @@ function buildCommand(yargs) {
       type: 'string',
       description: 'The GitHub token to use to apply a status check.',
     },
+    githubApiHost: {
+      type: 'string',
+      default: DEFAULT_GITHUB_API_HOST,
+      description:
+        'The GitHub host to use for the status check API request. Modify this when using on a GitHub Enterprise server.',
+    },
     githubAppToken: {
       type: 'string',
       description: 'The LHCI GitHub App token to use to apply a status check.',
@@ -101,10 +108,20 @@ function buildCommand(yargs) {
 }
 
 /**
- * @param {{slug: string, hash: string, state: 'failure'|'success', targetUrl: string, description: string, context: string, githubToken?: string, githubAppToken?: string}} options
+ * @param {{slug: string, hash: string, state: 'failure'|'success', targetUrl: string, description: string, context: string, githubToken?: string, githubAppToken?: string, githubApiHost?: string}} options
  */
 async function postStatusToGitHub(options) {
-  const {slug, hash, state, targetUrl, context, description, githubToken, githubAppToken} = options;
+  const {
+    slug,
+    hash,
+    state,
+    targetUrl,
+    context,
+    description,
+    githubToken,
+    githubAppToken,
+    githubApiHost = DEFAULT_GITHUB_API_HOST,
+  } = options;
 
   let response;
   if (githubAppToken) {
@@ -116,7 +133,7 @@ async function postStatusToGitHub(options) {
       body: JSON.stringify(payload),
     });
   } else {
-    const url = `https://api.github.com/repos/${slug}/statuses/${hash}`;
+    const url = `${githubApiHost}/repos/${slug}/statuses/${hash}`;
     const payload = {state, context, description, target_url: targetUrl};
     response = await fetch(url, {
       method: 'POST',
@@ -162,9 +179,9 @@ function getGitHubContext(urlLabel, options) {
  * @return {Promise<void>}
  */
 async function runGithubStatusCheck(options, targetUrlMap) {
+  const {githubToken, githubAppToken, githubApiHost} = options;
   const hash = getCurrentHash();
-  const slug = getGitHubRepoSlug();
-  const {githubToken, githubAppToken} = options;
+  const slug = getGitHubRepoSlug(githubApiHost);
 
   if (!githubToken && !githubAppToken) return print('No GitHub token set, skipping.\n');
   print('GitHub token found, attempting to set status...\n');
@@ -200,6 +217,7 @@ async function runGithubStatusCheck(options, targetUrlMap) {
         targetUrl,
         githubToken,
         githubAppToken,
+        githubApiHost,
       });
     }
   } else {
@@ -231,6 +249,7 @@ async function runGithubStatusCheck(options, targetUrlMap) {
         targetUrl,
         githubToken,
         githubAppToken,
+        githubApiHost,
       });
     }
   }

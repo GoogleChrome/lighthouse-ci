@@ -16,6 +16,7 @@ declare global {
         uploadUrlMap?: boolean;
         extraHeaders?: Record<string, string>;
         githubToken?: string;
+        githubApiHost?: string;
         githubAppToken?: string;
         serverBaseUrl: string;
         urlReplacementPatterns: string[];

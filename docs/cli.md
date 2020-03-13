@@ -194,6 +194,8 @@ Save the results to the server
 Options:
   --help                    Show help                                  [boolean]
   --version                 Show version number                        [boolean]
+  --no-lighthouserc         Disables automatic usage of a .lighthouserc file.
+                                                                       [boolean]
   --target                  The type of target to upload the data to. If set to
                             anything other than "lhci", some of the options will
                             not apply.
@@ -202,6 +204,10 @@ Options:
                             project.                                    [string]
   --githubToken             The GitHub token to use to apply a status check.
                                                                         [string]
+  --githubApiHost           The GitHub host to use for the status check API
+                            request. Modify this when using on a GitHub
+                            Enterprise server.
+                                    [string] [default: "https://api.github.com"]
   --githubAppToken          The LHCI GitHub App token to use to apply a status
                             check.                                      [string]
   --extraHeaders            [lhci only] Extra headers to use when making API
@@ -222,6 +228,7 @@ lhci upload --config=./lighthouserc.json
 lhci upload --target=temporary-public-storage
 lhci upload --serverBaseUrl=http://lhci.my-custom-domain.com/
 lhci upload --extraHeaders.Authorization='Basic dGVzdDoxMjPCow=='
+lhci upload --githubToken="$MY_ENTERPRISE_GITHUB_TOKEN" --githubApiHost="https://custom-github-server.example.com/api/v3"
 ```
 
 #### Build Context

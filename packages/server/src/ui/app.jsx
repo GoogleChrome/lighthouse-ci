@@ -39,6 +39,17 @@ export const App = () => {
           }
         />
         <LazyRoute
+          path="/app/projects/:projectSlug/settings"
+          loading={() => (
+            <Page>
+              <LoadingSpinner />
+            </Page>
+          )}
+          getComponent={() =>
+            import('./routes/project-settings/project-settings.jsx').then(m => m.ProjectSettings)
+          }
+        />
+        <LazyRoute
           path="/app/projects/:projectSlug/dashboard"
           loading={() => (
             <Page>

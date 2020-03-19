@@ -7,7 +7,6 @@
 
 const inquirer = require('inquirer');
 const ApiClient = require('@lhci/utils/src/api-client.js');
-const StorageMethod = require('@lhci/server/src/api/storage/storage-method.js');
 const _ = require('@lhci/utils/src/lodash.js');
 const log = require('lighthouse-logger');
 
@@ -70,6 +69,8 @@ async function runResetAdminTokenWizard(options) {
   if (!options.storage) {
     throw new Error('Cannot run admin token wizard without a storage configuration');
   }
+  // Require this only when run since `@lhci/server` is an optional dependency
+  const StorageMethod = require('@lhci/server/src/api/storage/storage-method.js');
 
   const storageMethod = StorageMethod.from(options.storage);
   await storageMethod.initialize(options.storage);

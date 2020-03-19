@@ -43,6 +43,7 @@ declare global {
         staticDistDir?: string;
         isSinglePageApplication?: boolean;
         startServerCommand?: string;
+        startServerReadyTimeout: number;
         startServerReadyPattern: string;
         chromePath?: string;
         puppeteerScript?: string;

@@ -61,6 +61,11 @@ function buildCommand(yargs) {
       type: 'string',
       default: 'listen|ready',
     },
+    startServerReadyTimeout: {
+      description: 'The number of milliseconds to wait for the server to start before continuing',
+      type: 'number',
+      default: 10000,
+    },
     settings: {description: 'The Lighthouse settings and flags to use when collecting'},
     numberOfRuns: {
       alias: 'n',
@@ -115,13 +120,13 @@ async function startServerAndDetermineUrls(options) {
       const {child, patternMatch, stdout, stderr} = await runCommandAndWaitForPattern(
         options.startServerCommand,
         regexPattern,
-        {timeout: 10000}
+        {timeout: options.startServerReadyTimeout}
       );
       process.stdout.write(`Started a web server with "${options.startServerCommand}"...\n`);
       close = () => killProcessTree(child.pid);
 
       if (!patternMatch) {
-        // This is only for readability.
+        // This `message` variable is only for readability.
         const message = `Ensure the server prints a pattern that matches ${regexPattern} when it is ready.\n`;
         process.stdout.write(`WARNING: Timed out waiting for the server to start listening.\n`);
         process.stdout.write(`         ${message}`);

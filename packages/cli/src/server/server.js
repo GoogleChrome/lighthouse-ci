@@ -55,6 +55,8 @@ function buildCommand(yargs) {
  * @return {Promise<{port: number, close: () => void}>}
  */
 async function runCommand(options) {
+  // Require this only after they decide to run `lhci server`
+  // eslint-disable-next-line import/no-extraneous-dependencies
   const {createServer} = require('@lhci/server');
   return createServer(options);
 }

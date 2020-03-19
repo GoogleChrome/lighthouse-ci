@@ -8,14 +8,21 @@
 module.exports = {
   // Start with google standard style and disable the prettier-controlled rules
   //     https://github.com/google/eslint-config-google/blob/master/index.js
-  extends: ['eslint:recommended', 'google', 'prettier'],
+  extends: [
+    'eslint:recommended',
+    'plugin:import/errors',
+    'plugin:import/warnings',
+    'google',
+    'prettier',
+  ],
   // Use the prettier plugin to enforce prettier violations
-  plugins: ['prettier'],
+  plugins: ['prettier', 'import'],
   env: {
     node: true,
     es6: true,
   },
   rules: {
+    'import/no-extraneous-dependencies': 'error',
     'prettier/prettier': 'error',
     eqeqeq: 'error',
     'no-floating-decimal': 'error',

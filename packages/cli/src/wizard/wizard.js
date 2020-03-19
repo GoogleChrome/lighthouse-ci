@@ -70,6 +70,7 @@ async function runResetAdminTokenWizard(options) {
     throw new Error('Cannot run admin token wizard without a storage configuration');
   }
   // Require this only when run since `@lhci/server` is an optional dependency
+  // eslint-disable-next-line import/no-extraneous-dependencies
   const StorageMethod = require('@lhci/server/src/api/storage/storage-method.js');
 
   const storageMethod = StorageMethod.from(options.storage);

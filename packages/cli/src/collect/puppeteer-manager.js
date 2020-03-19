@@ -27,6 +27,7 @@ class PuppeteerManager {
    */
   _requirePuppeteer() {
     try {
+      // eslint-disable-next-line import/no-extraneous-dependencies
       return require('puppeteer');
     } catch (_) {}
 

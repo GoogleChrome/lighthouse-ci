@@ -12,6 +12,8 @@ module.exports = {
     browser: true,
   },
   rules: {
+    'import/no-extraneous-dependencies': 'off', // false positives with parcel and less problematic in bundle jsx anyway
+    'import/no-unresolved': 'off', // doesn't support parcel's resolution algorithm
     'react/prop-types': 'off',
     'no-unused-vars': [
       'error',

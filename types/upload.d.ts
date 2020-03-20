@@ -18,6 +18,7 @@ declare global {
         githubToken?: string;
         githubApiHost?: string;
         githubAppToken?: string;
+        githubStatusContextSuffix?: string;
         serverBaseUrl: string;
         urlReplacementPatterns: string[];
       }

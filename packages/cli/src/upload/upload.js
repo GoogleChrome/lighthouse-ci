@@ -82,6 +82,10 @@ function buildCommand(yargs) {
       type: 'string',
       description: 'The LHCI GitHub App token to use to apply a status check.',
     },
+    githubStatusContextSuffix: {
+      type: 'string',
+      description: 'The suffix of the GitHub status check context label.',
+    },
     extraHeaders: {
       description: '[lhci only] Extra headers to use when making API requests to the LHCI server.',
     },
@@ -164,12 +168,13 @@ function getUrlLabelForGithub(rawUrl, options) {
 }
 
 /**
- *
  * @param {string} urlLabel
  * @param {LHCI.UploadCommand.Options} options
  */
 function getGitHubContext(urlLabel, options) {
-  const prefix = options.githubAppToken ? 'lhci-app' : 'lhci';
+  const prefix = options.githubStatusContextSuffix
+    ? `lhci${options.githubStatusContextSuffix}`
+    : 'lhci';
   return `${prefix}/url${urlLabel}`;
 }
 

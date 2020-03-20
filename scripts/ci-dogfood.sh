@@ -29,6 +29,7 @@ if [[ -n "$LHCI_CANARY_SERVER_URL" ]]; then
 fi
 
 # Upload the results to temporary public storage too
+export LHCI_GITHUB_STATUS_CONTEXT_SUFFIX="-2"
 export LHCI_GITHUB_APP_TOKEN=""
 yarn start upload --target=temporary-public-storage
 

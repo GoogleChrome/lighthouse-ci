@@ -20,6 +20,23 @@ function getSqlFilePath() {
   return `cli-test-${Math.round(Math.random() * 1e9)}.tmp.sql`;
 }
 
+/** @param {import('child_process').ChildProcess & {stdoutMemory: string}} wizardProcess @param {string[]} inputs */
+async function writeAllInputs(wizardProcess, inputs) {
+  const ENTER_KEY = '\x0D';
+
+  for (const input of inputs) {
+    wizardProcess.stdin.write(input);
+    wizardProcess.stdin.write(ENTER_KEY);
+    // Wait for inquirer to write back our response, that's the signal we can continue.
+    await waitForCondition(() => wizardProcess.stdoutMemory.includes(input));
+    // Sometimes it still isn't ready though, give it a bit more time to process.
+    await new Promise(r => setTimeout(r, process.env.CI ? 500 : 50));
+  }
+
+  wizardProcess.stdin.end();
+}
+
+/** @param {string} output */
 function cleanStdOutput(output) {
   return output
     .replace(/✘/g, 'X')
@@ -78,8 +95,23 @@ async function startServer(sqlFile, extraArgs = []) {
 
 function waitForCondition(fn, label) {
   return testingLibrary.wait(() => {
-    if (!fn()) throw new Error(label || 'Condition not met');
+    if (!fn()) {
+      throw new Error(typeof label === 'function' ? label() : label || 'Condition not met');
+    }
   });
+}
+
+/** @param {Record<string, string>|undefined} extraEnvVars */
+function getCleanEnvironment(extraEnvVars) {
+  const cleanEnv = {
+    ...process.env,
+    LHCI_GITHUB_TOKEN: '',
+    LHCI_GITHUB_APP_TOKEN: '',
+    NO_UPDATE_NOTIFIER: '1',
+    LHCI_NO_LIGHTHOUSERC: '1',
+  };
+
+  return {...cleanEnv, ...extraEnvVars};
 }
 
 /**
@@ -88,17 +120,10 @@ function waitForCondition(fn, label) {
  * @return {{stdout: string, stderr: string, status: number, matches: {uuids: RegExpMatchArray}}}
  */
 function runCLI(args, overrides = {}) {
-  const {env: extraEnvVars, ...options} = overrides;
-  const cleanEnv = {
-    ...process.env,
-    LHCI_GITHUB_TOKEN: '',
-    LHCI_GITHUB_APP_TOKEN: '',
-    NO_UPDATE_NOTIFIER: '1',
-    LHCI_NO_LIGHTHOUSERC: '1',
-  };
-  const env = {...cleanEnv, ...extraEnvVars};
+  const {env: extraEnvVars, cwd} = overrides;
+  const env = getCleanEnvironment(extraEnvVars);
   let {stdout = '', stderr = '', status = -1} = spawnSync('node', [CLI_PATH, ...args], {
-    ...options,
+    cwd,
     env,
   });
 
@@ -111,6 +136,44 @@ function runCLI(args, overrides = {}) {
   stderr = cleanStdOutput(stderr);
 
   return {stdout, stderr, status, matches: {uuids}};
+}
+
+/**
+ * @param {string[]} args
+ * @param {string[]} inputs
+ * @param {{cwd?: string, env?: Record<string, string>, inputWaitCondition?: string}} [overrides]
+ * @return {{stdout: string, stderr: string, status: number, matches: {uuids: RegExpMatchArray}}}
+ */
+async function runWizardCLI(args, inputs, overrides = {}) {
+  const {env: extraEnvVars, cwd, inputWaitCondition = 'Which wizard'} = overrides;
+  const env = getCleanEnvironment(extraEnvVars);
+  const wizardProcess = spawn('node', [CLI_PATH, 'wizard', ...args], {
+    cwd,
+    env,
+  });
+
+  wizardProcess.stdoutMemory = '';
+  wizardProcess.stderrMemory = '';
+  let status = -1;
+  wizardProcess.stdout.on('data', chunk => (wizardProcess.stdoutMemory += chunk.toString()));
+  wizardProcess.stderr.on('data', chunk => (wizardProcess.stderrMemory += chunk.toString()));
+  wizardProcess.on('exit', code => (status = code));
+
+  try {
+    await waitForCondition(
+      () => wizardProcess.stdoutMemory.includes(inputWaitCondition),
+      () =>
+        `Output never contained "${inputWaitCondition}"\nSTDOUT: ${
+          wizardProcess.stdoutMemory
+        }\nSTDERR:${wizardProcess.stderrMemory}`
+    );
+    await writeAllInputs(wizardProcess, inputs);
+    await waitForCondition(() => status >= 0).catch(() => undefined);
+  } finally {
+    wizardProcess.kill();
+  }
+
+  return {stdout: wizardProcess.stdoutMemory, stderr: wizardProcess.stderrMemory, status};
 }
 
 /**
@@ -129,6 +192,7 @@ async function startFallbackServer(staticDistDir, options) {
 module.exports = {
   CLI_PATH,
   runCLI,
+  runWizardCLI,
   startServer,
   waitForCondition,
   getSqlFilePath,
@@ -136,4 +200,5 @@ module.exports = {
   withTmpDir,
   cleanStdOutput,
   startFallbackServer,
+  writeAllInputs,
 };

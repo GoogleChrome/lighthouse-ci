@@ -5,7 +5,7 @@
  */
 'use strict';
 
-// jest.retryTimes(3);
+jest.retryTimes(3);
 
 /* eslint-env jest */
 

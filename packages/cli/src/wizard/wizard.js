@@ -44,8 +44,8 @@ async function runNewProjectWizard(options) {
   ]);
 
   const api = new ApiClient({
+    ...options,
     rootURL: responses.serverBaseUrl || options.serverBaseUrl,
-    extraHeaders: options.extraHeaders || {},
   });
   const project = await api.createProject({
     name: responses.projectName,

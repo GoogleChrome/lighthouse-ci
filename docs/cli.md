@@ -96,6 +96,7 @@ Runs an interactive step-by-step wizard to create a new project on the LHCI serv
 
 ```bash
 lhci wizard
+lhci wizard --basicAuth.username="customuser" --basicAuth.password="LighthouseRocks"
 ```
 
 ---
@@ -227,7 +228,8 @@ Options:
 lhci upload --config=./lighthouserc.json
 lhci upload --target=temporary-public-storage
 lhci upload --serverBaseUrl=http://lhci.my-custom-domain.com/
-lhci upload --extraHeaders.Authorization='Basic dGVzdDoxMjPCow=='
+lhci upload --extraHeaders.Authorization='Bearer X92sEo3n1J1F0k1E9'
+lhci upload --basicAuth.username="customuser" --basicAuth.password="LighthouseRocks"
 lhci upload --githubToken="$MY_ENTERPRISE_GITHUB_TOKEN" --githubApiHost="https://custom-github-server.example.com/api/v3"
 ```
 

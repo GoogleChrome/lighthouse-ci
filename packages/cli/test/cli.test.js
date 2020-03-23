@@ -12,7 +12,6 @@ jest.retryTimes(3);
 const path = require('path');
 const os = require('os');
 const fs = require('fs');
-const {spawn} = require('child_process');
 const fetch = require('isomorphic-fetch');
 const log = require('lighthouse-logger');
 const puppeteer = require('puppeteer');
@@ -20,11 +19,10 @@ const ApiClient = require('../../utils/src/api-client.js');
 const {
   startServer,
   cleanStdOutput,
-  waitForCondition,
   getSqlFilePath,
   safeDeleteFile,
   runCLI,
-  CLI_PATH,
+  runWizardCLI,
 } = require('./test-utils.js');
 
 describe('Lighthouse CI CLI', () => {
@@ -62,53 +60,35 @@ describe('Lighthouse CI CLI', () => {
   });
 
   describe('wizard', () => {
-    const ENTER_KEY = '\x0D';
-
-    async function writeAllInputs(wizardProcess, inputs) {
-      for (const input of inputs) {
-        wizardProcess.stdin.write(input);
-        wizardProcess.stdin.write(ENTER_KEY);
-        // Wait for inquirer to write back our response, that's the signal we can continue.
-        await waitForCondition(() => wizardProcess.stdoutMemory.includes(input));
-        // Sometimes it still isn't ready though, give it a bit more time to process.
-        await new Promise(r => setTimeout(r, process.env.CI ? 500 : 50));
-      }
-
-      wizardProcess.stdin.end();
-    }
-
     it('should create a new project', async () => {
-      const wizardProcess = spawn('node', [CLI_PATH, 'wizard']);
-      wizardProcess.stdoutMemory = '';
-      wizardProcess.stderrMemory = '';
-      wizardProcess.stdout.on('data', chunk => (wizardProcess.stdoutMemory += chunk.toString()));
-      wizardProcess.stderr.on('data', chunk => (wizardProcess.stderrMemory += chunk.toString()));
-
-      await waitForCondition(() => wizardProcess.stdoutMemory.includes('Which wizard'));
-      await writeAllInputs(wizardProcess, [
-        '', // Just ENTER key to select "new-project"
-        `http://localhost:${server.port}`, // The base URL to talk to
-        'AwesomeCIProjectName', // Project name
-        'https://example.com', // External build URL
-      ]);
+      const {stdout, stderr, status} = await runWizardCLI(
+        [],
+        [
+          '', // Just ENTER key to select "new-project"
+          `http://localhost:${server.port}`, // The base URL to talk to
+          'AwesomeCIProjectName', // Project name
+          'https://example.com', // External build URL
+        ]
+      );
 
       // Extract the regular token
-      expect(wizardProcess.stdoutMemory).toContain('Use token');
-      expect(wizardProcess.stderrMemory).toEqual('');
-      const tokenSentence = wizardProcess.stdoutMemory
+      expect(stdout).toContain('Use token');
+      const tokenSentence = stdout
         .match(/Use token [\s\S]+/im)[0]
         .replace(log.bold, '')
         .replace(log.reset, '');
       projectToken = tokenSentence.match(/Use token ([\w-]+)/)[1];
 
       // Extract the admin token
-      expect(wizardProcess.stdoutMemory).toContain('Use admin token');
-      expect(wizardProcess.stderrMemory).toEqual('');
-      const adminSentence = wizardProcess.stdoutMemory
+      expect(stdout).toContain('Use admin token');
+      const adminSentence = stdout
         .match(/Use admin token [\s\S]+/im)[0]
         .replace(log.bold, '')
         .replace(log.reset, '');
       projectAdminToken = adminSentence.match(/Use admin token (\w+)/)[1];
+
+      expect(stderr).toEqual('');
+      expect(status).toEqual(0);
     }, 30000);
 
     it('should create a new project with config file', async () => {
@@ -119,57 +99,19 @@ describe('Lighthouse CI CLI', () => {
       const wizardRcFile = `${tmpFolder}/wizard.json`;
       fs.writeFileSync(wizardRcFile, JSON.stringify(wizardTempConfigFile), {encoding: 'utf8'});
 
-      const wizardProcess = spawn('node', [CLI_PATH, 'wizard', `--config=${wizardRcFile}`]);
-      wizardProcess.stdoutMemory = '';
-      wizardProcess.stderrMemory = '';
-      wizardProcess.stdout.on(
-        'data',
-        chunk => (wizardProcess.stdoutMemory += chunk.toString().replace(/\n/g, ''))
+      const {stdout, stderr, status} = await runWizardCLI(
+        [`--config=${wizardRcFile}`],
+        [
+          '', // Just ENTER key to select "new-project"
+          '', // Just ENTER key to use serverBaseUrl from config file
+          'OtherCIProjectName', // Project name
+          'https://example.com', // External build URL
+        ]
       );
-      wizardProcess.stderr.on('data', chunk => (wizardProcess.stderrMemory += chunk.toString()));
 
-      await waitForCondition(() => wizardProcess.stdoutMemory.includes('Which wizard'));
-      await writeAllInputs(wizardProcess, [
-        '', // Just ENTER key to select "new-project"
-        '', // Just ENTER key to use serverBaseUrl from config file
-        'OtherCIProjectName', // Project name
-        'https://example.com', // External build URL
-      ]);
-
-      expect(wizardProcess.stdoutMemory).toContain(`http://localhost:${server.port}`);
-      expect(wizardProcess.stderrMemory).toEqual('');
-    }, 30000);
-
-    it('should reset the admin token', async () => {
-      const storage = {storageMethod: 'sql', sqlDialect: 'sqlite', sqlDatabasePath: server.sqlFile};
-      const wizardTempConfigFile = {ci: {wizard: {wizard: 'reset-admin-token', storage}}};
-      const tmpFolder = fs.mkdtempSync(`${os.tmpdir()}${path.sep}`);
-      const wizardRcFile = `${tmpFolder}/wizard.json`;
-      fs.writeFileSync(wizardRcFile, JSON.stringify(wizardTempConfigFile), {encoding: 'utf8'});
-
-      const wizardProcess = spawn('node', [CLI_PATH, 'wizard', `--config=${wizardRcFile}`]);
-      wizardProcess.stdoutMemory = '';
-      wizardProcess.stderrMemory = '';
-      wizardProcess.stdout.on(
-        'data',
-        chunk => (wizardProcess.stdoutMemory += chunk.toString().replace(/\n/g, ''))
-      );
-      wizardProcess.stderr.on('data', chunk => (wizardProcess.stderrMemory += chunk.toString()));
-
-      await waitForCondition(() => wizardProcess.stdoutMemory.includes('Which project'));
-      await writeAllInputs(wizardProcess, [
-        '', // Just ENTER key to select the first project
-        'AwesomeCIProjectName', // Project name
-      ]);
-
-      // Extract the admin token
-      expect(wizardProcess.stdoutMemory).toContain('Use admin token');
-      expect(wizardProcess.stderrMemory).toEqual('');
-      const adminSentence = wizardProcess.stdoutMemory
-        .match(/Use admin token [\s\S]+/im)[0]
-        .replace(log.bold, '')
-        .replace(log.reset, '');
-      projectAdminToken = adminSentence.match(/Use admin token (\w+)/)[1];
+      expect(stdout).toContain(`http://localhost:${server.port}`);
+      expect(stderr).toEqual('');
+      expect(status).toEqual(0);
     }, 30000);
   });
 

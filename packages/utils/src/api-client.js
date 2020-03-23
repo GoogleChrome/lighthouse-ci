@@ -9,7 +9,7 @@ const URL = require('url').URL;
 const fetch = require('isomorphic-fetch');
 
 /** @type {(s: string) => string} */
-const btoa = typeof window === 'undefined' ? s => Buffer.from(s).toString('base64') : window.btoa;
+const btoa = typeof window === 'undefined' ? s => Buffer.from(s).toString('base64') : window.btoa; // eslint-disable-line no-undef
 
 class ApiClient {
   /**

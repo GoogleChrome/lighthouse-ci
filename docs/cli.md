@@ -16,7 +16,7 @@ yarn global add @lhci/cli
 
 ## Commands
 
-All commands support configuration via a JSON file passed in via `--config=./path/to/`. Any argument on the CLI can also be passed in via environment variable. For example, `--config=foo` can be replaced with `LH_RC_FILE=foo`. Learn more about [configuration](./configuration.md).
+All commands support configuration via a JSON file passed in via `--config=./path/to/`. Any argument on the CLI can also be passed in via environment variable. For example, `--config=foo` can be replaced with `LH_CONFIG=foo`. Learn more about [configuration](./configuration.md).
 
 ### `healthcheck`
 
@@ -296,20 +296,25 @@ Run Lighthouse CI server
 Options:
   --help                                 Show help                     [boolean]
   --version                              Show version number           [boolean]
-  --config                               Path to JSON config file
+  --no-lighthouserc                      Disables automatic usage of a
+                                         .lighthouserc file.           [boolean]
   --logLevel        [string] [choices: "silent", "verbose"] [default: "verbose"]
   --port, -p                                            [number] [default: 9001]
   --storage.sqlDialect
-                    [string] [choices: "sqlite", "postgres", "mysql"] [default: "sqlite"]
+           [string] [choices: "sqlite", "postgres", "mysql"] [default: "sqlite"]
   --storage.sqlDatabasePath              The path to a SQLite database on disk.
-  --storage.sqlConnectionUrl             The connection url to a postgres
-                                         database.
+  --storage.sqlConnectionUrl             The connection url to a postgres or
+                                         mysql database.
   --storage.sqlConnectionSsl             Whether the SQL connection should force
                                          use of SSL   [boolean] [default: false]
   --storage.sqlDangerouslyResetDatabase  Whether to force the database to the
                                          required schema. WARNING: THIS WILL
                                          DELETE ALL DATA
                                                       [boolean] [default: false]
+  --basicAuth.username                   The username to protect the server with
+                                         HTTP Basic Authentication.     [string]
+  --basicAuth.password                   The password to protect the server with
+                                         HTTP Basic Authentication.     [string]
 ```
 
 **Examples**
@@ -317,6 +322,7 @@ Options:
 ```bash
 lhci server --storage.sqlDatabasePath=./lhci.db
 lhci server --storage.sqlDialect=postgres --storage.sqlConnectionUrl="postgres://user@localhost/lighthouse_ci_db"
+lhci server --storage.sqlDatabasePath=./lhci.db --basicAuth.username="customuser" --basicAuth.password="LighthouseRocks"
 ```
 
 ## Configuration

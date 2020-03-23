@@ -6,6 +6,7 @@
 'use strict';
 
 const basicAuth = require('express-basic-auth');
+const ApiClient = require('@lhci/utils/src/api-client.js');
 const {hashAdminToken} = require('./storage/auth.js');
 
 class E404 extends Error {}
@@ -60,7 +61,7 @@ module.exports = {
    */
   createBasicAuthMiddleware(context) {
     if (!context.options.basicAuth) return undefined;
-    const {username = 'lhci', password} = context.options.basicAuth;
+    const {username = ApiClient.DEFAULT_BASIC_AUTH_USERNAME, password} = context.options.basicAuth;
     if (!password) return undefined;
 
     return basicAuth({users: {[username]: password}, challenge: true});

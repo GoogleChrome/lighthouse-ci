@@ -14,6 +14,7 @@ declare global {
         token?: string;
         ignoreDuplicateBuildFailure?: boolean;
         uploadUrlMap?: boolean;
+        basicAuth?: ServerCommand.Options['basicAuth'];
         extraHeaders?: Record<string, string>;
         githubToken?: string;
         githubApiHost?: string;

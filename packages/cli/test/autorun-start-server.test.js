@@ -5,22 +5,48 @@
  */
 'use strict';
 
-jest.retryTimes(3);
+// jest.retryTimes(3);
 
 /* eslint-env jest */
 
+const fs = require('fs');
+const os = require('os');
 const path = require('path');
-const {runCLI} = require('./test-utils.js');
+const ApiClient = require('@lhci/utils/src/api-client.js');
+const {runCLI, startServer, safeDeleteFile} = require('./test-utils.js');
 
 describe('Lighthouse CI autorun CLI with startServerCommand', () => {
   const autorunDir = path.join(__dirname, 'fixtures/autorun-start-server');
+  let server;
+  let serverBaseUrl;
+  let project;
+  let tmpConfigFile;
+
+  beforeAll(async () => {
+    server = await startServer(undefined, ['--basicAuth.password=foobar']);
+    serverBaseUrl = `http://localhost:${server.port}/`;
+    const apiClient = new ApiClient({rootURL: serverBaseUrl, basicAuth: {password: 'foobar'}});
+    project = await apiClient.createProject({name: 'Test'});
+
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'lighthouse-ci-'));
+    tmpConfigFile = path.join(tmpDir, 'config.json');
+  });
+
+  afterAll(async () => {
+    await safeDeleteFile(tmpConfigFile);
+
+    if (server) {
+      await server.process.kill();
+      await safeDeleteFile(server.sqlFile);
+    }
+  });
 
   it('should run all three steps', () => {
     const {stdout, stderr, status} = runCLI(
       [
         'autorun',
         '--collect.url=http://localhost:52425',
-        '--collect.n=2',
+        '--collect.n=1',
         '--assert.assertions.viewport=error',
       ],
       {cwd: autorunDir}
@@ -33,16 +59,15 @@ describe('Lighthouse CI autorun CLI with startServerCommand', () => {
       Healthcheck passed!
 
       Started a web server with \\"node autorun-server.js\\"...
-      Running Lighthouse 2 time(s) on http://localhost:XXXX
+      Running Lighthouse 1 time(s) on http://localhost:XXXX
       Run #1...done.
-      Run #2...done.
       Done running Lighthouse!
 
 
       "
     `);
     expect(stderr).toMatchInlineSnapshot(`
-      "Checking assertions against 1 URL(s), 2 total run(s)
+      "Checking assertions against 1 URL(s), 1 total run(s)
 
       1 result(s) for [1mhttp://localhost:XXXX/[0m
 
@@ -52,12 +77,54 @@ describe('Lighthouse CI autorun CLI with startServerCommand', () => {
 
               expected: >=[32m1[0m
                  found: [31m0[0m
-            [2mall values: 0, 0[0m
+            [2mall values: 0[0m
 
       Assertion failed. Exiting with status code 1.
       assert command failed. Exiting with status code 1.
       "
     `);
     expect(status).toEqual(1);
+  }, 180000);
+
+  it('should run all three steps on an authenticated server', () => {
+    const config = {
+      collect: {url: 'http://localhost:52425', numberOfRuns: 1},
+      upload: {serverBaseUrl, token: project.token, basicAuth: {password: 'foobar'}},
+    };
+
+    fs.writeFileSync(tmpConfigFile, JSON.stringify({ci: config}));
+
+    const {stdout, stderr, status} = runCLI(['autorun', `--config=${tmpConfigFile}`], {
+      cwd: autorunDir,
+    });
+
+    expect(stdout).toMatchInlineSnapshot(`
+      "✅  .lighthouseci/ directory writable
+      ✅  Configuration file found
+      ✅  Chrome installation found
+      ⚠️   GitHub token not set
+      ✅  Ancestor hash determinable
+      ✅  LHCI server reachable
+      ✅  LHCI server token valid
+      ✅  LHCI server unique build for this hash
+      Healthcheck passed!
+
+      Started a web server with \\"node autorun-server.js\\"...
+      Running Lighthouse 1 time(s) on http://localhost:XXXX
+      Run #1...done.
+      Done running Lighthouse!
+
+      Saving CI project Test (<UUID>)
+      Saving CI build (<UUID>)
+      Saved LHR to http://localhost:XXXX/ (<UUID>)
+      Done saving build results to Lighthouse CI
+      View build diff at http://localhost:XXXX/app/projects/test/compare/<UUID>
+      No GitHub token set, skipping.
+
+      Done running autorun.
+      "
+    `);
+    expect(stderr).toMatchInlineSnapshot(`""`);
+    expect(status).toEqual(0);
   }, 180000);
 });

@@ -55,7 +55,7 @@ async function withTmpDir(fn) {
   rimraf.sync(tmpDir);
 }
 
-async function startServer(sqlFile) {
+async function startServer(sqlFile, extraArgs = []) {
   if (!sqlFile) {
     sqlFile = getSqlFilePath();
   }
@@ -66,6 +66,7 @@ async function startServer(sqlFile) {
     'server',
     '-p=0',
     `--storage.sqlDatabasePath=${sqlFile}`,
+    ...extraArgs,
   ]);
   serverProcess.stdout.on('data', chunk => (stdout += chunk.toString()));
 

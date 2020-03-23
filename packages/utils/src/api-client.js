@@ -8,9 +8,12 @@
 const URL = require('url').URL;
 const fetch = require('isomorphic-fetch');
 
+/** @type {(s: string) => string} */
+const btoa = typeof window === 'undefined' ? s => Buffer.from(s).toString('base64') : window.btoa;
+
 class ApiClient {
   /**
-   * @param {{rootURL: string, fetch?: import('isomorphic-fetch'), URL?: typeof import('url').URL, extraHeaders?: Record<string, string>}} options
+   * @param {{rootURL: string, fetch?: import('isomorphic-fetch'), URL?: typeof import('url').URL, extraHeaders?: Record<string, string>, basicAuth?: LHCI.ServerCommand.Options['basicAuth']}} options
    */
   constructor(options) {
     this._rootURL = options.rootURL;
@@ -18,6 +21,11 @@ class ApiClient {
     this._extraHeaders = options.extraHeaders || {};
     this._fetch = options.fetch || fetch;
     this._URL = options.URL || URL;
+
+    if (options.basicAuth && options.basicAuth.password) {
+      const {username = ApiClient.DEFAULT_BASIC_AUTH_USERNAME, password} = options.basicAuth;
+      this._extraHeaders.Authorization = `Basic ${btoa(`${username}:${password}`)}`;
+    }
 
     /** @type {LHCI.ServerCommand.StorageMethod} */
     const typecheck = this; // eslint-disable-line no-unused-vars
@@ -355,6 +363,10 @@ class ApiClient {
   }
 
   async close() {}
+
+  static get DEFAULT_BASIC_AUTH_USERNAME() {
+    return 'lhci';
+  }
 }
 
 module.exports = ApiClient;

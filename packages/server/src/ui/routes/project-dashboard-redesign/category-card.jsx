@@ -372,6 +372,13 @@ export const CategoryCard = props => {
           loadingState={props.loadingState}
           asyncData={props.statistics}
           renderLoading={() => <span>Loading, please wait...</span>}
+          renderError={() => (
+            <span style={{textAlign: 'center'}}>
+              Woah, looks like there's a lot of data here!
+              <br />
+              Statistics are being computed now. Please try again in a few minutes.
+            </span>
+          )}
           render={statistics => {
             const propsWithState = {
               ...props,

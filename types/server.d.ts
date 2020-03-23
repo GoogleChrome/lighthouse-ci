@@ -163,6 +163,10 @@ declare global {
         logLevel: 'silent' | 'verbose';
         port: number;
         storage: StorageOptions;
+        basicAuth?: {
+          username?: string;
+          password?: string;
+        };
       }
     }
   }

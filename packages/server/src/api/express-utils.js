@@ -5,6 +5,7 @@
  */
 'use strict';
 
+const basicAuth = require('express-basic-auth');
 const {hashAdminToken} = require('./storage/auth.js');
 
 class E404 extends Error {}
@@ -52,6 +53,17 @@ module.exports = {
           res.send(JSON.stringify({message: err.message}));
         });
     };
+  },
+  /**
+   * @param {{options: LHCI.ServerCommand.Options}} context
+   * @return {import('express-serve-static-core').RequestHandler|undefined}
+   */
+  createBasicAuthMiddleware(context) {
+    if (!context.options.basicAuth) return undefined;
+    const {username = 'lhci', password} = context.options.basicAuth;
+    if (!password) return undefined;
+
+    return basicAuth({users: {[username]: password}, challenge: true});
   },
   /**
    * @param {Error} err

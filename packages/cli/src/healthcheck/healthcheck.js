@@ -20,6 +20,9 @@ const PASS_ICON = '✅';
 const WARN_ICON = '⚠️ ';
 const FAIL_ICON = '❌';
 
+/** @param {LHCI.YargsOptions} options @return {ApiClient} */
+const getApiClient = options => new ApiClient({...options, rootURL: options.serverBaseUrl || ''});
+
 /**
  * @param {import('yargs').Argv} yargs
  */
@@ -83,8 +86,7 @@ const checks = [
     failureLabel: 'LHCI server not reachable',
     // the test only makes sense if they've configured an LHCI server
     shouldTest: opts => Boolean(opts.serverBaseUrl && opts.token),
-    test: async ({serverBaseUrl = ''}) =>
-      (await new ApiClient({rootURL: serverBaseUrl}).getVersion()).length > 0,
+    test: async opts => (await getApiClient(opts).getVersion()).length > 0,
   },
   {
     id: 'lhciServer',
@@ -92,9 +94,9 @@ const checks = [
     failureLabel: 'LHCI server token invalid',
     // the test only makes sense if they've configured an LHCI server
     shouldTest: opts => Boolean(opts.serverBaseUrl && opts.token),
-    test: async ({serverBaseUrl = '', token = ''}) => {
-      const client = new ApiClient({rootURL: serverBaseUrl});
-      const project = await client.findProjectByToken(token);
+    test: async opts => {
+      const client = getApiClient(opts);
+      const project = await client.findProjectByToken(opts.token || '');
       return Boolean(project);
     },
   },
@@ -104,9 +106,9 @@ const checks = [
     failureLabel: 'LHCI server non-unique build for this hash',
     // the test only makes sense if they've configured an LHCI server
     shouldTest: opts => Boolean(opts.serverBaseUrl && opts.token),
-    test: async ({serverBaseUrl = '', token = ''}) => {
-      const client = new ApiClient({rootURL: serverBaseUrl});
-      const project = await client.findProjectByToken(token);
+    test: async opts => {
+      const client = getApiClient(opts);
+      const project = await client.findProjectByToken(opts.token || '');
       if (!project) return true;
       const builds = await client.getBuilds(project.id, {
         branch: getCurrentBranch(),

@@ -89,6 +89,16 @@ function buildCommand(yargs) {
     extraHeaders: {
       description: '[lhci only] Extra headers to use when making API requests to the LHCI server.',
     },
+    'basicAuth.username': {
+      type: 'string',
+      description:
+        '[lhci only] The username to use on a server protected with HTTP Basic Authentication.',
+    },
+    'basicAuth.password': {
+      type: 'string',
+      description:
+        '[lhci only] The password to use on a server protected with HTTP Basic Authentication.',
+    },
     serverBaseUrl: {
       description: '[lhci only] The base URL of the LHCI server where results will be saved.',
       default: 'http://localhost:9001/',
@@ -334,7 +344,7 @@ function buildTemporaryStorageLink(compareUrl, urlAudited, previousUrlMap) {
 async function runLHCITarget(options) {
   if (!options.token) throw new Error('Must provide token for LHCI target');
 
-  const api = new ApiClient({rootURL: options.serverBaseUrl, extraHeaders: options.extraHeaders});
+  const api = new ApiClient({...options, rootURL: options.serverBaseUrl});
 
   const project = await api.findProjectByToken(options.token);
   if (!project) {

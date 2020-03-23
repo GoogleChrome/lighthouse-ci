@@ -54,7 +54,12 @@ class FallbackServer {
   async close() {
     if (!this._server) return;
     const server = this._server;
-    return new Promise((resolve, reject) => server.close(err => (err ? reject(err) : resolve())));
+    return new Promise((resolve, reject) =>
+      server.close(
+        /** @param {Error|undefined} err */
+        err => (err ? reject(err) : resolve())
+      )
+    );
   }
 
   /** @return {string[]} */

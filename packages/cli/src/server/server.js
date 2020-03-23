@@ -47,6 +47,14 @@ function buildCommand(yargs) {
       type: 'boolean',
       default: false,
     },
+    'basicAuth.username': {
+      type: 'string',
+      description: 'The username to protect the server with HTTP Basic Authentication.',
+    },
+    'basicAuth.password': {
+      type: 'string',
+      description: 'The password to protect the server with HTTP Basic Authentication.',
+    },
   });
 }
 

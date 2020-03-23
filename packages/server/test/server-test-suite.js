@@ -27,7 +27,7 @@ function runTests(state) {
 
   beforeAll(() => {
     rootURL = `http://localhost:${state.port}`;
-    client = new ApiClient({rootURL});
+    client = new ApiClient({rootURL, extraHeaders: state.extraHeaders});
   });
 
   describe('/version', () => {
@@ -735,13 +735,16 @@ function runTests(state) {
   });
 
   describe('error handling', () => {
+    // Defer the use of `state.extraHeaders` because they're initialized in a `beforeAll` block
+    const fetchOptions = () => ({headers: state.extraHeaders});
+
     it('should return 404 in the case of missing data by id', async () => {
-      const response = await fetch(`${rootURL}/v1/projects/missing`);
+      const response = await fetch(`${rootURL}/v1/projects/missing`, fetchOptions());
       expect(response.status).toEqual(404);
     });
 
     it('should return 404 in the case of missing data by slug', async () => {
-      const response = await fetch(`${rootURL}/v1/projects/slug:missing`);
+      const response = await fetch(`${rootURL}/v1/projects/slug:missing`, fetchOptions());
       expect(response.status).toEqual(404);
     });
 

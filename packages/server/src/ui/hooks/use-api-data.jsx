@@ -32,6 +32,28 @@ export const api = new ApiClient({
   fetch: window.fetch.bind(window),
 });
 
+/** @param {string} projectId @return {string|undefined} */
+function getAdminTokenForProject(projectId) {
+  return localStorage.getItem(`adminToken__${projectId}`) || undefined;
+}
+
+/** @param {string} projectId @param {string} adminToken */
+function setAdminTokenForProject(projectId, adminToken) {
+  return localStorage.setItem(`adminToken__${projectId}`, adminToken);
+}
+
+/** @param {string} projectId @return {[string|undefined, (s: string) => void]} */
+export function useAdminToken(projectId) {
+  const [adminToken, setAdminToken] = useState(getAdminTokenForProject(projectId));
+  return [
+    adminToken,
+    token => {
+      setAdminTokenForProject(projectId, token);
+      setAdminToken(token);
+    },
+  ];
+}
+
 /** @typedef {'loading'|'error'|'loaded'} LoadingState */
 
 // We cache the last result to getRuns so repeated requests for a particular LHR aren't repeated.

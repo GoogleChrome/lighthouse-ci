@@ -34,7 +34,7 @@ export const PageSidebar = props => {
             return (
               <ul>
                 {projects.map(project => (
-                  <li key={project.id}>
+                  <li className="page-sidebar__link" key={project.id}>
                     <Link
                       className={clsx({
                         active: project.slug === projectSlug,
@@ -43,6 +43,12 @@ export const PageSidebar = props => {
                       onClick={() => props.setIsOpen(false)}
                     >
                       {project.name}
+                    </Link>
+                    <Link
+                      href={`/app/projects/${project.slug}/settings`}
+                      onClick={() => props.setIsOpen(false)}
+                    >
+                      <i className="material-icons">settings</i>
                     </Link>
                   </li>
                 ))}

@@ -35,6 +35,13 @@ describe('build-context.js', () => {
   //   feat(server): add version endpoint
   //
   const hash = 'e7f1b0fa3aebb6ef95e44c0d0b820433ffdd2e63';
+  // commit aebce298f6727ab942b065d72a60534802a15295 (tag: v0.3.12)
+  // Author: Patrick Hulce <patrick.hulce@gmail.com>
+  // Date:   Thu Mar 19 22:37:31 2020 -0500
+  //
+  //   fix(cli): revert to lhci github status context (#249)
+  //
+  const versionHash = 'aebce298f6727ab942b065d72a60534802a15295';
 
   describe('#getCurrentHash()', () => {
     it('should work', () => {
@@ -105,15 +112,15 @@ describe('build-context.js', () => {
     });
   });
 
-  describe('#getAncestorHashForMaster()', () => {
+  describe('#getAncestorHashForBase()', () => {
     it('should work', () => {
-      expect(buildContext.getAncestorHashForMaster(hash)).toEqual(
+      expect(buildContext.getAncestorHashForBase(hash)).toEqual(
         'ec95bc8ad992c9d68845040d612fbbbe94ad7f13'
       );
     });
 
     it('should return empty string when it fails', () => {
-      expect(buildContext.getAncestorHashForMaster('random' + Math.random())).toEqual('');
+      expect(buildContext.getAncestorHashForBase('random' + Math.random())).toEqual('');
     });
 
     it('should respect env override', () => {
@@ -128,8 +135,13 @@ describe('build-context.js', () => {
       expect(buildContext.getAncestorHashForBranch(hash)).toEqual(hash);
     });
 
+    it('should work for alternate branches', () => {
+      // the merge-base of master with itself is just itself.
+      expect(buildContext.getAncestorHashForBranch('HEAD', 'v0.3.12')).toEqual(versionHash);
+    });
+
     it('should return empty string when it fails', () => {
-      expect(buildContext.getAncestorHashForMaster('random' + Math.random())).toEqual('');
+      expect(buildContext.getAncestorHashForBase('random' + Math.random())).toEqual('');
     });
   });
 

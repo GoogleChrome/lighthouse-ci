@@ -25,7 +25,7 @@ const {
   getCommitMessage,
   getAuthor,
   getAvatarUrl,
-  getAncestorHashForMaster,
+  getAncestorHashForBase,
   getAncestorHashForBranch,
   getGitHubRepoSlug,
 } = require('@lhci/utils/src/build-context.js');
@@ -351,10 +351,11 @@ async function runLHCITarget(options) {
     throw new Error('Could not find active project with provided token');
   }
 
+  const baseBranch = project.baseBranch || 'master';
   const hash = getCurrentHash();
   const branch = getCurrentBranch();
   const ancestorHash =
-    branch === 'master' ? getAncestorHashForMaster() : getAncestorHashForBranch();
+    branch === baseBranch ? getAncestorHashForBase() : getAncestorHashForBranch('HEAD', baseBranch);
 
   const build = await api.createBuild({
     projectId: project.id,

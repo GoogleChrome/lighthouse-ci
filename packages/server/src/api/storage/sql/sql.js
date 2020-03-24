@@ -478,13 +478,14 @@ class SqlStorageMethod {
    * @return {Promise<LHCI.ServerCommand.Build | undefined>}
    */
   async findAncestorBuildById(projectId, buildId) {
-    const {buildModel} = this._sql();
+    const {projectModel, buildModel} = this._sql();
+    const project = await this._findByPk(projectModel, projectId);
     const build = await this._findByPk(buildModel, buildId);
-    if (!build || (build && build.projectId !== projectId)) return undefined;
+    if (!project || !build || (build && build.projectId !== projectId)) return undefined;
 
     if (build.ancestorHash) {
       const ancestorsByHash = await this._findAll(buildModel, {
-        where: {projectId: build.projectId, branch: 'master', hash: build.ancestorHash},
+        where: {projectId: build.projectId, branch: project.baseBranch, hash: build.ancestorHash},
         limit: 1,
       });
 
@@ -493,7 +494,7 @@ class SqlStorageMethod {
 
     const where = {
       projectId: build.projectId,
-      branch: 'master',
+      branch: project.baseBranch,
       id: {[Sequelize.Op.ne]: build.id},
     };
 
@@ -503,7 +504,7 @@ class SqlStorageMethod {
       limit: 1,
     });
 
-    if (build.branch === 'master') {
+    if (build.branch === project.baseBranch) {
       return nearestBuildBefore[0];
     }
 

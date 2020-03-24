@@ -229,7 +229,7 @@ function getAvatarUrl(hash = 'HEAD') {
  * @param {string} [hash]
  * @return {string}
  */
-function getAncestorHashForMaster(hash = 'HEAD') {
+function getAncestorHashForBase(hash = 'HEAD') {
   const result = childProcess.spawnSync('git', ['rev-parse', `${hash}^`], {encoding: 'utf8'});
   // Ancestor hash is optional, so do not throw if it can't be computed.
   // See https://github.com/GoogleChrome/lighthouse-ci/issues/36
@@ -240,12 +240,13 @@ function getAncestorHashForMaster(hash = 'HEAD') {
 
 /**
  * @param {string} [hash]
+ * @param {string} [baseBranch]
  * @return {string}
  */
-function getAncestorHashForBranch(hash = 'HEAD') {
+function getAncestorHashForBranch(hash = 'HEAD', baseBranch = 'master') {
   const result = runCommandsUntilFirstSuccess([
-    ['git', ['merge-base', hash, 'origin/master']],
-    ['git', ['merge-base', hash, 'master']],
+    ['git', ['merge-base', hash, `origin/${baseBranch}`]],
+    ['git', ['merge-base', hash, baseBranch]],
   ]);
 
   // Ancestor hash is optional, so do not throw if it can't be computed.
@@ -267,7 +268,7 @@ function getAncestorHash(hash = 'HEAD') {
   if (envHash) return envHash;
 
   return getCurrentBranch() === 'master'
-    ? getAncestorHashForMaster(hash)
+    ? getAncestorHashForBase(hash)
     : getAncestorHashForBranch(hash);
 }
 
@@ -313,7 +314,7 @@ module.exports = {
   getAuthor,
   getAvatarUrl,
   getAncestorHash,
-  getAncestorHashForMaster,
+  getAncestorHashForBase,
   getAncestorHashForBranch,
   getGitRemote,
   getGitHubRepoSlug,

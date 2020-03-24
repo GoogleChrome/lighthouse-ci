@@ -44,6 +44,7 @@ async function run() {
     slug: '',
     externalUrl: '',
     token: '',
+    baseBranch: '',
     adminToken: '',
   };
 

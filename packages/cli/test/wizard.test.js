@@ -41,8 +41,12 @@ describe('wizard CLI', () => {
           `http://localhost:${server.port}`, // The base URL to talk to
           'AwesomeCIProjectName', // Project name
           'https://example.com', // External build URL
+          'development', // baseBranch
         ]
       );
+
+      expect(stderr).toEqual('');
+      expect(status).toEqual(0);
 
       // Extract the regular token
       expect(stdout).toContain('Use token');
@@ -60,8 +64,16 @@ describe('wizard CLI', () => {
         .replace(log.reset, '');
       projectAdminToken = adminSentence.match(/Use admin token (\w+)/)[1];
 
-      expect(stderr).toEqual('');
-      expect(status).toEqual(0);
+      const client = new ApiClient({
+        rootURL: `http://localhost:${server.port}`,
+        basicAuth: {password: 'lighthouse'},
+      });
+      const project = await client.findProjectByToken(projectToken);
+      expect(project).toMatchObject({
+        name: 'AwesomeCIProjectName',
+        externalUrl: 'https://example.com',
+        baseBranch: 'development',
+      });
     }, 30000);
 
     it('should create a new project with config file', async () => {
@@ -87,12 +99,13 @@ describe('wizard CLI', () => {
           '', // Just ENTER key to use serverBaseUrl from config file
           'OtherCIProjectName', // Project name
           'https://example.com', // External build URL
+          '', // Default baseBranch
         ]
       );
 
-      expect(stdout).toContain(`http://localhost:${server.port}`);
       expect(stderr).toEqual('');
       expect(status).toEqual(0);
+      expect(stdout).toContain(`http://localhost:${server.port}`);
     }, 30000);
   });
 

@@ -313,6 +313,7 @@ class SqlStorageMethod {
     const adminToken = generateAdminToken();
     const project = await projectModel.create({
       ...unsavedProject,
+      baseBranch: unsavedProject.baseBranch || 'master',
       adminToken: hashAdminToken(adminToken, projectId),
       token: uuid.v4(),
       id: projectId,

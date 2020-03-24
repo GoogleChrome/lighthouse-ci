@@ -341,11 +341,9 @@ describe('Lighthouse CI CLI', () => {
     it('should have written links to a file', () => {
       const linksFile = path.join(process.cwd(), '.lighthouseci/links.json');
       const links = fs.readFileSync(linksFile, 'utf8');
-      expect(cleanStdOutput(links)).toMatchInlineSnapshot(`
-        "{
-          \\"http://localhost:XXXX/app/\\": \\"https://storage.googleapis.com/lighthouse-infrastructure.appspot.com/reports/XXXX-XXXX.report.html\\"
-        }"
-      `);
+      expect(links).toContain('http://localhost');
+      expect(links).toContain('/app/');
+      expect(links).toContain('storage.googleapis.com');
     });
 
     it('should fail repeated attempts', () => {

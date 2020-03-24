@@ -20,6 +20,7 @@ declare global {
         name: string;
         externalUrl: string;
         token: string;
+        baseBranch: string;
         adminToken: string;
         slug: string;
         createdAt?: string;

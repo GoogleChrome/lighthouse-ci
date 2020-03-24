@@ -16,7 +16,8 @@ const attributes = {
   slug: {type: Sequelize.STRING(40)},
   externalUrl: {type: Sequelize.STRING(256)},
   token: {type: Sequelize.UUID()},
-  adminToken: {type: Sequelize.STRING(40)},
+  baseBranch: {type: Sequelize.STRING(80)},
+  adminToken: {type: Sequelize.STRING(64)},
   createdAt: {type: Sequelize.DATE(6)},
   updatedAt: {type: Sequelize.DATE(6)},
 };

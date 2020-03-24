@@ -68,8 +68,12 @@ describe('Lighthouse CI CLI', () => {
           `http://localhost:${server.port}`, // The base URL to talk to
           'AwesomeCIProjectName', // Project name
           'https://example.com', // External build URL
+          '', // Default baseBranch
         ]
       );
+
+      expect(stderr).toEqual('');
+      expect(status).toEqual(0);
 
       // Extract the regular token
       expect(stdout).toContain('Use token');
@@ -86,9 +90,6 @@ describe('Lighthouse CI CLI', () => {
         .replace(log.bold, '')
         .replace(log.reset, '');
       projectAdminToken = adminSentence.match(/Use admin token (\w+)/)[1];
-
-      expect(stderr).toEqual('');
-      expect(status).toEqual(0);
     }, 30000);
 
     it('should create a new project with config file', async () => {
@@ -106,12 +107,13 @@ describe('Lighthouse CI CLI', () => {
           '', // Just ENTER key to use serverBaseUrl from config file
           'OtherCIProjectName', // Project name
           'https://example.com', // External build URL
+          '', // Default baseBranch
         ]
       );
 
-      expect(stdout).toContain(`http://localhost:${server.port}`);
       expect(stderr).toEqual('');
       expect(status).toEqual(0);
+      expect(stdout).toContain(`http://localhost:${server.port}`);
     }, 30000);
   });
 

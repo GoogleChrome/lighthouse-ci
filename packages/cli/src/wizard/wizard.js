@@ -41,6 +41,12 @@ async function runNewProjectWizard(options) {
       message: "Where is the project's code hosted?",
       default: 'https://github.com/<org>/<repo>',
     },
+    {
+      type: 'input',
+      name: 'projectBaseBranch',
+      message: "What branch is considered the repo's trunk?",
+      default: 'master',
+    },
   ]);
 
   const api = new ApiClient({
@@ -50,6 +56,7 @@ async function runNewProjectWizard(options) {
   const project = await api.createProject({
     name: responses.projectName,
     externalUrl: responses.projectExternalUrl,
+    baseBranch: responses.projectBaseBranch,
     slug: '', // this property is dynamically generated server-side
   });
 

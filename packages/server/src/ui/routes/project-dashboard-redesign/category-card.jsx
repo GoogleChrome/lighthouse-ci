@@ -374,7 +374,7 @@ export const CategoryCard = props => {
           renderLoading={() => <span>Loading, please wait...</span>}
           renderError={() => (
             <span style={{textAlign: 'center'}}>
-              Woah, looks like there's a lot of data here!
+              Woah, looks like there&apos;s a lot of data here!
               <br />
               Statistics are being computed now. Please try again in a few minutes.
             </span>

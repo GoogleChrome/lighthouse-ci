@@ -60,19 +60,33 @@ const defaultProps = {
 
 export const SelectBase = () => (
   <Wrapper>
-    <BuildHashSelector_ {...defaultProps} selector="base" />
+    <BuildHashSelector_ {...defaultProps} selector="base" baseBranch="master" />
   </Wrapper>
 );
 
 export const SelectCompare = () => (
   <Wrapper>
-    <BuildHashSelector_ {...defaultProps} selector="compare" />
+    <BuildHashSelector_ {...defaultProps} selector="compare" baseBranch="master" />
+  </Wrapper>
+);
+
+export const CustomBaseBranch = () => (
+  <Wrapper>
+    <BuildHashSelector_
+      {...defaultProps}
+      selector="base"
+      baseBranch="dev"
+      baseBuilds={branchBuilds}
+      branchBuilds={masterBuilds}
+      build={masterBuilds[0]}
+      ancestorBuild={branchBuilds[0]}
+    />
   </Wrapper>
 );
 
 export const NoMasterBuilds = () => (
   <Wrapper>
-    <BuildHashSelector_ {...defaultProps} selector="compare" baseBuilds={[]} />
+    <BuildHashSelector_ {...defaultProps} selector="compare" baseBuilds={[]} baseBranch="master" />
   </Wrapper>
 );
 
@@ -83,6 +97,7 @@ export const NoBranchBuilds = () => (
       selector="base"
       build={masterBuilds[2]}
       branchBuilds={[]}
+      baseBranch="master"
     />
   </Wrapper>
 );

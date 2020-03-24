@@ -24,14 +24,16 @@ import clsx from 'clsx';
 import {ProjectBuildList} from './build-list';
 import {DocumentTitle} from '../../components/document-title';
 
-/** @param {{urls: Array<{url: string}>, branches: Array<{branch: string}>, runUrl?: string, branch?: string}} props */
+/** @param {{urls: Array<{url: string}>, branches: Array<{branch: string}>, runUrl?: string, branch?: string, baseBranch: string}} props */
 const computeUrlAndBranchSelection = props => {
   const availableUrls = props.urls.length ? props.urls : [{url: 'None'}];
-  const availableBranches = props.branches.length ? props.branches : [{branch: 'master'}];
+  const availableBranches = props.branches.length ? props.branches : [{branch: props.baseBranch}];
   const selectedUrl = props.runUrl || availableUrls[0].url;
   const selectedBranch =
     props.branch ||
-    (availableBranches.some(b => b.branch === 'master') ? 'master' : availableBranches[0].branch);
+    (availableBranches.some(b => b.branch === props.baseBranch)
+      ? props.baseBranch
+      : availableBranches[0].branch);
   return {
     availableUrls,
     availableBranches,
@@ -140,6 +142,7 @@ export const ProjectDashboard = props => {
               project={project}
               builds={builds}
               {...computeUrlAndBranchSelection({
+                baseBranch: project.baseBranch,
                 urls,
                 branches,
                 runUrl: props.runUrl,

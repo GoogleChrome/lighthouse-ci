@@ -13,7 +13,7 @@ import {AsyncLoader, combineLoadingStates, combineAsyncData} from '../../compone
 import {Pill} from '../../components/pill';
 import {useEffect} from 'preact/hooks';
 
-/** @param {{branch: string, withDevLine: boolean, withNode: boolean, withDevBranchArc: boolean}} props */
+/** @param {{branch: string, withDevLine: boolean, withNode: boolean, withDevBranchArc: boolean, baseBranch: string}} props */
 const GitViz = props => {
   const {branch, withDevLine, withNode, withDevBranchArc} = props;
 
@@ -21,21 +21,30 @@ const GitViz = props => {
     <span className="build-hash-selector__git-viz git-viz">
       <span className="git-viz__master-line" />
       {withDevLine ? <span className="git-viz__dev-line" /> : <Fragment />}
-      {withNode && branch === 'master' ? <span className="git-viz__master-node" /> : <Fragment />}
-      {withNode && branch !== 'master' ? <span className="git-viz__dev-node" /> : <Fragment />}
+      {withNode && branch === props.baseBranch ? (
+        <span className="git-viz__master-node" />
+      ) : (
+        <Fragment />
+      )}
+      {withNode && branch !== props.baseBranch ? (
+        <span className="git-viz__dev-node" />
+      ) : (
+        <Fragment />
+      )}
       {withDevBranchArc ? <span className="git-viz__dev-branch-off" /> : <Fragment />}
     </span>
   );
 };
 
-/** @param {{branch: string, withDevLine: boolean, withDevBranchArc?: boolean}} props */
+/** @param {{branch: string, withDevLine: boolean, withDevBranchArc?: boolean, baseBranch: string}} props */
 const LabelLineItem = props => {
-  const variant = props.branch === 'master' ? 'master-branch' : 'dev-branch';
+  const variant = props.branch === props.baseBranch ? 'master-branch' : 'dev-branch';
   return (
     <li className="build-hash-selector__item build-hash-selector__label-li">
       <div className="container">
         <span className="build-hash-selector__selection" />
         <GitViz
+          baseBranch={props.baseBranch}
           branch={props.branch}
           withNode={false}
           withDevBranchArc={props.withDevBranchArc || false}
@@ -82,14 +91,14 @@ const GitHubLink = props => {
   }
 };
 
-/** @param {{build: LHCI.ServerCommand.Build, compareBuild: LHCI.ServerCommand.Build, baseBuild: LHCI.ServerCommand.Build | null | undefined, selector: 'base'|'compare', withDevBranchArc: boolean, withDevLine: boolean, key: string}} props */
+/** @param {{build: LHCI.ServerCommand.Build, compareBuild: LHCI.ServerCommand.Build, baseBuild: LHCI.ServerCommand.Build | null | undefined, selector: 'base'|'compare', withDevBranchArc: boolean, withDevLine: boolean, key: string, baseBranch: string}} props */
 const BuildLineItem = props => {
   const {build, compareBuild, baseBuild, selector} = props;
   const isCompareBranch = build.id === compareBuild.id;
   const isBaseBranch = build.id === (baseBuild && baseBuild.id);
   const isSelected =
     (selector === 'base' && isBaseBranch) || (selector === 'compare' && isCompareBranch);
-  const variant = build.branch === 'master' ? 'master-branch' : 'dev-branch';
+  const variant = build.branch === props.baseBranch ? 'master-branch' : 'dev-branch';
 
   return (
     <li
@@ -128,6 +137,7 @@ const BuildLineItem = props => {
           )}
         </span>
         <GitViz
+          baseBranch={props.baseBranch}
           branch={build.branch}
           withNode
           withDevBranchArc={props.withDevBranchArc}
@@ -152,10 +162,11 @@ const BuildLineItem = props => {
 };
 
 /**
- * @param {{build: LHCI.ServerCommand.Build, ancestorBuild?: LHCI.ServerCommand.Build | null, selector: 'base'|'compare', branchBuilds: Array<LHCI.ServerCommand.Build>, baseBuilds: Array<LHCI.ServerCommand.Build>, lhr: LH.Result, baseLhr?: LH.Result, close: () => void}} props
+ * @param {{build: LHCI.ServerCommand.Build, ancestorBuild?: LHCI.ServerCommand.Build | null, selector: 'base'|'compare', branchBuilds: Array<LHCI.ServerCommand.Build>, baseBuilds: Array<LHCI.ServerCommand.Build>, lhr: LH.Result, baseLhr?: LH.Result, close: () => void, baseBranch: string}} props
  */
 export const BuildHashSelector_ = props => {
-  const {branchBuilds, baseBuilds} = props;
+  const {branchBuilds, baseBuilds, baseBranch} = props;
+  // Builds sorted by run time *descending* because we show most recent at the top.
   const builds = _.uniqBy(
     branchBuilds
       .concat(baseBuilds)
@@ -163,8 +174,9 @@ export const BuildHashSelector_ = props => {
     build => build.id
   );
 
-  const indexOfFirstDev =
-    props.build.branch === 'master'
+  // Compute the index of the *lowest* dev build so we know when to show the branch arc
+  const indexOfLastDev =
+    props.build.branch === baseBranch
       ? -10
       : builds.length -
         1 -
@@ -199,18 +211,24 @@ export const BuildHashSelector_ = props => {
             build={build}
             compareBuild={props.build}
             baseBuild={props.ancestorBuild}
+            baseBranch={props.baseBranch}
             selector={props.selector}
-            withDevLine={index <= indexOfFirstDev && props.build.branch !== 'master'}
-            withDevBranchArc={index === indexOfFirstDev + 1}
+            withDevLine={index <= indexOfLastDev && props.build.branch !== baseBranch}
+            withDevBranchArc={index === indexOfLastDev + 1}
           />
-          {index === indexOfFirstDev && build.branch !== 'master' ? (
-            <LabelLineItem branch={build.branch} withDevLine={true} />
+          {index === indexOfLastDev && build.branch !== baseBranch ? (
+            <LabelLineItem branch={build.branch} withDevLine={true} baseBranch={baseBranch} />
           ) : null}
-          {indexOfFirstDev === builds.length - 1 && index === indexOfFirstDev ? (
-            <LabelLineItem branch="" withDevLine={false} withDevBranchArc={true} />
+          {indexOfLastDev === builds.length - 1 && index === indexOfLastDev ? (
+            <LabelLineItem
+              branch=""
+              withDevLine={false}
+              withDevBranchArc={true}
+              baseBranch={baseBranch}
+            />
           ) : null}
           {index === builds.length - 1 ? (
-            <LabelLineItem branch="master" withDevLine={false} />
+            <LabelLineItem branch={baseBranch} withDevLine={false} baseBranch={baseBranch} />
           ) : null}
         </Fragment>
       ))}
@@ -219,12 +237,13 @@ export const BuildHashSelector_ = props => {
 };
 
 /**
- * @param {{build: LHCI.ServerCommand.Build, ancestorBuild?: LHCI.ServerCommand.Build | null, selector: 'base'|'compare', lhr: LH.Result, baseLhr?: LH.Result, close: () => void}} props
+ * @param {{build: LHCI.ServerCommand.Build, ancestorBuild?: LHCI.ServerCommand.Build | null, selector: 'base'|'compare', lhr: LH.Result, baseLhr?: LH.Result, close: () => void, baseBranch: string}} props
  */
 export const BuildHashSelector = props => {
-  const {build} = props;
+  const {build, baseBranch} = props;
   const branchLoadingData = useBranchBuilds(build.projectId, build.branch, {limit: 100});
-  const baseLoadingData = useBranchBuilds(build.projectId, 'master', {limit: 100});
+  const baseLoadingData = useBranchBuilds(build.projectId, baseBranch, {limit: 100});
+
   return (
     <Fragment>
       <div className="build-hash-selector-obscure-background" />
@@ -233,7 +252,12 @@ export const BuildHashSelector = props => {
           loadingState={combineLoadingStates(branchLoadingData, baseLoadingData)}
           asyncData={combineAsyncData(branchLoadingData, baseLoadingData)}
           render={([branchBuilds, baseBuilds]) => (
-            <BuildHashSelector_ {...props} branchBuilds={branchBuilds} baseBuilds={baseBuilds} />
+            <BuildHashSelector_
+              {...props}
+              branchBuilds={branchBuilds}
+              baseBuilds={baseBuilds}
+              baseBranch={baseBranch}
+            />
           )}
         />
       </div>

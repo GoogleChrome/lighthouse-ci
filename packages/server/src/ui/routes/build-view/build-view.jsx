@@ -130,6 +130,7 @@ const BuildView_ = props => {
           selector={openBuildHash}
           lhr={lhr}
           baseLhr={baseLhr}
+          baseBranch={props.project.baseBranch}
           close={buildHashSelectorCloseFn}
         />
       ) : (

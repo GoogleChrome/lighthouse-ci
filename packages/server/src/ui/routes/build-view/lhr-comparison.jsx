@@ -24,6 +24,30 @@ import {LhrRuntimeDiff, computeRuntimeDiffs} from './lhr-comparison-runtime-diff
 
 /** @typedef {{id: string, pairs: Array<LHCI.AuditPair>, group: {id: string, title: string}, showAsUnchanged: boolean}} AuditGroupDef */
 
+/** @param {(s: string) => void} setAuditId */
+function useAuditPermalinkScrollOnLoad(setAuditId) {
+  /** @param {number} ms */
+  const wait = ms => new Promise(r => setTimeout(r, ms));
+
+  /** @param {string} selector */
+  const waitUntilSelector = async selector => {
+    let attempts = 0;
+    while (!document.querySelector(selector) && attempts < 10) {
+      await wait(500);
+      attempts++;
+    }
+  };
+
+  useEffect(() => {
+    if (window.location.hash.length <= 1) return;
+
+    Promise.resolve().then(async () => {
+      await waitUntilSelector('.lhr-comparison__audit-groups');
+      setAuditId(window.location.hash.slice(1));
+    });
+  }, []);
+}
+
 /**
  * @param {LH.Result} lhr
  * @param {LH.Result|undefined} baseLhr
@@ -147,6 +171,7 @@ export const LhrComparison = props => {
   const [percentAbsoluteDeltaThreshold, setDiffThreshold] = useState(0.05);
   const [selectedAuditId, setAuditId] = useState(/** @type {string|null} */ (null));
   const [runtimeDiffAck, setRuntimeDiffAck] = useState(defaultAck);
+  useAuditPermalinkScrollOnLoad(setAuditId);
 
   // Attach the LHRs to the window for easy debugging.
   useEffect(() => {

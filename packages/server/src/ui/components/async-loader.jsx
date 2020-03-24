@@ -30,7 +30,7 @@ export const AsyncLoader = props => {
   if (loadingState === 'loaded') {
     return asyncData === undefined ? <Resource404 /> : render(asyncData);
   } else if (loadingState === 'error') {
-    return renderError ? renderError() : <h1>Lighthouse Error</h1>;
+    return renderError ? renderError() : <h1>Lighthouse CI Server Error</h1>;
   } else if (loadingState === 'loading') {
     return renderLoading ? renderLoading() : <LoadingSpinner />;
   }

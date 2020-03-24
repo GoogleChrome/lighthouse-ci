@@ -195,8 +195,8 @@ export const ProjectGraphs = props => {
   const {project, builds, branch: overrideBranch} = props;
   const branch =
     overrideBranch ||
-    (!builds.length || builds.some(build => build.branch === 'master')
-      ? 'master'
+    (!builds.length || builds.some(build => build.branch === project.baseBranch)
+      ? project.baseBranch
       : builds[0].branch);
   const buildIds = useMemo(
     () =>

@@ -44,7 +44,10 @@ function setAdminTokenForProject(projectId, adminToken) {
 
 /** @param {string} projectId @return {[string|undefined, (s: string) => void]} */
 export function useAdminToken(projectId) {
-  const [adminToken, setAdminToken] = useState(getAdminTokenForProject(projectId));
+  const adminToken = getAdminTokenForProject(projectId);
+  // We only use state to trigger a rerender, not to actually keep track of the data
+  const setAdminToken = useState(adminToken)[1];
+
   return [
     adminToken,
     token => {

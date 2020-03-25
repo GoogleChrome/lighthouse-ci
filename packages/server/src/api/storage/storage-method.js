@@ -82,6 +82,15 @@ class StorageMethod {
   }
 
   /**
+   * @param {Pick<LHCI.ServerCommand.Project, 'id'|'baseBranch'|'externalUrl'|'name'>} project
+   * @return {Promise<void>}
+   */
+  // eslint-disable-next-line no-unused-vars
+  async updateProject(project) {
+    throw new Error('Unimplemented');
+  }
+
+  /**
    * @param {string} projectId
    * @param {LHCI.ServerCommand.GetBuildsOptions} [options]
    * @return {Promise<LHCI.ServerCommand.Build[]>}

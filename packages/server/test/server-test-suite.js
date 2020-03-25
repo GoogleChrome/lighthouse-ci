@@ -102,6 +102,43 @@ function runTests(state) {
       expect(project).toEqual({...projectA, adminToken: '', token: ''});
     });
 
+    it('should update a project', async () => {
+      client.setAdminToken(projectC.adminToken);
+      await client.updateProject({
+        id: projectC.id,
+        name: 'Updated',
+        externalUrl: 'https://updated.example.com',
+        baseBranch: 'updated-dev',
+        adminToken: 'haxx',
+        slug: 'ignored',
+      });
+
+      const project = await client.findProjectById(projectC.id);
+      expect(project).toEqual({
+        ...projectC,
+        updatedAt: project.updatedAt,
+        name: 'Updated',
+        externalUrl: 'https://updated.example.com',
+        baseBranch: 'updated-dev',
+        adminToken: '',
+        token: '',
+      });
+
+      expect(new Date(project.updatedAt).getTime()).toBeGreaterThan(
+        new Date(projectC.updatedAt).getTime()
+      );
+
+      await client.updateProject({
+        id: projectC.id,
+        name: 'Updated Back',
+        adminToken: 'haxx',
+      });
+
+      expect(await client.findProjectById(projectC.id)).toHaveProperty('name', 'Updated Back');
+      client.setAdminToken('haxx');
+      await expect(client.updateProject(projectC)).rejects.toMatchObject({status: 403});
+    });
+
     describe('slugs', () => {
       it('should create lots of unique slugs', async () => {
         const payload = {name: 'Lighthouse', externalUrl: 'https://github.com/lighthouse'};
@@ -896,6 +933,16 @@ function runTests(state) {
       });
 
       expect(await client.findBuildById(projectA.id, buildA.id)).toBeDefined();
+    });
+
+    it('should fail to take update actions with a token for another project', async () => {
+      client.setAdminToken(projectB.adminToken);
+      await expect(client.updateProject({...projectA, name: 'Haxxx'})).rejects.toMatchObject({
+        status: 403,
+        body: '{"message":"Invalid token"}',
+      });
+
+      expect(await client.findProjectById(projectA.id)).toHaveProperty('name', projectA.name);
     });
   });
 

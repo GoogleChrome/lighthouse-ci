@@ -207,6 +207,14 @@ class ApiClient {
   }
 
   /**
+   * @param {Pick<LHCI.ServerCommand.Project, 'id'|'baseBranch'|'externalUrl'|'name'>} projectUpdates
+   * @return {Promise<void>}
+   */
+  async updateProject(projectUpdates) {
+    return this._put(`/v1/projects/${projectUpdates.id}`, projectUpdates);
+  }
+
+  /**
    * @param {string} projectId
    * @return {Promise<void>}
    */

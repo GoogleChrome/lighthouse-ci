@@ -65,6 +65,19 @@ function createRouter(context) {
     })
   );
 
+  // PUT /projects/:id
+  router.put(
+    '/:projectId',
+    validateAdminTokenMiddleware(context),
+    handleAsyncError(async (req, res) => {
+      await context.storageMethod.updateProject({
+        ...req.body,
+        id: req.params.projectId,
+      });
+      res.sendStatus(204);
+    })
+  );
+
   // DELETE /projects/:id
   router.delete(
     '/:projectId',

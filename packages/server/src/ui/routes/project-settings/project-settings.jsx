@@ -11,39 +11,117 @@ import {Page} from '../../layout/page';
 import {DocumentTitle} from '../../components/document-title';
 import './project-settings.css';
 import {Paper} from '../../components/paper';
-import {useState} from 'preact/hooks';
+import {useState, useEffect} from 'preact/hooks';
 import {route} from 'preact-router';
 import {LoadingSpinner} from '../../components/loading-spinner';
+import {usePreviousValue} from '../../hooks/use-previous-value';
 
 /** @param {{project: LHCI.ServerCommand.Project}} props */
 const ProjectSettings_ = ({project}) => {
+  const previousProjectId = usePreviousValue(project.id);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [adminToken, setAdminToken] = useAdminToken(project.id);
+  const [name, setName] = useState('');
+  const [externalUrl, setExternalUrl] = useState('');
+  const [baseBranch, setBaseBranch] = useState('');
+  const [adminToken, saveAdminToken] = useAdminToken(project.id);
+  const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+
+  const clearMessages = () => {
+    setSuccessMessage('');
+    setErrorMessage('');
+  };
+
+  useEffect(() => {
+    if (project.id === previousProjectId) return;
+    setName(project.name);
+    setExternalUrl(project.externalUrl);
+    setBaseBranch(project.baseBranch);
+  }, [project.id, previousProjectId]);
 
   if (isProcessing) {
     return <LoadingSpinner />;
   }
 
+  /** @type {(setter: (s: string) => void) => (e: Event) => void} */
+  const changeHandler = setter => e =>
+    setter(e.target instanceof HTMLInputElement ? e.target.value : '');
+
   return (
     <Fragment>
+      {successMessage ? <Paper>{successMessage}</Paper> : null}
       {errorMessage ? <Paper className="text--fail">{errorMessage}</Paper> : null}
       <Paper>
         <h2>Administrative Settings</h2>
-        <div className="text--secondary">{project.name}</div>
+        <label className="form-item">
+          <div className="text--smaller">Project Name</div>
+          <input
+            placeholder="Project"
+            style={{minWidth: 250}}
+            value={name}
+            onChange={changeHandler(setName)}
+            type="text"
+          />
+        </label>
+        <label className="form-item">
+          <div className="text--smaller">External URL</div>
+          <input
+            placeholder="master"
+            style={{minWidth: 250}}
+            value={externalUrl}
+            onChange={changeHandler(setExternalUrl)}
+            type="text"
+          />
+        </label>
+        <label className="form-item">
+          <div className="text--smaller">Base Branch</div>
+          <input
+            placeholder="master"
+            style={{minWidth: 250}}
+            value={baseBranch}
+            onChange={changeHandler(setBaseBranch)}
+            type="text"
+          />
+        </label>
         <label className="form-item">
           <div className="text--smaller">Admin Token</div>
           <input
-            placeholder="Paste admin token here"
+            placeholder="[REQUIRED] Paste admin token here"
             style={{minWidth: 250}}
-            value={adminToken}
-            onChange={e =>
-              setAdminToken(e.target instanceof HTMLInputElement ? e.target.value : '')
-            }
+            value={adminToken || ''}
+            onChange={changeHandler(saveAdminToken)}
             type="text"
           />
         </label>
         <div className="form-item">
+          <button
+            type="button"
+            disabled={!adminToken || !baseBranch}
+            onClick={() => {
+              clearMessages();
+              setIsProcessing(true);
+
+              api.setAdminToken(adminToken);
+              api
+                .updateProject({
+                  id: project.id,
+                  name,
+                  externalUrl,
+                  baseBranch,
+                })
+                .then(() => {
+                  setSuccessMessage('Project updated successfully!');
+                  setIsProcessing(false);
+                })
+                .catch(err => {
+                  setErrorMessage(`Failed to save project (${err.message})`);
+                  setIsProcessing(false);
+                });
+            }}
+          >
+            Save
+          </button>
+          <span className="h-spacer" />
           <button
             type="button"
             disabled={!adminToken}
@@ -60,6 +138,7 @@ const ProjectSettings_ = ({project}) => {
                 return;
               }
 
+              clearMessages();
               setIsProcessing(true);
               api.setAdminToken(adminToken);
               api

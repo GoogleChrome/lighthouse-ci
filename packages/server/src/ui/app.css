@@ -163,6 +163,16 @@ h6 {
   font-weight: var(--base-font-weight);
 }
 
+.v-spacer {
+  display: block;
+  height: var(--base-spacing);
+}
+
+.h-spacer {
+  display: inline-block;
+  width: var(--base-spacing);
+}
+
 .flex-row {
   display: flex;
   flex-direction: row;

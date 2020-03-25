@@ -23,14 +23,14 @@ const Resource404 = () => {
 
 /**
  * @template T
- * @param {{loadingState: LoadingState, asyncData: T | undefined, render: (data: T) => JSX.Element, renderLoading?: () => JSX.Element}} props */
+ * @param {{loadingState: LoadingState, asyncData: T | undefined, render: (data: T) => JSX.Element, renderLoading?: () => JSX.Element, renderError?: () => JSX.Element}} props */
 export const AsyncLoader = props => {
-  const {asyncData, loadingState, render, renderLoading} = props;
+  const {asyncData, loadingState, render, renderLoading, renderError} = props;
 
   if (loadingState === 'loaded') {
     return asyncData === undefined ? <Resource404 /> : render(asyncData);
   } else if (loadingState === 'error') {
-    return <h1>Lighthouse Error</h1>;
+    return renderError ? renderError() : <h1>Lighthouse CI Server Error</h1>;
   } else if (loadingState === 'loading') {
     return renderLoading ? renderLoading() : <LoadingSpinner />;
   }

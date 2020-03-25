@@ -22,7 +22,7 @@ describe('AsyncLoader', () => {
 
   it('should render the error state', async () => {
     const {container} = render(<AsyncLoader loadingState="error" />);
-    expect(container.innerHTML).toMatchInlineSnapshot(`"<h1>Lighthouse Error</h1>"`);
+    expect(container.innerHTML).toMatchInlineSnapshot(`"<h1>Lighthouse CI Server Error</h1>"`);
   });
 
   it('should render the loaded state', async () => {

@@ -325,6 +325,24 @@ class SqlStorageMethod {
   }
 
   /**
+   * @param {Pick<LHCI.ServerCommand.Project, 'id'|'baseBranch'|'externalUrl'|'name'>} projectUpdates
+   * @return {Promise<void>}
+   */
+  async updateProject(projectUpdates) {
+    const {projectModel} = this._sql();
+    if (projectUpdates.name.length < 4) throw new E422('Project name too short');
+
+    await projectModel.update(
+      {
+        name: projectUpdates.name,
+        externalUrl: projectUpdates.externalUrl,
+        baseBranch: projectUpdates.baseBranch,
+      },
+      {where: {id: projectUpdates.id}}
+    );
+  }
+
+  /**
    * @param {string} projectId
    * @param {LHCI.ServerCommand.GetBuildsOptions} [options]
    * @return {Promise<LHCI.ServerCommand.Build[]>}

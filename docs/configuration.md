@@ -179,6 +179,18 @@ If you're a Lighthouse pro, assert the recommended preset, increase the number o
 
 ## Common Examples
 
+### Custom build directory
+
+```json
+{
+  "ci": {
+    "collect": {
+      "staticDistDir": "./_site"
+    }
+  }
+}
+```
+
 ### Custom Lighthouse Config
 
 ```json

@@ -311,11 +311,11 @@ describe('Lighthouse CI CLI', () => {
       expect(stderr).toMatchInlineSnapshot(`
         "Checking assertions against 1 URL(s), 2 total run(s)
 
-        1 result(s) for [1mhttp://localhost:XXXX/app/[0m
+        1 result(s) for [1mhttp://localhost:XXXX/app/[0m :
 
           [31mX[0m  [1mworks-offline[0m failure for [1mminScore[0m assertion
-             Current page does not respond with a 200 when offline
-             Documentation: https://web.dev/works-offline
+               Current page does not respond with a 200 when offline
+               https://web.dev/works-offline
 
                 expected: >=[32m1[0m
                    found: [31m0[0m
@@ -340,11 +340,11 @@ describe('Lighthouse CI CLI', () => {
       expect(stderr).toMatchInlineSnapshot(`
         "Checking assertions against 1 URL(s), 2 total run(s)
 
-        1 result(s) for [1mhttp://localhost:XXXX/app/[0m
+        1 result(s) for [1mhttp://localhost:XXXX/app/[0m :
 
           [31mX[0m  [1mperformance-budget[0m.script.size failure for [1mmaxNumericValue[0m assertion
-             Performance budget
-             Documentation: https://developers.google.com/web/tools/lighthouse/audits/budgets
+               Performance budget
+               https://developers.google.com/web/tools/lighthouse/audits/budgets
 
                 expected: <=[32mXXXX[0m
                    found: [31mXXXX[0m
@@ -363,11 +363,11 @@ describe('Lighthouse CI CLI', () => {
       expect(stderr).toMatchInlineSnapshot(`
         "Checking assertions against 1 URL(s), 2 total run(s)
 
-        1 result(s) for [1mhttp://localhost:XXXX/app/[0m
+        1 result(s) for [1mhttp://localhost:XXXX/app/[0m :
 
           [31mX[0m  [1mworks-offline[0m failure for [1mminScore[0m assertion
-             Current page does not respond with a 200 when offline
-             Documentation: https://web.dev/works-offline
+               Current page does not respond with a 200 when offline
+               https://web.dev/works-offline
 
                 expected: >=[32m1[0m
                    found: [31m0[0m
@@ -391,11 +391,11 @@ describe('Lighthouse CI CLI', () => {
       expect(stderr).toMatchInlineSnapshot(`
         "Checking assertions against 1 URL(s), 2 total run(s)
 
-        2 result(s) for [1mhttp://localhost:XXXX/app/[0m
+        2 result(s) for [1mhttp://localhost:XXXX/app/[0m :
 
           [31mX[0m  [1mfirst-contentful-paint[0m failure for [1mmaxNumericValue[0m assertion
-             First Contentful Paint
-             Documentation: https://web.dev/first-contentful-paint
+               First Contentful Paint
+               https://web.dev/first-contentful-paint
 
                 expected: <=[32m1[0m
                    found: [31mXXXX[0m
@@ -403,8 +403,8 @@ describe('Lighthouse CI CLI', () => {
 
 
           [31mX[0m  [1mperformance-budget[0m.script.size failure for [1mmaxNumericValue[0m assertion
-             Performance budget
-             Documentation: https://developers.google.com/web/tools/lighthouse/audits/budgets
+               Performance budget
+               https://developers.google.com/web/tools/lighthouse/audits/budgets
 
                 expected: <=[32mXXXX[0m
                    found: [31mXXXX[0m
@@ -423,11 +423,11 @@ describe('Lighthouse CI CLI', () => {
       expect(stderr).toMatchInlineSnapshot(`
         "Checking assertions against 1 URL(s), 2 total run(s)
 
-        1 result(s) for [1mhttp://localhost:XXXX/app/[0m
+        1 result(s) for [1mhttp://localhost:XXXX/app/[0m :
 
           [31mX[0m  [1mresource-summary[0m.script.size failure for [1mmaxNumericValue[0m assertion
-             Keep request counts low and transfer sizes small
-             Documentation: https://developers.google.com/web/tools/lighthouse/audits/budgets
+               Keep request counts low and transfer sizes small
+               https://developers.google.com/web/tools/lighthouse/audits/budgets
 
                 expected: <=[32mXXXX[0m
                    found: [31mXXXX[0m

@@ -77,7 +77,7 @@ async function runCommand(options) {
       return levelA.localeCompare(levelB) || auditIdA.localeCompare(auditIdB);
     });
 
-    process.stderr.write(`${sortedResults.length} result(s) for ${log.bold}${url}${log.reset}\n`);
+    process.stderr.write(`${sortedResults.length} result(s) for ${log.bold}${url}${log.reset} :\n`);
 
     for (const result of sortedResults) {
       const {level, passed, auditId} = result;
@@ -90,12 +90,10 @@ async function runCommand(options) {
       const namePart = `${log.bold}${result.name}${log.reset}`;
 
       const auditTitlePart = result.auditTitle || '';
-      const documentationPart = result.auditDocumentationLink
-        ? `Documentation: ${result.auditDocumentationLink}`
-        : '';
+      const documentationPart = result.auditDocumentationLink || '';
       const titleAndDocs = [auditTitlePart, documentationPart]
         .filter(Boolean)
-        .map(s => `     ` + s)
+        .map(s => `       ` + s)
         .join('\n');
       const humanFriendlyParts = titleAndDocs ? `\n${titleAndDocs}\n` : '';
 

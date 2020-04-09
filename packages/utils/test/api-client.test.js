@@ -55,4 +55,29 @@ describe('Lighthouse CI API Client', () => {
       );
     });
   });
+
+  describe('#isApiVersionCompatible', () => {
+    const isCompatible = (s1, s2) => ApiClient.isApiVersionCompatible(s1, s2);
+
+    it('should recognize compatible versions', () => {
+      expect(isCompatible('0.0.1', '0.0.2')).toBe(true);
+      expect(isCompatible('1.0.1', '1.4.2')).toBe(true);
+      expect(isCompatible('2.1.1-alpha.1', '2.0.0')).toBe(true);
+      expect(isCompatible('0.3.1', '0.3.2')).toBe(true);
+      expect(isCompatible('0.0.1', '0.0.2')).toBe(true);
+      expect(isCompatible('0.0.1', '0.0.2')).toBe(true);
+    });
+
+    it('should recognize incompatible versions', () => {
+      expect(isCompatible('1.0.0', '2.0.0')).toBe(false);
+      expect(isCompatible('0.4.1', '0.3.2')).toBe(false);
+      expect(isCompatible('0.1.1', '1.0.2')).toBe(false);
+      expect(isCompatible('2.1.1-alpha.1', '1.0.2')).toBe(false);
+    });
+
+    it('should return false on invalid versions', () => {
+      expect(isCompatible('0.1', '0.1')).toBe(false);
+      expect(isCompatible('vtwo', 'vtwo')).toBe(false);
+    });
+  });
 });

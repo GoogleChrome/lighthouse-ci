@@ -132,6 +132,7 @@ describe('Lighthouse CI CLI', () => {
         ⚠️   GitHub token not set
         ✅  Ancestor hash determinable
         ✅  LHCI server reachable
+        ✅  LHCI server API-compatible
         ✅  LHCI server token valid
         ✅  LHCI server unique build for this hash
         Healthcheck passed!
@@ -156,6 +157,7 @@ describe('Lighthouse CI CLI', () => {
         ❌  GitHub token not set
         ✅  Ancestor hash determinable
         ✅  LHCI server reachable
+        ✅  LHCI server API-compatible
         ✅  LHCI server token valid
         ✅  LHCI server unique build for this hash
         Healthcheck failed!

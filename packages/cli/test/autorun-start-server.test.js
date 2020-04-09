@@ -5,8 +5,6 @@
  */
 'use strict';
 
-jest.retryTimes(3);
-
 /* eslint-env jest */
 
 const fs = require('fs');
@@ -105,6 +103,7 @@ describe('Lighthouse CI autorun CLI with startServerCommand', () => {
       ⚠️   GitHub token not set
       ✅  Ancestor hash determinable
       ✅  LHCI server reachable
+      ✅  LHCI server API-compatible
       ✅  LHCI server token valid
       ✅  LHCI server unique build for this hash
       Healthcheck passed!

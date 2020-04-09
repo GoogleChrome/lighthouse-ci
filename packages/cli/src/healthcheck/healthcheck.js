@@ -15,6 +15,7 @@ const {
   getGitHubRepoSlug,
 } = require('@lhci/utils/src/build-context.js');
 const {loadSavedLHRs} = require('@lhci/utils/src/saved-reports.js');
+const pkg = require('../../package.json');
 
 const PASS_ICON = '✅';
 const WARN_ICON = '⚠️ ';
@@ -87,6 +88,15 @@ const checks = [
     // the test only makes sense if they've configured an LHCI server
     shouldTest: opts => Boolean(opts.serverBaseUrl && opts.token),
     test: async opts => (await getApiClient(opts).getVersion()).length > 0,
+  },
+  {
+    id: 'lhciServer',
+    label: 'LHCI server API-compatible',
+    failureLabel: 'LHCI server not API-compatible',
+    // the test only makes sense if they've configured an LHCI server
+    shouldTest: opts => Boolean(opts.serverBaseUrl && opts.token),
+    test: async opts =>
+      ApiClient.isApiVersionCompatible(pkg.version, await getApiClient(opts).getVersion()),
   },
   {
     id: 'lhciServer',

@@ -375,6 +375,27 @@ class ApiClient {
   static get DEFAULT_BASIC_AUTH_USERNAME() {
     return 'lhci';
   }
+
+  /**
+   * Computes whether the two version strings are API-version compatible.
+   * For now this is just semver, but could eventually take more into account.
+   * @param {string} versionA
+   * @param {string} versionB
+   */
+  static isApiVersionCompatible(versionA, versionB) {
+    const partsA = versionA.split('.');
+    const partsB = versionB.split('.');
+    if (partsA.length < 3 || partsB.length < 3) return false;
+
+    let majorVersionA = partsA[0];
+    let majorVersionB = partsB[0];
+    if (majorVersionA !== majorVersionB) return false;
+
+    if (majorVersionA === '0') majorVersionA = partsA[1];
+    if (majorVersionB === '0') majorVersionB = partsB[1];
+
+    return majorVersionA === majorVersionB;
+  }
 }
 
 module.exports = ApiClient;

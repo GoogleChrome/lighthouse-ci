@@ -5,6 +5,9 @@
  */
 'use strict';
 
+const yargsParser = require('yargs-parser');
+const {resolveRcFilePath} = require('@lhci/utils/src/lighthouserc.js');
+
 /**
  * @param {import('yargs').Argv} yargs
  */
@@ -63,6 +66,19 @@ function buildCommand(yargs) {
  * @return {Promise<{port: number, close: () => void}>}
  */
 async function runCommand(options) {
+  if (!Number.isInteger(options.port) || options.port < 0 || options.port > 65536) {
+    const simpleArgv = yargsParser(process.argv.slice(2), {envPrefix: 'LHCI'});
+    const environment = Object.keys(process.env)
+      .filter(key => key.startsWith('LHCI_'))
+      .map(key => `${key}="${process.env[key]}"`)
+      .join(', ');
+    process.stderr.write(`Invalid port option "${options.port}"\n`);
+    process.stderr.write(`environment: ${environment}\n`);
+    process.stderr.write(`process.argv: ${process.argv.slice(2).join(' ')}\n`);
+    process.stderr.write(`configFile: ${resolveRcFilePath(simpleArgv.config)}\n`);
+    process.exit(1);
+  }
+
   // Require this only after they decide to run `lhci server`
   // eslint-disable-next-line import/no-extraneous-dependencies
   const {createServer} = require('@lhci/server');

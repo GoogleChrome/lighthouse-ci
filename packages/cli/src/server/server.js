@@ -75,6 +75,7 @@ async function runCommand(options) {
     process.stderr.write(`Invalid port option "${options.port}"\n`);
     process.stderr.write(`environment: ${environment}\n`);
     process.stderr.write(`process.argv: ${process.argv.slice(2).join(' ')}\n`);
+    process.stderr.write(`simpleArgv: port=${simpleArgv.port}, p=${simpleArgv.p}\n`);
     process.stderr.write(`configFile: ${resolveRcFilePath(simpleArgv.config)}\n`);
     process.exit(1);
   }

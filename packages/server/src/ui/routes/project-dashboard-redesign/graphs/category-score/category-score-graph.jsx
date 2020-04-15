@@ -28,7 +28,15 @@ export const GRAPH_MARGIN = {top: 10, right: 50, bottom: 10, left: 10};
 
 /** @typedef {import('../../project-category-summaries.jsx').StatisticWithBuild} StatisticWithBuild */
 
-/** @param {{selectedBuildId: string|undefined, averageStatistics: Array<StatisticWithBuild>, pinned: boolean}} props */
+const VersionChangeWarning = () => {
+  return (
+    <div className="category-score-graph__version-change-warning">
+      <i className="material-icons">warning</i> Lighthouse version changed
+    </div>
+  );
+};
+
+/** @param {{selectedBuildId: string|undefined, averageStatistics: Array<StatisticWithBuild>, versionChanges: Array<{build: LHCI.ServerCommand.Build}>, pinned: boolean}} props */
 const HoverCardWithDiff = props => {
   const {selectedBuildId, averageStatistics: stats} = props;
   const statIndex = selectedBuildId ? stats.findIndex(s => s.buildId === selectedBuildId) : -1;
@@ -36,6 +44,7 @@ const HoverCardWithDiff = props => {
 
   let children = <Fragment />;
   if (stat) {
+    const versionChange = props.versionChanges.find(change => change.build.id === stat.build.id);
     const previousStat = statIndex > 0 ? stats[statIndex - 1] : undefined;
     /** @type {LHCI.NumericAuditDiff|undefined} */
     const diff = previousStat && {
@@ -46,6 +55,7 @@ const HoverCardWithDiff = props => {
     };
     children = (
       <Fragment>
+        {versionChange ? <VersionChangeWarning /> : null}
         <Gauge score={stat.value} diff={diff} />
         {diff ? <ScoreDeltaBadge diff={diff} /> : null}
       </Fragment>
@@ -116,6 +126,17 @@ export const CategoryScoreTimelineGraph = props => {
   const categoryId = props.category.id;
   const allStats = props.statistics.filter(s => s.name.startsWith(`category_${categoryId}`));
   const averageStats = allStats.filter(s => s.name.endsWith('_average'));
+  const versionStatistics = props.statistics.filter(s => s.name === 'meta_lighthouse_version');
+  const versionChanges = versionStatistics
+    .map((statistic, index) => ({
+      build: statistic.build,
+      version: statistic.value,
+      index,
+    }))
+    .filter(({version, index}) => {
+      const previousVersion = versionStatistics[index - 1] && versionStatistics[index - 1].value;
+      return version && previousVersion && version !== previousVersion;
+    });
 
   if (!averageStats.length) return <span>No data available</span>;
 
@@ -127,6 +148,7 @@ export const CategoryScoreTimelineGraph = props => {
         data={{
           statistics: averageStats,
           statisticsWithMinMax: allStats,
+          versionChanges,
           selectedBuildId: selectedBuildId,
           setSelectedBuildId: setSelectedBuildId,
           setPinned: setPinned,
@@ -146,6 +168,7 @@ export const CategoryScoreTimelineGraph = props => {
         pinned={pinned}
         selectedBuildId={selectedBuildId}
         averageStatistics={averageStats}
+        versionChanges={versionChanges}
       />
       <div className="category-score-graph__x-axis">
         <div style={{marginLeft: GRAPH_MARGIN.left}}>

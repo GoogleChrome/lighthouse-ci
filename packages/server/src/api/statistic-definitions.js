@@ -9,6 +9,18 @@ const {computeRepresentativeRuns} = require('@lhci/utils/src/representative-runs
 
 /** @typedef {(lhrs: Array<LH.Result>) => ({value: number})} StatisticFn */
 
+/**
+ * @return {StatisticFn}
+ */
+function metaLighthouseVersion() {
+  return lhrs => {
+    const version = lhrs[0].lighthouseVersion || '';
+    const [_, major = '0', minor = '0', patch = '0'] = version.match(/^(\d+)\.(\d+)\.(\d+)/) || [];
+    const versionAsNumber = Number(major) * 100 * 100 + Number(minor) * 100 + Number(patch);
+    return {value: versionAsNumber || 0};
+  };
+}
+
 /** @param {Array<number>} values */
 function average(values) {
   const sum = values.reduce((x, y) => x + y, 0);
@@ -107,6 +119,7 @@ function auditGroupCountOfMedianLhr(groupId, type) {
 
 /** @type {Record<LHCI.ServerCommand.StatisticName, StatisticFn>} */
 const definitions = {
+  meta_lighthouse_version: metaLighthouseVersion(),
   audit_interactive_average: auditNumericValueAverage('interactive'),
   'audit_speed-index_average': auditNumericValueAverage('speed-index'),
   'audit_first-contentful-paint_average': auditNumericValueAverage('first-contentful-paint'),

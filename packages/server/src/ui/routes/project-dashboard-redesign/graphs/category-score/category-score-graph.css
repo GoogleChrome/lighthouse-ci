@@ -44,6 +44,11 @@
   fill: var(--fail-color);
 }
 
+.category-score-graph__score-graph .version-change-warning {
+  fill: var(--neutral-color);
+  opacity: 0.1;
+}
+
 .category-score-graph__score-graph .score-error-range {
   fill: var(--secondary-background-color);
 }
@@ -126,4 +131,24 @@
 
 .histogram-bar--fail {
   fill: var(--fail-color);
+}
+
+.category-score-graph__version-change-warning {
+  padding: 0 var(--base-spacing);
+  margin-bottom: var(--base-spacing);
+
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+
+  color: var(--neutral-color);
+  text-align: center;
+  line-height: var(--base-font-size);
+  font-size: var(--subtext-font-size);
+  font-weight: var(--medium-font-weight);
+}
+
+.category-score-graph__version-change-warning .material-icons {
+  font-size: var(--base-font-size);
+  margin-right: calc(var(--base-spacing) / 2);
 }

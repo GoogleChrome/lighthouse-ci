@@ -20,6 +20,7 @@
     "types/**/*.ts",
     "packages/*/src/**/*.jsx",
     "scripts/*.js",
+    "packages/server/test/api/*.js",
     "packages/server/test/e2e/**/*.js",
     "packages/viewer/test/**/*.js"
   ]

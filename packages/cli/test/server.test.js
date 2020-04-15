@@ -15,7 +15,7 @@ describe('Lighthouse CI server CLI', () => {
     expect(status).toEqual(1);
     expect(stderr).toMatchInlineSnapshot(`
       "Invalid port option \\"NaN\\"
-      environment: LHCI_GITHUB_TOKEN=\\"\\", LHCI_GITHUB_APP_TOKEN=\\"\\", LHCI_NO_LIGHTHOUSERC=\\"1\\", LHCI_port=\\"foo\\"
+      environment: LHCI_NO_LIGHTHOUSERC=\\"1\\", LHCI_port=\\"foo\\"
       process.argv: server
       simpleArgv: port=foo, p=undefined
       configFile: undefined
@@ -28,7 +28,7 @@ describe('Lighthouse CI server CLI', () => {
     expect(status).toEqual(1);
     expect(stderr).toMatchInlineSnapshot(`
       "Invalid port option \\"NaN\\"
-      environment: LHCI_GITHUB_TOKEN=\\"\\", LHCI_GITHUB_APP_TOKEN=\\"\\", LHCI_NO_LIGHTHOUSERC=\\"1\\"
+      environment: LHCI_NO_LIGHTHOUSERC=\\"1\\"
       process.argv: server -p=foo
       simpleArgv: port=undefined, p=foo
       configFile: undefined
@@ -45,7 +45,7 @@ describe('Lighthouse CI server CLI', () => {
     expect(status).toEqual(1);
     expect(stderr.replace(__dirname, '.').replace(__dirname, '.')).toMatchInlineSnapshot(`
       "Invalid port option \\"NaN\\"
-      environment: LHCI_GITHUB_TOKEN=\\"\\", LHCI_GITHUB_APP_TOKEN=\\"\\", LHCI_NO_LIGHTHOUSERC=\\"1\\"
+      environment: LHCI_NO_LIGHTHOUSERC=\\"1\\"
       process.argv: server --config ./fixtures/lighthouserc-invalid-port.json
       simpleArgv: port=undefined, p=undefined
       configFile: ./fixtures/lighthouserc-invalid-port.json

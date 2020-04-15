@@ -71,6 +71,7 @@ async function runCommand(options) {
     const environment = Object.keys(process.env)
       .filter(key => key.startsWith('LHCI_'))
       .map(key => `${key}="${process.env[key]}"`)
+      .sort()
       .join(', ');
     process.stderr.write(`Invalid port option "${options.port}"\n`);
     process.stderr.write(`environment: ${environment}\n`);

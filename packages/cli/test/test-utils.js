@@ -105,8 +105,10 @@ function waitForCondition(fn, label) {
 function getCleanEnvironment(extraEnvVars) {
   const cleanEnv = {
     ...process.env,
-    LHCI_GITHUB_TOKEN: '',
-    LHCI_GITHUB_APP_TOKEN: '',
+    LHCI_GITHUB_TOKEN: undefined,
+    LHCI_GITHUB_APP_TOKEN: undefined,
+    LHCI_CANARY_SERVER_URL: undefined,
+    LHCI_CANARY_SERVER_TOKEN: undefined,
     NO_UPDATE_NOTIFIER: '1',
     LHCI_NO_LIGHTHOUSERC: '1',
   };

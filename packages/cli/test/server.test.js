@@ -37,13 +37,19 @@ describe('Lighthouse CI server CLI', () => {
   });
 
   it('should print debug information when port is invalid from config', () => {
+    const normalizePathsForWindows = stderr =>
+      stderr
+        .replace(__dirname, '.')
+        .replace(__dirname, '.')
+        .replace(/\\/g, '/');
+
     const {status, stderr} = runCLI([
       'server',
       '--config',
       `${__dirname}/fixtures/lighthouserc-invalid-port.json`,
     ]);
     expect(status).toEqual(1);
-    expect(stderr.replace(__dirname, '.').replace(__dirname, '.')).toMatchInlineSnapshot(`
+    expect(normalizePathsForWindows(stderr)).toMatchInlineSnapshot(`
       "Invalid port option \\"NaN\\"
       environment: LHCI_NO_LIGHTHOUSERC=\\"1\\"
       process.argv: server --config ./fixtures/lighthouserc-invalid-port.json

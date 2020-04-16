@@ -7,8 +7,6 @@
 
 /* eslint-env jest */
 
-jest.retryTimes(3);
-
 const path = require('path');
 const os = require('os');
 const fs = require('fs');
@@ -106,6 +104,48 @@ describe('wizard CLI', () => {
       expect(stderr).toEqual('');
       expect(status).toEqual(0);
       expect(stdout).toContain(`http://localhost:${server.port}`);
+    }, 30000);
+  });
+
+  describe('reset-project-token', () => {
+    it('should reset the project token', async () => {
+      const storage = {storageMethod: 'sql', sqlDialect: 'sqlite', sqlDatabasePath: server.sqlFile};
+      const wizardTempConfigFile = {ci: {wizard: {wizard: 'reset-project-token', storage}}};
+      const tmpFolder = fs.mkdtempSync(`${os.tmpdir()}${path.sep}`);
+      const wizardRcFile = `${tmpFolder}/wizard.json`;
+      fs.writeFileSync(wizardRcFile, JSON.stringify(wizardTempConfigFile), {encoding: 'utf8'});
+
+      const {stdout, stderr, status} = await runWizardCLI(
+        [`--config=${wizardRcFile}`],
+        [
+          '', // Just ENTER key to select the first project
+          'AwesomeCIProjectName', // Confirm project name
+        ],
+        {inputWaitCondition: 'Which project'}
+      );
+
+      // Extract the project token
+      expect(stdout).toContain('Use project token');
+      const projectSentence = stdout
+        .match(/Use project token [\s\S]+/im)[0]
+        .replace(log.bold, '')
+        .replace(log.reset, '');
+      const oldProjectToken = projectToken;
+      projectToken = projectSentence.match(/Use project token (\S+)/)[1];
+
+      expect(stderr).toEqual('');
+      expect(status).toEqual(0);
+      expect(projectToken).toHaveLength(oldProjectToken.length);
+
+      const client = new ApiClient({
+        rootURL: `http://localhost:${server.port}`,
+        basicAuth: {password: 'lighthouse'},
+      });
+
+      const project = await client.findProjectByToken(projectToken);
+      expect(project).toHaveProperty('name', 'AwesomeCIProjectName');
+      const projectByOldToken = await client.findProjectByToken(oldProjectToken);
+      expect(projectByOldToken).toEqual(undefined);
     }, 30000);
   });
 

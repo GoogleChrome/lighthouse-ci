@@ -208,6 +208,15 @@ class StorageMethod {
   }
 
   /**
+   * @param {string} projectId
+   * @return {Promise<string>}
+   */
+  // eslint-disable-next-line no-unused-vars
+  async _resetProjectToken(projectId) {
+    throw new Error('Unimplemented');
+  }
+
+  /**
    * @param {StrictOmit<LHCI.ServerCommand.Project, 'id'|'token'|'adminToken'>} project
    * @return {Promise<LHCI.ServerCommand.Project>}
    */

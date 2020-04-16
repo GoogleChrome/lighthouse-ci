@@ -127,7 +127,7 @@ If you're just beginning to measure your project with Lighthouse, start slow and
 
 ### Intermediate
 
-If you're used to running Lighthouse on your project but still have some work to do, assert the recommended preset but disable the audits you're currently failing. Consider setting up the [Lighthouse CI server](./recipes/docker-server/README.md) to track your scores over time.
+If you're used to running Lighthouse on your project but still have some work to do, assert the recommended preset but disable the audits you're currently failing. Consider setting up the [Lighthouse CI server](./server.md) to track your scores over time.
 
 ```json
 {
@@ -150,7 +150,7 @@ If you're used to running Lighthouse on your project but still have some work to
 
 ### Advanced
 
-If you're a Lighthouse pro, assert the recommended preset, increase the number of runs, and set budgets for your performance metrics. Consider setting up the [Lighthouse CI server](./recipes/docker-server/README.md) to track your scores over time.
+If you're a Lighthouse pro, assert the recommended preset, increase the number of runs, and set budgets for your performance metrics. Consider setting up the [Lighthouse CI server](./server.md) to track your scores over time.
 
 ```json
 {
@@ -246,7 +246,7 @@ module.exports = {
 };
 ```
 
-### Non-NodeJS Server
+### Non-NodeJS Development Server
 
 ```json
 {
@@ -270,6 +270,39 @@ module.exports = {
   "ci": {
     "assert": {
       "budgetsFile": "./path/to/budgets.json"
+    }
+  }
+}
+```
+
+### Basic Auth (Client)
+
+```json
+{
+  "ci": {
+    "upload": {
+      "basicAuth": {
+        "username": "myusername",
+        "password": "LighthouseRocks"
+      }
+    }
+  }
+}
+```
+
+### Basic Auth (Server)
+
+```json
+{
+  "ci": {
+    "server": {
+      "basicAuth": {
+        "username": "myusername",
+        "password": "LighthouseRocks"
+      },
+      "storage": {
+        // ...
+      }
     }
   }
 }

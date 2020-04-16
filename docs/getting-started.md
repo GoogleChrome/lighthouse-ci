@@ -234,7 +234,7 @@ Be sure to keep this token secret. Anyone in possession of this token will be ab
 
 <img src="https://user-images.githubusercontent.com/39191/68522781-496bad00-0264-11ea-800a-ed86dbb04366.png" width="48%"> <img src="https://user-images.githubusercontent.com/39191/68522269-7917b680-025e-11ea-8d96-2774c0a0b04c.png" width="48%">
 
-Historical reports and advanced report diffing is available with the Lighthouse CI server. For setup of the server itself, see [our server recipe](./recipes/docker-server/README.md).
+Historical reports and advanced report diffing is available with the Lighthouse CI server. For setup of the server itself, see [the server documentation](./server.md).
 
 Once the server is set up, create a new project with the lhci wizard:
 

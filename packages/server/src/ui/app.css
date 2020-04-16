@@ -179,6 +179,10 @@ h6 {
   align-items: center;
 }
 
+.text--center {
+  text-align: center;
+}
+
 .text--secondary {
   color: var(--secondary-text-color);
 }

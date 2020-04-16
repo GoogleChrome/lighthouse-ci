@@ -57,6 +57,7 @@ declare global {
       }
 
       export type StatisticName =
+        | 'meta_lighthouse_version'
         | 'audit_interactive_average'
         | 'audit_first-contentful-paint_average'
         | 'audit_speed-index_average'

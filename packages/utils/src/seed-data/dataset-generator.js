@@ -58,6 +58,19 @@ function removeAllItems(auditsToFakeSrc) {
 }
 
 /**
+ * @param {Array<LHCI.ServerCommand.Run>} runs
+ * @param {string} version
+ */
+function setLighthouseVersion(runs, version) {
+  for (const run of runs) {
+    const lhr = JSON.parse(run.lhr);
+    lhr.lighthouseVersion = version;
+    run.lhr = JSON.stringify(lhr);
+  }
+  return runs;
+}
+
+/**
  * @return {{projects: Array<LHCI.ServerCommand.Project>, builds: Array<LHCI.ServerCommand.Build>, runs: Array<LHCI.ServerCommand.Run>}}
  */
 function createDefaultDataset() {
@@ -442,10 +455,13 @@ function createDefaultDataset() {
         auditsToFake,
         14
       ),
-      ...createRuns(
-        {projectId: '0', buildId: '8', url: 'http://localhost:1234/viewer/#home'},
-        removeAllItems(auditsToFake),
-        15
+      ...setLighthouseVersion(
+        createRuns(
+          {projectId: '0', buildId: '8', url: 'http://localhost:1234/viewer/#home'},
+          removeAllItems(auditsToFake),
+          15
+        ),
+        '6.0.0-beta.0'
       ),
     ],
   };

@@ -46,6 +46,7 @@ function buildXScale(graphWidth, data) {
  * @typedef ScoreGraphData
  * @prop {Array<StatisticWithBuild>} statistics
  * @prop {Array<StatisticWithBuild>} statisticsWithMinMax
+ * @prop {Array<{index: number}>} versionChanges
  * @prop {string|undefined} selectedBuildId
  * @prop {import('preact/hooks/src').StateUpdater<string|undefined>} setSelectedBuildId
  * @prop {import('preact/hooks/src').StateUpdater<boolean>} setPinned
@@ -56,7 +57,7 @@ function buildXScale(graphWidth, data) {
  * @param {ScoreGraphData} data
  */
 export function renderScoreGraph(rootEl, data) {
-  const {statistics, statisticsWithMinMax, setPinned} = data;
+  const {statistics, statisticsWithMinMax, versionChanges, setPinned} = data;
 
   const {svg, masks, width, graphWidth, graphHeight} = createRootSvg(rootEl, GRAPH_MARGIN);
   const minMaxByBuild = buildMinMaxByBuildId(statisticsWithMinMax);
@@ -132,6 +133,17 @@ export function renderScoreGraph(rootEl, data) {
     .datum(failingGuideLine)
     .attr('class', 'score-guide')
     .attr('d', guideLine);
+
+  // The shaded area for the version changes
+  for (const {index} of versionChanges) {
+    svg
+      .append('rect')
+      .attr('class', 'version-change-warning')
+      .attr('x', xScale(index - 1))
+      .attr('y', 0)
+      .attr('width', xScale(index) - xScale(index - 1))
+      .attr('height', graphHeight);
+  }
 
   // Passing score line mask fill
   svg

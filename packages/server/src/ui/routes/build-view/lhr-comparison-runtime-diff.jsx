@@ -49,6 +49,7 @@ export function computeRuntimeDiffs(lhr, baseLhr) {
   const throttling = settings.throttling || {};
   const baseThrottling = settings.throttling || {};
   const potentialDiffs = [
+    ['Lighthouse Version', baseLhr.lighthouseVersion, lhr.lighthouseVersion],
     ['Storage Reset', baseSettings.disableStorageReset, settings.disableStorageReset],
     ['Emulated Form Factor', baseSettings.emulatedFormFactor, settings.emulatedFormFactor],
     ['Throttling Method', baseSettings.throttlingMethod, settings.throttlingMethod],

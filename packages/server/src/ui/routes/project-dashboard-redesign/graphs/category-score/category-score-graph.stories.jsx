@@ -37,8 +37,8 @@ const createBuild = id => ({
   updatedAt: runAt(id),
 });
 
-/** @param {{id: number, min?: number, max?: number, avg: number}} props @return {Array<import('./category-score-graph').StatisticWithBuild>} */
-const createStatistics = ({id, min, max, avg}) => {
+/** @param {{id: number, name?: LHCI.ServerCommand.StatisticName, value: number}} props @return {import('./category-score-graph').StatisticWithBuild} */
+const createStatistic = ({id, name = 'category_seo_min', value}) => {
   const build = createBuild(id);
   /** @type {import('./category-score-graph').StatisticWithBuild} */
   const stat = {
@@ -46,14 +46,20 @@ const createStatistics = ({id, min, max, avg}) => {
     projectId: build.projectId,
     buildId: build.id,
     url: 'http://example.com',
-    name: `category_seo_min`,
-    value: avg,
+    name,
+    value,
     version: 1,
     build,
     createdAt: runAt(id),
     updatedAt: runAt(id),
   };
 
+  return stat;
+};
+
+/** @param {{id: number, min?: number, max?: number, avg: number}} props @return {Array<import('./category-score-graph').StatisticWithBuild>} */
+const createStatistics = ({id, min, max, avg}) => {
+  const stat = createStatistic({id, value: avg});
   min = min || avg * 0.8;
   max = max || avg * 1.2;
   return [
@@ -109,3 +115,27 @@ export const DefaultWithHoverCard = () => (
     />
   </Wrapper>
 );
+
+export const DefaultWithVersionChanges = () => {
+  const props = {...defaultProps};
+  props.statistics = [
+    ...props.statistics,
+    createStatistic({id: 1, value: 50500, name: 'meta_lighthouse_version'}),
+    createStatistic({id: 2, value: 50500, name: 'meta_lighthouse_version'}),
+    createStatistic({id: 3, value: 50600, name: 'meta_lighthouse_version'}),
+    createStatistic({id: 4, value: 50600, name: 'meta_lighthouse_version'}),
+    createStatistic({id: 5, value: 50600, name: 'meta_lighthouse_version'}),
+    createStatistic({id: 6, value: 50600, name: 'meta_lighthouse_version'}),
+    createStatistic({id: 7, value: 50600, name: 'meta_lighthouse_version'}),
+    createStatistic({id: 8, value: 60000, name: 'meta_lighthouse_version'}),
+    createStatistic({id: 9, value: 60000, name: 'meta_lighthouse_version'}),
+    createStatistic({id: 10, value: 60000, name: 'meta_lighthouse_version'}),
+    createStatistic({id: 11, value: 60000, name: 'meta_lighthouse_version'}),
+  ];
+
+  return (
+    <Wrapper>
+      <CategoryScoreTimelineGraph {...props} />
+    </Wrapper>
+  );
+};

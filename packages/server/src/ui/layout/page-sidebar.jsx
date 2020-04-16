@@ -8,7 +8,7 @@ import {h} from 'preact';
 import {Link} from 'preact-router';
 import './page-sidebar.css';
 import {AsyncLoader} from '../components/async-loader';
-import {useProjectList} from '../hooks/use-api-data';
+import {useProjectList, useVersion} from '../hooks/use-api-data';
 import clsx from 'clsx';
 import {useRouteParams} from '../hooks/use-route-params';
 
@@ -16,6 +16,7 @@ import {useRouteParams} from '../hooks/use-route-params';
 export const PageSidebar = props => {
   const {projectSlug} = useRouteParams();
   const [loadingState, projects] = useProjectList();
+  const [_, version = ''] = useVersion();
 
   return (
     <div
@@ -58,16 +59,10 @@ export const PageSidebar = props => {
         />
       </div>
       <div className="page-sidebar__footer">
-        <span className="page-sidebar__version">
-          {/* This environment variable is set by npm/yarn on any script command. */}v
-          {process.env.npm_package_version}
-        </span>{' '}
-        |{' '}
+        <span className="page-sidebar__version">v{version}</span> |{' '}
         <a
           className="page-sidebar__issue-link"
-          href={`https://github.com/GoogleChrome/lighthouse-ci/releases/tag/v${
-            process.env.npm_package_version
-          }`}
+          href={`https://github.com/GoogleChrome/lighthouse-ci/releases/tag/v${version}`}
           target="_blank"
           rel="noopener noreferrer"
         >

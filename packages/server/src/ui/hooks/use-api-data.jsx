@@ -112,6 +112,13 @@ function useApiData(apiMethod, apiParameters) {
 }
 
 /**
+ * @return {[LoadingState, string | undefined]}
+ */
+export function useVersion() {
+  return useApiData('getVersion', []);
+}
+
+/**
  * @return {[LoadingState, Array<LHCI.ServerCommand.Project> | undefined]}
  */
 export function useProjectList() {

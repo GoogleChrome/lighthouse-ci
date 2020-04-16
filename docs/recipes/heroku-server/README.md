@@ -1,5 +1,7 @@
 # Heroku-based LHCI Server
 
+**NOTE: be sure to read the [Security section](../../server.md#Security) of the server documentation to protect your server properly**
+
 ## Overview
 
 The LHCI server can be run in any node environment with persistent disk storage or network access to a postgres database. Heroku offers a [free tier of hosting](https://www.heroku.com/pricing) that provides exactly this!
@@ -31,6 +33,8 @@ git push heroku master
 heroku ps:scale web=1
 heroku open
 ```
+
+Once you've got the server up and running you can continue with the [Getting Started](../../getting-started.md#The-Lighthouse-CI-Server) steps using `https://<project-name>.herokuapp.com` as your LHCI server base URL.
 
 ## Updating LHCI
 

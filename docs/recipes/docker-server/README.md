@@ -1,8 +1,10 @@
 # Docker-based LHCI Server
 
+**NOTE: be sure to read the [Security section](../../server.md#Security) of the server documentation to protect your server properly**
+
 ## Overview
 
-The LHCI server can be run in any node environment with persistent disk storage or network access to a postgres database. Docker can help encapsulate the server setup details for an instant custom server.
+The LHCI server can be run in any node environment with persistent disk storage or network access to a postgres/mysql database. Docker can help encapsulate the server setup details for an instant custom server.
 
 ## Building Locally
 
@@ -65,6 +67,21 @@ kubectl get service
 # lhci-server   LoadBalancer   10.X.X.X       X.X.X.X        80:XXXXX/TCP   2m
 ```
 
+Once you've got the server up and running you can continue with the [Getting Started](../../getting-started.md#The-Lighthouse-CI-Server) steps using the EXTERNAL-IP as your LHCI server base URL.
+
+#### Troubleshooting
+
+The above commands assume that you're working a clean project that hasn't been manually configured for other services. If you've used this project for other GCP services, you might need to tweak the commands used. Some examples with workarounds are reproduced below.
+
+**default network problem**
+GCP projects come with a `default` network when created. You might have manually deleted this. You can either recreate the default network before running the script or manually create a cluster named `lhci-server` via the UI, edit the default-pool to have 1 node instead of 3, and set the smallest acceptable machines.
+
+**connected to machine problem**
+If you weren't able to create the server via the CLI or have other permissions set, you won't be connected to `lhci-server` when you run the rest of the commands.
+
+Run the below to continue:
+`gcloud container clusters get-credentials lhci-server --zone $COMPUTE_ZONE --project $PROJECT_ID`
+
 ### Docker Compose
 
 You can create a docker-compose.yml file to orchestrate an LHCI server in cloud services or along with your existing app docker containers. Execute `docker-compose up` relative to the file's location.
@@ -81,5 +98,3 @@ services:
 volumes:
   lhci-data:
 ```
-
-Note that the server has no authentication mechanisms and that anyone with HTTP access to the server will be able to view and create data. If your server contains sensitive information, consider protecting it within a firewall that is only accessible to your internal network.

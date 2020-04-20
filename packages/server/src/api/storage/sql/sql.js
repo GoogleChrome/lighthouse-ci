@@ -660,6 +660,17 @@ class SqlStorageMethod {
     );
     return newToken;
   }
+
+  /**
+   * @param {string} projectId
+   * @return {Promise<string>}
+   */
+  async _resetProjectToken(projectId) {
+    const {projectModel} = this._sql();
+    const newToken = uuid.v4();
+    await projectModel.update({token: newToken}, {where: {id: projectId}});
+    return newToken;
+  }
 }
 
 module.exports = SqlStorageMethod;

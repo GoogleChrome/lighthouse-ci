@@ -370,6 +370,15 @@ class ApiClient {
     throw new Error('Unimplemented');
   }
 
+  /**
+   * @param {string} projectId
+   * @return {Promise<string>}
+   */
+  // eslint-disable-next-line no-unused-vars
+  async _resetProjectToken(projectId) {
+    throw new Error('Unimplemented');
+  }
+
   async close() {}
 
   static get DEFAULT_BASIC_AUTH_USERNAME() {

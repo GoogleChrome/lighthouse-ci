@@ -11,8 +11,8 @@ import _ from '@lhci/utils/src/lodash.js';
 import {
   useProjectBuilds,
   useProjectBySlug,
-  useProjectURLs,
   useProjectBranches,
+  useBuildURLs,
 } from '../../hooks/use-api-data';
 import {AsyncLoader, combineLoadingStates, combineAsyncData} from '../../components/async-loader';
 import {Page} from '../../layout/page.jsx';
@@ -24,23 +24,59 @@ import clsx from 'clsx';
 import {ProjectBuildList} from './build-list';
 import {DocumentTitle} from '../../components/document-title';
 
-/** @param {{urls: Array<{url: string}>, branches: Array<{branch: string}>, runUrl?: string, branch?: string, baseBranch: string}} props */
-const computeUrlAndBranchSelection = props => {
-  const availableUrls = props.urls.length ? props.urls : [{url: 'None'}];
+/** @typedef {import('../../hooks/use-api-data').LoadingState} LoadingState */
+
+/** @param {{branches: Array<{branch: string}>, branch?: string, baseBranch: string}} props */
+const computeBranchSelection = props => {
   const availableBranches = props.branches.length ? props.branches : [{branch: props.baseBranch}];
-  const selectedUrl = props.runUrl || availableUrls[0].url;
   const selectedBranch =
     props.branch ||
     (availableBranches.some(b => b.branch === props.baseBranch)
       ? props.baseBranch
       : availableBranches[0].branch);
   return {
-    availableUrls,
     availableBranches,
-    selectedUrl,
     selectedBranch,
   };
 };
+
+/** @param {{urls: Array<{url: string}>, runUrl?: string}} props */
+const computeUrlSelection = props => {
+  const availableUrls = props.urls.length ? props.urls : [{url: 'None'}];
+  // Default to the shortest URL because that's usually the root homepage, e.g. `/`
+  const shortestUrl = _.minBy(availableUrls.map(({url}) => url), url => url.length);
+  const selectedUrl = props.runUrl || shortestUrl || 'None';
+
+  return {
+    availableUrls,
+    selectedUrl,
+  };
+};
+
+/**
+ * Hooks can't return early, so we have to do some convoluted `undefined` gymnastics to create our URL query.
+ * We only want the dropdown to be populated with URLs that are actually available on this branch.
+ *
+ *
+ * @param {[LoadingState, LHCI.ServerCommand.Project | undefined]} projectData
+ * @param {[LoadingState, Array<LHCI.ServerCommand.Build> | undefined]} buildData
+ * @param {[LoadingState, Array<{branch: string}> | undefined]} branchData
+ * @param {string|undefined} branchFromProps
+ */
+function useUrlsAvailableForBranch(projectData, buildData, branchData, branchFromProps) {
+  const baseBranch = projectData[1] ? projectData[1].baseBranch || '' : undefined;
+  const branches = branchData[1];
+  const {selectedBranch} =
+    baseBranch && branches
+      ? computeBranchSelection({baseBranch, branches, branch: branchFromProps})
+      : {selectedBranch: undefined};
+  const builds = buildData[1];
+  const filteredBuilds = (builds || []).filter(build => build.branch === selectedBranch);
+  const latestBuildById = _.maxBy(filteredBuilds, build => new Date(build.runAt).getTime());
+  const buildIdToFetch =
+    builds && selectedBranch ? (latestBuildById && latestBuildById.id) || '' : undefined;
+  return useBuildURLs(projectData[1] && projectData[1].id, buildIdToFetch);
+}
 
 /** @param {{availableUrls: Array<{url: string}>, availableBranches: Array<{branch: string}>, selectedUrl: string, selectedBranch: string}} props */
 const UrlAndBranchSelector = props => {
@@ -114,8 +150,13 @@ export const ProjectDashboard = props => {
   const projectApiData = useProjectBySlug(props.projectSlug);
   const projectId = projectApiData[1] && projectApiData[1].id;
   const projectBuildData = useProjectBuilds(projectId);
-  const projectUrlData = useProjectURLs(projectId);
   const projectBranchData = useProjectBranches(projectId);
+  const projectUrlData = useUrlsAvailableForBranch(
+    projectApiData,
+    projectBuildData,
+    projectBranchData,
+    props.branch
+  );
 
   const loadingState = combineLoadingStates(
     projectApiData,
@@ -141,12 +182,14 @@ export const ProjectDashboard = props => {
             <ProjectDashboard_
               project={project}
               builds={builds}
-              {...computeUrlAndBranchSelection({
+              {...computeBranchSelection({
                 baseBranch: project.baseBranch,
-                urls,
                 branches,
-                runUrl: props.runUrl,
                 branch: props.branch,
+              })}
+              {...computeUrlSelection({
+                urls,
+                runUrl: props.runUrl,
               })}
             />
           ) : (

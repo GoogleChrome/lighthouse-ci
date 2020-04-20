@@ -9,8 +9,8 @@ const {waitForNetworkIdle0, waitForAllImages} = require('../../test-utils.js');
 
 /* eslint-env jest, browser */
 
-/** @param {LHCI.E2EState} state @param {string} projectName */
-module.exports = (state, projectName) => {
+/** @param {LHCI.E2EState} state @param {string} projectName @param {{newDashboard: boolean}} [opts] */
+module.exports = (state, projectName, opts) => {
   describe('navigate to project', () => {
     it('should navigate to the project list', async () => {
       await Promise.all([state.page.goto(`${state.rootURL}/app`), waitForNetworkIdle0(state.page)]);
@@ -32,6 +32,28 @@ module.exports = (state, projectName) => {
       await state.page.waitFor('.dashboard');
       await state.page.waitFor('.dashboard-graph');
     });
+
+    if (opts && opts.newDashboard) {
+      it('should navigate to new dashboard', async () => {
+        const clickPromise = state.page.evaluate(() => {
+          const links = [...document.querySelectorAll('a')];
+          const matchingLink = links.find(link =>
+            (link.textContent || '').includes('redesigned dashboard')
+          );
+          if (matchingLink) return matchingLink.click();
+          throw new Error(
+            `${links.map(link => link.textContent).join(' ')} did not include ${name}`
+          );
+        });
+
+        await Promise.all([clickPromise, waitForNetworkIdle0(state.page)]);
+        await waitForAllImages(state.page);
+      });
+
+      it('should wait for the dashboard to load', async () => {
+        await state.page.waitFor('.category-score-graph');
+      });
+    }
 
     if (state.debug) {
       it(

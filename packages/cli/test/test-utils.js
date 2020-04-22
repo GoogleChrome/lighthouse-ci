@@ -90,13 +90,11 @@ async function startServer(sqlFile, extraArgs = []) {
   serverProcess.stderr.on('data', chunk => (stderr += chunk.toString()));
 
  
-  const unexpectedServerClose = code => {
-    throw new Error(`Server process closed unexpectedly.\n\n${stderr}`);
-  };
-  serverProcess.on('close', unexpectedServerClose);
-
-  await waitForCondition(() => stdout.includes('listening'));
-  serverProcess.removeListener('close', unexpectedServerClose);
+  try {
+    await waitForCondition(() => stdout.includes('listening'));
+  } catch (err) {
+    throw new Error(`Server failed to start: ${err.message}\n\n${stdout}\n\n${stderr}`);
+  }
 
   const port = stdout.match(/port (\d+)/)[1];
   return {port, process: serverProcess, sqlFile};

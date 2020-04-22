@@ -89,7 +89,6 @@ async function startServer(sqlFile, extraArgs = []) {
   serverProcess.stdout.on('data', chunk => (stdout += chunk.toString()));
   serverProcess.stderr.on('data', chunk => (stderr += chunk.toString()));
 
- 
   try {
     await waitForCondition(() => stdout.includes('listening'));
   } catch (err) {

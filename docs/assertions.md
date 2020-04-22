@@ -107,6 +107,8 @@ Your custom user timings using [`performance.mark`](https://developer.mozilla.or
 
 The general format for asserting against a user timing value is `"user-timings:<kebab-cased-name>": ["<level>", {maxNumericValue: <value in milliseconds>}]`. For example, if you wanted to assert that a mark with name `My Custom Mark` started within the first 2s of page load and that a measure `my:custom-@-Measure` lasted fewer than 50 ms you would use the following assertions config.
 
+Note that only the first matching entry with the name will be used from each run and the rest will be ignored.
+
 ```json
 {
   "assertions": {

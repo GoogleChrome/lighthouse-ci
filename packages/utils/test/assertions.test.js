@@ -701,6 +701,105 @@ describe('getAllAssertionResults', () => {
     });
   });
 
+  describe('user timings', () => {
+    let lhrWithUserTimings;
+
+    beforeEach(() => {
+      lhrWithUserTimings = {
+        finalUrl: 'http://example.com',
+        audits: {
+          'user-timings': {
+            details: {
+              items: [
+                {name: 'Core initializer', startTime: 757, duration: 123, timingType: 'Measure'},
+                {name: 'super_Cool_Measure', startTime: 999, duration: 52, timingType: 'Measure'},
+                {name: 'ultraCoolMark', startTime: 5231, timingType: 'Mark'},
+                {name: 'other:%Cool.Mark', startTime: 12052, timingType: 'Mark'},
+                // Duplicates will be ignored
+                {name: 'super_Cool_Measure', startTime: 0, duration: 4252, timingType: 'Measure'},
+              ],
+            },
+          },
+        },
+      };
+    });
+
+    it('should assert user timing keys', () => {
+      const assertions = {
+        'user-timings.core-initializer': ['error', {maxNumericValue: 100}],
+        'user-timings.super-cool-measure': ['warn', {maxNumericValue: 100}],
+        'user-timings:ultra-cool-mark': ['warn', {maxNumericValue: 5000}],
+        'user-timings:other-cool-mark': ['error', {maxNumericValue: 10000}],
+        'user-timings:missing-timing': ['error', {maxNumericValue: 10000}],
+      };
+
+      const lhrs = [lhrWithUserTimings, lhrWithUserTimings];
+      const results = getAllAssertionResults({assertions, includePassedAssertions: true}, lhrs);
+      expect(results).toEqual([
+        {
+          actual: 123,
+          auditId: 'user-timings',
+          auditProperty: 'core-initializer',
+          expected: 100,
+          level: 'error',
+          name: 'maxNumericValue',
+          operator: '<=',
+          passed: false,
+          url: 'http://example.com',
+          values: [123, 123],
+        },
+        {
+          actual: 52,
+          auditId: 'user-timings',
+          auditProperty: 'super-cool-measure',
+          expected: 100,
+          level: 'warn',
+          name: 'maxNumericValue',
+          operator: '<=',
+          passed: true,
+          url: 'http://example.com',
+          values: [52, 52],
+        },
+        {
+          actual: 5231,
+          auditId: 'user-timings',
+          auditProperty: 'ultra-cool-mark',
+          expected: 5000,
+          level: 'warn',
+          name: 'maxNumericValue',
+          operator: '<=',
+          passed: false,
+          url: 'http://example.com',
+          values: [5231, 5231],
+        },
+        {
+          actual: 12052,
+          auditId: 'user-timings',
+          auditProperty: 'other-cool-mark',
+          expected: 10000,
+          level: 'error',
+          name: 'maxNumericValue',
+          operator: '<=',
+          passed: false,
+          url: 'http://example.com',
+          values: [12052, 12052],
+        },
+        {
+          actual: 0,
+          auditId: 'user-timings',
+          auditProperty: 'missing-timing',
+          expected: 1,
+          level: 'error',
+          name: 'auditRan',
+          operator: '>=',
+          passed: false,
+          url: 'http://example.com',
+          values: [0, 0],
+        },
+      ]);
+    });
+  });
+
   describe('URL-grouping', () => {
     beforeEach(() => {
       for (const lhr of [...lhrs]) {

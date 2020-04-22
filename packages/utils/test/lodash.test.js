@@ -135,11 +135,30 @@ describe('lodash.js', () => {
       // WAI
       expect(_.kebabCase('camelCase')).toEqual('camel-case');
       expect(_.kebabCase('kebab-case')).toEqual('kebab-case');
+      expect(_.kebabCase('exampleURL')).toEqual('example-url');
 
       // Not implemented but should probably work consistently at some point.
       // Tests just for documentation.
+      expect(_.kebabCase('kebab-case:document.type')).toEqual('kebab-case:document.type');
+      expect(_.kebabCase('mixed-Case3_Issues+')).toEqual('mixed-case3_issues+');
       expect(_.kebabCase('ALL CAPS')).toEqual('all caps');
       expect(_.kebabCase('snake_case')).toEqual('snake_case');
+    });
+
+    it('should convert strings to kebab-case alphanumericOnly', () => {
+      // WAI
+      expect(_.kebabCase('camelCase', {alphanumericOnly: true})).toEqual('camel-case');
+      expect(_.kebabCase('kebab-case', {alphanumericOnly: true})).toEqual('kebab-case');
+      expect(_.kebabCase('kebab-case:document.type', {alphanumericOnly: true})).toEqual(
+        'kebab-case-document-type'
+      );
+      expect(_.kebabCase('exampleURL', {alphanumericOnly: true})).toEqual('example-url');
+      expect(_.kebabCase('!exampleURL', {alphanumericOnly: true})).toEqual('example-url');
+      expect(_.kebabCase('mixed-Case3_Issues+', {alphanumericOnly: true})).toEqual(
+        'mixed-case3-issues'
+      );
+      expect(_.kebabCase('ALL CAPS', {alphanumericOnly: true})).toEqual('all-caps');
+      expect(_.kebabCase('snake_case', {alphanumericOnly: true})).toEqual('snake-case');
     });
   });
 

@@ -78,6 +78,7 @@ async function startServer(sqlFile, extraArgs = []) {
   }
 
   let stdout = '';
+  let stderr = '';
   const serverProcess = spawn('node', [
     CLI_PATH,
     'server',
@@ -86,8 +87,13 @@ async function startServer(sqlFile, extraArgs = []) {
     ...extraArgs,
   ]);
   serverProcess.stdout.on('data', chunk => (stdout += chunk.toString()));
+  serverProcess.stderr.on('data', chunk => (stderr += chunk.toString()));
 
-  await waitForCondition(() => stdout.includes('listening'));
+  try {
+    await waitForCondition(() => stdout.includes('listening'));
+  } catch (err) {
+    throw new Error(`Server failed to start: ${err.message}\n\n${stdout}\n\n${stderr}`);
+  }
 
   const port = stdout.match(/port (\d+)/)[1];
   return {port, process: serverProcess, sqlFile};

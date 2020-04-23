@@ -3,5 +3,6 @@
 node_modules/
 yarn.lock
 
+storybook-static/
 *.tmp.sql
 packages/

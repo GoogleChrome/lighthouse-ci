@@ -9,6 +9,7 @@ import {useState, useMemo, useCallback} from 'preact/hooks';
 import {Link, route} from 'preact-router';
 import clsx from 'clsx';
 import './build-view.css';
+import * as _ from '@lhci/utils/src/lodash.js';
 
 import {AsyncLoader, combineLoadingStates, combineAsyncData} from '../../components/async-loader';
 import {
@@ -28,14 +29,32 @@ import {LoadingSpinner} from '../../components/loading-spinner';
 import {LhrComparison} from './lhr-comparison.jsx';
 import {Dropdown} from '../../components/dropdown';
 
+/**
+ * @param {{compareUrl?: string, runs: Array<LHCI.ServerCommand.Run>}} props
+ * @param {Array<LHCI.ServerCommand.Run>} compareRuns
+ * @return {string} */
+function computeSelectedUrl(props, compareRuns) {
+  if (props.compareUrl) return props.compareUrl;
+  if (!compareRuns.length) return '';
+
+  // Choose the shortest URL that exists in both of the builds fallingback to whatever was available in the compare.
+  const fallbackUrl = compareRuns[0].url;
+  const groupedUrls = _.groupBy(props.runs, run => run.url);
+  const urlsInBothRuns = groupedUrls
+    .filter(group => new Set(group.map(entry => entry.buildId)).size > 1)
+    .map(group => group[0].url)
+    .sort((a, b) => a.length - b.length);
+  return urlsInBothRuns[0] || fallbackUrl;
+}
+
 /** @param {{project: LHCI.ServerCommand.Project, build: LHCI.ServerCommand.Build, ancestorBuild: LHCI.ServerCommand.Build | null, runs: Array<LHCI.ServerCommand.Run>, compareUrl?: string, hasBaseOverride: boolean}} props */
 const BuildView_ = props => {
   const [openBuildHash, setOpenBuild] = useState(/** @type {null|'base'|'compare'} */ (null));
   const [isOpenLhrLinkHovered, setLhrLinkHover] = useState(false);
-  const selectedUrl = props.compareUrl || (props.runs[0] && props.runs[0].url);
   const buildHashSelectorCloseFn = useCallback(() => setOpenBuild(null), [setOpenBuild]);
 
   const compareRuns = props.runs.filter(run => run.buildId === props.build.id);
+  const selectedUrl = computeSelectedUrl(props, compareRuns);
   const availableUrls = [...new Set(compareRuns.map(run => run.url))];
   const run = compareRuns.find(run => run.url === selectedUrl);
 

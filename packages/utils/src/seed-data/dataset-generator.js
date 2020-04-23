@@ -451,7 +451,7 @@ function createDefaultDataset() {
         13
       ),
       ...createRuns(
-        {projectId: '0', buildId: '7', url: 'http://localhost:1234/viewer/#checkout'},
+        {projectId: '0', buildId: '7', url: 'http://localhost:1234/viewer/#missing'},
         auditsToFake,
         14
       ),

@@ -44,9 +44,17 @@ function merge(v1, v2) {
 /**
  * Converts a string from camelCase to kebab-case.
  * @param {string} s
+ * @param {{alphanumericOnly?: boolean}} [opts]
  */
-function kebabCase(s) {
-  return s.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
+function kebabCase(s, opts) {
+  let kebabed = s.replace(/([a-z])([A-Z])/g, '$1-$2');
+  if (opts && opts.alphanumericOnly) {
+    kebabed = kebabed
+      .replace(/[^a-z0-9]+/gi, '-')
+      .replace(/-+/g, '-')
+      .replace(/(^-|-$)/g, '');
+  }
+  return kebabed.toLowerCase();
 }
 
 /**

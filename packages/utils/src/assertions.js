@@ -311,6 +311,22 @@ function getAssertionResultsForAudit(auditId, auditProperty, auditResults, asser
       ...result,
       auditProperty: auditProperty.join('.'),
     }));
+  } else if (auditId === 'user-timings' && auditProperty) {
+    const userTimingName = _.kebabCase(auditProperty.join('-'), {alphanumericOnly: true});
+    const psuedoAuditResults = auditResults.map(result => {
+      if (!result || !result.details || !result.details.items) return;
+      const item = result.details.items.find(
+        item => _.kebabCase(item.name, {alphanumericOnly: true}) === userTimingName
+      );
+      if (!item) return;
+      const numericValue = Number.isFinite(item.duration) ? item.duration : item.startTime;
+      return {...result, numericValue};
+    });
+
+    return getStandardAssertionResults(psuedoAuditResults, assertionOptions).map(result => ({
+      ...result,
+      auditProperty: userTimingName,
+    }));
   } else {
     return getStandardAssertionResults(auditResults, assertionOptions);
   }
@@ -342,7 +358,7 @@ function resolveAssertionOptionsAndLhrs(baseOptions, unfilteredLhrs) {
     lhrs.map(lhr => /** @type {[LH.Result, LH.Result]} */ ([lhr, lhr])),
   ]);
 
-  const auditsToAssert = [...new Set(Object.keys(assertions).map(_.kebabCase))].map(
+  const auditsToAssert = [...new Set(Object.keys(assertions).map(key => _.kebabCase(key)))].map(
     assertionKey => {
       const [auditId, ...rest] = assertionKey.split(/\.|:/g).filter(Boolean);
       const auditInstances = lhrs.map(lhr => lhr.audits[auditId]).filter(Boolean);

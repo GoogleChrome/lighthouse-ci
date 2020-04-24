@@ -5,6 +5,10 @@
  */
 'use strict';
 
+const fs = require('fs');
+const PuppeteerManager = require('./collect/puppeteer-manager.js');
+const ChromeLauncher = require('chrome-launcher').Launcher;
+
 /** @param {string} dependency */
 function assertOptionalDependency(dependency) {
   try {
@@ -19,4 +23,49 @@ function assertOptionalDependency(dependency) {
   }
 }
 
-module.exports = {assertOptionalDependency};
+/** @param {string} filePath @return {boolean} */
+function canAccessPath(filePath) {
+  try {
+    fs.accessSync(filePath);
+    return true;
+  } catch (_) {
+    return false;
+  }
+}
+
+/**
+ * ChromeLauncher has an annoying API that *throws* instead of returning an empty array.
+ * Also enables testing of environments that don't have Chrome globally installed in tests.
+ *
+ * @return {string[]}
+ */
+function getChromeInstallationsSafe() {
+  if (process.env.LHCITEST_IGNORE_CHROME_INSTALLATIONS) return [];
+
+  try {
+    return ChromeLauncher.getInstallations();
+  } catch (err) {
+    return [];
+  }
+}
+
+/**
+ * @param {Partial<LHCI.CollectCommand.Options>} options
+ * @return {string|undefined}
+ */
+function determineChromePath(options) {
+  return (
+    options.chromePath ||
+    process.env.CHROME_PATH ||
+    PuppeteerManager.getChromiumPath(options) ||
+    getChromeInstallationsSafe()[0] ||
+    undefined
+  );
+}
+
+module.exports = {
+  assertOptionalDependency,
+  canAccessPath,
+  determineChromePath,
+  getChromeInstallationsSafe,
+};

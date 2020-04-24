@@ -7,7 +7,10 @@
 
 /* eslint-env jest */
 
+const os = require('os');
+const fs = require('fs');
 const path = require('path');
+const rimraf = require('rimraf');
 const {runCLI} = require('./test-utils.js');
 
 describe('Lighthouse CI healthcheck CLI', () => {
@@ -112,6 +115,72 @@ describe('Lighthouse CI healthcheck CLI', () => {
         "
       `);
       expect(stderr).toMatchInlineSnapshot(`""`);
+    });
+  });
+
+  describe('chrome installation', () => {
+    let fixtureDir;
+
+    beforeEach(() => {
+      fixtureDir = path.join(os.tmpdir(), fs.mkdtempSync('lhcihealthcheck'));
+      fs.mkdirSync(fixtureDir, {recursive: true});
+    });
+
+    afterEach(() => {
+      rimraf.sync(fixtureDir);
+    });
+
+    it('should find a chrome installation installed on the system', () => {
+      const {stdout, stderr, status} = runCLI(['healthcheck', '--fatal'], {
+        cwd: fixtureDir,
+      });
+
+      expect(stdout).toMatchInlineSnapshot(`
+        "✅  .lighthouseci/ directory writable
+        ⚠️   Configuration file not found
+        ✅  Chrome installation found
+        Healthcheck passed!
+        "
+      `);
+      expect(stderr).toMatchInlineSnapshot(`""`);
+      expect(status).toEqual(0);
+    });
+
+    it('should not find a chrome installation when ignored', () => {
+      const {stdout, stderr, status} = runCLI(['healthcheck', '--fatal'], {
+        cwd: fixtureDir,
+        env: {LHCITEST_IGNORE_CHROME_INSTALLATIONS: '1'},
+      });
+
+      expect(stdout).toMatchInlineSnapshot(`
+        "✅  .lighthouseci/ directory writable
+        ⚠️   Configuration file not found
+        ❌  Chrome installation not found
+        Healthcheck failed!
+        "
+      `);
+      expect(stderr).toMatchInlineSnapshot(`""`);
+      expect(status).toEqual(1);
+    });
+
+    it('should find a chrome installation when ignored but passed explicitly via config', () => {
+      const ci = {collect: {chromePath: fixtureDir}};
+      fs.writeFileSync(path.join(fixtureDir, '.lighthouserc.json'), JSON.stringify({ci}));
+
+      const {stdout, stderr, status} = runCLI(['healthcheck', '--fatal'], {
+        cwd: fixtureDir,
+        env: {LHCI_NO_LIGHTHOUSERC: undefined, LHCITEST_IGNORE_CHROME_INSTALLATIONS: '1'},
+      });
+
+      expect(stdout).toMatchInlineSnapshot(`
+        "✅  .lighthouseci/ directory writable
+        ✅  Configuration file found
+        ✅  Chrome installation found
+        Healthcheck passed!
+        "
+      `);
+      expect(stderr).toMatchInlineSnapshot(`""`);
+      expect(status).toEqual(0);
     });
   });
 });

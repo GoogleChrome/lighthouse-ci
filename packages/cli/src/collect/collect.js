@@ -7,7 +7,7 @@
 
 const path = require('path');
 const yargsParser = require('yargs-parser');
-const ChromeLauncher = require('chrome-launcher').Launcher;
+const {determineChromePath} = require('../utils.js');
 const FallbackServer = require('./fallback-server.js');
 const LighthouseRunner = require('./lighthouse-runner.js');
 const PuppeteerManager = require('./puppeteer-manager.js');
@@ -41,10 +41,7 @@ function buildCommand(yargs) {
     },
     chromePath: {
       description: 'The path to the Chrome or Chromium executable to use for collection.',
-      default:
-        process.env.CHROME_PATH ||
-        new PuppeteerManager(naiveOptions).getChromiumPath() ||
-        ChromeLauncher.getInstallations()[0],
+      default: determineChromePath(naiveOptions),
     },
     puppeteerScript: {
       description:

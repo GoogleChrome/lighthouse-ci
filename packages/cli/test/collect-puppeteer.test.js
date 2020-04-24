@@ -49,4 +49,23 @@ describe('Lighthouse CI collect CLI with puppeteer', () => {
     `);
     expect(status).toEqual(0);
   }, 180000);
+
+  it('should not fail on providing defaults without Chrome installations', () => {
+    const {stdout, stderr, status} = runCLI(['collect', '--help'], {
+      cwd: autorunDir,
+      env: {LHCITEST_IGNORE_CHROME_INSTALLATIONS: '1'},
+    });
+
+    // Make sure there is no default chromePath found
+    const chromePathHelp = stdout.match(/--chromePath.*\n.*\n.*/);
+    expect(chromePathHelp).toMatchInlineSnapshot(`
+      Array [
+        "--chromePath               The path to the Chrome or Chromium executable to
+                                   use for collection.
+        --puppeteerScript          The path to a script that manipulates the browser",
+      ]
+    `);
+    expect(stderr).toMatchInlineSnapshot(`""`);
+    expect(status).toEqual(0);
+  });
 });

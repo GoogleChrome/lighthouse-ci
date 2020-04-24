@@ -21,7 +21,8 @@ jobs:
         - yarn test:unit
       before_cache:
         # nyc, jest and other projects store files in here. They mess up the travis build cache.
-        - rm -rf ./node_modules/.cache/
+        # fsevents somehow gets "changed" every build on mac and it takes forever to recache
+        - rm -rf ./node_modules/.cache/ ./node_modules/fsevents/node_modules
       addons:
         chrome: stable
     - <<: *base-test

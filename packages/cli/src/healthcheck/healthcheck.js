@@ -5,6 +5,7 @@
  */
 'use strict';
 
+const fs = require('fs');
 const ChromeLauncher = require('chrome-launcher').Launcher;
 const ApiClient = require('@lhci/utils/src/api-client.js');
 const {loadAndParseRcFile, resolveRcFilePath} = require('@lhci/utils/src/lighthouserc.js');
@@ -63,7 +64,10 @@ const checks = [
     label: 'Chrome installation found',
     failureLabel: 'Chrome installation not found',
     shouldTest: () => true,
-    test: () => ChromeLauncher.getInstallations().length > 0,
+    test: opts => {
+      if (opts.chromePath) return fs.existsSync(opts.chromePath);
+      return ChromeLauncher.getInstallations().length > 0;
+    },
   },
   {
     id: 'githubToken',

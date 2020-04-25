@@ -8,6 +8,7 @@
 /* eslint-env jest */
 
 const os = require('os');
+const fs = require('fs');
 const path = require('path');
 const {runCLI, withTmpDir, cleanStdOutput} = require('./test-utils.js');
 
@@ -19,6 +20,11 @@ describe('collect', () => {
     'should collect results from staticDistDir',
     () =>
       withTmpDir(tmpDir => {
+        const ciFolder = path.join(tmpDir, '.lighthouseci');
+        fs.mkdirSync(ciFolder);
+        fs.writeFileSync(path.join(ciFolder, 'lhr-123.html'), '<!DOCTYPE html>');
+        fs.writeFileSync(path.join(ciFolder, 'lhr-123.json'), '{}');
+
         const {stdout, stderr, status} = runCLI(
           ['collect', `--config=${rcFile}`, `--static-dist-dir=${fixturesDir}`],
           {
@@ -41,6 +47,13 @@ describe('collect', () => {
         `);
         expect(stderr.toString()).toMatchInlineSnapshot(`""`);
         expect(status).toEqual(0);
+
+        const filesInCiFolder = fs.readdirSync(ciFolder);
+        const reports = filesInCiFolder.filter(file => file.startsWith('lhr-'));
+        expect(reports).toHaveLength(8); // 2 per run, 2 runs per URL, 2 URLs = 2*2*2
+        // Make sure we cleared out what was left before
+        expect(filesInCiFolder).not.toContain('lhr-123.html');
+        expect(filesInCiFolder).not.toContain('lhr-123.json');
       }),
     90000
   );

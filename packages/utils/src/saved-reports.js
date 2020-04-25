@@ -9,6 +9,7 @@ const fs = require('fs');
 const path = require('path');
 const LHCI_DIR = path.join(process.cwd(), '.lighthouseci');
 const LHR_REGEX = /^lhr-\d+\.json$/;
+const LH_HTML_REPORT_REGEX = /^lhr-\d+\.html$/;
 const ASSERTION_RESULTS_PATH = path.join(LHCI_DIR, 'assertion-results.json');
 const URL_LINK_MAP_PATH = path.join(LHCI_DIR, 'links.json');
 
@@ -55,10 +56,10 @@ function getHTMLReportForLHR(lhr) {
   return ReportGenerator.generateReportHtml(lhr);
 }
 
-function clearSavedLHRs() {
+function clearSavedReportsAndLHRs() {
   ensureDirectoryExists();
   for (const file of fs.readdirSync(LHCI_DIR)) {
-    if (!LHR_REGEX.test(file)) continue;
+    if (!LHR_REGEX.test(file) && !LH_HTML_REPORT_REGEX.test(file)) continue;
 
     const filePath = path.join(LHCI_DIR, file);
     fs.unlinkSync(filePath);
@@ -119,7 +120,7 @@ module.exports = {
   getHTMLReportForLHR,
   loadSavedLHRs,
   saveLHR,
-  clearSavedLHRs,
+  clearSavedReportsAndLHRs,
   loadAssertionResults,
   saveAssertionResults,
   getSavedReportsDirectory,

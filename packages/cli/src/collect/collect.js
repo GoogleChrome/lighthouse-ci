@@ -11,7 +11,7 @@ const {determineChromePath} = require('../utils.js');
 const FallbackServer = require('./fallback-server.js');
 const LighthouseRunner = require('./lighthouse-runner.js');
 const PuppeteerManager = require('./puppeteer-manager.js');
-const {saveLHR, clearSavedLHRs} = require('@lhci/utils/src/saved-reports.js');
+const {saveLHR, clearSavedReportsAndLHRs} = require('@lhci/utils/src/saved-reports.js');
 const {
   runCommandAndWaitForPattern,
   killProcessTree,
@@ -178,7 +178,7 @@ function checkIgnoredChromeFlagsOption(options) {
  */
 async function runCommand(options) {
   if (options.method !== 'node') throw new Error(`Method "${options.method}" not yet supported`);
-  if (!options.additive) clearSavedLHRs();
+  if (!options.additive) clearSavedReportsAndLHRs();
 
   checkIgnoredChromeFlagsOption(options);
 

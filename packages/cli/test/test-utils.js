@@ -111,6 +111,7 @@ function waitForCondition(fn, label) {
 function getCleanEnvironment(extraEnvVars) {
   const cleanEnv = {
     ...process.env,
+    CHROME_PATH: undefined,
     LHCI_GITHUB_TOKEN: undefined,
     LHCI_GITHUB_APP_TOKEN: undefined,
     LHCI_CANARY_SERVER_URL: undefined,

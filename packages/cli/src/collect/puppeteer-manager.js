@@ -25,7 +25,7 @@ class PuppeteerManager {
    * setting of `collect.chromePath`.
    * @return {typeof import('puppeteer')|undefined}
    */
-  _requirePuppeteer() {
+  static _requirePuppeteer() {
     try {
       // eslint-disable-next-line import/no-extraneous-dependencies
       return require('puppeteer');
@@ -43,7 +43,7 @@ class PuppeteerManager {
     if (this._browser) return this._browser;
 
     // Delay require to only run after user requests puppeteer functionality.
-    const puppeteer = this._requirePuppeteer();
+    const puppeteer = PuppeteerManager._requirePuppeteer();
     if (!puppeteer) {
       throw new Error(`Unable to require 'puppeteer' for script, have you run 'npm i puppeteer'?`);
     }
@@ -65,13 +65,16 @@ class PuppeteerManager {
     return !!this._options.puppeteerScript;
   }
 
-  /** @return {string|undefined} */
-  getChromiumPath() {
+  /**
+   * @param {{puppeteerScript?: string}} options
+   * @return {string|undefined}
+   */
+  static getChromiumPath(options) {
     // If we're not using puppeteer, return undefined.
-    if (!this._options.puppeteerScript) return undefined;
+    if (!options.puppeteerScript) return undefined;
 
     // Otherwise, check to see if the expected puppeteer download exists.
-    const puppeteer = this._requirePuppeteer();
+    const puppeteer = PuppeteerManager._requirePuppeteer();
     const chromiumPath = puppeteer && puppeteer.executablePath();
     return chromiumPath && fs.existsSync(chromiumPath) ? chromiumPath : undefined;
   }

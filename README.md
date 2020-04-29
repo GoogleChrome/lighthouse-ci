@@ -18,8 +18,7 @@ The node server (`npm install @lhci/server`) stores results, compares reports, a
 - Compare two versions of your site to find improvements and regressions of individual resources.
 
 <img src="https://user-images.githubusercontent.com/2301202/70814696-a4c41a00-1d91-11ea-9ed9-77811939c244.png"
-alt="Screenshot of the Lighthouse CI github app UI" width="48%"> <img src="https://user-images.githubusercontent.com/2301202/79480502-c8af9a80-7fd3-11ea-8087-52f6c8ba6f03.png
-"
+alt="Screenshot of the Lighthouse CI github app UI" width="48%"> <img src="https://user-images.githubusercontent.com/2301202/79480502-c8af9a80-7fd3-11ea-8087-52f6c8ba6f03.png"
 alt="Screenshot of the Lighthouse CI server dashboard UI" width="48%">
 <img src="https://user-images.githubusercontent.com/2301202/70814842-ef459680-1d91-11ea-8b55-bb5d44eeb969.png"
 alt="Screenshot of the Lighthouse CI assertion output" width="48%"> <img src="https://user-images.githubusercontent.com/2301202/70814650-85c58800-1d91-11ea-925e-af9d03f1b20d.png"

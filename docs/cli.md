@@ -23,7 +23,7 @@ All commands support configuration via a JSON file passed in via `--config=./pat
 
 ### Global Options
 
-```
+```txt
   --help             Show help                                         [boolean]
   --version          Show version number                               [boolean]
   --no-lighthouserc  Disables automatic usage of a .lighthouserc file. [boolean]
@@ -57,7 +57,7 @@ lhci healthcheck --fatal --checks=githubToken
 
 ### `autorun`
 
-Automatically run, with sensible defaults, `lhci collect`, `lhci assert` and `lhci upload`, depending on the options. Options for individual commands can be set by prefixing the option with the command name.
+Automatically run, with sensible defaults, [`lhci collect`](#collect), [`lhci assert`](#assert) and [`lhci upload`](#upload), depending on the options. Options for individual commands can be set by prefixing the option with the command name.
 
 **Examples**
 
@@ -69,7 +69,7 @@ lhci autorun --upload.target=temporary-public-storage
 
 #### Starting a webserver
 
-To allow autorun to automatically start your own webserver, add an npm script named `serve:lhci`. autorun will execute this script before collection.
+To allow autorun to automatically start your webserver, add an npm script named `serve:lhci`.
 
 example `package.json` excerpt:
 
@@ -79,7 +79,7 @@ example `package.json` excerpt:
   }
 ```
 
-You can also supply the custom server initalization command from `collect` as a flag directly to `autorun`:
+Alternatively, you can supply the custom server initalization command from [`collect`](#collect) as a flag directly to `autorun`:
 
 ```bash
 lhci autorun --collect.startServerCommand="rails server -e production"
@@ -266,8 +266,6 @@ lhci assert --preset=lighthouse:recommended --includePassedAssertions
 
 Open a local lighthouse report that has been created using `collect`.
 
-**Examples**
-
 ```bash
 lhci open
 ```
@@ -277,8 +275,6 @@ lhci open
 ### `wizard`
 
 Runs an interactive step-by-step wizard to either A) create a new project on the LHCI server or B) reset a project's admin token.
-
-**Examples**
 
 ```bash
 lhci wizard

@@ -180,7 +180,7 @@ The setup so far will automatically assert the Lighthouse team's recommended set
 
 ## Configuration
 
-Lighthouse CI uses a `lighthouserc.json` file to configure all the core commands used. You can replace the options on the command-line we've seen so far with the following configuration file. Read more about how to configure Lighthouse CI [in our docs](./configuration.md).
+Lighthouse CI uses a `lighthouserc.json` file to configure all the core commands used. You can replace the options on the command-line we've seen so far with the following configuration file. Read more about [how to configure Lighthouse CI](./configuration.md).
 
 ```bash
 # no need to pass explicit options

@@ -2,21 +2,35 @@
 
 ## Overview
 
-The CLI is the primary API you'll use when setting up Lighthouse CI. Install the CLI globally to try it out locally.
+The CLI is the primary API you'll use when setting up Lighthouse CI. To install:
 
 ```bash
 npm install -g @lhci/cli
 ```
 
-or
-
-```bash
-yarn global add @lhci/cli
-```
-
 ## Commands
 
 All commands support configuration via a JSON file passed in via `--config=./path/to/`. Any argument on the CLI can also be passed in via environment variable. For example, `--config=foo` can be replaced with `LH_CONFIG=foo`. Learn more about [configuration](./configuration.md).
+
+* [`healthcheck`](#healthcheck)
+* [`autorun`](#autorun)
+* [`collect`](#collect)
+* [`upload`](#upload)
+* [`assert`](#assert)
+* [`open`](#open)
+* [`wizard`](#wizard)
+* [`server`](#server)
+
+### Global Options
+
+```
+  --help             Show help                                         [boolean]
+  --version          Show version number                               [boolean]
+  --no-lighthouserc  Disables automatic usage of a .lighthouserc file. [boolean]
+  --config           Path to JSON config file.
+```
+
+---------------------
 
 ### `healthcheck`
 
@@ -28,9 +42,6 @@ lhci healthcheck --help
 Run diagnostics to ensure a valid configuration
 
 Options:
-  --help     Show help                                                 [boolean]
-  --version  Show version number                                       [boolean]
-  --config   Path to JSON config file
   --fatal    Exit with a non-zero status code when a component fails the status
              check.                                                    [boolean]
   --checks   The list of opt-in checks to include in the fatality check. [array]
@@ -46,7 +57,7 @@ lhci healthcheck --fatal --checks=githubToken
 
 ### `autorun`
 
-Automatically run `collect` with sensible defaults and `assert` or `upload` as specified. Options for individual commands can be set by prefixing the option with the command name.
+Automatically run, with sensible defaults, `lhci collect`, `lhci assert` and `lhci upload`, depending on the options. Options for individual commands can be set by prefixing the option with the command name.
 
 **Examples**
 
@@ -76,31 +87,6 @@ lhci autorun --collect.startServerCommand="rails server -e production"
 
 ---
 
-### `open`
-
-Open a local lighthouse report that has been created using `collect`.
-
-**Examples**
-
-```bash
-lhci open
-```
-
----
-
-### `wizard`
-
-Runs an interactive step-by-step wizard to create a new project on the LHCI server.
-
-**Examples**
-
-```bash
-lhci wizard
-lhci wizard --basicAuth.username="customuser" --basicAuth.password="LighthouseRocks"
-```
-
----
-
 ### `collect`
 
 Runs Lighthouse n times and stores the LHRs in a local `.lighthouseci/` folder.
@@ -111,9 +97,6 @@ lhci collect --help
 Run Lighthouse and save the results to a local folder
 
 Options:
-  --help                    Show help                                      [boolean]
-  --version                 Show version number                            [boolean]
-  --config                  Path to JSON config file
   --method                              [string] [choices: "node"] [default: "node"]
   --headful                 Run with a headful Chrome                      [boolean]
   --additive                Skips clearing of previous collect data        [boolean]
@@ -193,10 +176,6 @@ lhci upload --help
 Save the results to the server
 
 Options:
-  --help                    Show help                                  [boolean]
-  --version                 Show version number                        [boolean]
-  --no-lighthouserc         Disables automatic usage of a .lighthouserc file.
-                                                                       [boolean]
   --target                  The type of target to upload the data to. If set to
                             anything other than "lhci", some of the options will
                             not apply.
@@ -264,10 +243,6 @@ lhci assert
 Assert that the latest results meet expectations
 
 Options:
-  --help                     Show help                                 [boolean]
-  --version                  Show version number                       [boolean]
-  --no-lighthouserc          Disables automatic usage of a .lighthouserc file.
-                                                                       [boolean]
   --preset                   The assertions preset to extend
       [choices: "lighthouse:all", "lighthouse:recommended", "lighthouse:no-pwa"]
   --assertions               The assertions to use.
@@ -287,6 +262,30 @@ lhci assert --preset=lighthouse:recommended --includePassedAssertions
 
 ---
 
+### `open`
+
+Open a local lighthouse report that has been created using `collect`.
+
+**Examples**
+
+```bash
+lhci open
+```
+
+---
+
+### `wizard`
+
+Runs an interactive step-by-step wizard to either A) create a new project on the LHCI server or B) reset a project's admin token.
+
+**Examples**
+
+```bash
+lhci wizard
+```
+
+---
+
 ### `server`
 
 Starts the LHCI server. This command is unique in that it is likely run on infrastructure rather than in your build process. Learn more about the [LHCI server](./getting-started.md#the-lighthouse-ci-server) and [how to setup your personal LHCI server](./recipes/heroku-server/README.md) accessible over the internet.
@@ -296,10 +295,6 @@ Starts the LHCI server. This command is unique in that it is likely run on infra
 Run Lighthouse CI server
 
 Options:
-  --help                                 Show help                     [boolean]
-  --version                              Show version number           [boolean]
-  --no-lighthouserc                      Disables automatic usage of a
-                                         .lighthouserc file.           [boolean]
   --logLevel        [string] [choices: "silent", "verbose"] [default: "verbose"]
   --port, -p                                            [number] [default: 9001]
   --storage.sqlDialect

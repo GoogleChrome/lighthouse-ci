@@ -2,38 +2,45 @@
 
 ## Overview
 
-The CLI is the primary API you'll use when setting up Lighthouse CI. Install the CLI globally to try it out locally.
+The CLI is the primary API you'll use when setting up Lighthouse CI. To install:
 
 ```bash
 npm install -g @lhci/cli
-```
-
-or
-
-```bash
-yarn global add @lhci/cli
 ```
 
 ## Commands
 
 All commands support configuration via a JSON file passed in via `--config=./path/to/`. Any argument on the CLI can also be passed in via environment variable. For example, `--config=foo` can be replaced with `LH_CONFIG=foo`. Learn more about [configuration](./configuration.md).
 
+* [`healthcheck`](#healthcheck)
+* [`autorun`](#autorun)
+* [`collect`](#collect)
+* [`upload`](#upload)
+* [`assert`](#assert)
+* [`open`](#open)
+* [`wizard`](#wizard)
+* [`server`](#server)
+
+### Global Options
+
+```txt
+  --help             Show help                                         [boolean]
+  --version          Show version number                               [boolean]
+  --no-lighthouserc  Disables automatic usage of a .lighthouserc file. [boolean]
+  --config           Path to JSON config file.
+```
+
+---------------------
+
 ### `healthcheck`
 
 Runs diagnostics to ensure a valid configuration, useful when setting up Lighthouse CI for the first time to test your configuration.
 
 ```bash
-lhci healthcheck --help
-
-Run diagnostics to ensure a valid configuration
-
 Options:
-  --help     Show help                                                 [boolean]
-  --version  Show version number                                       [boolean]
-  --config   Path to JSON config file
-  --fatal    Exit with a non-zero status code when a component fails the status
-             check.                                                    [boolean]
-  --checks   The list of opt-in checks to include in the fatality check. [array]
+  --fatal            Exit with a non-zero status code when a component fails the status check.
+                                                                                           [boolean]
+  --checks           The list of opt-in checks to include in the fatality check.             [array]
 ```
 
 **Examples**
@@ -46,19 +53,18 @@ lhci healthcheck --fatal --checks=githubToken
 
 ### `autorun`
 
-Automatically run `collect` with sensible defaults and `assert` or `upload` as specified. Options for individual commands can be set by prefixing the option with the command name.
+Automatically run, with sensible defaults, [`lhci collect`](#collect), [`lhci assert`](#assert) and [`lhci upload`](#upload), depending on the options. Options for individual commands can be set by prefixing the option with the command name.
 
 **Examples**
 
 ```bash
-lhci autorun --config=./lighthouserc.json
 lhci autorun --collect.numberOfRuns=5
 lhci autorun --upload.target=temporary-public-storage
 ```
 
 #### Starting a webserver
 
-To allow autorun to automatically start your own webserver, add an npm script named `serve:lhci`. autorun will execute this script before collection.
+To allow autorun to automatically start your webserver, add an npm script named `serve:lhci`.
 
 example `package.json` excerpt:
 
@@ -68,35 +74,10 @@ example `package.json` excerpt:
   }
 ```
 
-You can also supply the custom server initalization command from `collect` as a flag directly to `autorun`:
+Alternatively, you can supply the custom server initalization command from [`collect`](#collect) as a flag directly to `autorun`:
 
 ```bash
 lhci autorun --collect.startServerCommand="rails server -e production"
-```
-
----
-
-### `open`
-
-Open a local lighthouse report that has been created using `collect`.
-
-**Examples**
-
-```bash
-lhci open
-```
-
----
-
-### `wizard`
-
-Runs an interactive step-by-step wizard to create a new project on the LHCI server.
-
-**Examples**
-
-```bash
-lhci wizard
-lhci wizard --basicAuth.username="customuser" --basicAuth.password="LighthouseRocks"
 ```
 
 ---
@@ -106,33 +87,28 @@ lhci wizard --basicAuth.username="customuser" --basicAuth.password="LighthouseRo
 Runs Lighthouse n times and stores the LHRs in a local `.lighthouseci/` folder.
 
 ```bash
-lhci collect --help
-
-Run Lighthouse and save the results to a local folder
-
 Options:
-  --help                    Show help                                      [boolean]
-  --version                 Show version number                            [boolean]
-  --config                  Path to JSON config file
-  --method                              [string] [choices: "node"] [default: "node"]
-  --headful                 Run with a headful Chrome                      [boolean]
-  --additive                Skips clearing of previous collect data        [boolean]
-  --url                     A URL to run Lighthouse on.  You can evaluate multiple
-                            URLs by adding this flag multiple times.
-  --staticDistDir           The build directory where your HTML files to run
-                            Lighthouse on are located.
-  --chromePath              The path to the Chrome or Chromium executable to use for
-                            collection.
-  --puppeteerScript         The path to a script that manipulates the browser with
-                            puppeteer before running Lighthouse, used for auth.
-  --puppeteerLaunchOptions  The path to a script that manipulates the browser with
-                            puppeteer before running Lighthouse, used for auth.
-  --startServerCommand      The command to run to start the server.
-  --startServerReadyPattern String pattern to listen for started server.
-                                              [string] [default: "listen|ready"]
-  --settings                The Lighthouse settings and flags to use when collecting
-  --numberOfRuns, -n        The number of times to run Lighthouse.
-                                                           [number] [default: 3]
+  --method                                              [string] [choices: "node"] [default: "node"]
+  --headful                  Run with a headful Chrome                                     [boolean]
+  --additive                 Skips clearing of previous collect data                       [boolean]
+  --url                      A URL to run Lighthouse on. Use this flag multiple times to evaluate
+                             multiple URLs.
+  --staticDistDir            The build directory where your HTML files to run Lighthouse on are
+                             located.
+  --isSinglePageApplication  If the application is created by Single Page Application, enable
+                             redirect to index.html.
+  --chromePath               The path to the Chrome or Chromium executable to use for collection.
+             [default: "/Applications/Google Chrome Canary.app/Contents/MacOS/Google Chrome Canary"]
+  --puppeteerScript          The path to a script that manipulates the browser with puppeteer before
+                             running Lighthouse, used for auth.
+  --puppeteerLaunchOptions   The object of puppeteer launch options
+  --startServerCommand       The command to run to start the server.
+  --startServerReadyPattern  String pattern to listen for started server.
+                                                                  [string] [default: "listen|ready"]
+  --startServerReadyTimeout  The number of milliseconds to wait for the server to start before
+                             continuing                                    [number] [default: 10000]
+  --settings                 The Lighthouse settings and flags to use when collecting
+  --numberOfRuns, -n         The number of times to run Lighthouse.            [number] [default: 3]
 ```
 
 **Examples**
@@ -188,38 +164,34 @@ For more information on how to use puppeteer, read up on [their API docs](https:
 Saves the runs in the `.lighthouseci/` folder to desired target and sets a GitHub status check when token is available.
 
 ```bash
-lhci upload --help
-
-Save the results to the server
-
 Options:
-  --help                    Show help                                  [boolean]
-  --version                 Show version number                        [boolean]
-  --no-lighthouserc         Disables automatic usage of a .lighthouserc file.
-                                                                       [boolean]
-  --target                  The type of target to upload the data to. If set to
-                            anything other than "lhci", some of the options will
-                            not apply.
-        [string] [choices: "lhci", "temporary-public-storage"] [default: "lhci"]
-  --token                   [lhci only] The Lighthouse CI server token for the
-                            project.                                    [string]
-  --githubToken             The GitHub token to use to apply a status check.
-                                                                        [string]
-  --githubApiHost           The GitHub host to use for the status check API
-                            request. Modify this when using on a GitHub
-                            Enterprise server.
-                                    [string] [default: "https://api.github.com"]
-  --githubAppToken          The LHCI GitHub App token to use to apply a status
-                            check.                                      [string]
-  --extraHeaders            [lhci only] Extra headers to use when making API
-                            requests to the LHCI server.
-  --serverBaseUrl           [lhci only] The base URL of the LHCI server where
-                            results will be saved.
-                                             [default: "http://localhost:9001/"]
-  --urlReplacementPatterns  [lhci only] sed-like replacement patterns to mask
-                            non-deterministic URL substrings.  [array] [default:
-  ["s#:[0-9]{3,5}/#:PORT/#","s/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[
-                                                          0-9a-f]{12}/UUID/ig"]]
+  --target                       The type of target to upload the data to. If set to anything other
+                                 than "lhci", some of the options will not apply.
+                            [string] [choices: "lhci", "temporary-public-storage"] [default: "lhci"]
+  --token                        [lhci only] The Lighthouse CI server token for the project.[string]
+  --ignoreDuplicateBuildFailure  [lhci only] Whether to ignore failures (still exit with code 0)
+                                 caused by uploads of a duplicate build.                   [boolean]
+  --githubToken                  The GitHub token to use to apply a status check.           [string]
+  --githubApiHost                The GitHub host to use for the status check API request. Modify
+                                 this when using on a GitHub Enterprise server.
+                                                        [string] [default: "https://api.github.com"]
+  --githubAppToken               The LHCI GitHub App token to use to apply a status check.  [string]
+  --githubStatusContextSuffix    The suffix of the GitHub status check context label.       [string]
+  --extraHeaders                 [lhci only] Extra headers to use when making API requests to the
+                                 LHCI server.
+  --basicAuth.username           [lhci only] The username to use on a server protected with HTTP
+                                 Basic Authentication.                                      [string]
+  --basicAuth.password           [lhci only] The password to use on a server protected with HTTP
+                                 Basic Authentication.                                      [string]
+  --serverBaseUrl                [lhci only] The base URL of the LHCI server where results will be
+                                 saved.                          [default: "http://localhost:9001/"]
+  --uploadUrlMap                 [temporary-public-storage only] Whether to post links to historical
+                                 base results to storage or not. Defaults to true only on master
+                                 branch.                                  [boolean] [default: false]
+  --urlReplacementPatterns       [lhci only] sed-like replacement patterns to mask non-deterministic
+                                 URL substrings.                                   [array] [default:
+  ["s#:[0-9]{3,5}/#:PORT/#","s/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/UUID/ig"
+                                                                                                  ]]
 ```
 
 **Examples**
@@ -259,21 +231,13 @@ The following environment variables override the inferred build context settings
 Asserts the conditions in the Lighthouse CI config and exits with the appropriate status code if there were any failures. See the [assertion docs](./assertions.md) for more.
 
 ```bash
-lhci assert
-
-Assert that the latest results meet expectations
-
 Options:
-  --help                     Show help                                 [boolean]
-  --version                  Show version number                       [boolean]
-  --no-lighthouserc          Disables automatic usage of a .lighthouserc file.
-                                                                       [boolean]
   --preset                   The assertions preset to extend
-      [choices: "lighthouse:all", "lighthouse:recommended", "lighthouse:no-pwa"]
+                          [choices: "lighthouse:all", "lighthouse:recommended", "lighthouse:no-pwa"]
   --assertions               The assertions to use.
   --budgetsFile              The path (relative to cwd) to a budgets.json file.
-  --includePassedAssertions  Whether to include the results of passed assertions
-                             in the output.                            [boolean]
+  --includePassedAssertions  Whether to include the results of passed assertions in the output.
+                                                                                           [boolean]
 ```
 
 **Examples**
@@ -287,6 +251,26 @@ lhci assert --preset=lighthouse:recommended --includePassedAssertions
 
 ---
 
+### `open`
+
+Open a local lighthouse report that has been created using `collect`.
+
+```bash
+lhci open
+```
+
+---
+
+### `wizard`
+
+Runs an interactive step-by-step wizard to either A) create a new project on the LHCI server or B) reset a project's admin token.
+
+```bash
+lhci wizard
+```
+
+---
+
 ### `server`
 
 Starts the LHCI server. This command is unique in that it is likely run on infrastructure rather than in your build process. Learn more about the [LHCI server](./getting-started.md#the-lighthouse-ci-server) and [how to setup your personal LHCI server](./recipes/heroku-server/README.md) accessible over the internet.
@@ -296,27 +280,21 @@ Starts the LHCI server. This command is unique in that it is likely run on infra
 Run Lighthouse CI server
 
 Options:
-  --help                                 Show help                     [boolean]
-  --version                              Show version number           [boolean]
-  --no-lighthouserc                      Disables automatic usage of a
-                                         .lighthouserc file.           [boolean]
-  --logLevel        [string] [choices: "silent", "verbose"] [default: "verbose"]
-  --port, -p                                            [number] [default: 9001]
-  --storage.sqlDialect
-           [string] [choices: "sqlite", "postgres", "mysql"] [default: "sqlite"]
+  --logLevel                            [string] [choices: "silent", "verbose"] [default: "verbose"]
+  --port, -p                                                                [number] [default: 9001]
+  --storage.storageMethod                      [string] [choices: "sql", "spanner"] [default: "sql"]
+  --storage.sqlDialect         [string] [choices: "sqlite", "postgres", "mysql"] [default: "sqlite"]
   --storage.sqlDatabasePath              The path to a SQLite database on disk.
-  --storage.sqlConnectionUrl             The connection url to a postgres or
-                                         mysql database.
-  --storage.sqlConnectionSsl             Whether the SQL connection should force
-                                         use of SSL   [boolean] [default: false]
-  --storage.sqlDangerouslyResetDatabase  Whether to force the database to the
-                                         required schema. WARNING: THIS WILL
-                                         DELETE ALL DATA
-                                                      [boolean] [default: false]
-  --basicAuth.username                   The username to protect the server with
-                                         HTTP Basic Authentication.     [string]
-  --basicAuth.password                   The password to protect the server with
-                                         HTTP Basic Authentication.     [string]
+  --storage.sqlConnectionUrl             The connection url to a postgres or mysql database.
+  --storage.sqlConnectionSsl             Whether the SQL connection should force use of SSL
+                                                                          [boolean] [default: false]
+  --storage.sqlDangerouslyResetDatabase  Whether to force the database to the required schema.
+                                         WARNING: THIS WILL DELETE ALL DATA
+                                                                          [boolean] [default: false]
+  --basicAuth.username                   The username to protect the server with HTTP Basic
+                                         Authentication.                                    [string]
+  --basicAuth.password                   The password to protect the server with HTTP Basic
+                                         Authentication.                                    [string]
 ```
 
 **Examples**

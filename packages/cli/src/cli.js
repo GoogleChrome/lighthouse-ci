@@ -48,6 +48,7 @@ async function run() {
     .usage('lhci <command> <options>')
     .env('LHCI')
     .demand(1)
+    .strict()
     .command('collect', 'Run Lighthouse and save the results to a local folder', commandYargs =>
       collectCmd.buildCommand(commandYargs)
     )

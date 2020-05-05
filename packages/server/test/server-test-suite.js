@@ -332,6 +332,46 @@ function runTests(state) {
       );
     });
 
+    it('should handle partial id ambiguity when there is one 0 and one 00 build', async () => {
+      const dummyProject = await client.createProject({name: 'dummy', externalUrl: ''});
+      const builds = [];
+      const findAmbiguity = () => {
+        for (const a of builds) {
+          for (const b of builds) {
+            if (a === b) continue;
+
+            if (a.id.startsWith('0') && !a.id.startsWith('00') && b.id.startsWith('00')) {
+              return true;
+            }
+          }
+        }
+      };
+
+      while (!findAmbiguity()) {
+        builds.push(
+          await client.createBuild({
+            ...buildA,
+            hash: Math.random().toString(),
+            projectId: dummyProject.id,
+          })
+        );
+      }
+
+      const buildsWithAmbiguousPrefix = builds.filter(b => b.id.startsWith('0'));
+      const doubleZeroBuild = buildsWithAmbiguousPrefix.find(b => b.id.startsWith('00'));
+      const singleZeroBuild = buildsWithAmbiguousPrefix.find(b => !b.id.startsWith('00'));
+
+      const ambiguousQueryResult = await client.findBuildById(dummyProject.id, '0');
+      const doubleZeroResult = await client.findBuildById(dummyProject.id, doubleZeroBuild.id);
+      const singleZeroResult = await client.findBuildById(dummyProject.id, singleZeroBuild.id);
+
+      expect([ambiguousQueryResult, doubleZeroResult, singleZeroResult]).toEqual([
+        undefined,
+        doubleZeroBuild,
+        singleZeroBuild,
+      ]);
+    }, 60000);
+
     it('should handle UUIDs that start with 0', async () => {
       const dummyProject = await client.createProject({name: 'dummy', externalUrl: ''});
       const builds = [];

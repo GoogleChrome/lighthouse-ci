@@ -479,8 +479,11 @@ class SqlStorageMethod {
     //      <= a82fb732-ffff-ffff-ffff-ffffffffffff
     const [leadingZeros = ''] = buildId.match(/^0+/) || [];
     const numericValue = parseInt(buildId.replace(/-/g, ''), 16);
-    const lowerUuid = formatAsUuid(leadingZeros + numericValue.toString(16), '0');
-    const upperUuid = formatAsUuid(leadingZeros + numericValue.toString(16), 'f');
+    // If the prefix *is* 0 we don't want to double count it.
+    let prefix = numericValue.toString(16);
+    if (numericValue !== 0) prefix = `${leadingZeros}${prefix}`;
+    const lowerUuid = formatAsUuid(prefix, '0');
+    const upperUuid = formatAsUuid(prefix, 'f');
     const builds = await buildModel.findAll({
       where: {id: {[Sequelize.Op.gte]: lowerUuid, [Sequelize.Op.lte]: upperUuid}, projectId},
       limit: 2,

@@ -108,7 +108,7 @@ describe('wizard CLI', () => {
   });
 
   describe('reset-project-token', () => {
-    it('should reset the project token', async () => {
+    it('should reset the build token', async () => {
       const storage = {storageMethod: 'sql', sqlDialect: 'sqlite', sqlDatabasePath: server.sqlFile};
       const wizardTempConfigFile = {ci: {wizard: {wizard: 'reset-project-token', storage}}};
       const tmpFolder = fs.mkdtempSync(`${os.tmpdir()}${path.sep}`);
@@ -124,14 +124,14 @@ describe('wizard CLI', () => {
         {inputWaitCondition: 'Which project'}
       );
 
-      // Extract the project token
-      expect(stdout).toContain('Use project token');
+      // Extract the build token
+      expect(stdout).toContain('Use build token');
       const projectSentence = stdout
-        .match(/Use project token [\s\S]+/im)[0]
+        .match(/Use build token [\s\S]+/im)[0]
         .replace(log.bold, '')
         .replace(log.reset, '');
       const oldProjectToken = projectToken;
-      projectToken = projectSentence.match(/Use project token (\S+)/)[1];
+      projectToken = projectSentence.match(/Use build token (\S+)/)[1];
 
       expect(stderr).toEqual('');
       expect(status).toEqual(0);

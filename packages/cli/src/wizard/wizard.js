@@ -5,7 +5,9 @@
  */
 'use strict';
 
+const path = require('path');
 const inquirer = require('inquirer');
+const {getGitHubRepoSlug} = require('@lhci/utils/src/build-context.js');
 const ApiClient = require('@lhci/utils/src/api-client.js');
 const _ = require('@lhci/utils/src/lodash.js');
 const log = require('lighthouse-logger');
@@ -23,6 +25,10 @@ function buildCommand(yargs) {
  * @return {Promise<void>}
  */
 async function runNewProjectWizard(options) {
+  const repoSlug = getGitHubRepoSlug();
+  const fallbackProjectName = path.basename(process.cwd());
+  const [defaultProjectName = fallbackProjectName] = (repoSlug && repoSlug.match(/[^/]+$/)) || [];
+
   const responses = await inquirer.prompt([
     {
       type: 'input',
@@ -35,12 +41,13 @@ async function runNewProjectWizard(options) {
       name: 'projectName',
       message: 'What would you like to name the project?',
       validate: input => !!input.length,
+      default: defaultProjectName,
     },
     {
       type: 'input',
       name: 'projectExternalUrl',
       message: "Where is the project's code hosted?",
-      default: 'https://github.com/<org>/<repo>',
+      default: `https://github.com/${repoSlug || '<org>/<repo>'}`,
     },
     {
       type: 'input',

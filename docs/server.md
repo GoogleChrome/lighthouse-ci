@@ -72,11 +72,11 @@ The default security model of LHCI server is two-tiered:
 
 In other words, the server has very weak authentication mechanisms by default and **anyone with HTTP access to the server will be able to view your Lighthouse results and upload data to the server**. If your Lighthouse reports contain sensitive information or you would like to prevent unauthorized users from uploading builds, you have a few options outlined below.
 
-### Project & Admin Tokens
+### Build & Admin Tokens
 
-LHCI has two built-in authentication mechanisms enabled by default: the project token and the admin token.
+LHCI has two built-in authentication mechanisms enabled by default: the build token and the admin token.
 
-The _project token_ allows a user to _upload new data_ to a particular project, but does not allow the destruction or editing of any historical data. If your project is open source and you want to collect Lighthouse data on pull requests from external contributors then you should consider the _project token_ to be public knowledge.
+The _build token_ allows a user to _upload new data_ to a particular project, but does not allow the destruction or editing of any historical data. If your project is open source and you want to collect Lighthouse data on pull requests from external contributors then you should consider the _build token_ to be public knowledge.
 
 The _admin token_ allows a user to _edit or delete data_ from a particular project. **The admin token should only be shared with trusted users and never placed in the CI environment**, even in open source projects with external contributors. Anyone with the admin token can delete the entire project's data.
 

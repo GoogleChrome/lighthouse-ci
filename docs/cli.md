@@ -12,14 +12,14 @@ npm install -g @lhci/cli
 
 All commands support configuration via a JSON file passed in via `--config=./path/to/`. Any argument on the CLI can also be passed in via environment variable. For example, `--config=foo` can be replaced with `LH_CONFIG=foo`. Learn more about [configuration](./configuration.md).
 
-* [`healthcheck`](#healthcheck)
-* [`autorun`](#autorun)
-* [`collect`](#collect)
-* [`upload`](#upload)
-* [`assert`](#assert)
-* [`open`](#open)
-* [`wizard`](#wizard)
-* [`server`](#server)
+- [`healthcheck`](#healthcheck)
+- [`autorun`](#autorun)
+- [`collect`](#collect)
+- [`upload`](#upload)
+- [`assert`](#assert)
+- [`open`](#open)
+- [`wizard`](#wizard)
+- [`server`](#server)
 
 ### Global Options
 
@@ -30,7 +30,7 @@ All commands support configuration via a JSON file passed in via `--config=./pat
   --config           Path to JSON config file.
 ```
 
----------------------
+---
 
 ### `healthcheck`
 
@@ -161,14 +161,14 @@ For more information on how to use puppeteer, read up on [their API docs](https:
 
 ### `upload`
 
-Saves the runs in the `.lighthouseci/` folder to desired target and sets a GitHub status check when token is available.
+Saves the runs in the `.lighthouseci/` folder to desired target and sets a GitHub status check when the GitHub token is available.
 
 ```bash
 Options:
   --target                       The type of target to upload the data to. If set to anything other
                                  than "lhci", some of the options will not apply.
                             [string] [choices: "lhci", "temporary-public-storage"] [default: "lhci"]
-  --token                        [lhci only] The Lighthouse CI server token for the project.[string]
+  --token                        [lhci only] The Lighthouse CI build token for the project.[string]
   --ignoreDuplicateBuildFailure  [lhci only] Whether to ignore failures (still exit with code 0)
                                  caused by uploads of a duplicate build.                   [boolean]
   --githubToken                  The GitHub token to use to apply a status check.           [string]

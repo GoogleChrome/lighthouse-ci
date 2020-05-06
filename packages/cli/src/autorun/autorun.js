@@ -9,11 +9,14 @@ const fs = require('fs');
 const path = require('path');
 const childProcess = require('child_process');
 const _ = require('@lhci/utils/src/lodash.js');
+const version = require('../../package.json').version;
 const {
   loadRcFile,
   flattenRcToConfig,
   resolveRcFilePath,
 } = require('@lhci/utils/src/lighthouserc.js');
+
+const CONFIGURATION_DOCS_URL = `https://github.com/GoogleChrome/lighthouse-ci/blob/v${version}/docs/configuration.md`;
 
 const BUILD_DIR_PRIORITY = [
   // explicitly a dist version of the site, highly likely to be production assets
@@ -68,7 +71,12 @@ function findBuildDir() {
     }
   }
 
-  throw new Error('Unable to determine `staticDistDir`; Set it explicitly in lighthouserc.json');
+  process.stderr.write('\nERROR:\n');
+  process.stderr.write('Unable to automatically determine the location of static site files.\n');
+  process.stderr.write('Use the CLI flag --collect.staticDistDir or a lighthouserc config file ');
+  process.stderr.write('to tell Lighthouse CI where your HTML files are located.\n');
+  process.stderr.write(`Learn More: ${CONFIGURATION_DOCS_URL}\n\n`);
+  throw new Error('Failed to automatically determine `staticDistDir`');
 }
 
 /** @return {string} */

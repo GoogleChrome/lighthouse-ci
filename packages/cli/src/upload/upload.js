@@ -198,7 +198,10 @@ async function runGithubStatusCheck(options, targetUrlMap) {
   const hash = getCurrentHash();
   const slug = getGitHubRepoSlug(githubApiHost);
 
-  if (!githubToken && !githubAppToken) return print('No GitHub token set, skipping.\n');
+  if (!githubToken && !githubAppToken) {
+    return print('No GitHub token set, skipping GitHub status check.\n');
+  }
+
   print('GitHub token found, attempting to set status...\n');
   if (!slug) return print(`No GitHub remote found, skipping.\n`);
   if (!slug.includes('/')) return print(`Invalid repo slug "${slug}", skipping.\n`);

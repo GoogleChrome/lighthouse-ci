@@ -2,8 +2,6 @@
 
 ## Overview
 
-Estimated Time: ~15 minutes
-
 This document provides a step-by-step walkthrough on how to setup Lighthouse CI on your repository. After this guide, your build system will be running Lighthouse on your project's URLs on every commit, automatically asserting that important Lighthouse audits pass, and uploading the reports for manual inspection.
 
 **Important Note Before Starting**
@@ -30,8 +28,8 @@ NOTE: As the name implies, this is _temporary_ and _public_ storage. If you're u
 **.travis.yml**
 
 ```yaml
-# dist: xenial (the default) or newer required
-language: node_js # Node 10 LTS or later required
+language: node_js
+node_js: v12 # Node 10 LTS or later required
 addons:
   chrome: stable # make Chrome available
 before_install:
@@ -48,11 +46,11 @@ after_success:
 <br />
 
 ```yaml
-name: Build project and Run Lighthouse CI
+name: CI
 on: [push]
 jobs:
   lhci:
-    name: Lighthouse CI
+    name: Lighthouse
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -180,7 +178,7 @@ The setup so far will automatically assert the Lighthouse team's recommended set
 
 ## Configuration
 
-Lighthouse CI uses a `lighthouserc.json` file to configure all the core commands used. You can replace the options on the command-line we've seen so far with the following configuration file. Read more about [how to configure Lighthouse CI](./configuration.md).
+Lighthouse CI uses a `lighthouserc.json` file to configure all the core commands used. You can replace the CLI flags we've seen so far with the following configuration file. Read more about [how to configure Lighthouse CI](./configuration.md).
 
 ```bash
 # no need to pass explicit options

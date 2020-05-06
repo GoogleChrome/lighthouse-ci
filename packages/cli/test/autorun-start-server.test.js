@@ -118,7 +118,7 @@ describe('Lighthouse CI autorun CLI with startServerCommand', () => {
       Saved LHR to http://localhost:XXXX/ (<UUID>)
       Done saving build results to Lighthouse CI
       View build diff at http://localhost:XXXX/app/projects/test/compare/<UUID>
-      No GitHub token set, skipping.
+      No GitHub token set, skipping GitHub status check.
 
       Done running autorun.
       "

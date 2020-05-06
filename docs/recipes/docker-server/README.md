@@ -38,19 +38,28 @@ docker push <your username>/lhci-server:latest
 
 You can deploy your own server instance to Google Cloud Platform without ever installing Docker or ssh'ing into any machines.
 
+**WARNING:** GCP pricing changes for Kubernetes cluster management went into effect starting June 6, 2020 that clusters beyond your first now cost \$72/month. We would only recommend following the script below if you're required to use GCP. If you're just trying to setup the server quickly for free, follow our other guides for [more economical options](../heroku-server/README.md).
+
+- List of [GCP Zones](https://cloud.google.com/compute/docs/regions-zones#available)
+- Google Cloud [SDK Installation Instructions](https://cloud.google.com/sdk/install) (though if you have to use these, this guide probably isn't for you)
+
+**Run the below commands locally to setup your GCP server.**
+
 ```bash
 # Configure the gcloud utility
 PROJECT_ID="<your GCP project id here>"
 COMPUTE_ZONE="<your zone here, e.g. us-central1-a>"
-gcloud config set project $PROJECT_ID
-gcloud config set compute/zone $COMPUTE_ZONE
+gcloud config set project "$PROJECT_ID"
+gcloud config set compute/zone "$COMPUTE_ZONE"
 
 # Create our Kubernetes cluster for LHCI
 gcloud container clusters create lhci-cluster --num-nodes=1
 
 # Deploy the LHCI server pod
-kubectl apply -f ./kubernetes/lhci-data-claim.yml
-kubectl apply -f ./kubernetes/lhci-pod.yml
+curl https://raw.githubusercontent.com/GoogleChrome/lighthouse-ci/master/docs/recipes/docker-server/kubernetes/lhci-data-claim.yml > lhci-data-claim.yml
+curl https://raw.githubusercontent.com/GoogleChrome/lighthouse-ci/master/docs/recipes/docker-server/kubernetes/lhci-pod.yml > lhci-pod.yml
+kubectl apply -f ./lhci-data-claim.yml
+kubectl apply -f ./lhci-pod.yml
 
 # Make sure our pod was created successfully
 kubectl get pods

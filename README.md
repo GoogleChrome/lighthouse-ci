@@ -2,7 +2,7 @@
 
 ## Overview
 
-Lighthouse CI is a set of commands that make continuously running, asserting, saving, and retrieving [Lighthouse](https://github.com/GoogleChrome/lighthouse) results as easy as possible.
+Lighthouse CI is a suite of tools that make continuously running, asserting, saving, and retrieving [Lighthouse](https://github.com/GoogleChrome/lighthouse) results as easy as possible.
 
 The node CLI (`npm install -g @lhci/cli`) runs Lighthouse, asserts results, and uploads reports.
 
@@ -28,10 +28,10 @@ alt="Screenshot of the Lighthouse CI server diff UI" width="48%">
 
 - [Getting Started](./docs/getting-started.md)
 - [Troubleshooting / FAQs](./docs/troubleshooting.md)
-- [CLI Documentation](./docs/cli.md)
-- [Server Documentation](./docs/server.md)
-- [Assertions Documentation](./docs/assertions.md)
-- [Configuration Documentation](./docs/configuration.md)
+- [CLI](./docs/cli.md)
+- [Server](./docs/server.md)
+- [Assertions](./docs/assertions.md)
+- [Configuration](./docs/configuration.md)
 - [Versioning Policy](./docs/version-policy.md)
 
 ### Quick Start
@@ -40,6 +40,7 @@ alt="Screenshot of the Lighthouse CI server diff UI" width="48%">
 
 ```yaml
 language: node_js
+node_js: v12
 addons:
   chrome: stable
 before_install:

@@ -107,10 +107,10 @@ describe('wizard CLI', () => {
     }, 30000);
   });
 
-  describe('reset-project-token', () => {
+  describe('reset-build-token', () => {
     it('should reset the build token', async () => {
       const storage = {storageMethod: 'sql', sqlDialect: 'sqlite', sqlDatabasePath: server.sqlFile};
-      const wizardTempConfigFile = {ci: {wizard: {wizard: 'reset-project-token', storage}}};
+      const wizardTempConfigFile = {ci: {wizard: {wizard: 'reset-build-token', storage}}};
       const tmpFolder = fs.mkdtempSync(`${os.tmpdir()}${path.sep}`);
       const wizardRcFile = `${tmpFolder}/wizard.json`;
       fs.writeFileSync(wizardRcFile, JSON.stringify(wizardTempConfigFile), {encoding: 'utf8'});

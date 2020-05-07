@@ -413,7 +413,7 @@ The target location to which Lighthouse CI should upload the reports.
 
 _target=lhci only_
 
-The build token for your Lighthouse CI project. Required when using `target=lhci`. This token should be given to you by `lhci wizard --wizard=new-project`. If you've forgotten your token, connect directly to your server and run `lhci wizard --wizard=reset-project-token`.
+The build token for your Lighthouse CI project. Required when using `target=lhci`. This token should be given to you by `lhci wizard --wizard=new-project`. If you've forgotten your token, connect directly to your server and run `lhci wizard --wizard=reset-build-token`.
 
 #### `ignoreDuplicateBuildFailure`
 
@@ -577,7 +577,7 @@ Runs an interactive step-by-step wizard to accomplish various Lighthouse CI task
 lhci wizard
 ? Which wizard do you want to run? (Use arrow keys)
 ❯ new-project
-  reset-project-token
+  reset-build-token
   reset-admin-token
 ```
 

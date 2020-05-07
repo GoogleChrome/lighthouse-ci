@@ -87,7 +87,7 @@ async function runNewProjectWizard(options) {
 }
 
 /**
- * @param {'admin'|'project'} type
+ * @param {'admin'|'build'} type
  * @param {LHCI.WizardCommand.Options} options
  * @return {Promise<void>}
  */
@@ -155,7 +155,7 @@ async function runCommand(options) {
           type: 'list',
           name: 'wizard',
           message: 'Which wizard do you want to run?',
-          choices: ['new-project', 'reset-project-token', 'reset-admin-token'],
+          choices: ['new-project', 'reset-build-token', 'reset-admin-token'],
         },
       ]);
 
@@ -163,8 +163,8 @@ async function runCommand(options) {
     case 'new-project':
       await runNewProjectWizard(options);
       break;
-    case 'reset-project-token':
-      await runResetTokenWizard('project', options);
+    case 'reset-build-token':
+      await runResetTokenWizard('build', options);
       break;
     case 'reset-admin-token':
       await runResetTokenWizard('admin', options);

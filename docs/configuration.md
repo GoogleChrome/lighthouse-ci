@@ -392,6 +392,116 @@ Options:
                                                                                                   ]]
 ```
 
+#### `target`
+
+The target location to which Lighthouse CI should upload the reports.
+
+**When to use `target=temporary-public-storage`:**
+
+- You want to setup Lighthouse CI as quickly as possible without any costs.
+- You're OK with your reports being available to anyone on the internet with the link.
+- You're OK with your reports being automatically deleted after 7 days.
+- You're OK with your reports being stored on GCP Cloud Storage.
+
+**When to use `target=lhci`:**
+
+- You want to store Lighthouse reports for longer than 7 days.
+- You want to control access to your Lighthouse reports.
+- You've setup a [Lighthouse CI server](./server.md).
+
+#### `token`
+
+_target=lhci only_
+
+The build token for your Lighthouse CI project. Required when using `target=lhci`. This token should be given to you by `lhci wizard --wizard=new-project`. If you've forgotten your token, connect directly to your server and run `lhci wizard --wizard=reset-project-token`.
+
+#### `ignoreDuplicateBuildFailure`
+
+_target=lhci only_
+
+Boolean that controls whether upload failures due to duplicate build hashes should be ignored. The build token only allows the _creation_ of data on the server and not the _editing_ or _destruction_ of data on the LHCI server. When the CLI attempts to upload a Lighthouse report for a hash that already exists, the server will reject it.
+
+Use this option when you don't run Lighthouse CI as the last step of your CI process or reruns are common.
+
+#### `githubToken`
+
+The GitHub token to use when setting a status check on a GitHub PR. Use this when the project is hosted on GitHub and not using the [official GitHub App](https://github.com/apps/lighthouse-ci).
+
+#### `githubApiHost`
+
+The GitHub API host to use when attempting to set a status check. Use this when the project is hosted on a private GitHub enterprise server and not using the public GitHub API.
+
+#### `githubAppToken`
+
+The GitHub App token returned when installing the [GitHub App](https://github.com/apps/lighthouse-ci). Use this to set status checks on GitHub PRs when using the official GitHub App.
+
+#### `githubStatusContextSuffix`
+
+The suffix to use when setting the status check on a GitHub PR.
+
+For example, by default `lhci` is used as the root of the status check label, but this can be configured to `lhci-app` by setting `githubStatusContextSuffix` to `-app`.
+
+#### `extraHeaders`
+
+_target=lhci only_
+
+A map of additional headers to add the requests made to the LHCI server. Useful for adding bespoke auth tokens.
+
+#### `basicAuth`
+
+_target=lhci only_
+
+An object containing a username and password pair for authenicating with a Basic auth protected LHCI server. Use this setting when you've protected your LHCI server with Basic auth.
+
+**Example:**
+
+```json
+{
+  "ci": {
+    "upload": {
+      "basicAuth": {
+        "username": "myAdminUser",
+        "password": "LighthouseRocks!"
+      }
+    }
+  }
+}
+```
+
+#### `serverBaseUrl`
+
+_target=lhci only_
+
+The base URL of the LHCI server to upload to. Required when using `target=lhci`.
+
+#### `uploadUrlMap`
+
+_target=temporary-public-storage only_
+
+Boolean that controls whether to update the latest build in temporary public storage associated with this repo. If you use `master` as your default branch, **DO NOT** use this option. If you don't use `master` as your default branch, set this option _when you upload results from your actual default branch_.
+
+#### `urlReplacementPatterns`
+
+_target=lhci only_
+
+A list of replacement patterns that will mask differences in tested URLs that you wish to hide for display or treat as the same. The `urlReplacementPatterns` are used to identify the same URLs for diff comparisons and as preprocessing for GitHub status check labels.
+
+For example, by default Lighthouse CI will automatically replace the port of tested URLs. A localhost static server port may change on each additional invocation, but with `urlReplacementPatterns` the port number is replaced with `PORT` so all builds
+
+**Format:** `s{DELIMITER}{SEARCH_REGEX}{DELIMITER}{REPLACEMENT}{DELIMITER}{SEARCH_REGEX_FLAGS}`
+
+**Notes:**
+
+- There is no escape support for the delimiter, so you must choose a delimiter character that does not appear in your search regex or your replacement.
+- Beware of double-escaping requirements. If you're passing a string in JS or an argument through a shell, you may need to use `\\` in order for a `\` to be seen by Lighthouse CI.
+- If you set `urlReplacementPatterns` yourself, you will lose the defaults provided by Lighthouse CI. If you need the functionality provided by the defaults, be sure to copy them into your configuration as well.
+
+**Examples:**
+
+- `s/Foo/Bar/g` - Replace _all_ occurrences of `Foo` with `Bar`, case-sensitive.
+- `s/v\d+/VERSION/i` - Replace the _first_ sequence of a v followed by digits with `VERSION`, case-insensitive.
+- `s#(//.*?)/.*$#$1/replaceThePath#` - Replace the entire URL following the origin with `/replaceThePath` using `#` as the delimiter character and a group reference.
+
 #### Build Context
 
 When uploading to the Lighthouse CI server, the CLI will attempt to automatically infer the build context such as git hash, author, message, ancestor, etc. In most cases, there's nothing you need to change about this, but if you're running without a git repo, in a Jenkins environment, a CI provider we haven't documented yet, or are just running into errors, you can control the build context yourself.

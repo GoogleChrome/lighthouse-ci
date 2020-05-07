@@ -28,10 +28,9 @@ alt="Screenshot of the Lighthouse CI server diff UI" width="48%">
 
 - [Getting Started](./docs/getting-started.md)
 - [Troubleshooting / FAQs](./docs/troubleshooting.md)
-- [CLI](./docs/cli.md)
+- [Configuration](./docs/configuration.md)
 - [Server](./docs/server.md)
 - [Assertions](./docs/assertions.md)
-- [Configuration](./docs/configuration.md)
 - [Versioning Policy](./docs/version-policy.md)
 
 ### Quick Start

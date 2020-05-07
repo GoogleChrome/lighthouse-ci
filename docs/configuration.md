@@ -169,11 +169,11 @@ Autorun will attempt to automatically detect the directory of your static site f
 - `build` (default name for create-react-app and preact-cli)
 - `public` (default name for gatsby)
 
-If your productionized static assets live in a different folder or your project does not use a build step at all, see the [`lhci collect` documentation](#collect) for how to configure your project.
+If your productionized static assets live in a different folder, you'd like to run Lighthouse CI on a specific subset of your static pages, your project does not use a build step at all or a different server, see the [`lhci collect` documentation](#collect) for how to configure your project.
 
 #### Detecting `collect.startServerCommand`
 
-Autorun will attempt to automatically detect the `collect.startServerCommand` based on our `package.json`. To allow autorun to automatically start your webserver, add an npm script named `serve:lhci`.
+If no `staticDistDir` could be automatically detected, autorun will attempt to automatically detect the `collect.startServerCommand` based on our `package.json`. To allow autorun to automatically start your webserver, add an npm script named `serve:lhci`.
 
 example `package.json` excerpt:
 
@@ -216,22 +216,49 @@ Options:
   --numberOfRuns, -n         The number of times to run Lighthouse.            [number] [default: 3]
 ```
 
-**Examples**
+#### `method`
 
-```bash
-# Basic usage
-lhci collect --numberOfRuns=5 --url=https://example.com
-# Have LHCI start a server before running
-lhci collect --start-server-command="yarn serve" --url=http://localhost:8080/
-# Have LHCI use the built-in server on a static directory
-lhci collect --staticDistDir=./dist
-# Have LHCI use the built-in server and audit a specific URL
-lhci collect --staticDistDir=./public --url=http://localhost/products/pricing/
-# Run on multiple URLs
-lhci collect --url=https://example-1.com --url=https://example-2.com
-# Have LHCI start a server and login with puppeteer before running
-lhci collect --start-server-command="yarn serve" --url=http://localhost:8080/ --puppeteer-script=./path/to/login-with-puppeteer.js
-```
+The method used to run Lighthouse. There is currently only a single option available, `"node"` which runs Lighthouse locally via `node`.
+
+#### `headful`
+
+Boolean that controls whether Chrome is launched in headless or headful mode. This flag does not apply when using `puppeteerScript`.
+
+#### `additive`
+
+Boolean that controls whether the `.lighthouseci` directory is cleared before starting. By default, this directory is cleared on every invocation of `lhci collect` to start fresh.
+
+#### `url`
+
+An array of the URLs that you'd like Lighthouse CI to collect results from.
+
+**When used with `staticDistDir`:**
+
+- Automatic detection of URLs based on HTML files on disk will be disabled.
+- URLs will have their port replaced with the port of the local server that Lighthouse CI starts for you. This allows you to write URLs as `http://localhost/my-static-page.html` without worrying about the chosen temporary port.
+
+**When used without `staticDistDir`:**
+
+- URLs will be used as-is without modification.
+
+#### `staticDistDir`
+
+The path to the directory where the project's productionized static assets are kept. Lighthouse CI uses this to spin up a static server on your behalf that will be used to load your site.
+
+Use this option when the project is a static website to be hosted locally that does not require a separate server. **DO NOT** use this option if `url` will point to an origin that isn't `localhost` or the project uses `startServerCommand` to start a separate server.
+
+#### `isSinglePageApplication`
+
+Boolean that controls whether the static server started in `staticDistDir` should act like a single-page application that serves `index.html` instead of a 404 for unrecognized paths. This flag has no function when `staticDistDir` is not set.
+
+#### `chromePath`
+
+The path of the Chrome executable to use for `puppeteerScript` and running Lighthouse. Lighthouse CI will use Chrome installations in the following priority order:
+
+- `chromePath` option
+- `CHROME_PATH` Environment Variable
+- Executable path returned by `puppeteer` or `puppeteer-core`, if installed.
+- Highest priority installation returned by the `chrome-launcher` npm package.
 
 #### `puppeteerScript`
 
@@ -261,6 +288,72 @@ module.exports = async (browser, context) => {
 Lighthouse CI will then use the browser that this script sets up when running Lighthouse. Note that if you store your credentials in `localStorage` or anything other than a cookie you might want to pair this option with `--settings.disableStorageReset` to force Lighthouse to keep the cache state.
 
 For more information on how to use puppeteer, read up on [their API docs](https://github.com/puppeteer/puppeteer/blob/v2.0.0/docs/api.md#class-browser).
+
+#### `puppeteerLaunchOptions`
+
+An object of options to pass to puppeteer's [`launch` method](https://github.com/puppeteer/puppeteer/blob/v2.0.0/docs/api.md#puppeteerlaunchoptions). Only used when `puppeterScript` is set.
+
+#### `startServerCommand`
+
+The shell command to use to start the project's webserver. LHCI will use this command to start the server before loading the `url`s and automatically shut it down once collection is complete.
+
+Use this option when your project requires a special webserver. **DO NOT** use this option when your project is just a collection of static assets. Use `staticDistDir` instead to use the built-in static server.
+
+#### `startServerReadyPattern`
+
+The regex pattern to look for in the server command's output before considering the server ready for requests. Only used when `startServerCommand` is set.
+
+For example, when using the default `listen|ready`, Lighthouse would start collecting results once the the `startServerCommand` process printed `Listening on port 1337` to stdout.
+
+#### `startServerReadyTimeout`
+
+The maximum amount of time in milliseconds to wait for `startServerCommand` to print the `startServerReadyPattern` before continuing anyway. Only used when `startServerCommand` is set.
+
+#### `settings`
+
+The [Lighthouse settings object](https://github.com/GoogleChrome/lighthouse/blob/master/docs/configuration.md#settings-objectundefined) to pass along to Lighthouse. This can be used to change configuration of it Lighthouse itself.
+
+**Example:**
+
+```json
+{
+  "ci": {
+    "collect": {
+      "settings": {
+        // Don't run certain audits
+        "skipAudits": ["redirects-http"],
+        // Don't clear localStorage/IndexedDB/etc before loading the page.
+        "disableStorageReset": true,
+        // Wait up to 90s for the page to load
+        "maxWaitForLoad": 90000,
+        // Use applied throttling instead of simulated throttling
+        "throttlingMethod": "devtools"
+      }
+    }
+  }
+}
+```
+
+#### `numberOfRuns`
+
+The number of times to collect Lighthouse results on each `url`. This option helps mitigate fluctations due to natural page [variability](https://github.com/GoogleChrome/lighthouse/blob/v6.0.0-beta.0/docs/variability.md).
+
+#### Examples
+
+```bash
+# Basic usage
+lhci collect --numberOfRuns=5 --url=https://example.com
+# Have LHCI start a server before running
+lhci collect --start-server-command="yarn serve" --url=http://localhost:8080/
+# Have LHCI use the built-in server on a static directory
+lhci collect --staticDistDir=./dist
+# Have LHCI use the built-in server and audit a specific URL
+lhci collect --staticDistDir=./public --url=http://localhost/products/pricing/
+# Run on multiple URLs
+lhci collect --url=https://example-1.com --url=https://example-2.com
+# Have LHCI start a server and login with puppeteer before running
+lhci collect --start-server-command="yarn serve" --url=http://localhost:8080/ --puppeteer-script=./path/to/login-with-puppeteer.js
+```
 
 ---
 
@@ -299,17 +392,6 @@ Options:
                                                                                                   ]]
 ```
 
-**Examples**
-
-```bash
-lhci upload --config=./lighthouserc.json
-lhci upload --target=temporary-public-storage
-lhci upload --serverBaseUrl=http://lhci.my-custom-domain.com/
-lhci upload --extraHeaders.Authorization='Bearer X92sEo3n1J1F0k1E9'
-lhci upload --basicAuth.username="customuser" --basicAuth.password="LighthouseRocks"
-lhci upload --githubToken="$MY_ENTERPRISE_GITHUB_TOKEN" --githubApiHost="https://custom-github-server.example.com/api/v3"
-```
-
 #### Build Context
 
 When uploading to the Lighthouse CI server, the CLI will attempt to automatically infer the build context such as git hash, author, message, ancestor, etc. In most cases, there's nothing you need to change about this, but if you're running without a git repo, in a Jenkins environment, a CI provider we haven't documented yet, or are just running into errors, you can control the build context yourself.
@@ -328,6 +410,17 @@ The following environment variables override the inferred build context settings
 | `LHCI_BUILD_CONTEXT__AUTHOR`             | `Patrick Hulce <patrick.hulce@example.com>`     |
 | `LHCI_BUILD_CONTEXT__AVATAR_URL`         | https://example.com/patrickhulce.jpg            |
 | `LHCI_BUILD_CONTEXT__EXTERNAL_BUILD_URL` | https://my-jenkins.example.com/jobs/123         |
+
+#### Examples
+
+```bash
+lhci upload --config=./lighthouserc.json
+lhci upload --target=temporary-public-storage
+lhci upload --serverBaseUrl=http://lhci.my-custom-domain.com/
+lhci upload --extraHeaders.Authorization='Bearer X92sEo3n1J1F0k1E9'
+lhci upload --basicAuth.username="customuser" --basicAuth.password="LighthouseRocks"
+lhci upload --githubToken="$MY_ENTERPRISE_GITHUB_TOKEN" --githubApiHost="https://custom-github-server.example.com/api/v3"
+```
 
 ---
 
@@ -620,8 +713,17 @@ module.exports = {
 ```json
 {
   "ci": {
+    "collect": {
+      "settings": {
+        // This setting makes the budgets section appear in the Lighthouse report itself
+        "budgetsPath": "./path/to/budgets.json"
+      }
+    },
     "assert": {
-      "budgetsFile": "./path/to/budgets.json"
+      "assertions": {
+        // This setting asserts that the budgets audit passed in Lighthouse CI
+        "performance-budget": "error"
+      }
     }
   }
 }

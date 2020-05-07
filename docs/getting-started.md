@@ -157,7 +157,7 @@ That's it! With this in place, you'll have Lighthouse reports collected and uplo
 
 Temporary public storage provides access to individual reports, but not historical data, report diffing, or build failures. Read on to find out how to [add assertions](#add-assertions), configure the [Lighthouse CI server](#the-lighthouse-ci-server) for report diffs and timeseries charts, and enable [GitHub status checks](#github-status-checks).
 
-**NOTE:** If your site isn't static or requires a custom webserver of some sort, refer to the [autorun docs](./cli.md#autorun) for more on how to configure LHCI to integrate with your server.
+**NOTE:** If your site isn't static or requires a custom webserver of some sort, refer to the [autorun docs](./configuration.md#autorun) for more on how to configure LHCI to integrate with your server.
 
 ## Add Assertions
 

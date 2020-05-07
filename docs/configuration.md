@@ -561,7 +561,7 @@ lhci assert --preset=lighthouse:recommended --includePassedAssertions
 
 ### `open`
 
-Open a local lighthouse report that has been created using `collect`.
+Open a local lighthouse report that has been created using `collect`. There is no configuration for this command.
 
 ```bash
 lhci open
@@ -571,17 +571,21 @@ lhci open
 
 ### `wizard`
 
-Runs an interactive step-by-step wizard to either A) create a new project on the LHCI server or B) reset a project's admin token.
+Runs an interactive step-by-step wizard to accomplish various Lighthouse CI tasks. Resetting tokens will require a server configuration file and running on a device that has direct write access to the server's database.
 
 ```bash
 lhci wizard
+? Which wizard do you want to run? (Use arrow keys)
+❯ new-project
+  reset-project-token
+  reset-admin-token
 ```
 
 ---
 
 ### `server`
 
-Starts the LHCI server. This command is unique in that it is likely run on infrastructure rather than in your build process. Learn more about the [LHCI server](./getting-started.md#the-lighthouse-ci-server) and [how to setup your personal LHCI server](./recipes/heroku-server/README.md) accessible over the internet.
+Starts the LHCI server. This command is unique in that it is likely run on infrastructure rather than in your build process. Learn more about the [LHCI server](./server.md) and [how to setup your personal LHCI server](./recipes/heroku-server/README.md) accessible over the internet.
 
 ```bash
 
@@ -613,62 +617,15 @@ lhci server --storage.sqlDialect=postgres --storage.sqlConnectionUrl="postgres:/
 lhci server --storage.sqlDatabasePath=./lhci.db --basicAuth.username="customuser" --basicAuth.password="LighthouseRocks"
 ```
 
-## Configuration
+## Recommended Configurations
 
-Configuring settings for Lighthouse CI is most easily done through a `lighthouserc.json` file. The file supports configuration for the four major commands, `collect`, `upload`, `assert`, and `server`. Learn more about [configuration](./configuration.md).
+### Easy Mode
 
-**Usage**
+**Recommended for those new to Lighthouse.**
 
-```bash
-# Your config file is at `./lighthouserc.json` and will be picked up automatically
-lhci <command>
+If you're just beginning to measure your project with Lighthouse, start slowly and manually monitor your scores first by only configuring `upload`. Once you're comfortable, consider moving up to [Intermediate](#intermediate).
 
-# Specify a config file via command-line flag
-lhci <command> --config=path/to/different/rc/file
-```
-
-**Example Project Config File**
-
-```json
-{
-  "ci": {
-    "collect": {
-      "numberOfRuns": 5
-    },
-    "assert": {
-      "preset": "lighthouse:recommended",
-      "assertions": {
-        "offscreen-images": "off",
-        "uses-webp-images": "off"
-      }
-    },
-    "upload": {
-      "serverBaseUrl": "http://my-custom-lhci-server.example.com/"
-    }
-  }
-}
-```
-
-**Example Server RC File**
-
-```json
-{
-  "ci": {
-    "server": {
-      "port": 9009,
-      "storage": {
-        "sqlDatabasePath": "/home/lhci/lhci.db"
-      }
-    }
-  }
-}
-```
-
-## Recommendations
-
-### Beginner
-
-If you're just beginning to measure your project with Lighthouse, start slow and manually monitor your scores first by only configuring `upload`. Once you're comfortable, consider moving up to [Intermediate](#intermediate).
+Combine this with [GitHub App](https://github.com/apps/lighthouse-ci) to get convenient links to your reports.
 
 ```json
 {
@@ -680,7 +637,9 @@ If you're just beginning to measure your project with Lighthouse, start slow and
 }
 ```
 
-### Intermediate
+### Next Level
+
+**Recommended for those familiar with Lighthouse, but new to performance measurement in CI.**
 
 If you're used to running Lighthouse on your project but still have some work to do, assert the recommended preset but disable the audits you're currently failing. Consider setting up the [Lighthouse CI server](./server.md) to track your scores over time.
 
@@ -703,9 +662,11 @@ If you're used to running Lighthouse on your project but still have some work to
 }
 ```
 
-### Advanced
+### The Complete Experience
 
-If you're a Lighthouse pro, assert the recommended preset, increase the number of runs, and set budgets for your performance metrics. Consider setting up the [Lighthouse CI server](./server.md) to track your scores over time.
+**Recommended for seasoned Lighthouse users who are used to measuring performance in CI.**
+
+If you're a Lighthouse pro, assert the recommended preset, increase the number of runs, and set budgets for your performance metrics. Set up the [Lighthouse CI server](./server.md) to track your scores over time and receive build diffs when your metrics regress.
 
 ```json
 {

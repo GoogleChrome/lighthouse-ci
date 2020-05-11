@@ -76,12 +76,12 @@ describe('Lighthouse CI CLI', () => {
       expect(status).toEqual(0);
 
       // Extract the regular token
-      expect(stdout).toContain('Use token');
+      expect(stdout).toContain('Use build token');
       const tokenSentence = stdout
-        .match(/Use token [\s\S]+/im)[0]
+        .match(/Use build token [\s\S]+/im)[0]
         .replace(log.bold, '')
         .replace(log.reset, '');
-      projectToken = tokenSentence.match(/Use token ([\w-]+)/)[1];
+      projectToken = tokenSentence.match(/Use build token ([\w-]+)/)[1];
 
       // Extract the admin token
       expect(stdout).toContain('Use admin token');

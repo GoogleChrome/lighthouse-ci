@@ -174,7 +174,7 @@ script:
 
 **NOTE:** the `lhci autorun` command moved from `after_success` to `script` in this example because we'd like the exit code of `lhci` to fail the build. If you're using another CI provider you can remove the `|| echo "LHCI failed!"`.
 
-The setup so far will automatically assert the Lighthouse team's recommended set of audits, but your project might have a bit of work to go before hitting straight 100s! Fear not, the assertions are completely configurable and you can disable as many audits as you need. Read more about what's possible in [configuration](./configuration.md) with [the assertions format](./assertions.md).
+The setup so far will automatically assert the Lighthouse team's recommended set of audits, but your project might have a bit of work to go before hitting straight 100s! Fear not, the assertions are completely configurable and you can disable as many audits as you need. Read more about what's possible in [configuration](./configuration.md) with [the assertions format](./configuration.md#assert).
 
 ## Configuration
 

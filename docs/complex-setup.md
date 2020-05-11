@@ -140,7 +140,7 @@ exit $EXIT_CODE
 
 ### Configuration
 
-The setup so far will automatically assert the Lighthouse team's recommended set of audits, but your project might have a bit of work to go before hitting straight 100s! Lucky for you the assertions are completely configurable! Read more about what's possible with [the assertions format](./assertions.md).
+The setup so far will automatically assert the Lighthouse team's recommended set of audits, but your project might have a bit of work to go before hitting straight 100s! Lucky for you the assertions are completely configurable! Read more about what's possible with [the assertions format](./configuration.md#assert).
 
 **lighthouserc.json**
 

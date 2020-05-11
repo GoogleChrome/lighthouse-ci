@@ -30,7 +30,6 @@ alt="Screenshot of the Lighthouse CI server diff UI" width="48%">
 - [Troubleshooting / FAQs](./docs/troubleshooting.md)
 - [Configuration](./docs/configuration.md)
 - [Server](./docs/server.md)
-- [Assertions](./docs/assertions.md)
 - [Versioning Policy](./docs/version-policy.md)
 
 ### Quick Start

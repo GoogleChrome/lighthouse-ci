@@ -122,7 +122,7 @@ describe('Lighthouse CI healthcheck CLI', () => {
     let fixtureDir;
 
     beforeEach(() => {
-      fixtureDir = path.join(os.tmpdir(), fs.mkdtempSync('lhcihealthcheck'));
+      fixtureDir = fs.mkdtempSync(path.join(os.tmpdir(), 'lhcihealthcheck'));
       fs.mkdirSync(fixtureDir, {recursive: true});
     });
 

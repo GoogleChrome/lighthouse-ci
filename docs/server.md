@@ -8,7 +8,7 @@ The LHCI server saves historical Lighthouse data, displays trends in a dashboard
 alt="Screenshot of the Lighthouse CI server dashboard UI" width="48%"> <img src="https://user-images.githubusercontent.com/2301202/70814650-85c58800-1d91-11ea-925e-af9d03f1b20d.png"
 alt="Screenshot of the Lighthouse CI server diff UI" width="48%">
 
-## Setup
+## Deployment
 
 ### Requirements
 

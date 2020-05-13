@@ -1,5 +1,23 @@
 # Getting Started
 
+## Table of Contents
+
+- [Overview](#overview)
+- [Prerequisites](#prerequisites)
+- [Collect Lighthouse Results](#collect-lighthouse-results)
+  - [Configure Lighthouse CI](#configure-lighthouse-ci)
+  - [Configure Your CI Provider](#configure-your-ci-provider)
+  - [Modifications for Sites without a Build Step](#modifications-for-sites-without-a-build-step)
+  - [Modifications for Sites with a Custom Server](#modifications-for-sites-with-a-custom-server)
+- [GitHub Status Checks](#github-status-checks)
+  - [GitHub App Method (Recommended)](#github-app-method-recommended)
+  - [Alternative: Personal Access Token Method](#alternative-personal-access-token-method)
+- [Add Assertions](#add-assertions)
+- [The Lighthouse CI Server](#the-lighthouse-ci-server)
+  - [Deployment](#deployment)
+  - [Project Creation](#project-creation)
+  - [Configuration](#configuration)
+
 ## Overview
 
 This document provides a step-by-step walkthrough on how to setup Lighthouse CI on your repository. After this guide, your build system will be running Lighthouse on your project's URLs on every commit, automatically asserting that important Lighthouse audits pass, and uploading the reports for manual inspection.
@@ -335,7 +353,7 @@ module.exports = {
 
 Read more about what's possible in [configuration](./configuration.md) with [the assertions format](./configuration.md#assert).
 
-### The Lighthouse CI Server
+## The Lighthouse CI Server
 
 <img src="https://user-images.githubusercontent.com/2301202/79480502-c8af9a80-7fd3-11ea-8087-52f6c8ba6f03.png"
 alt="Screenshot of the Lighthouse CI server dashboard UI" width="45.8%"> <img src="https://user-images.githubusercontent.com/39191/68522269-7917b680-025e-11ea-8d96-2774c0a0b04c.png" width="50%">
@@ -352,11 +370,11 @@ You can use the CI server to...
 
 The process for setting up the server involve commands across a couple different machines and will very depending on your specific infrastructure setup,
 
-#### Deployment
+### Deployment
 
 To deploy the server to cloud infrastructure, refer to [our deployment guides](./server.md#deployment). Note that by default anyone with HTTP access to the server will be able to view and create data, see the [documentation on server security](./server.md#security) to learn about security options.
 
-#### Project Creation
+### Project Creation
 
 Once the server is set up, _on your local laptop or desktop_, make sure you can connect to the server, install the Lighthouse wizard with `npm`, and create a new project:
 
@@ -382,7 +400,7 @@ The _build token_ is used by CI to upload new data to your server. It's not real
 
 The _admin token_ is used to edit or delete data within the project. **KEEP THIS SECRET - Anyone possessing the admin token can delete your entire project and all of the data within it**.
 
-#### Configuration
+### Configuration
 
 With your server setup and the project created, all that's left to do is update your Lighthouse CI configuration file with the new URL and token. If you'd like to keep the token secret from contributors, you can use the `LHCI_TOKEN` environment variable instead of putting the token in plain text in your code.
 

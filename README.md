@@ -2,11 +2,11 @@
 
 ## Overview
 
-Lighthouse CI is a suite of tools that make continuously running, asserting, saving, and retrieving [Lighthouse](https://github.com/GoogleChrome/lighthouse) results as easy as possible.
+Lighthouse CI is a suite of tools that make continuously running, saving, retrieving, and asserting against [Lighthouse](https://github.com/GoogleChrome/lighthouse) results as easy as possible.
 
 ### Quick Start
 
-To get started in 5 minutes with GitHub actions for common project configurations, add the following file to your GitHub repository. Follow [Getting Started](./docs/getting-started.md) for a more complete walkthrough and instructions on other providers and setups.
+To get started with GitHub actions for common project configurations, add the following file to your GitHub repository. Follow [the Getting Started guide](./docs/getting-started.md) for a more complete walkthrough and instructions on other providers and setups.
 
 **.github/workflows/ci.yml**
 
@@ -48,6 +48,7 @@ If you're _not_ familiar with continuous integration, start with [Introduction t
 
 - [Introduction to CI](./docs/introduction-to-ci.yml)
 - [Getting Started](./docs/getting-started.md)
+- [Architecture](./docs/architecture.md)
 - [Troubleshooting / FAQs](./docs/troubleshooting.md)
 - [Configuration](./docs/configuration.md)
 - [Server](./docs/server.md)

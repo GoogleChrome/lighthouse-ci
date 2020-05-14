@@ -115,6 +115,15 @@ export const SimpleDetails = props => {
       return <span>{value}</span>;
     case 'node':
       return <pre>{value.snippet}</pre>;
+    case 'source-location': {
+      if (!value.url) return <pre>{JSON.stringify(value)}</pre>;
+      const {url, line, column} = value;
+      return (
+        <pre>
+          {url}:{line}:{column}
+        </pre>
+      );
+    }
     default: {
       const debugdata = JSON.stringify(props);
       return <pre data-tooltip={debugdata}>{debugdata.slice(0, 20)}</pre>;

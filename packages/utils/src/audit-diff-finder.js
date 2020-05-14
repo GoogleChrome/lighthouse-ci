@@ -329,6 +329,14 @@ function synthesizeItemKeyDiffs(diffs, baseItems, compareItems) {
 
 /** @param {string} s */
 function replaceNondeterministicStrings(s) {
+  if (s.startsWith('http') && s.includes('?')) {
+    try {
+      const url = new URL(s);
+      url.search = '';
+      s = url.href;
+    } catch (err) {}
+  }
+
   return (
     s
       // YouTube Embeds
@@ -339,14 +347,18 @@ function replaceNondeterministicStrings(s) {
       // localhost Ports
       .replace(/:[0-9]{3,5}\//, ':PORT/')
       // Hash components embedded in filenames
-      .replace(/(\.|-)[0-9a-f]{8}\.(js|css|woff|html|png|jpeg|jpg|svg)/i, '$1HASH.$2')
+      .replace(/(\.|-)[0-9a-f]{6,8}\.(js|css|woff|html|png|jpeg|jpg|svg)/i, '$1HASH.$2')
   );
 }
 
 /** @param {Record<string, any>} item @return {string} */
 function getItemKey(item) {
   // For most opportunities, diagnostics, etc where 1 row === 1 resource
-  if (typeof item.url === 'string') return item.url;
+  if (typeof item.url === 'string' && item.url) return item.url;
+  // For sourcemapped opportunities that identify a source location
+  const source = item.source;
+  if (typeof source === 'string') return source;
+  if (source && source.url) return `${source.url}:${source.line}:${source.column}`;
   // For the pre-grouped audits like resource-summary
   if (typeof item.label === 'string') return item.label;
   // For the pre-grouped audits like mainthread-work-breakdown

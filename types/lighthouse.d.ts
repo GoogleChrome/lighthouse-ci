@@ -22,6 +22,7 @@ declare global {
       | 'numeric'
       | 'url'
       | 'link'
+      | 'source-location'
       | 'thumbnail'
       | 'unknown';
 

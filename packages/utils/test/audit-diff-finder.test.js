@@ -609,6 +609,30 @@ describe('#zipBaseAndCompareItems', () => {
     ]);
   });
 
+  it('should zip souce-locations', () => {
+    const base = [
+      {source: {url: 'http://example.com', line: 5, column: 10}, count: 1},
+      {source: {url: 'http://example.com', line: 5, column: 16}, count: 1},
+    ];
+    const compare = [
+      {source: {url: 'http://example.com', line: 5, column: 10}, count: 1},
+      {source: {url: 'http://example.com', line: 10, column: 2}, count: 1},
+    ];
+    const zipped = zipBaseAndCompareItems(base, compare);
+    expect(zipped).toEqual([
+      {
+        base: {item: base[0], kind: 'base', index: 0},
+        compare: {item: compare[0], kind: 'compare', index: 0},
+      },
+      {
+        base: {item: base[1], kind: 'base', index: 1},
+      },
+      {
+        compare: {item: compare[1], kind: 'compare', index: 1},
+      },
+    ]);
+  });
+
   it('should not zip ambiguous values', () => {
     const base = [
       {node: {snippet: '<a>Text</a>'}, count: 1},
@@ -882,12 +906,20 @@ describe('#replaceNondeterministicStrings', () => {
     expect(replaceNondeterministicStrings('nonsense')).toEqual('nonsense');
     expect(replaceNondeterministicStrings('Other')).toEqual('Other');
     expect(replaceNondeterministicStrings('Unknown')).toEqual('Unknown');
+    expect(replaceNondeterministicStrings('Is it real?')).toEqual('Is it real?');
     expect(replaceNondeterministicStrings('foo.notahash.js')).toEqual('foo.notahash.js');
-    expect(replaceNondeterministicStrings('foo.1234567.js')).toEqual('foo.1234567.js');
+    expect(replaceNondeterministicStrings('foo.js')).toEqual('foo.js');
     expect(replaceNondeterministicStrings('at foo.js:1234')).toEqual('at foo.js:1234');
+    expect(replaceNondeterministicStrings('http almost a URL?')).toEqual('http almost a URL?');
     expect(replaceNondeterministicStrings('http://localhost/foo')).toEqual('http://localhost/foo');
     expect(replaceNondeterministicStrings('data:image/png;base64,abcdef')).toEqual(
       'data:image/png;base64,abcdef'
+    );
+  });
+
+  it('should replace querystrings', () => {
+    expect(replaceNondeterministicStrings('http://localhost/foo?bar=1#baz')).toEqual(
+      'http://localhost/foo#baz'
     );
   });
 
@@ -901,6 +933,7 @@ describe('#replaceNondeterministicStrings', () => {
   });
 
   it('should replace hash parts', () => {
+    expect(replaceNondeterministicStrings('foo-123456.js')).toEqual('foo-HASH.js');
     expect(replaceNondeterministicStrings('foo.12345678.js')).toEqual('foo.HASH.js');
     expect(replaceNondeterministicStrings('foo.abcdef12.woff2')).toEqual('foo.HASH.woff2');
     expect(replaceNondeterministicStrings('foo-abcdef12.css')).toEqual('foo-HASH.css');
@@ -908,7 +941,7 @@ describe('#replaceNondeterministicStrings', () => {
 
   it('should replace ports', () => {
     expect(replaceNondeterministicStrings('http://localhost:1337/foo?bar=1#baz')).toEqual(
-      'http://localhost:PORT/foo?bar=1#baz'
+      'http://localhost:PORT/foo#baz'
     );
   });
 

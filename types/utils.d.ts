@@ -92,6 +92,7 @@ declare global {
 
     export interface E2EState {
       debug: boolean;
+      dataset: 'generated' | 'actual';
       rootURL: string;
       client: import('../packages/utils/src/api-client');
       server: {port: number; close: () => Promise<void>};

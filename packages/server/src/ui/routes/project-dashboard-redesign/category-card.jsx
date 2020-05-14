@@ -36,9 +36,12 @@ const BUILD_LIMIT_OPTIONS = [{value: 25}, {value: 50}, {value: 100}, {value: 150
 const SCORE_LEVEL_METRIC_THRESHOLDS = {
   'first-contentful-paint': [2000, 4000],
   'first-meaningful-paint': [2000, 4000],
+  'largest-contentful-paint': [2000, 4000],
   'first-cpu-idle': [3000, 7500],
   interactive: [3000, 7500],
   'speed-index': [3000, 6000],
+  'total-blocking-time': [300, 600],
+  'cumulative-layout-shift': [0.1, 0.25],
   'max-potential-fid': [100, 250],
 };
 
@@ -69,6 +72,12 @@ const MetricLineGraphs = props => {
             scoreLevels: SCORE_LEVEL_METRIC_THRESHOLDS['first-contentful-paint'],
           },
           {
+            abbreviation: 'LCP',
+            label: 'Largest Contentful Paint',
+            statistics: stats('audit_largest-contentful-paint_average'),
+            scoreLevels: SCORE_LEVEL_METRIC_THRESHOLDS['largest-contentful-paint'],
+          },
+          {
             abbreviation: 'TTI',
             label: 'Time to Interactive',
             statistics: stats('audit_interactive_average'),
@@ -89,22 +98,16 @@ const MetricLineGraphs = props => {
         setSelectedBuildId={props.setSelectedBuildId}
         metrics={[
           {
-            abbreviation: 'FCP',
-            label: 'First Contentful Paint',
-            statistics: stats('audit_first-contentful-paint_average'),
-            scoreLevels: SCORE_LEVEL_METRIC_THRESHOLDS['first-contentful-paint'],
+            abbreviation: 'TBT',
+            label: 'Total Blocking Time',
+            statistics: stats('audit_total-blocking-time_average'),
+            scoreLevels: SCORE_LEVEL_METRIC_THRESHOLDS['total-blocking-time'],
           },
           {
-            abbreviation: 'TTI',
-            label: 'Time to Interactive',
-            statistics: stats('audit_interactive_average'),
-            scoreLevels: SCORE_LEVEL_METRIC_THRESHOLDS['interactive'],
-          },
-          {
-            abbreviation: 'SI',
-            label: 'Speed Index',
-            statistics: stats('audit_speed-index_average'),
-            scoreLevels: SCORE_LEVEL_METRIC_THRESHOLDS['speed-index'],
+            abbreviation: 'FID',
+            label: 'Max Potential FID',
+            statistics: stats('audit_max-potential-fid_average'),
+            scoreLevels: SCORE_LEVEL_METRIC_THRESHOLDS['max-potential-fid'],
           },
         ]}
       />

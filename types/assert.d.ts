@@ -78,10 +78,13 @@ declare global {
         /** Supported timing metrics. */
         export type TimingMetric =
           | 'first-contentful-paint'
+          | 'largest-contentful-paint'
           | 'first-cpu-idle'
           | 'interactive'
           | 'first-meaningful-paint'
           | 'speed-index'
+          | 'total-blocking-time'
+          | 'cumulative-layout-shift'
           | 'max-potential-fid';
 
         /** Supported values for the resourceType property of a ResourceBudget. */

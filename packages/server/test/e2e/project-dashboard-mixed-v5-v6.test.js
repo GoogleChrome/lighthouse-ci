@@ -12,11 +12,11 @@ const {shouldRunE2E, emptyTest} = require('../test-utils.js');
 describe('Project dashboard', () => {
   if (!shouldRunE2E()) return emptyTest();
 
-  const state = /** @type {LHCI.E2EState} */ ({});
+  const state = /** @type {LHCI.E2EState} */ ({dataset: 'actual'});
 
   require('./steps/setup')(state);
 
-  require('./steps/navigate-to-project')(state, 'Lighthouse Viewer', {newDashboard: true});
+  require('./steps/navigate-to-project')(state, 'Lighthouse Real-World', {newDashboard: true});
 
   describe('render the dashboard', () => {
     it('should show the commits', async () => {
@@ -28,17 +28,33 @@ describe('Project dashboard', () => {
 
       expect(commits).toMatchInlineSnapshot(`
         Array [
-          "824cbea4test: empty basecall_splitmasterOct 09 8:15 PM",
-          "ba5b0ad9test(unmatched-ancestor): a really really really really long messagecall_splitmissing_ancestorAug 09 8:13 PM",
-          "5b0ad9f6test(matched-ancestor): a really really really really really long messagecall_splitmasterAug 09 6:55 PM",
-          "c1ea447bfeat: improves TTIcall_splittest_1Aug 09 6:15 PM",
-          "aaa5b0a3feat: regresses TTIcall_splittest_0Aug 09 3:15 PM",
+          "1238build 4call_splitmasterMay 14 6:00 AM",
+          "1237build 3call_splitmasterMay 13 6:00 AM",
+          "1236build 2call_splitmasterMay 12 6:00 AM",
+          "1234build 1call_splitmasterMay 11 6:00 AM",
         ]
       `);
     });
 
     it('should look correct', async () => {
       expect(await state.page.screenshot({fullPage: true})).toMatchImageSnapshot();
+    });
+
+    it('should render graphs for previously unavailable data', async () => {
+      const {height, left} = await state.page.evaluate(() => {
+        const graphs = Array.from(document.querySelectorAll('.metric-line-graph__graph'));
+        if (!graphs.length) throw new Error('Should have found 2 metric graphs');
+        const {top, bottom, left} = graphs[1].getBoundingClientRect();
+        window.scrollTo({top: top - 50});
+        return {height: bottom - top, left};
+      });
+
+      await state.page.mouse.move(left + 50, 50 + height * 0.8);
+      await state.page.waitFor(500);
+    });
+
+    it('should look correct on hover', async () => {
+      expect(await state.page.screenshot({fullPage: false})).toMatchImageSnapshot();
     });
   });
 

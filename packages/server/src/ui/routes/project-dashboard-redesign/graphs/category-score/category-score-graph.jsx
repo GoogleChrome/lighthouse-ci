@@ -172,13 +172,11 @@ export const CategoryScoreTimelineGraph = props => {
       />
       <div className="category-score-graph__x-axis">
         <div style={{marginLeft: GRAPH_MARGIN.left}}>
-          {new Date(averageStats[0].build.createdAt || '').toLocaleDateString()}
+          {new Date(averageStats[0].build.runAt || '').toLocaleDateString()}
         </div>
         <div style={{flexGrow: 1}} />
         <div style={{marginRight: GRAPH_MARGIN.right}}>
-          {new Date(
-            averageStats[averageStats.length - 1].build.createdAt || ''
-          ).toLocaleDateString()}
+          {new Date(averageStats[averageStats.length - 1].build.runAt || '').toLocaleDateString()}
         </div>
       </div>
     </div>

@@ -13,7 +13,6 @@ const {createLHR} = require('./lhr-generator.js');
 
 // To include in next LHR update...
 //    - 0-value numericValue
-//    - LCP/CLS/TBT
 
 /** @typedef {import('./lhr-generator').AuditGenDef} AuditGenDef */
 

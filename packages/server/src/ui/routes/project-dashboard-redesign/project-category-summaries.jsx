@@ -83,7 +83,7 @@ export const ProjectCategorySummaries = props => {
     statsWithBuildsUnfiltered
       .filter(stat => stat.build.branch === branch)
       .filter(stat => stat.url === url)
-      .sort((a, b) => (a.build.createdAt || '').localeCompare(b.build.createdAt || ''));
+      .sort((a, b) => (a.build.runAt || '').localeCompare(b.build.runAt || ''));
 
   return (
     <div className="project-category-summaries">

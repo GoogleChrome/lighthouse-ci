@@ -9,6 +9,7 @@
 const {loadAndParseRcFile} = require('../packages/utils/src/lighthouserc.js');
 const ApiClient = require('../packages/utils/src/api-client.js');
 const {writeSeedDataToApi} = require('../packages/utils/src/seed-data/seed-data.js');
+const {createActualTestDataset} = require('../packages/server/test/test-utils.js');
 const {
   createDefaultDataset,
   createLoadTestDataset,
@@ -26,7 +27,11 @@ async function run() {
   const api = new ApiClient({rootURL: serverBaseUrl});
   await writeSeedDataToApi(
     api,
-    process.argv.includes('--load') ? createLoadTestDataset() : createDefaultDataset()
+    process.argv.includes('--load')
+      ? createLoadTestDataset()
+      : process.argv.includes('--actual')
+      ? createActualTestDataset()
+      : createDefaultDataset()
   );
 }
 

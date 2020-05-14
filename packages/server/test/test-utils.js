@@ -47,6 +47,55 @@ async function createTestServer(sqlFile) {
 }
 
 /**
+ * @return {{projects: Array<LHCI.ServerCommand.Project>, builds: Array<LHCI.ServerCommand.Build>, runs: Array<LHCI.ServerCommand.Run>}}
+ */
+function createActualTestDataset() {
+  /** @param {string} variant @return {any} */
+  const lhr = variant => {
+    const lhr = require(`./fixtures/${variant}`);
+    if (lhr.lighthouseVersion === '5.6.0') {
+      delete lhr.audits['total-blocking-time'];
+      delete lhr.audits['largest-contentful-paint'];
+    }
+
+    return JSON.stringify(lhr);
+  };
+  /** @param {number} delta */
+  const runAt = delta =>
+    new Date(
+      new Date('2020-05-10T11:00:00.000Z').getTime() + delta * 24 * 60 * 60 * 1000
+    ).toISOString();
+  const url = 'http://lhci.example.com/';
+  const baseProject = {externalUrl: '', baseBranch: '', token: '', adminToken: '', slug: ''};
+  const baseRun = {projectId: '0', representative: false, url};
+  const baseBuild = {
+    projectId: '0',
+    lifecycle: /** @type {'unsealed'} */ ('unsealed'),
+    branch: 'master',
+    externalBuildUrl: '',
+    author: 'Patrick Hulce <patrick@example.com>',
+    avatarUrl: 'https://avatars1.githubusercontent.com/u/2301202?s=460&v=4',
+    ancestorHash: '',
+  };
+
+  return {
+    projects: [{...baseProject, id: '0', name: 'Lighthouse Real-World'}],
+    builds: [
+      {...baseBuild, id: '0', hash: '1234', commitMessage: 'build 1', runAt: runAt(1)},
+      {...baseBuild, id: '1', hash: '1236', commitMessage: 'build 2', runAt: runAt(2)},
+      {...baseBuild, id: '2', hash: '1237', commitMessage: 'build 3', runAt: runAt(3)},
+      {...baseBuild, id: '3', hash: '1238', commitMessage: 'build 4', runAt: runAt(4)},
+    ],
+    runs: [
+      {...baseRun, id: '0', buildId: '0', url, lhr: lhr('lh-5-6-0-verge-a.json')},
+      {...baseRun, id: '1', buildId: '1', url, lhr: lhr('lh-5-6-0-verge-b.json')},
+      {...baseRun, id: '2', buildId: '2', url, lhr: lhr('lh-6-0-0-coursehero-a.json')},
+      {...baseRun, id: '3', buildId: '3', url, lhr: lhr('lh-6-0-0-coursehero-b.json')},
+    ],
+  };
+}
+
+/**
  *
  * @param {LHCI.PreactNode} preactNodeToRender
  * @param {{container?: HTMLElement}} context
@@ -189,6 +238,7 @@ module.exports = {
   waitForAllImages,
   // Utils for E2E tests
   getTestLHRPath,
+  createActualTestDataset,
   shouldRunE2E: () => Boolean(!process.env.CI || process.env.RUN_E2E_TESTS),
   emptyTest: () => it.skip('not enabled', () => {}),
   setupImageSnapshots: () => {
@@ -209,5 +259,6 @@ module.exports = {
       env: {...process.env, TZ: 'America/Chicago'},
     });
     state.page = await state.browser.newPage();
+    await state.page.setViewport({width: 1440, height: 900});
   },
 };

@@ -228,9 +228,15 @@ const HoverCardWithMetricValue = props => {
         <div
           className={`text--${getMetricScoreLevel(statistic.value, selectedMetric.scoreLevels)}`}
         >
-          {statistic.value.toLocaleString(undefined, {maximumFractionDigits: 0})}
-          <Nbsp />
-          ms
+          {statistic.value === -1 ? (
+            <span>Not Available</span>
+          ) : (
+            <Fragment>
+              {statistic.value.toLocaleString(undefined, {maximumFractionDigits: 0})}
+              <Nbsp />
+              ms
+            </Fragment>
+          )}
         </div>
         <div>{selectedMetric.label}</div>
       </div>
@@ -268,11 +274,11 @@ export const MetricLineGraph = props => {
 
       <div className="metric-line-graph__date-range">
         <div style={{marginLeft: GRAPH_MARGIN.left}}>
-          {new Date(firstStat.build.createdAt || '').toLocaleDateString()}
+          {new Date(firstStat.build.runAt || '').toLocaleDateString()}
         </div>
         <div style={{flexGrow: 1}} />
         <div style={{marginRight: GRAPH_MARGIN.right}}>
-          {new Date(lastStat.build.createdAt || '').toLocaleDateString()}
+          {new Date(lastStat.build.runAt || '').toLocaleDateString()}
         </div>
       </div>
 

@@ -37,7 +37,7 @@ describe('Project dashboard', () => {
       `);
     });
 
-    it('should look correct', async () => {
+    it.skip('should look correct', async () => {
       expect(await state.page.screenshot()).toMatchImageSnapshot();
     });
   });

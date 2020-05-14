@@ -762,7 +762,7 @@ function runTests(state) {
       const urlRootStats = statistics.filter(stat => stat.url === 'https://example.com:PORT/');
       const urlBlogStats = statistics.filter(stat => stat.url === 'https://example.com:PORT/blog');
 
-      expect(urlRootStats).toHaveLength(61);
+      expect(urlRootStats.length).toBeGreaterThan(60);
       expect(urlBlogStats).toHaveLength(urlRootStats.length);
 
       const fcpAverage = urlRootStats.find(s => s.name === 'audit_first-contentful-paint_average');

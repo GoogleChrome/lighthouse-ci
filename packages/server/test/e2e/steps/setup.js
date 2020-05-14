@@ -9,7 +9,12 @@
 
 const fs = require('fs');
 const path = require('path');
-const {createTestServer, setupImageSnapshots, launchBrowser} = require('../../test-utils.js');
+const {
+  createActualTestDataset,
+  createTestServer,
+  setupImageSnapshots,
+  launchBrowser,
+} = require('../../test-utils.js');
 const ApiClient = require('@lhci/utils/src/api-client.js');
 const {writeSeedDataToApi} = require('@lhci/utils/src/seed-data/seed-data.js');
 
@@ -20,6 +25,7 @@ setupImageSnapshots();
 /** @param {LHCI.E2EState} state */
 module.exports = state => {
   state.debug = Boolean(process.env.DEBUG);
+  state.dataset = state.dataset || 'generated';
 
   describe('initialize', () => {
     it('should initialize a server', async () => {
@@ -29,7 +35,11 @@ module.exports = state => {
     });
 
     it('should write seed data to the server', async () => {
-      await writeSeedDataToApi(state.client, JSON.parse(fs.readFileSync(SEED_DATA_PATH, 'utf8')));
+      const generated = JSON.parse(fs.readFileSync(SEED_DATA_PATH, 'utf8'));
+      await writeSeedDataToApi(
+        state.client,
+        state.dataset === 'generated' ? generated : createActualTestDataset()
+      );
     }, 15000);
 
     it('should initialize a browser', () => launchBrowser(state));

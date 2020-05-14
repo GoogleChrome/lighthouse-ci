@@ -6,8 +6,10 @@
 
 import {h} from 'preact';
 import {LhrComparison} from './lhr-comparison';
-import lhrA_ from '../../../../test/fixtures/lh-5-6-0-verge-a.json';
-import lhrB_ from '../../../../test/fixtures/lh-5-6-0-verge-b.json';
+import lhr5A_ from '../../../../test/fixtures/lh-5-6-0-verge-a.json';
+import lhr5B_ from '../../../../test/fixtures/lh-5-6-0-verge-b.json';
+import lhr6A_ from '../../../../test/fixtures/lh-6-0-0-coursehero-a.json';
+import lhr6B_ from '../../../../test/fixtures/lh-6-0-0-coursehero-b.json';
 
 export default {
   title: 'Build View/LHR Comparison',
@@ -15,14 +17,22 @@ export default {
   parameters: {dimensions: 'auto'},
 };
 
-const lhrA = /** @type {any} */ (lhrA_);
-const lhrB = /** @type {any} */ (lhrB_);
+const lhr5A = /** @type {any} */ (lhr5A_);
+const lhr5B = /** @type {any} */ (lhr5B_);
+const lhr6A = /** @type {any} */ (lhr6A_);
+const lhr6B = /** @type {any} */ (lhr6B_);
 
 /** @param {{children: LHCI.PreactNode}} props */
 const Wrapper = ({children}) => <div className="build-hash-selector">{children}</div>;
 
 export const Default = () => (
   <Wrapper>
-    <LhrComparison lhr={lhrA} baseLhr={lhrB} hookElements={{}} />
+    <LhrComparison lhr={lhr5A} baseLhr={lhr5B} hookElements={{}} />
+  </Wrapper>
+);
+
+export const Version6 = () => (
+  <Wrapper>
+    <LhrComparison lhr={lhr6A} baseLhr={lhr6B} hookElements={{}} />
   </Wrapper>
 );

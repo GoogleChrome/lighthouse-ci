@@ -8,24 +8,29 @@
 /* eslint-env jest */
 
 /** @type {any} */
-const baseLhr_ = require('../fixtures/lh-5-6-0-verge-a.json');
+const baseLhr5_ = require('../fixtures/lh-5-6-0-verge-a.json');
+/** @type {any} */
+const baseLhr6_ = require('../fixtures/lh-6-0-0-coursehero-a.json');
 const {definitions} = require('../../src/api/statistic-definitions.js');
 
 describe('Statistic Definitions', () => {
   /** @type {LH.Result} */
-  const baseLhr = baseLhr_;
+  const baseLhr5 = baseLhr5_;
+  /** @type {LH.Result} */
+  const baseLhr6 = baseLhr6_;
 
   describe('metaLighthouseVersion()', () => {
     const run = definitions.meta_lighthouse_version;
 
     it('should extract the version', () => {
-      expect(run([baseLhr])).toEqual({value: 50600});
-      expect(run([{...baseLhr, lighthouseVersion: '1.2.3-beta.0'}])).toEqual({value: 10203});
+      expect(run([baseLhr5])).toEqual({value: 50600});
+      expect(run([baseLhr6])).toEqual({value: 60000});
+      expect(run([{...baseLhr5, lighthouseVersion: '1.2.3-beta.0'}])).toEqual({value: 10203});
     });
 
     it('should fallback to 0 for bad versions', () => {
-      expect(run([{...baseLhr, lighthouseVersion: 'empty'}])).toEqual({value: 0});
-      expect(run([{...baseLhr, lighthouseVersion: '5.6'}])).toEqual({value: 0});
+      expect(run([{...baseLhr5, lighthouseVersion: 'empty'}])).toEqual({value: 0});
+      expect(run([{...baseLhr5, lighthouseVersion: '5.6'}])).toEqual({value: 0});
     });
   });
 });

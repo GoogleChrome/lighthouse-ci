@@ -159,10 +159,14 @@ function createDefaultDataset() {
   const auditsToFake = {
     'first-contentful-paint': {averageNumericValue: 1000},
     'first-meaningful-paint': {averageNumericValue: 1000},
+    'largest-contentful-paint': {averageNumericValue: 1500},
     'first-cpu-idle': {averageNumericValue: 3000},
     'speed-index': {averageNumericValue: 3000},
     interactive: {averageNumericValue: 5000},
+    'total-blocking-time': {averageNumericValue: 500},
     'max-potential-fid': {averageNumericValue: 250},
+    'estimated-input-latency': {averageNumericValue: 70},
+    'cumulative-layout-shift': {averageNumericValue: 0.5},
 
     'uses-responsive-images': {averageWastedMs: 400, items: fiftyFiftyImages},
     'uses-minified-files': {averageWastedMs: 800, items: fiftyFiftyImages},

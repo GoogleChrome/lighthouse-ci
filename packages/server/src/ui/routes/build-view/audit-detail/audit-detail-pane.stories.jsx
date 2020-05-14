@@ -8,8 +8,10 @@ import {h} from 'preact';
 import {action} from '@storybook/addon-actions';
 import {computeAuditGroups} from '../lhr-comparison';
 import {AuditDetailPane} from './audit-detail-pane';
-import lhrA_ from '../../../../../test/fixtures/lh-5-6-0-verge-a.json';
-import lhrB_ from '../../../../../test/fixtures/lh-5-6-0-verge-b.json';
+import lhr5A_ from '../../../../../test/fixtures/lh-5-6-0-verge-a.json';
+import lhr5B_ from '../../../../../test/fixtures/lh-5-6-0-verge-b.json';
+import lhr6A_ from '../../../../../test/fixtures/lh-6-0-0-coursehero-a.json';
+import lhr6B_ from '../../../../../test/fixtures/lh-6-0-0-coursehero-b.json';
 
 export default {
   title: 'Build View/Audit Detail Pane',
@@ -17,22 +19,44 @@ export default {
   parameters: {dimensions: 'auto'},
 };
 
-const lhrA = /** @type {any} */ (lhrA_);
-const lhrB = /** @type {any} */ (lhrB_);
+const lhr5A = /** @type {any} */ (lhr5A_);
+const lhr5B = /** @type {any} */ (lhr5B_);
+const lhr6A = /** @type {any} */ (lhr6A_);
+const lhr6B = /** @type {any} */ (lhr6B_);
 
-/** @type {Array<LHCI.AuditPair>} */
-const auditPairs = computeAuditGroups(lhrA, lhrB, {percentAbsoluteDeltaThreshold: 0.05})
-  .filter(group => !group.showAsUnchanged)
-  .map(group => group.pairs)
-  .reduce((a, b) => a.concat(b))
-  // We don't need *all* the audits, so sample ~1/3 of them.
-  .filter((pair, i) => i % 2 === 0 && pair.audit.id !== 'uses-long-cache-ttl');
+const auditPairs5 = createAuditPairs(lhr5A, lhr5B);
+const auditPairs6 = createAuditPairs(lhr6A, lhr6B);
 
 export const Default = () => (
   <AuditDetailPane
-    selectedAuditId={auditPairs[0].audit.id || ''}
+    selectedAuditId={auditPairs5[0].audit.id || ''}
     setSelectedAuditId={action('setSelectedAuditId')}
-    pairs={auditPairs}
-    baseLhr={lhrB}
+    pairs={auditPairs5}
+    baseLhr={lhr5B}
   />
 );
+
+export const Version6 = () => (
+  <AuditDetailPane
+    selectedAuditId={auditPairs6[1].audit.id || ''}
+    setSelectedAuditId={action('setSelectedAuditId')}
+    pairs={auditPairs6}
+    baseLhr={lhr5B}
+  />
+);
+
+/**
+ * @param {LH.Result} lhrA
+ * @param {LH.Result} lhrB
+ * @return {Array<LHCI.AuditPair>}
+ */
+function createAuditPairs(lhrA, lhrB) {
+  return (
+    computeAuditGroups(lhrA, lhrB, {percentAbsoluteDeltaThreshold: 0.05})
+      .filter(group => !group.showAsUnchanged)
+      .map(group => group.pairs)
+      .reduce((a, b) => a.concat(b))
+      // We don't need *all* the audits, so sample ~1/3 of them.
+      .filter((pair, i) => i % 2 === 0 && pair.audit.id !== 'uses-long-cache-ttl')
+  );
+}

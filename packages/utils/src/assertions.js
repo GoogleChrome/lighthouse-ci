@@ -216,7 +216,7 @@ function getBudgetAssertionResults(auditResults) {
       const countKey = `${budgetRow.resourceType}.count`;
 
       if (budgetRow.sizeOverBudget && !resultsKeys.has(sizeKey)) {
-        const actual = budgetRow.size;
+        const actual = budgetRow.size || budgetRow.transferSize;
         const expected = actual - budgetRow.sizeOverBudget;
         results.push(...getAssertionResultsForBudgetRow(sizeKey, actual, expected));
         resultsKeys.add(sizeKey);
@@ -301,9 +301,13 @@ function getAssertionResultsForAudit(auditId, auditProperty, auditResults, asser
 
     const psuedoAuditResults = auditResults.map(result => {
       if (!result || !result.details || !result.details.items) return;
-      const itemKey = auditProperty[1] === 'count' ? 'requestCount' : 'size';
       const item = result.details.items.find(item => item.resourceType === auditProperty[0]);
       if (!item) return;
+
+      const primaryItemKey = auditProperty[1] === 'size' ? 'size' : 'requestCount';
+      const backupItemKey = auditProperty[1] === 'size' ? 'transferSize' : '';
+      const itemKey = primaryItemKey in item ? primaryItemKey : backupItemKey;
+      if (!(itemKey in item)) return;
       return {...result, numericValue: item[itemKey]};
     });
 

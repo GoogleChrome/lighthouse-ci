@@ -598,6 +598,59 @@ describe('getAllAssertionResults', () => {
       ]);
     });
 
+    it('should return assertion results for budgets v6 UI', () => {
+      const assertions = {
+        'performance-budget': 'error',
+      };
+
+      for (const item of lhrWithBudget.audits['performance-budget'].details.items) {
+        item.transferSize = item.size;
+        delete item.size;
+      }
+
+      // Include the LHR twice to exercise our de-duping logic.
+      const lhrs = [lhrWithBudget, lhrWithBudget];
+      const results = getAllAssertionResults({assertions}, lhrs);
+      expect(results).toEqual([
+        {
+          url: 'http://page-1.com',
+          actual: 3608,
+          auditId: 'performance-budget',
+          auditProperty: 'document.size',
+          expected: 1024,
+          level: 'error',
+          name: 'maxNumericValue',
+          operator: '<=',
+          values: [3608],
+          passed: false,
+        },
+        {
+          url: 'http://page-1.com',
+          actual: 103675,
+          auditId: 'performance-budget',
+          auditProperty: 'script.size',
+          expected: 30720,
+          level: 'error',
+          name: 'maxNumericValue',
+          operator: '<=',
+          values: [103675],
+          passed: false,
+        },
+        {
+          url: 'http://page-1.com',
+          actual: 4,
+          auditId: 'performance-budget',
+          auditProperty: 'script.count',
+          expected: 2,
+          level: 'error',
+          name: 'maxNumericValue',
+          operator: '<=',
+          values: [4],
+          passed: false,
+        },
+      ]);
+    });
+
     it('should assert budgets natively', () => {
       const budgets = [
         {
@@ -657,6 +710,60 @@ describe('getAllAssertionResults', () => {
         'resource-summary:font.count': ['warn', {maxNumericValue: 1}],
         'resource-summary:third-party.count': ['warn', {maxNumericValue: 5}],
       };
+
+      const lhrs = [lhrWithResourceSummary, lhrWithResourceSummary];
+      const results = getAllAssertionResults({assertions}, lhrs);
+      expect(results).toEqual([
+        {
+          url: 'http://example.com',
+          actual: 1143,
+          auditId: 'resource-summary',
+          auditProperty: 'document.size',
+          expected: 400,
+          level: 'error',
+          name: 'maxNumericValue',
+          operator: '<=',
+          values: [1143, 1143],
+          passed: false,
+        },
+        {
+          url: 'http://example.com',
+          actual: 2,
+          auditId: 'resource-summary',
+          auditProperty: 'font.count',
+          expected: 1,
+          level: 'warn',
+          name: 'maxNumericValue',
+          operator: '<=',
+          values: [2, 2],
+          passed: false,
+        },
+        {
+          url: 'http://example.com',
+          actual: 7,
+          auditId: 'resource-summary',
+          auditProperty: 'third-party.count',
+          expected: 5,
+          level: 'warn',
+          name: 'maxNumericValue',
+          operator: '<=',
+          values: [7, 7],
+          passed: false,
+        },
+      ]);
+    });
+
+    it('should assert v6 budgets after the fact', () => {
+      const assertions = {
+        'resource-summary.document.size': ['error', {maxNumericValue: 400}],
+        'resource-summary:font.count': ['warn', {maxNumericValue: 1}],
+        'resource-summary:third-party.count': ['warn', {maxNumericValue: 5}],
+      };
+
+      for (const item of lhrWithResourceSummary.audits['resource-summary'].details.items) {
+        item.transferSize = item.size;
+        delete item.size;
+      }
 
       const lhrs = [lhrWithResourceSummary, lhrWithResourceSummary];
       const results = getAllAssertionResults({assertions}, lhrs);

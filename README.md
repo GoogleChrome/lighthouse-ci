@@ -44,9 +44,9 @@ alt="Screenshot of the Lighthouse CI server diff UI" width="48%">
 
 If you're already familiar with continuous integration and have an existing process, start with [Getting Started](./docs/getting-started.md).
 
-If you're _not_ familiar with continuous integration, start with [Introduction to CI](./docs/introduction-to-ci.yml).
+If you're _not_ familiar with continuous integration, start with [Introduction to CI](./docs/introduction-to-ci.md).
 
-- [Introduction to CI](./docs/introduction-to-ci.yml)
+- [Introduction to CI](./docs/introduction-to-ci.md)
 - [Getting Started](./docs/getting-started.md)
 - [Architecture](./docs/architecture.md)
 - [Troubleshooting / FAQs](./docs/troubleshooting.md)

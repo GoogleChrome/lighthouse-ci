@@ -430,9 +430,10 @@ describe('getAllAssertionResults', () => {
   });
 
   describe('presets', () => {
-    const auditIds = Object.keys(lighthouseAllPreset.assertions).filter(
-      id => lighthouseAllPreset.assertions[id][0] !== 'off'
-    );
+    const auditIds = Object.keys(lighthouseAllPreset.assertions)
+      .filter(id => lighthouseAllPreset.assertions[id][0] !== 'off')
+      .filter(id => id !== 'performance-budget') // budgets are handled separately
+      .sort();
 
     beforeEach(() => {
       const lhrA = {audits: {}};
@@ -451,23 +452,36 @@ describe('getAllAssertionResults', () => {
       };
 
       const results = getAllAssertionResults({preset: 'lighthouse:all', assertions}, lhrs);
-      expect(results).toHaveLength(auditIds.length);
+      const assertedIds = results.map(r => r.auditId).sort();
+      expect(assertedIds).toEqual(auditIds);
 
       for (const result of results) {
         if (result.auditId === 'first-contentful-paint') {
-          expect(result).toMatchObject({level: 'warn', expected: 0.6, actual: 0.5});
+          expect(result).toMatchObject({
+            auditId: result.auditId,
+            level: 'warn',
+            expected: 0.6,
+            actual: 0.5,
+          });
         } else {
-          expect(result).toMatchObject({level: 'error', expected: 0.9, actual: 0.7});
+          expect(result).toMatchObject({
+            auditId: result.auditId,
+            level: 'error',
+            expected: 0.9,
+            actual: 0.7,
+          });
         }
       }
     });
 
     it('should use the preset as-is', () => {
       const results = getAllAssertionResults({preset: 'lighthouse:all'}, lhrs);
-      expect(results).toHaveLength(auditIds.length);
+      const assertedIds = results.map(r => r.auditId).sort();
+      expect(assertedIds).toEqual(auditIds);
 
       for (const result of results) {
         expect(result).toMatchObject({
+          auditId: result.auditId,
           level: 'error',
           expected: 0.9,
           actual: 0.7,

@@ -52,8 +52,8 @@ describe('Lighthouse CI assert CLI', () => {
   it('should run the recommended preset', () => {
     const result = run([`--preset=lighthouse:recommended`]);
     expect(result.status).toEqual(1);
-    expect(result.failures).toHaveLength(79);
-    expect(result.warnings).toHaveLength(16);
+    expect(result.failures).toHaveLength(78);
+    expect(result.warnings).toHaveLength(17);
     expect(result.passes).toHaveLength(0);
     expect(result.failures).toContain('deprecations failure');
     expect(result.failures).toContain('viewport failure');
@@ -62,8 +62,8 @@ describe('Lighthouse CI assert CLI', () => {
   it('should run the no-pwa preset', () => {
     const result = run([`--preset=lighthouse:no-pwa`]);
     expect(result.status).toEqual(1);
-    expect(result.failures).toHaveLength(70);
-    expect(result.warnings).toHaveLength(13);
+    expect(result.failures).toHaveLength(69);
+    expect(result.warnings).toHaveLength(14);
     expect(result.passes).toHaveLength(0);
     expect(result.failures).toContain('deprecations failure');
     expect(result.failures).not.toContain('viewport failure');
@@ -83,8 +83,8 @@ describe('Lighthouse CI assert CLI', () => {
   it('should return passing audits', () => {
     const result = run([`--preset=lighthouse:recommended`, '--include-passed-assertions']);
     expect(result.status).toEqual(1);
-    expect(result.warnings).toHaveLength(16);
-    expect(result.failures).toHaveLength(79);
+    expect(result.warnings).toHaveLength(17);
+    expect(result.failures).toHaveLength(78);
     expect(result.passes).toHaveLength(1);
     expect(result.passes).toContain('first-contentful-paint passing');
     expect(result.failures).toContain('viewport failure');

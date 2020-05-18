@@ -43,7 +43,7 @@ module.exports = {
     'dom-size': ['error', {}],
     'duplicate-id': ['error', {}],
     'efficient-animated-content': ['error', {}],
-    'errors-in-console': ['error', {maxLength: 0}],
+    'errors-in-console': ['error', {}],
     'external-anchors-use-rel-noopener': ['error', {}],
     'first-contentful-paint': ['error', {}],
     'first-cpu-idle': ['error', {}],

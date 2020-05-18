@@ -73,7 +73,7 @@ describe('Lighthouse CI autorun CLI with startServerCommand', () => {
              Does not have a \`<meta name=\\"viewport\\">\` tag with \`width\` or \`initial-scale\`
              https://web.dev/viewport
 
-              expected: >=[32m1[0m
+              expected: >=[32m0.9[0m
                  found: [31m0[0m
             [2mall values: 0[0m
 

@@ -630,6 +630,7 @@ function runTests(state) {
         lhr: JSON.stringify(lhr),
       };
 
+      client.setBuildToken(projectA.token);
       runA = await client.createRun(payload);
       expect(runA).toHaveProperty('id');
       expect(runA.projectId).toEqual(projectA.id);
@@ -650,6 +651,7 @@ function runTests(state) {
         }),
       };
 
+      client.setBuildToken(projectA.token);
       runB = await client.createRun(payload);
       expect(runB).toHaveProperty('id');
       expect(runB.projectId).toEqual(projectA.id);
@@ -670,6 +672,7 @@ function runTests(state) {
         }),
       };
 
+      client.setBuildToken(projectA.token);
       runC = await client.createRun(payload);
       expect(runC).toHaveProperty('id');
       expect(runC.projectId).toEqual(projectA.id);
@@ -698,6 +701,7 @@ function runTests(state) {
         }),
       };
 
+      client.setBuildToken(projectA.token);
       runD = await client.createRun(payload);
       expect(runD).toHaveProperty('id');
       expect(runD.projectId).toEqual(projectA.id);
@@ -735,6 +739,7 @@ function runTests(state) {
     });
 
     it('should seal the build', async () => {
+      client.setBuildToken(projectA.token);
       await client.sealBuild(projectA.id, buildA.id);
 
       // Build should now be sealed
@@ -944,7 +949,16 @@ function runTests(state) {
       });
     });
 
+    it('should fail to create a run without a build token', async () => {
+      client.setBuildToken(undefined);
+      await expect(client.createRun({...runA, buildId: buildB.id})).rejects.toMatchObject({
+        status: 403,
+        body: '{"message":"Invalid token"}',
+      });
+    });
+
     it('should reject new runs after sealing', async () => {
+      client.setBuildToken(projectA.token);
       await expect(client.createRun(runA)).rejects.toMatchObject({
         status: 422,
         body: '{"message":"Invalid build"}',
@@ -952,6 +966,7 @@ function runTests(state) {
     });
 
     it('should reject runs with representative flag', async () => {
+      client.setBuildToken(projectA.token);
       await expect(
         client.createRun({...runA, buildId: buildB.id, representative: true})
       ).rejects.toMatchObject({
@@ -961,11 +976,20 @@ function runTests(state) {
     });
 
     it('should reject runs with invalid LHR', async () => {
+      client.setBuildToken(projectA.token);
       await expect(
         client.createRun({...runA, buildId: buildB.id, lhr: null})
       ).rejects.toMatchObject({
         status: 422,
         body: '{"message":"Invalid LHR"}',
+      });
+    });
+
+    it('should fail to seal a build without a build token', async () => {
+      client.setBuildToken(undefined);
+      await expect(client.sealBuild(buildB.projectId, buildB.id)).rejects.toMatchObject({
+        status: 403,
+        body: '{"message":"Invalid token"}',
       });
     });
 

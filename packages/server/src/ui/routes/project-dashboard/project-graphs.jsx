@@ -220,28 +220,28 @@ export const ProjectGraphs = props => {
       <Legend statistics={statsWithBuilds} builds={builds} branch={branch} />
       <StatisticPlot
         title="Performance"
-        statisticName="category_performance_average"
+        statisticName="category_performance_median"
         loadingState={loadingState}
         statistics={statsWithBuilds}
         builds={builds}
       />
       <StatisticPlot
         title="PWA"
-        statisticName="category_pwa_average"
+        statisticName="category_pwa_median"
         loadingState={loadingState}
         statistics={statsWithBuilds}
         builds={builds}
       />
       <StatisticPlot
         title="Accessibility"
-        statisticName="category_accessibility_average"
+        statisticName="category_accessibility_median"
         loadingState={loadingState}
         statistics={statsWithBuilds}
         builds={builds}
       />
       <StatisticPlot
         title="SEO"
-        statisticName="category_seo_average"
+        statisticName="category_seo_median"
         loadingState={loadingState}
         statistics={statsWithBuilds}
         builds={builds}

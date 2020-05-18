@@ -43,7 +43,7 @@ const createStatistic = ({id, value}) => {
     projectId: build.projectId,
     buildId: build.id,
     url: 'http://example.com',
-    name: 'audit_first-contentful-paint_average',
+    name: 'audit_first-contentful-paint_median',
     value,
     version: 1,
     build,

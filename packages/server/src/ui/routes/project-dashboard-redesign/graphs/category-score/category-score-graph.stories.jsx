@@ -65,7 +65,7 @@ const createStatistics = ({id, min, max, avg}) => {
   return [
     {...stat, value: min, name: 'category_seo_min'},
     {...stat, value: max, name: 'category_seo_max'},
-    {...stat, value: avg, name: 'category_seo_average'},
+    {...stat, value: avg, name: 'category_seo_median'},
   ];
 };
 

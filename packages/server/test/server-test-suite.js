@@ -180,6 +180,7 @@ function runTests(state) {
         ancestorCommittedAt: new Date().toISOString(),
       };
 
+      client.setBuildToken(projectA.token);
       buildA = await client.createBuild(payload);
       expect(buildA).toHaveProperty('id');
       expect(buildA.projectId).toEqual(projectA.id);
@@ -202,6 +203,7 @@ function runTests(state) {
         ancestorCommittedAt: new Date().toISOString(),
       };
 
+      client.setBuildToken(projectA.token);
       buildB = await client.createBuild(payload);
       expect(buildB).toHaveProperty('id');
       expect(buildB.projectId).toEqual(projectA.id);
@@ -224,6 +226,7 @@ function runTests(state) {
         ancestorCommittedAt: new Date().toISOString(),
       };
 
+      client.setBuildToken(projectA.token);
       buildC = await client.createBuild(payload);
       expect(buildC).toHaveProperty('id');
       expect(buildC.projectId).toEqual(projectA.id);
@@ -246,6 +249,7 @@ function runTests(state) {
         ancestorCommittedAt: new Date().toISOString(),
       };
 
+      client.setBuildToken(projectB.token);
       buildD = await client.createBuild(payload);
       expect(buildD).toHaveProperty('id');
       expect(buildD.projectId).toEqual(projectB.id);
@@ -315,6 +319,7 @@ function runTests(state) {
       };
 
       while (!findAmbiguity()) {
+        client.setBuildToken(dummyProject.token);
         builds.push(
           await client.createBuild({
             ...buildA,
@@ -348,6 +353,7 @@ function runTests(state) {
       };
 
       while (!findAmbiguity()) {
+        client.setBuildToken(dummyProject.token);
         builds.push(
           await client.createBuild({
             ...buildA,
@@ -380,6 +386,7 @@ function runTests(state) {
       };
 
       while (!findBuildWith0()) {
+        client.setBuildToken(dummyProject.token);
         builds.push(
           await client.createBuild({
             ...buildA,
@@ -429,6 +436,7 @@ function runTests(state) {
 
     it('should find a build with complicated ancestor', async () => {
       const project = await client.createProject(projectA);
+      client.setBuildToken(project.token);
       const buildWithoutAncestor = await client.createBuild({
         ...buildC,
         hash: Math.random().toString(),
@@ -491,6 +499,7 @@ function runTests(state) {
 
     it('should find a build with an ancestor hash duplicate of branch hash', async () => {
       const project = await client.createProject(projectA);
+      client.setBuildToken(project.token);
       const branchBuild = await client.createBuild({
         ...buildA,
         hash: 'hash-1',
@@ -527,6 +536,7 @@ function runTests(state) {
 
     it('should find a build with an ancestor hash of non-master base', async () => {
       const project = await client.createProject({...projectA, baseBranch: 'dev'});
+      client.setBuildToken(project.token);
       const branchBuild = await client.createBuild({
         ...buildA,
         hash: 'hash-1',
@@ -908,6 +918,7 @@ function runTests(state) {
 
     it('should fail to create a sealed build', async () => {
       const payload = {...buildA, lifecycle: 'sealed', id: undefined};
+      client.setBuildToken(projectA.token);
       await expect(client.createBuild(payload)).rejects.toMatchObject({
         status: 422,
         body: '{"message":"Invalid lifecycle value"}',
@@ -916,10 +927,20 @@ function runTests(state) {
 
     it('should fail to create a build with same hash', async () => {
       const payload = {...buildA, id: undefined};
+      client.setBuildToken(projectA.token);
       await expect(client.createBuild(payload)).rejects.toMatchObject({
         status: 422,
         body:
           '{"message":"Build already exists for hash \\"e0acdd50ed0fdcfdceb2508498be50cc55c696ef\\""}',
+      });
+    });
+
+    it('should fail to create a build without a build token', async () => {
+      const payload = {...buildA, hash: 'newhash', id: undefined};
+      client.setBuildToken(undefined);
+      await expect(client.createBuild(payload)).rejects.toMatchObject({
+        status: 403,
+        body: '{"message":"Invalid token"}',
       });
     });
 

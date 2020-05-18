@@ -319,7 +319,7 @@ describe('Lighthouse CI CLI', () => {
                Current page does not respond with a 200 when offline
                https://web.dev/works-offline
 
-                expected: >=[32m1[0m
+                expected: >=[32m0.9[0m
                    found: [31m0[0m
               [2mall values: 0, 0[0m
 
@@ -371,7 +371,7 @@ describe('Lighthouse CI CLI', () => {
                Current page does not respond with a 200 when offline
                https://web.dev/works-offline
 
-                expected: >=[32m1[0m
+                expected: >=[32m0.9[0m
                    found: [31m0[0m
               [2mall values: 0, 0[0m
 

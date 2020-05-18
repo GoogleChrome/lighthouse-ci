@@ -388,22 +388,24 @@ class ApiClient {
   /**
    * Computes whether the two version strings are API-version compatible.
    * For now this is just semver, but could eventually take more into account.
-   * @param {string} versionA
-   * @param {string} versionB
+   * @param {string} clientVersion
+   * @param {string} serverVersion
    */
-  static isApiVersionCompatible(versionA, versionB) {
-    const partsA = versionA.split('.');
-    const partsB = versionB.split('.');
-    if (partsA.length < 3 || partsB.length < 3) return false;
+  static isApiVersionCompatible(clientVersion, serverVersion) {
+    const partsClient = clientVersion.match(/(\d+)\.(\d+)\.\d+/);
+    const partsServer = serverVersion.match(/(\d+)\.(\d+)\.\d+/);
+    if (!partsClient || !partsServer) return false;
 
-    let majorVersionA = partsA[0];
-    let majorVersionB = partsB[0];
-    if (majorVersionA !== majorVersionB) return false;
+    let majorVersionClient = Number(partsClient[1]);
+    let majorVersionServer = Number(partsServer[1]);
+    if (majorVersionClient !== majorVersionServer) return false;
 
-    if (majorVersionA === '0') majorVersionA = partsA[1];
-    if (majorVersionB === '0') majorVersionB = partsB[1];
+    if (majorVersionClient === 0) majorVersionClient = Number(partsClient[2]);
+    if (majorVersionServer === 0) majorVersionServer = Number(partsServer[2]);
 
-    return majorVersionA === majorVersionB;
+    return (
+      majorVersionClient === majorVersionServer || majorVersionClient === majorVersionServer + 1
+    );
   }
 }
 

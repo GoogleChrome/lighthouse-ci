@@ -170,7 +170,7 @@ describe('getAllAssertionResults', () => {
         actual: 0.8,
         auditId: 'categories',
         auditProperty: 'pwa',
-        expected: 1,
+        expected: 0.9,
         level: 'warn',
         name: 'minScore',
         operator: '>=',
@@ -182,7 +182,7 @@ describe('getAllAssertionResults', () => {
         actual: 0.1,
         auditId: 'categories',
         auditProperty: 'perf',
-        expected: 1,
+        expected: 0.9,
         level: 'error',
         name: 'minScore',
         operator: '>=',
@@ -192,13 +192,13 @@ describe('getAllAssertionResults', () => {
     ]);
   });
 
-  it('should use minScore = 1 by default', () => {
+  it('should use minScore = 0.9 by default', () => {
     const assertions = {
       'first-contentful-paint': ['warn', {aggregationMethod: 'optimistic'}],
     };
 
     const results = getAllAssertionResults({assertions}, lhrs);
-    expect(results).toMatchObject([{actual: 0.8, expected: 1}]);
+    expect(results).toMatchObject([{actual: 0.8, expected: 0.9}]);
   });
 
   it('should respect notApplicable', () => {
@@ -224,7 +224,7 @@ describe('getAllAssertionResults', () => {
     lhrs[0].audits['network-requests'].scoreDisplayMode = 'informative';
     lhrs[1].audits['network-requests'].scoreDisplayMode = 'informative';
     const results = getAllAssertionResults({assertions}, lhrs);
-    expect(results).toMatchObject([{actual: 0, expected: 1, name: 'minScore'}]);
+    expect(results).toMatchObject([{actual: 0, expected: 0.9, name: 'minScore'}]);
   });
 
   it('should de-dupe camelcase audits', () => {
@@ -405,7 +405,7 @@ describe('getAllAssertionResults', () => {
 
       lhrs[1].audits['first-contentful-paint'].score = null;
       const results = getAllAssertionResults({assertions}, lhrs);
-      expect(results).toMatchObject([{actual: 0.6, expected: 1, name: 'minScore'}]);
+      expect(results).toMatchObject([{actual: 0.6, expected: 0.9, name: 'minScore'}]);
     });
 
     it('should handle partial failure with mode median', () => {
@@ -415,7 +415,7 @@ describe('getAllAssertionResults', () => {
 
       lhrs[1].audits['first-contentful-paint'].score = null;
       const results = getAllAssertionResults({assertions}, lhrs);
-      expect(results).toMatchObject([{actual: 0.6, expected: 1, name: 'minScore'}]);
+      expect(results).toMatchObject([{actual: 0.6, expected: 0.9, name: 'minScore'}]);
     });
 
     it('should handle partial failure when mode is pessimistic', () => {
@@ -457,7 +457,7 @@ describe('getAllAssertionResults', () => {
         if (result.auditId === 'first-contentful-paint') {
           expect(result).toMatchObject({level: 'warn', expected: 0.6, actual: 0.5});
         } else {
-          expect(result).toMatchObject({level: 'error', expected: 1, actual: 0.7});
+          expect(result).toMatchObject({level: 'error', expected: 0.9, actual: 0.7});
         }
       }
     });
@@ -469,7 +469,7 @@ describe('getAllAssertionResults', () => {
       for (const result of results) {
         expect(result).toMatchObject({
           level: 'error',
-          expected: 1,
+          expected: 0.9,
           actual: 0.7,
           values: [0.5, 0.7],
         });

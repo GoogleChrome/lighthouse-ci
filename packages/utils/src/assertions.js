@@ -209,6 +209,7 @@ function getBudgetAssertionResults(auditResults) {
   const resultsKeys = new Set();
 
   for (const auditResult of auditResults) {
+    if (!auditResult) continue;
     if (!auditResult.details || !auditResult.details.items) continue;
 
     for (const budgetRow of auditResult.details.items) {

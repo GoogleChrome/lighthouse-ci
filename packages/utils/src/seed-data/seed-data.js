@@ -36,8 +36,10 @@ async function writeSeedDataToApi(client, rawData) {
   const builds = [];
   for (const build of data.builds) {
     delete build.id;
-    build.projectId = projects[Number(build.projectId)].id;
+    const project = projects[Number(build.projectId)];
+    build.projectId = project.id;
     build.lifecycle = 'unsealed';
+    client.setBuildToken(project.token);
     builds.push(await client.createBuild(build));
   }
 

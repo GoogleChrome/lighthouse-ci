@@ -192,6 +192,7 @@ function createRouter(context) {
   // POST /projects/<id>/builds/<id>/runs
   router.post(
     '/:projectId/builds/:buildId/runs',
+    validateBuildTokenMiddleware(context),
     handleAsyncError(async (req, res) => {
       const unsavedRun = req.body;
       unsavedRun.projectId = req.params.projectId;
@@ -213,6 +214,7 @@ function createRouter(context) {
   // PUT /projects/<id>/builds/<id>/lifecycle
   router.put(
     '/:projectId/builds/:buildId/lifecycle',
+    validateBuildTokenMiddleware(context),
     handleAsyncError(async (req, res) => {
       if (req.body !== 'sealed') throw new Error('Invalid lifecycle');
       await context.storageMethod.sealBuild(req.params.projectId, req.params.buildId);

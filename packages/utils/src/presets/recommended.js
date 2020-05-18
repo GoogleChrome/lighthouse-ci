@@ -32,6 +32,7 @@ module.exports = {
     'uses-responsive-images': ['error', {maxLength: 0}],
     'uses-text-compression': ['error', {maxLength: 0}],
     // Audits that don't typically apply in dev environments or are more opinionated (warn)
+    'dom-size': ['warn', {}],
     'render-blocking-resources': ['warn', {maxLength: 0}],
     'uses-webp-images': ['warn', {maxLength: 0}],
     'uses-long-cache-ttl': ['warn', {maxLength: 0}],

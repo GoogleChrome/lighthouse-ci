@@ -32,6 +32,11 @@ class ApiClient {
   }
 
   /** @param {string|undefined} token */
+  setBuildToken(token) {
+    this._extraHeaders = {...this._extraHeaders, 'x-lhci-build-token': token || ''};
+  }
+
+  /** @param {string|undefined} token */
   setAdminToken(token) {
     this._extraHeaders = {...this._extraHeaders, 'x-lhci-admin-token': token || ''};
   }

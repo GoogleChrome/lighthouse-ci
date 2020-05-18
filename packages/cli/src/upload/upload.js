@@ -349,6 +349,7 @@ async function runLHCITarget(options) {
 
   const api = new ApiClient({...options, rootURL: options.serverBaseUrl});
 
+  api.setBuildToken(options.token);
   const project = await api.findProjectByToken(options.token);
   if (!project) {
     throw new Error('Could not find active project with provided token');

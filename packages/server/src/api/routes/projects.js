@@ -6,7 +6,11 @@
 'use strict';
 
 const express = require('express');
-const {handleAsyncError, validateAdminTokenMiddleware} = require('../express-utils.js');
+const {
+  handleAsyncError,
+  validateBuildTokenMiddleware,
+  validateAdminTokenMiddleware,
+} = require('../express-utils.js');
 
 /**
  * @param {{storageMethod: LHCI.ServerCommand.StorageMethod}} context
@@ -121,6 +125,7 @@ function createRouter(context) {
   // POST /projects/<id>/builds
   router.post(
     '/:projectId/builds',
+    validateBuildTokenMiddleware(context),
     handleAsyncError(async (req, res) => {
       const unsavedBuild = req.body;
       unsavedBuild.projectId = req.params.projectId;

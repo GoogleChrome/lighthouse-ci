@@ -36,6 +36,28 @@ module.exports = {
    * @param {{storageMethod: LHCI.ServerCommand.StorageMethod}} context
    * @return {import('express-serve-static-core').RequestHandler}
    */
+  validateBuildTokenMiddleware(context) {
+    return (req, res, next) => {
+      Promise.resolve()
+        .then(async () => {
+          const project = await context.storageMethod.findProjectById(req.params.projectId);
+          if (!project) throw new Error('Invalid token');
+
+          const buildToken = req.header('x-lhci-build-token') || '';
+          if (buildToken !== project.token) throw new Error('Invalid token');
+
+          next();
+        })
+        .catch(err => {
+          res.status(403);
+          res.send(JSON.stringify({message: err.message}));
+        });
+    };
+  },
+  /**
+   * @param {{storageMethod: LHCI.ServerCommand.StorageMethod}} context
+   * @return {import('express-serve-static-core').RequestHandler}
+   */
   validateAdminTokenMiddleware(context) {
     return (req, res, next) => {
       Promise.resolve()

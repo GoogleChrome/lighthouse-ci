@@ -22,19 +22,19 @@ function metaLighthouseVersion() {
 }
 
 /** @param {Array<number>} values */
-function average(values) {
-  const sum = values.reduce((x, y) => x + y, 0);
-  const count = values.length;
+function median(values) {
+  const sorted = [...values].sort((a, b) => a - b);
+  const medianIndex = Math.floor(values.length / 2);
 
-  if (count === 0) return {value: -1};
-  return {value: sum / count};
+  if (values.length === 0) return {value: -1};
+  return {value: sorted[medianIndex]};
 }
 
 /**
  * @param {string} auditId
  * @return {StatisticFn}
  */
-function auditNumericValueAverage(auditId) {
+function auditNumericValueMedian(auditId) {
   return lhrs => {
     const values = lhrs
       .map(lhr => lhr.audits[auditId] && lhr.audits[auditId].numericValue)
@@ -43,7 +43,7 @@ function auditNumericValueAverage(auditId) {
           typeof value === 'number' && Number.isFinite(value)
       );
 
-    return average(values);
+    return median(values);
   };
 }
 
@@ -51,7 +51,7 @@ function auditNumericValueAverage(auditId) {
  * @param {string} categoryId
  * @return {StatisticFn}
  */
-function categoryScoreAverage(categoryId) {
+function categoryScoreMedian(categoryId) {
   return lhrs => {
     const values = lhrs
       .map(lhr => lhr.categories[categoryId] && lhr.categories[categoryId].score)
@@ -60,7 +60,7 @@ function categoryScoreAverage(categoryId) {
           typeof value === 'number' && Number.isFinite(value)
       );
 
-    return average(values);
+    return median(values);
   };
 }
 
@@ -120,17 +120,17 @@ function auditGroupCountOfMedianLhr(groupId, type) {
 /** @type {Record<LHCI.ServerCommand.StatisticName, StatisticFn>} */
 const definitions = {
   meta_lighthouse_version: metaLighthouseVersion(),
-  audit_interactive_average: auditNumericValueAverage('interactive'),
-  'audit_speed-index_average': auditNumericValueAverage('speed-index'),
-  'audit_first-contentful-paint_average': auditNumericValueAverage('first-contentful-paint'),
-  'audit_largest-contentful-paint_average': auditNumericValueAverage('largest-contentful-paint'),
-  'audit_total-blocking-time_average': auditNumericValueAverage('total-blocking-time'),
-  'audit_max-potential-fid_average': auditNumericValueAverage('max-potential-fid'),
-  category_performance_average: categoryScoreAverage('performance'),
-  category_pwa_average: categoryScoreAverage('pwa'),
-  category_seo_average: categoryScoreAverage('seo'),
-  category_accessibility_average: categoryScoreAverage('accessibility'),
-  'category_best-practices_average': categoryScoreAverage('best-practices'),
+  audit_interactive_median: auditNumericValueMedian('interactive'),
+  'audit_speed-index_median': auditNumericValueMedian('speed-index'),
+  'audit_first-contentful-paint_median': auditNumericValueMedian('first-contentful-paint'),
+  'audit_largest-contentful-paint_median': auditNumericValueMedian('largest-contentful-paint'),
+  'audit_total-blocking-time_median': auditNumericValueMedian('total-blocking-time'),
+  'audit_max-potential-fid_median': auditNumericValueMedian('max-potential-fid'),
+  category_performance_median: categoryScoreMedian('performance'),
+  category_pwa_median: categoryScoreMedian('pwa'),
+  category_seo_median: categoryScoreMedian('seo'),
+  category_accessibility_median: categoryScoreMedian('accessibility'),
+  'category_best-practices_median': categoryScoreMedian('best-practices'),
   category_performance_min: categoryScoreMinOrMax('performance', 'min'),
   category_pwa_min: categoryScoreMinOrMax('pwa', 'min'),
   category_seo_min: categoryScoreMinOrMax('seo', 'min'),

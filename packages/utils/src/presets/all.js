@@ -7,7 +7,8 @@
 
 module.exports = {
   assertions: {
-    // Not useful diagnostic audits (off)
+    // Not useful or invisible diagnostic audits (off)
+    'critical-request-chains': ['off', {}],
     'final-screenshot': ['off', {}],
     'js-libraries': ['off', {}],
     'main-thread-tasks': ['off', {}],
@@ -18,8 +19,13 @@ module.exports = {
     'user-timings': ['off', {}],
     diagnostics: ['off', {}],
     metrics: ['off', {}],
+    'estimated-input-latency': ['off', {}],
+    'total-blocking-time': ['off', {}],
+    'resource-summary': ['off', {}],
+    'third-party-summary': ['off', {}],
     // All the rest of the audits (error)
     'appcache-manifest': ['error', {}],
+    'apple-touch-icon': ['off', {}],
     'aria-allowed-attr': ['error', {}],
     'aria-required-attr': ['error', {}],
     'aria-required-children': ['error', {}],
@@ -32,14 +38,12 @@ module.exports = {
     'button-name': ['error', {}],
     'color-contrast': ['error', {}],
     'content-width': ['error', {}],
-    'critical-request-chains': ['error', {}],
     'definition-list': ['error', {}],
     'document-title': ['error', {}],
     'dom-size': ['error', {}],
     'duplicate-id': ['error', {}],
     'efficient-animated-content': ['error', {}],
-    'errors-in-console': ['error', {}],
-    'estimated-input-latency': ['error', {}],
+    'errors-in-console': ['error', {maxLength: 0}],
     'external-anchors-use-rel-noopener': ['error', {}],
     'first-contentful-paint': ['error', {}],
     'first-cpu-idle': ['error', {}],
@@ -73,6 +77,7 @@ module.exports = {
     'offline-start-url': ['error', {}],
     'offscreen-images': ['error', {}],
     'password-inputs-can-be-pasted-into': ['error', {}],
+    'performance-budget': ['error', {}],
     'redirects-http': ['error', {}],
     'render-blocking-resources': ['error', {}],
     'robots-txt': ['error', {}],

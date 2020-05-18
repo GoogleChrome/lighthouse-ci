@@ -168,7 +168,7 @@ function getStandardAssertionResults(possibleAuditResults, options) {
     );
   }
 
-  const realMinScore = minScore === undefined && !hadManualAssertion ? 1 : minScore;
+  const realMinScore = minScore === undefined && !hadManualAssertion ? 0.9 : minScore;
   if (realMinScore !== undefined) {
     results.push(...getAssertionResult(auditResults, aggregationMethod, 'minScore', realMinScore));
   }

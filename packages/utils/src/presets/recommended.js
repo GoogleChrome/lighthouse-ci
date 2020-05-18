@@ -8,16 +8,16 @@
 module.exports = {
   assertions: {
     // Flaky audits (warn)
-    'bootup-time': ['warn', {minScore: 0.9}],
-    'mainthread-work-breakdown': ['warn', {minScore: 0.9}],
-    'first-contentful-paint': ['warn', {minScore: 0.9}],
-    'first-cpu-idle': ['warn', {minScore: 0.9}],
-    'first-meaningful-paint': ['warn', {minScore: 0.9}],
-    interactive: ['warn', {minScore: 0.9}],
-    'speed-index': ['warn', {minScore: 0.9}],
-    'max-potential-fid': ['warn', {minScore: 0.9}],
+    'bootup-time': ['warn', {}],
+    'mainthread-work-breakdown': ['warn', {}],
+    'first-contentful-paint': ['warn', {}],
+    'first-cpu-idle': ['warn', {}],
+    'first-meaningful-paint': ['warn', {}],
+    interactive: ['warn', {}],
+    'speed-index': ['warn', {}],
+    'max-potential-fid': ['warn', {}],
     'load-fast-enough-for-pwa': ['warn', {}],
-    'uses-rel-preload': ['warn', {minScore: 1}],
+    'uses-rel-preload': ['warn', {}],
     // Not useful diagnostic audits (off)
     'critical-request-chains': ['off', {}],
     'final-screenshot': ['off', {}],

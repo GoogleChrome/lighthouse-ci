@@ -19,7 +19,7 @@ describe('Statistic Definitions', () => {
   /** @type {LH.Result} */
   const baseLhr6 = baseLhr6_;
 
-  describe('metaLighthouseVersion()', () => {
+  describe('meta_lighthouse_version()', () => {
     const run = definitions.meta_lighthouse_version;
 
     it('should extract the version', () => {
@@ -31,6 +31,69 @@ describe('Statistic Definitions', () => {
     it('should fallback to 0 for bad versions', () => {
       expect(run([{...baseLhr5, lighthouseVersion: 'empty'}])).toEqual({value: 0});
       expect(run([{...baseLhr5, lighthouseVersion: '5.6'}])).toEqual({value: 0});
+    });
+  });
+
+  describe('audit_interactive_median()', () => {
+    const run = definitions.audit_interactive_median;
+
+    it('should extract the median value', () => {
+      const low = JSON.parse(JSON.stringify(baseLhr5));
+      const high = JSON.parse(JSON.stringify(baseLhr5));
+      low.audits.interactive.numericValue = 1e3;
+      high.audits.interactive.numericValue = 100e3;
+      expect(run([low, high, baseLhr5]).value).toBeCloseTo(43223.58);
+      expect(run([baseLhr6, low, high]).value).toBeCloseTo(20253.43);
+    });
+  });
+
+  describe('category_performance_median()', () => {
+    const run = definitions.category_performance_median;
+
+    it('should extract the median value', () => {
+      const low = JSON.parse(JSON.stringify(baseLhr5));
+      const high = JSON.parse(JSON.stringify(baseLhr5));
+      low.categories.performance.score = 0.01;
+      high.categories.performance.score = 0.99;
+      expect(run([low, high, baseLhr5]).value).toBeCloseTo(0.18);
+      expect(run([baseLhr6, low, high]).value).toBeCloseTo(0.16);
+    });
+  });
+
+  describe('category_performance_min()', () => {
+    const run = definitions.category_performance_min;
+
+    it('should extract the min value', () => {
+      const low = JSON.parse(JSON.stringify(baseLhr5));
+      const high = JSON.parse(JSON.stringify(baseLhr5));
+      low.categories.performance.score = 0.01;
+      high.categories.performance.score = 0.99;
+      expect(run([low, high, baseLhr5]).value).toBeCloseTo(0.01);
+      expect(run([baseLhr6, low, high]).value).toBeCloseTo(0.01);
+    });
+  });
+
+  describe('category_performance_max()', () => {
+    const run = definitions.category_performance_max;
+
+    it('should extract the max value', () => {
+      const low = JSON.parse(JSON.stringify(baseLhr5));
+      const high = JSON.parse(JSON.stringify(baseLhr5));
+      low.categories.performance.score = 0.01;
+      high.categories.performance.score = 0.99;
+      expect(run([low, high, baseLhr5]).value).toBeCloseTo(0.99);
+      expect(run([baseLhr6, low, high]).value).toBeCloseTo(0.99);
+    });
+  });
+
+  describe('auditgroup_a11y-aria_*()', () => {
+    it('should extract the group count', () => {
+      expect(definitions['auditgroup_a11y-aria_pass']([baseLhr5])).toEqual({value: 7});
+      expect(definitions['auditgroup_a11y-aria_pass']([baseLhr6])).toEqual({value: 10});
+      expect(definitions['auditgroup_a11y-color-contrast_fail']([baseLhr5])).toEqual({value: 0});
+      expect(definitions['auditgroup_a11y-color-contrast_fail']([baseLhr6])).toEqual({value: 1});
+      expect(definitions['auditgroup_a11y-aria_na']([baseLhr5])).toEqual({value: 0});
+      expect(definitions['auditgroup_a11y-aria_na']([baseLhr6])).toEqual({value: 2});
     });
   });
 });

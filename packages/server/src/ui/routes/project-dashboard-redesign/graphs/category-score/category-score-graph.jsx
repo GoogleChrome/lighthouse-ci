@@ -36,9 +36,9 @@ const VersionChangeWarning = () => {
   );
 };
 
-/** @param {{selectedBuildId: string|undefined, averageStatistics: Array<StatisticWithBuild>, versionChanges: Array<{build: LHCI.ServerCommand.Build}>, pinned: boolean}} props */
+/** @param {{selectedBuildId: string|undefined, medianStatistics: Array<StatisticWithBuild>, versionChanges: Array<{build: LHCI.ServerCommand.Build}>, pinned: boolean}} props */
 const HoverCardWithDiff = props => {
-  const {selectedBuildId, averageStatistics: stats} = props;
+  const {selectedBuildId, medianStatistics: stats} = props;
   const statIndex = selectedBuildId ? stats.findIndex(s => s.buildId === selectedBuildId) : -1;
   const stat = statIndex !== -1 ? stats[statIndex] : undefined;
 
@@ -125,7 +125,7 @@ export const CategoryScoreTimelineGraph = props => {
 
   const categoryId = props.category.id;
   const allStats = props.statistics.filter(s => s.name.startsWith(`category_${categoryId}`));
-  const averageStats = allStats.filter(s => s.name.endsWith('_average'));
+  const medianStats = allStats.filter(s => s.name.endsWith('_median'));
   const versionStatistics = props.statistics.filter(s => s.name === 'meta_lighthouse_version');
   const versionChanges = versionStatistics
     .map((statistic, index) => ({
@@ -138,7 +138,7 @@ export const CategoryScoreTimelineGraph = props => {
       return version && previousVersion && version !== previousVersion;
     });
 
-  if (!averageStats.length) return <span>No data available</span>;
+  if (!medianStats.length) return <span>No data available</span>;
 
   return (
     <div className={clsx('category-score-graph', 'graph-root-el')}>
@@ -146,7 +146,7 @@ export const CategoryScoreTimelineGraph = props => {
       <D3Graph
         className="category-score-graph__score-graph"
         data={{
-          statistics: averageStats,
+          statistics: medianStats,
           statisticsWithMinMax: allStats,
           versionChanges,
           selectedBuildId: selectedBuildId,
@@ -160,23 +160,23 @@ export const CategoryScoreTimelineGraph = props => {
       />
       <D3Graph
         className="category-score-graph__score-delta-graph"
-        data={averageStats}
+        data={medianStats}
         render={renderScoreDeltaGraph}
         computeRerenderKey={computeStatisticRerenderKey}
       />
       <HoverCardWithDiff
         pinned={pinned}
         selectedBuildId={selectedBuildId}
-        averageStatistics={averageStats}
+        medianStatistics={medianStats}
         versionChanges={versionChanges}
       />
       <div className="category-score-graph__x-axis">
         <div style={{marginLeft: GRAPH_MARGIN.left}}>
-          {new Date(averageStats[0].build.runAt || '').toLocaleDateString()}
+          {new Date(medianStats[0].build.runAt || '').toLocaleDateString()}
         </div>
         <div style={{flexGrow: 1}} />
         <div style={{marginRight: GRAPH_MARGIN.right}}>
-          {new Date(averageStats[averageStats.length - 1].build.runAt || '').toLocaleDateString()}
+          {new Date(medianStats[medianStats.length - 1].build.runAt || '').toLocaleDateString()}
         </div>
       </div>
     </div>

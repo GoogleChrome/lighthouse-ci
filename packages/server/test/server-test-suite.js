@@ -780,21 +780,21 @@ function runTests(state) {
       expect(urlRootStats.length).toBeGreaterThan(60);
       expect(urlBlogStats).toHaveLength(urlRootStats.length);
 
-      const fcpAverage = urlRootStats.find(s => s.name === 'audit_first-contentful-paint_average');
-      const a11yAverage = urlRootStats.find(s => s.name === 'category_accessibility_average');
+      const fcpMedian = urlRootStats.find(s => s.name === 'audit_first-contentful-paint_median');
+      const a11yMedian = urlRootStats.find(s => s.name === 'category_accessibility_median');
       const a11yMin = urlRootStats.find(s => s.name === 'category_accessibility_min');
-      const perfAverage = urlRootStats.find(s => s.name === 'category_performance_average');
+      const perfMedian = urlRootStats.find(s => s.name === 'category_performance_median');
       const perfMin = urlRootStats.find(s => s.name === 'category_performance_min');
       const perfMax = urlRootStats.find(s => s.name === 'category_performance_max');
 
-      expect(fcpAverage).toMatchObject({
+      expect(fcpMedian).toMatchObject({
         url: 'https://example.com:PORT/',
-        name: 'audit_first-contentful-paint_average',
+        name: 'audit_first-contentful-paint_median',
         value: 2000,
       });
-      expect(a11yAverage).toMatchObject({
+      expect(a11yMedian).toMatchObject({
         url: 'https://example.com:PORT/',
-        name: 'category_accessibility_average',
+        name: 'category_accessibility_median',
         value: -1,
       });
       expect(a11yMin).toMatchObject({
@@ -802,9 +802,9 @@ function runTests(state) {
         name: 'category_accessibility_min',
         value: -1,
       });
-      expect(perfAverage).toMatchObject({
+      expect(perfMedian).toMatchObject({
         url: 'https://example.com:PORT/',
-        name: 'category_performance_average',
+        name: 'category_performance_median',
         value: 0.45,
       });
       expect(perfMin).toMatchObject({

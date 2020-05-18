@@ -68,25 +68,25 @@ const MetricLineGraphs = props => {
           {
             abbreviation: 'FCP',
             label: 'First Contentful Paint',
-            statistics: stats('audit_first-contentful-paint_average'),
+            statistics: stats('audit_first-contentful-paint_median'),
             scoreLevels: SCORE_LEVEL_METRIC_THRESHOLDS['first-contentful-paint'],
           },
           {
             abbreviation: 'LCP',
             label: 'Largest Contentful Paint',
-            statistics: stats('audit_largest-contentful-paint_average'),
+            statistics: stats('audit_largest-contentful-paint_median'),
             scoreLevels: SCORE_LEVEL_METRIC_THRESHOLDS['largest-contentful-paint'],
           },
           {
             abbreviation: 'TTI',
             label: 'Time to Interactive',
-            statistics: stats('audit_interactive_average'),
+            statistics: stats('audit_interactive_median'),
             scoreLevels: SCORE_LEVEL_METRIC_THRESHOLDS['interactive'],
           },
           {
             abbreviation: 'SI',
             label: 'Speed Index',
-            statistics: stats('audit_speed-index_average'),
+            statistics: stats('audit_speed-index_median'),
             scoreLevels: SCORE_LEVEL_METRIC_THRESHOLDS['speed-index'],
           },
         ]}
@@ -100,13 +100,13 @@ const MetricLineGraphs = props => {
           {
             abbreviation: 'TBT',
             label: 'Total Blocking Time',
-            statistics: stats('audit_total-blocking-time_average'),
+            statistics: stats('audit_total-blocking-time_median'),
             scoreLevels: SCORE_LEVEL_METRIC_THRESHOLDS['total-blocking-time'],
           },
           {
             abbreviation: 'FID',
             label: 'Max Potential FID',
-            statistics: stats('audit_max-potential-fid_average'),
+            statistics: stats('audit_max-potential-fid_median'),
             scoreLevels: SCORE_LEVEL_METRIC_THRESHOLDS['max-potential-fid'],
           },
         ]}
@@ -125,19 +125,19 @@ const MetricDistributionGraphs = props => {
       <MetricDistributionGraph
         abbreviation={'FCP'}
         label={'First Contentful Paint'}
-        statistics={stats('audit_first-contentful-paint_average')}
+        statistics={stats('audit_first-contentful-paint_median')}
         scoreLevels={SCORE_LEVEL_METRIC_THRESHOLDS['first-contentful-paint']}
       />
       <MetricDistributionGraph
         abbreviation={'SI'}
         label={'Speed Index'}
-        statistics={stats('audit_speed-index_average')}
+        statistics={stats('audit_speed-index_median')}
         scoreLevels={SCORE_LEVEL_METRIC_THRESHOLDS['speed-index']}
       />
       <MetricDistributionGraph
         abbreviation={'TTI'}
         label={'Time to Interactive'}
-        statistics={stats('audit_interactive_average')}
+        statistics={stats('audit_interactive_median')}
         scoreLevels={SCORE_LEVEL_METRIC_THRESHOLDS['interactive']}
       />
     </Fragment>

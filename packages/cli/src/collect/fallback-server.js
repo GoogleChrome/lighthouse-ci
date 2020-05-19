@@ -11,6 +11,14 @@ const express = require('express');
 const compression = require('compression');
 const createHttpServer = require('http').createServer;
 
+const IGNORED_FOLDERS_FOR_AUTOFIND = new Set([
+  'node_modules',
+  'bower_components',
+  'jspm_packages',
+  'web_modules',
+  'tmp',
+]);
+
 class FallbackServer {
   /**
    * @param {string} pathToBuildDir
@@ -82,6 +90,10 @@ class FallbackServer {
     if (depth === 0) return htmlFiles;
 
     for (const fileOrFolder of filesAndFolders) {
+      // Don't recurse into hidden folders, things that look like files, or dependency folders
+      if (fileOrFolder.includes('.')) continue;
+      if (IGNORED_FOLDERS_FOR_AUTOFIND.has(fileOrFolder)) continue;
+
       try {
         const fullPath = path.join(directory, fileOrFolder);
         if (!fs.statSync(fullPath).isDirectory()) continue;

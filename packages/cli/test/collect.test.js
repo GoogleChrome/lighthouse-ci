@@ -20,13 +20,14 @@ describe('collect', () => {
     'should collect results from staticDistDir',
     () =>
       withTmpDir(tmpDir => {
+        const staticDistDir = path.join(fixturesDir, 'collect-static-dir-without-urls');
         const ciFolder = path.join(tmpDir, '.lighthouseci');
         fs.mkdirSync(ciFolder);
         fs.writeFileSync(path.join(ciFolder, 'lhr-123.html'), '<!DOCTYPE html>');
         fs.writeFileSync(path.join(ciFolder, 'lhr-123.json'), '{}');
 
         const {stdout, stderr, status} = runCLI(
-          ['collect', `--config=${rcFile}`, `--static-dist-dir=${fixturesDir}`],
+          ['collect', `--config=${rcFile}`, `--static-dist-dir=${staticDistDir}`],
           {
             // Run in temp dir to avoid conflicts with other tests
             cwd: tmpDir,

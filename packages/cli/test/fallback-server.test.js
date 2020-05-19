@@ -16,7 +16,7 @@ const fetch = require('isomorphic-fetch');
 
 describe('fallbackServer', () => {
   let server;
-  const fixturesDir = path.join(__dirname, 'fixtures');
+  const fixturesDir = path.join(__dirname, 'fixtures', 'collect-static-dir-without-urls');
 
   const fetchBody = async url => (await fetch(`http://localhost:${server.port}${url}`)).text();
 
@@ -83,6 +83,11 @@ describe('fallbackServer', () => {
       fs.writeFileSync(`${tmpDir}/pricing/index.html`, '');
       fs.mkdirSync(`${tmpDir}/pricing/plans`);
       fs.writeFileSync(`${tmpDir}/pricing/plans/index.html`, '');
+      // These should be ignored
+      fs.mkdirSync(`${tmpDir}/node_modules`);
+      fs.writeFileSync(`${tmpDir}/node_modules/index.html`, '');
+      fs.mkdirSync(`${tmpDir}/.lighthouseci`);
+      fs.writeFileSync(`${tmpDir}/.lighthouseci/index.html`, '');
     });
 
     it('should find all HTML files', () => {

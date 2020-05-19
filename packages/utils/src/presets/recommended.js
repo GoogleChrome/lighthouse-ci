@@ -12,33 +12,37 @@ module.exports = {
     ...all.assertions,
     // Flaky audits (warn)
     'bootup-time': ['warn', {}],
-    'mainthread-work-breakdown': ['warn', {}],
+    'cumulative-layout-shift': ['warn', {}],
     'first-contentful-paint': ['warn', {}],
     'first-cpu-idle': ['warn', {}],
     'first-meaningful-paint': ['warn', {}],
-    interactive: ['warn', {}],
-    'speed-index': ['warn', {}],
-    'max-potential-fid': ['warn', {}],
+    'largest-contentful-paint': ['warn', {}],
     'load-fast-enough-for-pwa': ['warn', {}],
+    'mainthread-work-breakdown': ['warn', {}],
+    'max-potential-fid': ['warn', {}],
+    'speed-index': ['warn', {}],
     'uses-rel-preload': ['warn', {}],
+    interactive: ['warn', {}],
     // Flaky score but non-flaky details (error, maxLength)
     'efficient-animated-content': ['error', {maxLength: 0}],
     'offscreen-images': ['error', {maxLength: 0}],
     'unminified-css': ['error', {maxLength: 0}],
     'unminified-javascript': ['error', {maxLength: 0}],
     'unused-css-rules': ['error', {maxLength: 0}],
+    'unused-javascript': ['error', {maxLength: 0}],
     'uses-optimized-images': ['error', {maxLength: 0}],
     'uses-rel-preconnect': ['error', {maxLength: 0}],
     'uses-responsive-images': ['error', {maxLength: 0}],
     'uses-text-compression': ['error', {maxLength: 0}],
     // Audits that don't typically apply in dev environments or are more opinionated (warn)
+    'redirects-http': ['off', {}], // not useful for the dev server
+    'uses-http2': ['off', {}], // not useful for the dev server
+
     'dom-size': ['warn', {}],
+    'is-on-https': ['warn', {}], // passes on localhost, so OK to leave on
     'render-blocking-resources': ['warn', {maxLength: 0}],
-    'uses-webp-images': ['warn', {maxLength: 0}],
+    'server-response-time': ['warn', {}],
     'uses-long-cache-ttl': ['warn', {maxLength: 0}],
-    'is-on-https': ['warn', {}],
-    'redirects-http': ['warn', {}],
-    'time-to-first-byte': ['warn', {}],
-    'uses-http2': ['warn', {}],
+    'uses-webp-images': ['warn', {maxLength: 0}],
   },
 };

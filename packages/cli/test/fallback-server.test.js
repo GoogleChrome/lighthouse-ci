@@ -7,7 +7,10 @@
 
 /* eslint-env jest */
 
+const fs = require('fs');
+const os = require('os');
 const path = require('path');
+const FallbackServer = require('../src/collect/fallback-server.js');
 const {startFallbackServer} = require('./test-utils.js');
 const fetch = require('isomorphic-fetch');
 
@@ -64,6 +67,41 @@ describe('fallbackServer', () => {
     it('should serve index for a 404', async () => {
       const body = await fetchBody('/missing');
       expect(body).toContain('index test page');
+    });
+  });
+
+  describe('#readHtmlFilesInDirectory()', () => {
+    let tmpDir = '';
+
+    beforeAll(() => {
+      tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'lhci-fallback'));
+      fs.writeFileSync(`${tmpDir}/index.html`, '');
+      fs.writeFileSync(`${tmpDir}/404.html`, '');
+      fs.mkdirSync(`${tmpDir}/checkout`);
+      fs.writeFileSync(`${tmpDir}/checkout/index.html`, '');
+      fs.mkdirSync(`${tmpDir}/pricing`);
+      fs.writeFileSync(`${tmpDir}/pricing/index.html`, '');
+      fs.mkdirSync(`${tmpDir}/pricing/plans`);
+      fs.writeFileSync(`${tmpDir}/pricing/plans/index.html`, '');
+    });
+
+    it('should find all HTML files', () => {
+      expect(FallbackServer.readHtmlFilesInDirectory(tmpDir, 2)).toEqual([
+        {file: '404.html', depth: 0},
+        {file: 'index.html', depth: 0},
+        {file: 'checkout/index.html', depth: 1},
+        {file: 'pricing/index.html', depth: 1},
+        {file: 'pricing/plans/index.html', depth: 2},
+      ]);
+    });
+
+    it('should only traverse depth', () => {
+      expect(FallbackServer.readHtmlFilesInDirectory(tmpDir, 1)).toEqual([
+        {file: '404.html', depth: 0},
+        {file: 'index.html', depth: 0},
+        {file: 'checkout/index.html', depth: 1},
+        {file: 'pricing/index.html', depth: 1},
+      ]);
     });
   });
 });

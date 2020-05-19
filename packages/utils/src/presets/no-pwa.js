@@ -24,5 +24,6 @@ module.exports = {
     viewport: 'off',
     'without-javascript': 'off',
     'apple-touch-icon': 'off',
+    'maskable-icon': 'off',
   },
 };

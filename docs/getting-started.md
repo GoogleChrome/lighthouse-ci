@@ -299,12 +299,8 @@ While Lighthouse reports at your fingertips is great, failing the build based on
 
 ```js
 module.exports = {
-  ci: {
-    // ...
-    assert: {
-      preset: 'lighthouse:recommended',
-    },
-    // ...
+  assert: {
+    preset: 'lighthouse:recommended',
   },
 };
 ```
@@ -337,16 +333,12 @@ You would change your configuration to disable those two audits:
 
 ```js
 module.exports = {
-  ci: {
-    // ...
-    assert: {
-      preset: 'lighthouse:recommended',
-      assertions: {
-        'uses-rel-preload': 'off',
-        'uses-rel-preconnect': 'off',
-      },
+  assert: {
+    preset: 'lighthouse:recommended',
+    assertions: {
+      'uses-rel-preload': 'off',
+      'uses-rel-preconnect': 'off',
     },
-    // ...
   },
 };
 ```

@@ -16,12 +16,12 @@ describe('Lighthouse CI autorun CLI', () => {
   const autorunDir = path.join(__dirname, 'fixtures/autorun-static-dir');
 
   it('should run all three steps', () => {
-    const {stdout, stderr, status} = runCLI(['autorun', '--collect.numberOfRuns=2'], {
+    const {stdout, stderr, status} = runCLI(['autorun', '--collect.numberOfRuns=1'], {
       cwd: autorunDir,
       env: {LHCI_NO_LIGHTHOUSERC: undefined},
     });
 
-    const stdoutClean = stdout.replace(/Open the report at.*\n/, 'Open the report at <link>\n');
+    const stdoutClean = stdout.replace(/Open the report at.*\n/g, 'Open the report at <link>\n');
     expect(stdoutClean).toMatchInlineSnapshot(`
       "✅  .lighthouseci/ directory writable
       ✅  Configuration file found
@@ -33,20 +33,23 @@ describe('Lighthouse CI autorun CLI', () => {
       Set it explicitly in lighthouserc.json if incorrect.
 
       Started a web server on port XXXX...
-      Running Lighthouse 2 time(s) on http://localhost:XXXX/good.html
+      Running Lighthouse 1 time(s) on http://localhost:XXXX/good.html
       Run #1...done.
-      Run #2...done.
+      Running Lighthouse 1 time(s) on http://localhost:XXXX/subdir/index.html
+      Run #1...done.
       Done running Lighthouse!
 
 
       Uploading median LHR of http://localhost:XXXX/good.html...success!
+      Open the report at <link>
+      Uploading median LHR of http://localhost:XXXX/subdir/index.html...success!
       Open the report at <link>
       No GitHub token set, skipping GitHub status check.
 
       "
     `);
     expect(stderr).toMatchInlineSnapshot(`
-      "Checking assertions against 1 URL(s), 2 total run(s)
+      "Checking assertions against 2 URL(s), 2 total run(s)
 
       1 result(s) for [1mhttp://localhost:XXXX/good.html[0m :
 
@@ -56,7 +59,17 @@ describe('Lighthouse CI autorun CLI', () => {
 
               expected: >=[32m0.9[0m
                  found: [31m0[0m
-            [2mall values: 0, 0[0m
+            [2mall values: 0[0m
+
+      1 result(s) for [1mhttp://localhost:XXXX/subdir/index.html[0m :
+
+        [31mX[0m  [1mviewport[0m failure for [1mminScore[0m assertion
+             Does not have a \`<meta name=\\"viewport\\">\` tag with \`width\` or \`initial-scale\`
+             https://web.dev/viewport
+
+              expected: >=[32m0.9[0m
+                 found: [31m0[0m
+            [2mall values: 0[0m
 
       Assertion failed. Exiting with status code 1.
       assert command failed. Exiting with status code 1.

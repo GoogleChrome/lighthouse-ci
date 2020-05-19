@@ -111,6 +111,8 @@ async function runOnUrl(url, options, context) {
 async function startServerAndDetermineUrls(options) {
   const urlsAsArray = Array.isArray(options.url) ? options.url : options.url ? [options.url] : [];
   if (!options.staticDistDir) {
+    if (!urlsAsArray.length) throw new Error(`No URLs provided to collect`);
+
     let close = async () => undefined;
     if (options.startServerCommand) {
       const regexPattern = new RegExp(options.startServerReadyPattern, 'i');
@@ -144,7 +146,11 @@ async function startServerAndDetermineUrls(options) {
 
   const urls = urlsAsArray;
   if (!urls.length) {
-    urls.push(...server.getAvailableUrls());
+    urls.push(...server.getAvailableUrls().slice(0, 5));
+  }
+
+  if (!urls.length) {
+    throw new Error(`No URLs provided to collect and no HTML files found in staticDistDir`);
   }
 
   urls.forEach((rawUrl, i) => {

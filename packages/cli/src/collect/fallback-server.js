@@ -6,6 +6,7 @@
 'use strict';
 
 const fs = require('fs');
+const path = require('path');
 const express = require('express');
 const compression = require('compression');
 const createHttpServer = require('http').createServer;
@@ -64,8 +65,36 @@ class FallbackServer {
 
   /** @return {string[]} */
   getAvailableUrls() {
-    const htmlFiles = fs.readdirSync(this._pathToBuildDir).filter(file => file.endsWith('.html'));
-    return htmlFiles.map(file => `http://localhost:${this._port}/${file}`);
+    const htmlFiles = FallbackServer.readHtmlFilesInDirectory(this._pathToBuildDir, 2);
+    return htmlFiles.map(({file}) => `http://localhost:${this._port}/${file}`);
+  }
+
+  /**
+   * @param {string} directory
+   * @param {number} depth
+   * @return {Array<{file: string, depth: number}>}
+   */
+  static readHtmlFilesInDirectory(directory, depth) {
+    const filesAndFolders = fs.readdirSync(directory);
+    const htmlFiles = filesAndFolders
+      .filter(file => file.endsWith('.html'))
+      .map(file => ({file, depth: 0}));
+    if (depth === 0) return htmlFiles;
+
+    for (const fileOrFolder of filesAndFolders) {
+      try {
+        const fullPath = path.join(directory, fileOrFolder);
+        if (!fs.statSync(fullPath).isDirectory()) continue;
+
+        htmlFiles.push(
+          ...FallbackServer.readHtmlFilesInDirectory(fullPath, depth - 1).map(({file, depth}) => {
+            return {file: `${fileOrFolder}/${file}`, depth: depth + 1};
+          })
+        );
+      } catch (err) {}
+    }
+
+    return htmlFiles;
   }
 }
 

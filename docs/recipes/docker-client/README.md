@@ -34,7 +34,7 @@ docker push <your username>/lhci-client:latest
 
 ## `--no-sandbox` Issues Explained
 
-Chrome uses sandboxing to isolate renderer processes and restrict their capabilities. If a rouge website is able to discover a browser vulnerability and break out of JavaScript engine for example, they would find themselves in a very limited process that can't write to the filesystem, make network requests, mess with devices, etc.
+Chrome uses sandboxing to isolate renderer processes and restrict their capabilities. If a rogue website is able to discover a browser vulnerability and break out of JavaScript engine for example, they would find themselves in a very limited process that can't write to the filesystem, make network requests, mess with devices, etc.
 
 Getting Chrome to run in CI and uncommon linux environments can frequently fail due to sandbox issues that present themselves in two common forms.
 

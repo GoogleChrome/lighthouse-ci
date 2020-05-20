@@ -16,12 +16,12 @@ describe('Project dashboard', () => {
 
   require('./steps/setup')(state);
 
-  require('./steps/navigate-to-project')(state, 'Lighthouse Viewer');
+  require('./steps/navigate-to-project')(state, 'Lighthouse Viewer', {newDashboard: true});
 
   describe('render the dashboard', () => {
     it('should show the commits', async () => {
       const commits = await state.page.evaluate(() => {
-        return [...document.querySelectorAll('.dashboard__build-list tr')].map(
+        return [...document.querySelectorAll('.dashboard-build-list tr')].map(
           row => row.textContent
         );
       });
@@ -37,8 +37,8 @@ describe('Project dashboard', () => {
       `);
     });
 
-    it.skip('should look correct', async () => {
-      expect(await state.page.screenshot()).toMatchImageSnapshot();
+    it('should look correct', async () => {
+      expect(await state.page.screenshot({fullPage: true})).toMatchImageSnapshot();
     });
   });
 

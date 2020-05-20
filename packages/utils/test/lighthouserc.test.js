@@ -239,8 +239,9 @@ describe('lighthouserc.js', () => {
       });
 
       it('.json', () => {
-        const expected = path.join(LH_ROOT, 'lighthouserc.json');
-        expect(rc.findRcFile(LH_ROOT)).toEqual(expected);
+        tempFile = path.join(tempDir, 'lighthouserc.json');
+        writeJSONFile(tempFile, {});
+        expect(rc.findRcFile(tempDir)).toEqual(tempFile);
       });
 
       it('.yaml', () => {
@@ -261,7 +262,7 @@ describe('lighthouserc.js', () => {
     });
 
     it('should find an rcfile find-up-style when recursive is true', () => {
-      const expected = path.join(LH_ROOT, 'lighthouserc.json');
+      const expected = path.join(LH_ROOT, '.lighthouserc.js');
       expect(rc.findRcFile(__dirname, {recursive: true})).toEqual(expected);
     });
 

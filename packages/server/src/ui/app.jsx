@@ -34,9 +34,12 @@ export const App = () => {
               <LoadingSpinner />
             </Page>
           )}
-          getComponent={() =>
-            import('./routes/project-dashboard/project-dashboard.jsx').then(m => m.ProjectDashboard)
-          }
+          getComponent={async (url, cb, props) => {
+            const Component = () => (
+              <Redirect to={`/app/projects/${props.projectSlug}/dashboard`} />
+            );
+            return Component;
+          }}
         />
         <LazyRoute
           path="/app/projects/:projectSlug/settings"
@@ -57,9 +60,7 @@ export const App = () => {
             </Page>
           )}
           getComponent={() =>
-            import('./routes/project-dashboard-redesign/project-dashboard.jsx').then(
-              m => m.ProjectDashboard
-            )
+            import('./routes/project-dashboard/project-dashboard.jsx').then(m => m.ProjectDashboard)
           }
         />
         <LazyRoute

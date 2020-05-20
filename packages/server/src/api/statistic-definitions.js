@@ -186,4 +186,4 @@ const definitions = {
 };
 
 // Keep the export separate from declaration to enable tsc to typecheck the `@type` annotation.
-module.exports = {definitions, VERSION: 1};
+module.exports = {definitions, VERSION: 2};

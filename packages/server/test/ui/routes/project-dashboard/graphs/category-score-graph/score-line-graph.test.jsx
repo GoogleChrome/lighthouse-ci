@@ -5,7 +5,7 @@
  */
 
 import {h} from 'preact';
-import {buildMinMaxByBuildId} from '../../../../../../src/ui/routes/project-dashboard-redesign/graphs/category-score/score-line-graph';
+import {buildMinMaxByBuildId} from '../../../../../../src/ui/routes/project-dashboard/graphs/category-score/score-line-graph';
 import {cleanup} from '../../../../../test-utils.js';
 
 afterEach(cleanup);

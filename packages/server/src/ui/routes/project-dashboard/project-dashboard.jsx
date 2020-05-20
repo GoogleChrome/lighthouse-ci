@@ -1,74 +1,147 @@
 /**
- * @license Copyright 2019 Google Inc. All Rights Reserved.
+ * @license Copyright 2020 Google Inc. All Rights Reserved.
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
  */
 
 import {h} from 'preact';
+import {useState, useEffect} from 'preact/hooks';
 import {route} from 'preact-router';
 import _ from '@lhci/utils/src/lodash.js';
-import {useProjectBuilds, useProjectBySlug} from '../../hooks/use-api-data';
+import {
+  useProjectBuilds,
+  useProjectBySlug,
+  useProjectBranches,
+  useBuildURLs,
+} from '../../hooks/use-api-data';
 import {AsyncLoader, combineLoadingStates, combineAsyncData} from '../../components/async-loader';
-import {ProjectGettingStarted} from './getting-started.jsx';
 import {Page} from '../../layout/page.jsx';
-import {ProjectGraphs} from './project-graphs.jsx';
+import {ProjectCategorySummaries} from './project-category-summaries.jsx';
 
 import './project-dashboard.css';
-import {Pill} from '../../components/pill';
+import {Dropdown} from '../../components/dropdown';
+import clsx from 'clsx';
+import {ProjectBuildList} from './build-list';
 import {DocumentTitle} from '../../components/document-title';
+import {ProjectGettingStarted} from './getting-started';
 
-/** @param {{project: LHCI.ServerCommand.Project, builds: Array<LHCI.ServerCommand.Build>, runUrl?: string, branch?: string}} props */
+/** @typedef {import('../../hooks/use-api-data').LoadingState} LoadingState */
+
+/** @param {{branches: Array<{branch: string}>, branch?: string, baseBranch: string}} props */
+const computeBranchSelection = props => {
+  const availableBranches = props.branches.length ? props.branches : [{branch: props.baseBranch}];
+  const selectedBranch =
+    props.branch ||
+    (availableBranches.some(b => b.branch === props.baseBranch)
+      ? props.baseBranch
+      : availableBranches[0].branch);
+  return {
+    availableBranches,
+    selectedBranch,
+  };
+};
+
+/** @param {{urls: Array<{url: string}>, runUrl?: string}} props */
+const computeUrlSelection = props => {
+  const availableUrls = props.urls.length ? props.urls : [{url: 'None'}];
+  // Default to the shortest URL because that's usually the root homepage, e.g. `/`
+  const shortestUrl = _.minBy(availableUrls.map(({url}) => url), url => url.length);
+  const selectedUrl = props.runUrl || shortestUrl || 'None';
+
+  return {
+    availableUrls,
+    selectedUrl,
+  };
+};
+
+/**
+ * Hooks can't return early, so we have to do some convoluted `undefined` gymnastics to create our URL query.
+ * We only want the dropdown to be populated with URLs that are actually available on this branch.
+ *
+ *
+ * @param {[LoadingState, LHCI.ServerCommand.Project | undefined]} projectData
+ * @param {[LoadingState, Array<LHCI.ServerCommand.Build> | undefined]} buildData
+ * @param {[LoadingState, Array<{branch: string}> | undefined]} branchData
+ * @param {string|undefined} branchFromProps
+ */
+function useUrlsAvailableForBranch(projectData, buildData, branchData, branchFromProps) {
+  const baseBranch = projectData[1] ? projectData[1].baseBranch || '' : undefined;
+  const branches = branchData[1];
+  const {selectedBranch} =
+    baseBranch && branches
+      ? computeBranchSelection({baseBranch, branches, branch: branchFromProps})
+      : {selectedBranch: undefined};
+  const builds = buildData[1];
+  const filteredBuilds = (builds || []).filter(build => build.branch === selectedBranch);
+  const latestBuildById = _.maxBy(filteredBuilds, build => new Date(build.runAt).getTime());
+  const buildIdToFetch =
+    builds && selectedBranch ? (latestBuildById && latestBuildById.id) || '' : undefined;
+  return useBuildURLs(projectData[1] && projectData[1].id, buildIdToFetch);
+}
+
+/** @param {{availableUrls: Array<{url: string}>, availableBranches: Array<{branch: string}>, selectedUrl: string, selectedBranch: string}} props */
+const UrlAndBranchSelector = props => {
+  return (
+    <div className="dashboard__url-branch-selector">
+      <Dropdown
+        label="URL"
+        className="dropdown--url"
+        value={props.selectedUrl}
+        setValue={url => {
+          const to = new URL(window.location.href);
+          to.searchParams.set('runUrl', url);
+          route(`${to.pathname}${to.search}`);
+        }}
+        options={props.availableUrls.map(({url}) => ({value: url, label: url}))}
+      />
+      <Dropdown
+        label="Branch"
+        className="dropdown--branch"
+        value={props.selectedBranch}
+        setValue={branch => {
+          const to = new URL(window.location.href);
+          to.searchParams.set('branch', branch);
+          route(`${to.pathname}${to.search}`);
+        }}
+        options={props.availableBranches.map(({branch}) => ({value: branch, label: branch}))}
+      />
+    </div>
+  );
+};
+
+/** @param {{project: LHCI.ServerCommand.Project, builds: Array<LHCI.ServerCommand.Build>, availableUrls: Array<{url: string}>, availableBranches: Array<{branch: string}>, selectedUrl: string, selectedBranch: string}} props */
 const ProjectDashboard_ = props => {
-  const {project, builds} = props;
+  const [isScrolledToGraphs, setIsScrolledToGraphs] = useState(false);
+
+  useEffect(() => {
+    const isScrolled = () => {
+      const scrollDetector = document.getElementById('dashboard__scroll-height-detector');
+      if (!(scrollDetector instanceof HTMLElement)) return false;
+      return window.scrollY > scrollDetector.offsetTop;
+    };
+    const listener = () => setIsScrolledToGraphs(isScrolled());
+
+    listener();
+    window.addEventListener('scroll', listener);
+    return () => window.removeEventListener('scroll', listener);
+  }, [setIsScrolledToGraphs]);
 
   return (
-    <div className="dashboard">
-      <DocumentTitle title={`${project.name} Dashboard`} />
-      <div style={{position: 'absolute', top: 60, width: '100%', textAlign: 'center', zIndex: 9}}>
-        Protip: Test out the{' '}
-        <a href={`/app/projects/${project.slug}/dashboard`}>newly redesigned dashboard</a> and{' '}
-        <a
-          href="https://github.com/GoogleChrome/lighthouse-ci/issues/new"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          let us know
-        </a>{' '}
-        what you think!
-      </div>
-      <div className="dashboard__recent-activity">
-        <h2>{project.name}</h2>
-        <div className="dashboard__build-list-scroll-container">
-          <table className="dashboard__build-list">
-            {builds.slice(0, 5).map(build => {
-              return (
-                <tr
-                  key={build.id}
-                  onClick={() =>
-                    route(`/app/projects/${project.slug}/compare/${_.shortId(build.id)}`)
-                  }
-                >
-                  <td className="build-list__hash" data-tooltip={build.author}>
-                    <Pill avatar={build}>{build.hash.slice(0, 8)}</Pill>
-                  </td>
-                  <td className="build-list__commit">{build.commitMessage}</td>
-                  <td className="build-list__branch">
-                    <div className="flex-row">
-                      <i className="material-icons">call_split</i>
-                      {build.branch}
-                    </div>
-                  </td>
-                  <td className="build-list__date">
-                    {new Date(build.runAt).toDateString().replace(/\w+ (.*) \d{4}/, '$1')}{' '}
-                    {new Date(build.runAt).toLocaleTimeString().replace(/:\d{2} /, ' ')}
-                  </td>
-                </tr>
-              );
-            })}
-          </table>
-        </div>
-      </div>
-      <ProjectGraphs {...props} />
+    <div
+      className={clsx('dashboard', {
+        'dashboard--scrolled': isScrolledToGraphs,
+      })}
+    >
+      <DocumentTitle title={`${props.project.name} Dashboard`} />
+      <ProjectBuildList project={props.project} builds={props.builds} />
+      <div id="dashboard__scroll-height-detector" />
+      <UrlAndBranchSelector {...props} />
+      <ProjectCategorySummaries
+        project={props.project}
+        builds={props.builds}
+        url={props.selectedUrl}
+        branch={props.selectedBranch}
+      />
     </div>
   );
 };
@@ -78,15 +151,48 @@ export const ProjectDashboard = props => {
   const projectApiData = useProjectBySlug(props.projectSlug);
   const projectId = projectApiData[1] && projectApiData[1].id;
   const projectBuildData = useProjectBuilds(projectId);
+  const projectBranchData = useProjectBranches(projectId);
+  const projectUrlData = useUrlsAvailableForBranch(
+    projectApiData,
+    projectBuildData,
+    projectBranchData,
+    props.branch
+  );
+
+  const loadingState = combineLoadingStates(
+    projectApiData,
+    projectBuildData,
+    projectUrlData,
+    projectBranchData
+  );
+
+  const asyncData = combineAsyncData(
+    projectApiData,
+    projectBuildData,
+    projectUrlData,
+    projectBranchData
+  );
 
   return (
     <Page>
       <AsyncLoader
-        loadingState={combineLoadingStates(projectApiData, projectBuildData)}
-        asyncData={combineAsyncData(projectApiData, projectBuildData)}
-        render={([project, builds]) =>
+        loadingState={loadingState}
+        asyncData={asyncData}
+        render={([project, builds, urls, branches]) =>
           builds.length ? (
-            <ProjectDashboard_ project={project} builds={builds} {...props} />
+            <ProjectDashboard_
+              project={project}
+              builds={builds}
+              {...computeBranchSelection({
+                baseBranch: project.baseBranch,
+                branches,
+                branch: props.branch,
+              })}
+              {...computeUrlSelection({
+                urls,
+                runUrl: props.runUrl,
+              })}
+            />
           ) : (
             <ProjectGettingStarted project={project} />
           )

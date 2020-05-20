@@ -1,5 +1,5 @@
 /**
- * @license Copyright 2019 Google Inc. All Rights Reserved.
+ * @license Copyright 2020 Google Inc. All Rights Reserved.
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
  */
@@ -9,75 +9,37 @@
   flex-direction: column;
 }
 
-.dashboard__recent-activity {
-  width: 100vw;
-  margin-top: calc(var(--base-spacing) * -1);
-  margin-left: calc(var(--base-spacing) * -1);
+.dashboard__url-branch-selector {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+
   margin-bottom: var(--base-spacing);
-  padding: calc(var(--base-spacing) * 2);
-  padding-bottom: calc(var(--base-spacing) * 2);
-
-  background: var(--highlighted-background-color);
 }
 
-.dashboard__build-list-scroll-container {
-  width: 100%;
-  max-height: 300px;
-  overflow: auto;
+.dashboard__url-branch-selector > * {
+  margin-right: var(--base-spacing);
 }
 
-.dashboard__recent-activity h2 {
-  font-size: var(--header-font-size);
-  margin-bottom: calc(var(--base-spacing) * 2);
+.dashboard__url-branch-selector .dropdown--url select {
+  max-width: 300px;
 }
 
-.dashboard__build-list {
-  width: 100%;
-  max-width: 100%;
+.dashboard__url-branch-selector .dropdown--branch select {
+  max-width: 120px;
 }
 
-.dashboard__build-list {
-  border-collapse: collapse;
+.dashboard--scrolled .dashboard__url-branch-selector {
+  position: fixed;
+  z-index: 11;
+  top: 0;
+  left: var(--page-header-height);
+  right: var(--page-header-height);
+  height: var(--page-header-height);
 }
 
-.dashboard__build-list td {
-  padding: var(--base-spacing);
-}
-
-.dashboard__build-list tr:nth-child(odd) {
-  background-color: var(--base-background-color);
-}
-
-.dashboard__build-list tr:hover {
-  cursor: pointer;
-  background-color: var(--color-gray-100);
-}
-
-.dashboard__build-list i {
-  margin: 0 calc(var(--base-spacing) / 2);
-}
-
-.build-list__commit {
-  max-width: 30vw;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
-
-.build-list__commit,
-.build-list__branch {
-  font-weight: var(--medium-font-weight);
-}
-
-.build-list__date {
-  color: var(--secondary-text-color);
-  white-space: nowrap;
-}
-
-.build-list__hash {
-  width: 145px;
-}
-
-.build-list__hash .pill {
-  width: fit-content;
+/** fill in some of the space that dissappears when it flips to position: fixed */
+.dashboard--scrolled #dashboard__scroll-height-detector {
+  height: calc(var(--base-spacing) + var(--base-font-size));
 }

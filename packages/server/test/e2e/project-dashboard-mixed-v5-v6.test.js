@@ -16,7 +16,7 @@ describe('Project dashboard', () => {
 
   require('./steps/setup')(state);
 
-  require('./steps/navigate-to-project')(state, 'Lighthouse Real-World', {newDashboard: true});
+  require('./steps/navigate-to-project')(state, 'Lighthouse Real-World');
 
   describe('render the dashboard', () => {
     it('should show the commits', async () => {

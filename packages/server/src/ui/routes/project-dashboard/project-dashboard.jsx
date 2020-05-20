@@ -65,7 +65,7 @@ const computeUrlSelection = props => {
  * @param {string|undefined} branchFromProps
  */
 function useUrlsAvailableForBranch(projectData, buildData, branchData, branchFromProps) {
-  const baseBranch = projectData[1] ? projectData[1].baseBranch || '' : undefined;
+  const baseBranch = projectData[1] ? projectData[1].baseBranch || 'master' : undefined;
   const branches = branchData[1];
   const {selectedBranch} =
     baseBranch && branches
@@ -76,7 +76,15 @@ function useUrlsAvailableForBranch(projectData, buildData, branchData, branchFro
   const latestBuildById = _.maxBy(filteredBuilds, build => new Date(build.runAt).getTime());
   const buildIdToFetch =
     builds && selectedBranch ? (latestBuildById && latestBuildById.id) || '' : undefined;
-  return useBuildURLs(projectData[1] && projectData[1].id, buildIdToFetch);
+
+  /** @type {[undefined, null]} */
+  const shortCircuitArguments = [undefined, null];
+  const realArguments = [projectData[1] && projectData[1].id, buildIdToFetch];
+
+  const hasAllDataLoaded = Boolean(projectData[1] && buildData[1] && branchData[1]);
+  const argumentsToUse =
+    hasAllDataLoaded && !buildIdToFetch ? shortCircuitArguments : realArguments;
+  return useBuildURLs(argumentsToUse[0], argumentsToUse[1]);
 }
 
 /** @param {{availableUrls: Array<{url: string}>, availableBranches: Array<{branch: string}>, selectedUrl: string, selectedBranch: string}} props */

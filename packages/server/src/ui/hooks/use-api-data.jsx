@@ -178,11 +178,18 @@ export function useBuild(projectId, buildId) {
 
 /**
  * @param {string|undefined} projectId
- * @param {string|undefined} buildId
+ * @param {string|null|undefined} buildId
  * @return {[LoadingState, Array<{url: string}> | undefined]}
  */
 export function useBuildURLs(projectId, buildId) {
-  return useApiData('getUrls', projectId && buildId ? [projectId, buildId] : undefined);
+  const [loadingState, data] = useApiData(
+    'getUrls',
+    projectId && buildId ? [projectId, buildId] : undefined
+  );
+
+  // If we receive a `null` that means it's explicitly not available, so short-circuit and return empty
+  if (buildId === null) return ['loaded', []];
+  return [loadingState, data];
 }
 
 /**

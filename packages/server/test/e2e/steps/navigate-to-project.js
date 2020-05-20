@@ -9,7 +9,7 @@ const {waitForNetworkIdle0, waitForAllImages} = require('../../test-utils.js');
 
 /* eslint-env jest, browser */
 
-/** @param {LHCI.E2EState} state @param {string} projectName @param {{}} [opts] */
+/** @param {LHCI.E2EState} state @param {string} projectName @param {{waitFor: 'empty'|'graph'}} [opts] */
 module.exports = (state, projectName, opts) => {
   describe('navigate to project', () => {
     it('should navigate to the project list', async () => {
@@ -29,7 +29,11 @@ module.exports = (state, projectName, opts) => {
     });
 
     it('should wait for the dashboard to load', async () => {
-      await state.page.waitFor('.category-score-graph');
+      if (opts && opts.waitFor === 'empty') {
+        await state.page.waitFor('.getting-started');
+      } else {
+        await state.page.waitFor('.category-score-graph');
+      }
     });
 
     if (state.debug) {

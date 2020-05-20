@@ -19,7 +19,10 @@ describe('ProjectDashboard', () => {
 
   beforeEach(() => {
     fetchMock = global.fetch = require('jest-fetch-mock');
-    api._fetch = fetchMock;
+    api._fetch = (...args) => {
+      if (process.env.DEBUG) console.log('fetching', args); // eslint-disable-line
+      return fetchMock(...args);
+    };
   });
 
   afterEach(() => {
@@ -27,15 +30,19 @@ describe('ProjectDashboard', () => {
   });
 
   it('should render a message when no builds available', async () => {
-    fetchMock.mockResponseOnce(JSON.stringify({id: '1', name: 'My Project'}));
-    fetchMock.mockResponseOnce(JSON.stringify([]));
+    fetchMock.mockResponseOnce(JSON.stringify({id: '1', name: 'My Project'})); // fetch project
+    fetchMock.mockResponseOnce(JSON.stringify([])); // fetch builds
+    fetchMock.mockResponseOnce(JSON.stringify([])); // fetch branches
+    fetchMock.mockResponseOnce(JSON.stringify([])); // fetch build URLs
 
     const {getAllByText} = render(<ProjectDashboard projectSlug={'abcd'} />);
     await wait(() => getAllByText(/No build/));
   });
 
   it('should render the dashboard', async () => {
+    // fetch the project
     fetchMock.mockResponseOnce(JSON.stringify({id: '1', name: 'My Project'}));
+    // fetch the builds
     fetchMock.mockResponseOnce(
       JSON.stringify([
         {
@@ -54,6 +61,14 @@ describe('ProjectDashboard', () => {
         },
       ])
     );
+    // fetch the branches
+    fetchMock.mockResponseOnce(JSON.stringify([{branch: 'master'}, {branch: 'feature_branch'}]));
+    // fetch the URLs
+    fetchMock.mockResponseOnce(JSON.stringify([{url: 'http://localhost:1000/foo'}]));
+    // fetch the representative run
+    fetchMock.mockResponseOnce(JSON.stringify([{id: '1', projectId: '1', lhr: ''}]));
+    // fetch build stats
+    fetchMock.mockResponseOnce(JSON.stringify([]));
 
     const {getAllByText} = render(<ProjectDashboard projectSlug={'abcd'} />);
     await wait(() => getAllByText(/feature_branch/));

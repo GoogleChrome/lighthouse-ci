@@ -10,7 +10,7 @@ RUN apt-get update
 RUN apt-get install -y google-chrome-stable --no-install-recommends
 
 # Install Lighthouse CI
-RUN npm install -g @lhci/cli@0.3.13
+RUN npm install -g @lhci/cli@0.4.0
 RUN npm install -g lighthouse
 
 # Setup a user to avoid doing everything as root

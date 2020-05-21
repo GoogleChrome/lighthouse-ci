@@ -19,7 +19,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v1
-      - run: npm install && npm install -g @lhci/cli@0.3.x
+      - run: npm install && npm install -g @lhci/cli@0.4.x
       - run: npm run build
       - run: lhci autorun --upload.target=temporary-public-storage
 ```

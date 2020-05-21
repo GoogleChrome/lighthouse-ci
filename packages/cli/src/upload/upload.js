@@ -178,6 +178,21 @@ function getUrlLabelForGithub(rawUrl, options) {
 }
 
 /**
+ *
+ * @param {string} rawUrl
+ * @param {LHCI.UploadCommand.Options} options
+ */
+function getUrlForLhciTarget(rawUrl, options) {
+  let url = replaceUrlPatterns(rawUrl, options.urlReplacementPatterns);
+  if (url.length > 256) {
+    process.stderr.write('WARNING: audited URL exceeds character limits, truncation possible.');
+    url = url.slice(0, 256);
+  }
+
+  return url;
+}
+
+/**
  * @param {string} urlLabel
  * @param {LHCI.UploadCommand.Options} options
  */
@@ -380,7 +395,6 @@ async function runLHCITarget(options) {
   print(`Saving CI build (${build.id})\n`);
 
   const lhrs = loadSavedLHRs();
-  const urlReplacementPatterns = options.urlReplacementPatterns;
   const targetUrlMap = new Map();
 
   const buildViewUrl = new URL(
@@ -390,7 +404,7 @@ async function runLHCITarget(options) {
 
   for (const lhr of lhrs) {
     const parsedLHR = JSON.parse(lhr);
-    const url = replaceUrlPatterns(parsedLHR.finalUrl, urlReplacementPatterns);
+    const url = getUrlForLhciTarget(parsedLHR.finalUrl, options);
     const run = await api.createRun({
       projectId: project.id,
       buildId: build.id,

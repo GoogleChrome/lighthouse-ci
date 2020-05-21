@@ -16,12 +16,13 @@ const {runCLI, startServer, safeDeleteFile} = require('./test-utils.js');
 
 describe('Lighthouse CI upload CLI', () => {
   const uploadDir = path.join(__dirname, 'fixtures/uploads');
+  const lighthouseciDir = path.join(uploadDir, '.lighthouseci');
+  const fakeLhrPath = path.join(lighthouseciDir, 'lhr-12345.json');
 
   const writeLhr = () => {
-    const lighthouseciDir = path.join(uploadDir, '.lighthouseci');
     if (fs.existsSync(lighthouseciDir)) rimraf.sync(lighthouseciDir);
     if (!fs.existsSync(lighthouseciDir)) fs.mkdirSync(lighthouseciDir, {recursive: true});
-    const fakeLhrPath = path.join(lighthouseciDir, 'lhr-12345.json');
+
     const fakeLhr = {finalUrl: 'foo.com', categories: {}, audits: {}};
     fakeLhr.categories.pwa = {score: 0};
     fakeLhr.audits['performance-budget'] = {score: 0};
@@ -123,5 +124,39 @@ describe('Lighthouse CI upload CLI', () => {
     expect(status).toEqual(0);
 
     expect(await apiClient.getBuilds(project.id)).toHaveLength(1);
+  }, 15000);
+
+  it('should upload for a build with very long URL', async () => {
+    const lhr = JSON.parse(fs.readFileSync(fakeLhrPath, 'utf8'));
+    lhr.finalUrl = `http://localhost/reall${'l'.repeat(256)}y-long-url`;
+    fs.writeFileSync(fakeLhrPath, JSON.stringify(lhr));
+
+    expect(await apiClient.getBuilds(project.id)).toHaveLength(1);
+
+    const {stdout, stderr, status} = runCLI(
+      ['upload', `--serverBaseUrl=${serverBaseUrl}`, `--token=${project.token}`],
+      {
+        cwd: uploadDir,
+        env: {
+          LHCI_BUILD_CONTEXT__CURRENT_HASH: 'cde4a48118a9be48e914c656591301ebed6972db',
+        },
+      }
+    );
+
+    expect(stdout).toMatchInlineSnapshot(`
+      "Saving CI project Test (<UUID>)
+      Saving CI build (<UUID>)
+      Saved LHR to http://localhost:XXXX/ (<UUID>)
+      Done saving build results to Lighthouse CI
+      View build diff at http://localhost:XXXX/app/projects/test/compare/<UUID>
+      No GitHub token set, skipping GitHub status check.
+      "
+    `);
+    expect(stderr).toMatchInlineSnapshot(
+      `"WARNING: audited URL exceeds character limits, truncation possible."`
+    );
+    expect(status).toEqual(0);
+
+    expect(await apiClient.getBuilds(project.id)).toHaveLength(2);
   }, 15000);
 });

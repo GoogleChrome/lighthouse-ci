@@ -16,7 +16,7 @@ module.exports = {
       .replace(/[^a-z0-9]/gi, 'l');
   },
   /**
-   * Hashes an admin token with a given salt. In v0.3.x, salt is the projectId.
+   * Hashes an admin token with a given salt. In v0.4.x and earlier, salt is the projectId.
    * @param {string} token
    * @param {string} salt
    */

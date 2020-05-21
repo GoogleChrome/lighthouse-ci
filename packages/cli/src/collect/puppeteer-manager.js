@@ -35,6 +35,15 @@ class PuppeteerManager {
       // @ts-ignore - puppeteer-core is API-compatible with puppeteer
       return require('puppeteer-core');
     } catch (_) {}
+
+    // Try relative to the CWD too in case we're installed globally
+    try {
+      return require(path.join(process.cwd(), 'node_modules/puppeteer'));
+    } catch (_) {}
+
+    try {
+      return require(path.join(process.cwd(), 'node_modules/puppeteer-core'));
+    } catch (_) {}
   }
 
   /** @return {Promise<import('puppeteer').Browser>} */

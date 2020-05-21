@@ -696,7 +696,7 @@ The below example uses the `lighthouse:no-pwa` preset but disables a few audits 
 
 #### `budgetsFile`
 
-Instead of configuring using Lighthouse CI assertions against Lighthouse audits, a [budget.json](https://github.com/GoogleChrome/budget.json) file can be used instead. This option cannot be used in conjunction with any other option.
+Instead of configuring using Lighthouse CI assertions against Lighthouse audits, a [budget.json](https://github.com/GoogleChrome/budget.json) file can be used instead. This option cannot be used in conjunction with any other assert option.
 
 ```json
 {

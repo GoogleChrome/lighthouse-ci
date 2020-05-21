@@ -10,7 +10,7 @@ When a breaking change has been introduced, the relevant commit will contain a l
 
 ## Cadence
 
-Breaking changes come from many sources within LHCI and have a much stricter definition than those in core Lighthouse. Accordinly, breaking change releases will be more frequent, but should also be less impactful on average. See the examples below for estimated frequency of each impact.
+Breaking changes come from many sources within LHCI and have a much stricter definition than those in core Lighthouse. Accordingly, breaking change releases will be more frequent, but should also be less impactful on average. See the examples below for estimated frequency of each impact.
 
 ## Example Breaking Changes
 
@@ -18,6 +18,7 @@ Breaking changes come from many sources within LHCI and have a much stricter def
 | --------------------------------------------------------- | -------- | ------------------ |
 | Lighthouse minor version bump that introduces a new audit | Low      | 3-6/year           |
 | Lighthouse major version bump                             | Moderate | 1-2/year           |
+| LHCI server API format change (removal of data)           | Moderate | 1-2/year           |
 | LHCI server frontend URL format change                    | High     | 1-2/year           |
 | Change in an assertion preset (stricter)                  | High     | 1-2/year           |
 | Removal of a flag or option                               | High     | 1-2/year           |
@@ -25,11 +26,12 @@ Breaking changes come from many sources within LHCI and have a much stricter def
 
 ## Example Non-Breaking Changes
 
-| Change                                        | Impact   | Expected Frequency |
-| --------------------------------------------- | -------- | ------------------ |
-| Lighthouse minor version bump that fixes bugs | Low      | 3-6/year           |
-| Addition of a new flag or option              | Low      | 2-4/year           |
-| LHCI server frontend design change            | Moderate | 1-2/year           |
-| Change in an assertion preset (more lenient)  | Moderate | 1-2/year           |
-| Fix of a critical security vulnerability      | High     | 0/year ;)          |
-| Fix of a fatal startup bug                    | High     | 0/year ;)          |
+| Change                                           | Impact   | Expected Frequency |
+| ------------------------------------------------ | -------- | ------------------ |
+| Lighthouse minor version bump that fixes bugs    | Low      | 3-6/year           |
+| Addition of a new flag or option                 | Low      | 2-4/year           |
+| LHCI server API format change (addition of data) | Low      | 1-2/year           |
+| LHCI server frontend design change               | Moderate | 1-2/year           |
+| Change in an assertion preset (more lenient)     | Moderate | 1-2/year           |
+| Fix of a critical security vulnerability         | High     | 0/year ;)          |
+| Fix of a fatal startup bug                       | High     | 0/year ;)          |

@@ -1043,6 +1043,30 @@ module.exports = {
 };
 ```
 
+### Custom Sequelize Configuration
+
+See [the sequelize docs](https://sequelize.org/v4/) for more information on available settings.
+
+```js
+module.exports = {
+  ci: {
+    server: {
+      storage: {
+        storageMethod: 'sql',
+        sqlDialect: 'postgres',
+        sqlConnectionSsl: true,
+        sqlConnectionUrl: process.env.DATABASE_URL,
+        sequelizeOptions: {
+          pool: {
+            acquire: 30000,
+          },
+        },
+      },
+    },
+  },
+};
+```
+
 ### Custom Headers for Wizard
 
 If you're running the `lhci server` behind a reverse proxy or any other component that requires some extra headers you can configure them in the wizard section `extraHeaders`.

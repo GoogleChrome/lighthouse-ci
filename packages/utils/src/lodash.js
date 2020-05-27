@@ -252,6 +252,14 @@ module.exports = {
     return this.maxBy(items, o => -keyFn(o));
   },
   /**
+   * @template TArr
+   * @param {Array<TArr>} items
+   * @param {(o: TArr) => number} keyFn
+   */
+  sortBy(items, keyFn) {
+    return items.slice().sort((a, b) => keyFn(a) - keyFn(b));
+  },
+  /**
    * @template T
    * @param {T} object
    * @param {Array<keyof T>} propertiesToPick

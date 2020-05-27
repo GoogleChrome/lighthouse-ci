@@ -46,6 +46,7 @@ async function run() {
     .help('help')
     .version(pkg.version)
     .usage('lhci <command> <options>')
+    .wrap(yargs.terminalWidth())
     .env('LHCI')
     .demand(1)
     .command('collect', 'Run Lighthouse and save the results to a local folder', commandYargs =>

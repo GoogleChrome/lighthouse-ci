@@ -162,6 +162,7 @@ declare global {
         sqlConnectionSsl?: string;
         sqlConnectionUrl?: string;
         sqlDangerouslyResetDatabase?: boolean;
+        sequelizeOptions?: import('sequelize').Options;
       }
 
       export interface Options {

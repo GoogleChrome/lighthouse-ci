@@ -78,8 +78,9 @@ function validatePartialUuidOrUndefined(id) {
 function createSequelize(options) {
   const dialect = options.sqlDialect;
   const sequelizeOptions = {
-    operatorsAliases: false,
     logging: () => {},
+    ...options.sequelizeOptions,
+    operatorsAliases: false,
   };
 
   if (dialect === 'sqlite') {

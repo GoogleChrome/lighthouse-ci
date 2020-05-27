@@ -20,14 +20,12 @@ describe('Lighthouse CI upload CLI', () => {
   const fakeLhrPath = path.join(lighthouseciDir, 'lhr-12345.json');
 
   const writeLhr = () => {
-    if (fs.existsSync(lighthouseciDir)) rimraf.sync(lighthouseciDir);
-    if (!fs.existsSync(lighthouseciDir)) fs.mkdirSync(lighthouseciDir, {recursive: true});
-
     const fakeLhr = {finalUrl: 'foo.com', categories: {}, audits: {}};
     fakeLhr.categories.pwa = {score: 0};
+    fakeLhr.categories.performance = {score: 0};
     fakeLhr.audits['performance-budget'] = {score: 0};
     for (const key of Object.keys(fullPreset.assertions)) {
-      fakeLhr.audits[key] = {score: 1, details: {items: [{}]}};
+      fakeLhr.audits[key] = {score: 1, numericValue: 1000, details: {items: [{}]}};
     }
 
     fs.writeFileSync(fakeLhrPath, JSON.stringify(fakeLhr));
@@ -41,6 +39,9 @@ describe('Lighthouse CI upload CLI', () => {
   beforeAll(async () => {
     process.env.LHCI_BUILD_CONTEXT__CURRENT_HASH = 'e7f1b0fa3aebb6ef95e44c0d0b820433ffdd2e63';
     process.env.LHCI_BUILD_CONTEXT__ANCESTOR_HASH = 'e7f1b0fa3aebb6ef95e44c0d0b820433ffdd2e63';
+
+    if (fs.existsSync(lighthouseciDir)) rimraf.sync(lighthouseciDir);
+    if (!fs.existsSync(lighthouseciDir)) fs.mkdirSync(lighthouseciDir, {recursive: true});
 
     writeLhr();
     server = await startServer();
@@ -158,5 +159,72 @@ describe('Lighthouse CI upload CLI', () => {
     expect(status).toEqual(0);
 
     expect(await apiClient.getBuilds(project.id)).toHaveLength(2);
+  }, 15000);
+
+  it('should support target=filesystem', async () => {
+    const lhr = JSON.parse(fs.readFileSync(fakeLhrPath, 'utf8'));
+    lhr.finalUrl = `https://www.example.com/page`;
+    lhr.fetchTime = '2020-05-22T22:12:01.000Z';
+    lhr.audits['first-contentful-paint'].numericValue = 900;
+    fs.writeFileSync(fakeLhrPath.replace(/\d+/, '1'), JSON.stringify(lhr));
+    lhr.fetchTime = '2020-05-22T22:12:02.000Z';
+    lhr.audits['first-contentful-paint'].numericValue = 1100;
+    fs.writeFileSync(fakeLhrPath.replace(/\d+/, '2'), JSON.stringify(lhr));
+    // This is the median run now
+    lhr.fetchTime = '2020-05-22T22:12:03.000Z';
+    lhr.categories.performance = {score: 0.5};
+    lhr.audits['first-contentful-paint'].numericValue = 1000;
+    fs.writeFileSync(fakeLhrPath.replace(/\d+/, '3'), JSON.stringify(lhr));
+    fs.unlinkSync(fakeLhrPath);
+
+    const {stdout, stderr, status} = runCLI(
+      ['upload', `--target=filesystem`, `--outputDir=.lighthouseci/targetfs`],
+      {cwd: uploadDir}
+    );
+
+    expect(stdout.replace(/at .*\.\.\./, 'at FOLDER...')).toMatchInlineSnapshot(`
+      "Dumping 3 reports to disk at FOLDER...
+      Done writing reports to disk.
+      "
+    `);
+    expect(stderr).toMatchInlineSnapshot(`""`);
+    expect(status).toEqual(0);
+
+    const outputDir = path.join(uploadDir, '.lighthouseci/targetfs');
+    const files = fs.readdirSync(outputDir).sort();
+    expect(files).toEqual([
+      'manifest.json',
+      'www_example_com-_page-2020_05_22_22_12_01.report.html',
+      'www_example_com-_page-2020_05_22_22_12_01.report.json',
+      'www_example_com-_page-2020_05_22_22_12_02.report.html',
+      'www_example_com-_page-2020_05_22_22_12_02.report.json',
+      'www_example_com-_page-2020_05_22_22_12_03.report.html',
+      'www_example_com-_page-2020_05_22_22_12_03.report.json',
+    ]);
+
+    const manifest = JSON.parse(fs.readFileSync(path.join(outputDir, 'manifest.json'), 'utf8'));
+    expect(manifest).toEqual([
+      {
+        url: 'https://www.example.com/page',
+        isRepresentativeRun: false,
+        htmlPath: path.join(outputDir, 'www_example_com-_page-2020_05_22_22_12_01.report.html'),
+        jsonPath: path.join(outputDir, 'www_example_com-_page-2020_05_22_22_12_01.report.json'),
+        summary: {performance: 0, pwa: 0},
+      },
+      {
+        url: 'https://www.example.com/page',
+        isRepresentativeRun: false,
+        htmlPath: path.join(outputDir, 'www_example_com-_page-2020_05_22_22_12_02.report.html'),
+        jsonPath: path.join(outputDir, 'www_example_com-_page-2020_05_22_22_12_02.report.json'),
+        summary: {performance: 0, pwa: 0},
+      },
+      {
+        url: 'https://www.example.com/page',
+        isRepresentativeRun: true,
+        htmlPath: path.join(outputDir, 'www_example_com-_page-2020_05_22_22_12_03.report.html'),
+        jsonPath: path.join(outputDir, 'www_example_com-_page-2020_05_22_22_12_03.report.json'),
+        summary: {performance: 0.5, pwa: 0},
+      },
+    ]);
   }, 15000);
 });

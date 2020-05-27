@@ -5,6 +5,8 @@
  */
 'use strict';
 
+const fs = require('fs');
+const path = require('path');
 const URL = require('url').URL;
 const fetch = require('isomorphic-fetch');
 const _ = require('@lhci/utils/src/lodash.js');
@@ -54,10 +56,9 @@ function buildCommand(yargs) {
     target: {
       type: 'string',
       default: 'lhci',
-      choices: ['lhci', 'temporary-public-storage'],
+      choices: ['lhci', 'temporary-public-storage', 'filesystem'],
       description:
-        'The type of target to upload the data to. If set to anything other than "lhci", ' +
-        'some of the options will not apply.',
+        'The type of target to upload the data to. Some options will only apply to particular targets',
     },
     token: {
       type: 'string',
@@ -117,6 +118,15 @@ function buildCommand(yargs) {
         's#:[0-9]{3,5}/#:PORT/#', // replace ports
         's/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/UUID/ig', // replace UUIDs
       ],
+    },
+    outputDir: {
+      type: 'string',
+      description: '[filesystem only] The directory in which to dump Lighthouse results.',
+    },
+    reportFilenamePattern: {
+      type: 'string',
+      description: '[filesystem only] The pattern to use for naming Lighthouse reports.',
+      default: '%%HOSTNAME%%-%%PATHNAME%%-%%DATETIME%%.report.%%EXTENSION%%',
     },
   });
 }
@@ -472,6 +482,84 @@ async function runTemporaryPublicStorageTarget(options) {
 }
 
 /**
+ *
+ * @param {string} pattern
+ * @param {Record<string, string>} context
+ */
+function getFileOutputPath(pattern, context) {
+  let filename = pattern;
+  const matches = pattern.match(/%%([a-z]+)%%/gi) || [];
+  for (const match of matches) {
+    const name = match.slice(2, -2).toLowerCase();
+    const value = context[name] || 'unknown';
+    const sanitizedValue = value.replace(/[^a-z0-9]+/gi, '_');
+    filename = filename.replace(match, sanitizedValue);
+  }
+
+  return filename;
+}
+
+/**
+ * @param {LHCI.UploadCommand.Options} options
+ * @return {Promise<void>}
+ */
+async function runFilesystemTarget(options) {
+  /** @type {Array<LH.Result>} */
+  const lhrs = loadSavedLHRs().map(lhr => JSON.parse(lhr));
+  /** @type {Array<Array<[LH.Result, LH.Result]>>} */
+  const lhrsByUrl = _.groupBy(lhrs, lhr => lhr.finalUrl).map(lhrs => lhrs.map(lhr => [lhr, lhr]));
+  const representativeLhrs = computeRepresentativeRuns(lhrsByUrl);
+
+  const targetDir = path.resolve(process.cwd(), options.outputDir || '');
+  if (!fs.existsSync(targetDir)) fs.mkdirSync(targetDir, {recursive: true});
+
+  print(`Dumping ${lhrs.length} reports to disk at ${targetDir}...\n`);
+  /** @type {Array<LHCI.UploadCommand.ManifestEntry>} */
+  const manifest = [];
+  // Process the median LHRs last so duplicate filenames will be overwritten by the median run
+  for (const lhr of _.sortBy(lhrs, lhr => (representativeLhrs.includes(lhr) ? 10 : 1))) {
+    const url = new URL(lhr.finalUrl);
+    const fetchTimeDate = new Date(new Date(lhr.fetchTime).getTime() || Date.now());
+    const context = {
+      hostname: url.hostname,
+      pathname: url.pathname,
+      date: fetchTimeDate.toISOString().replace(/T.*/, ''),
+      datetime: fetchTimeDate
+        .toISOString()
+        .replace(/\.\d{3}Z/, '')
+        .replace('T', ' '),
+    };
+
+    const filePattern = options.reportFilenamePattern;
+    const htmlPath = getFileOutputPath(filePattern, {...context, extension: 'html'});
+    const jsonPath = getFileOutputPath(filePattern, {...context, extension: 'json'});
+
+    /** @type {LHCI.UploadCommand.ManifestEntry} */
+    const entry = {
+      url: lhr.finalUrl,
+      isRepresentativeRun: representativeLhrs.includes(lhr),
+      htmlPath: path.join(targetDir, htmlPath),
+      jsonPath: path.join(targetDir, jsonPath),
+      summary: Object.keys(lhr.categories).reduce(
+        (summary, key) => {
+          summary[key] = lhr.categories[key].score;
+          return summary;
+        },
+        /** @type {Record<string, number>} */ ({})
+      ),
+    };
+
+    fs.writeFileSync(entry.htmlPath, getHTMLReportForLHR(lhr));
+    fs.writeFileSync(entry.jsonPath, JSON.stringify(lhr));
+    manifest.push(entry);
+  }
+
+  const manifestPath = path.join(targetDir, 'manifest.json');
+  fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2));
+  print('Done writing reports to disk.\n');
+}
+
+/**
  * @param {LHCI.UploadCommand.Options} options
  * @return {Promise<void>}
  */
@@ -492,6 +580,8 @@ async function runCommand(options) {
       }
     case 'temporary-public-storage':
       return runTemporaryPublicStorageTarget(options);
+    case 'filesystem':
+      return runFilesystemTarget(options);
     default:
       throw new Error(`Unrecognized target "${options.target}"`);
   }

@@ -390,6 +390,10 @@ Options:
                                  URL substrings.                                   [array] [default:
   ["s#:[0-9]{3,5}/#:PORT/#","s/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/UUID/ig"
                                                                                                   ]]
+  --outputDir                    [filesystem only] The directory in which to dump Lighthouse results.                                           [string]
+  --reportFilenamePattern        [filesystem only] The pattern to use for naming Lighthouse reports.
+                                                                       [string] [default:
+  "%%HOSTNAME%%-%%PATHNAME%%-%%DATETIME%%.report.%%EXTENSION%%"]
 ```
 
 #### `target`
@@ -408,6 +412,12 @@ The target location to which Lighthouse CI should upload the reports.
 - You want to store Lighthouse reports for longer than 7 days.
 - You want to control access to your Lighthouse reports.
 - You've setup a [Lighthouse CI server](./server.md).
+
+**When to use `target=filesystem`:**
+
+- You want to process the raw Lighthouse results yourself locally.
+- You want access to the report files on the local filesystem.
+- You don't want to upload the results to a custom location that isn't supported by Lighthouse CI.
 
 #### `token`
 
@@ -501,6 +511,44 @@ For example, by default Lighthouse CI will automatically replace the port of tes
 - `s/Foo/Bar/g` - Replace _all_ occurrences of `Foo` with `Bar`, case-sensitive.
 - `s/v\d+/VERSION/i` - Replace the _first_ sequence of a v followed by digits with `VERSION`, case-insensitive.
 - `s#(//.*?)/.*$#$1/replaceThePath#` - Replace the entire URL following the origin with `/replaceThePath` using `#` as the delimiter character and a group reference.
+
+#### `outputDir`
+
+_target=filesystem only_
+
+The directory relative to the current working directory in which to output a `manifest.json` along with the Lighthouse reports collected. Any existing `manifest.json` in that directory will be overwritten.
+
+Sample file structure for `--outputDir=./lhci` on `https://www.example.com/page`
+
+```
+|- (cwd)
+  |- lhci
+    |- manifest.json
+    |- www_example_com-_page-2020_05_22_21_15_05.report.json
+    |- www_example_com-_page-2020_05_22_21_15_05.report.html
+```
+
+The `manifest.json` has the following structure.
+
+```jsonc
+[
+  {
+    "url": "https://www.example.com/page",
+    "isRepresentativeRun": true, // whether it's the median run
+    "htmlPath": "/path/to/cwd/lhci/www_example_com-_page-2020_05_22_21_15_05.report.html",
+    "jsonPath": "/path/to/cwd/lhci/www_example_com-_page-2020_05_22_21_15_05.report.json",
+    "summary": {"performance": 0.95, "seo": 0.9, "best-practices": 1}
+  }
+]
+```
+
+#### `reportFilenamePattern`
+
+_target=filesystem only_
+
+The pattern to use for report filenames when writing the reports to the filesystem. Basic string interpolation is supported replacing `%%HOSTNAME%%` with the URL's hostname, `%%PATHNAME%%` with the page path, `%%DATETIME%%` with the ISO string of the UTC report generated timestamp, `%%DATE%%` with the ISO-style string of the UTC report generated date, `%%EXTENSION%%` with the extension of the file.
+
+In the case of filename collisions between runs, the last written report wins and all others will be overwritten. Median reports are written to disk last.
 
 #### Build Context
 

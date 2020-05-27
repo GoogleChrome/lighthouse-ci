@@ -417,7 +417,7 @@ The target location to which Lighthouse CI should upload the reports.
 
 - You want to process the raw Lighthouse results yourself locally.
 - You want access to the report files on the local filesystem.
-- You don't want to upload the results to a custom location that isn't supported by Lighthouse CI.
+- You want to upload the results to a custom location that isn't supported by Lighthouse CI.
 
 #### `token`
 
@@ -516,7 +516,7 @@ For example, by default Lighthouse CI will automatically replace the port of tes
 
 _target=filesystem only_
 
-The directory relative to the current working directory in which to output a `manifest.json` along with the Lighthouse reports collected. Any existing `manifest.json` in that directory will be overwritten.
+The directory relative to the current working directory in which to output a `manifest.json` along with the Lighthouse reports collected. If `manifest.json` already exists in that directory, the action will fail.
 
 Sample file structure for `--outputDir=./lhci` on `https://www.example.com/page`
 

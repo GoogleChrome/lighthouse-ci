@@ -511,7 +511,11 @@ async function runFilesystemTarget(options) {
   const representativeLhrs = computeRepresentativeRuns(lhrsByUrl);
 
   const targetDir = path.resolve(process.cwd(), options.outputDir || '');
+  const manifestPath = path.join(targetDir, 'manifest.json');
   if (!fs.existsSync(targetDir)) fs.mkdirSync(targetDir, {recursive: true});
+  if (fs.existsSync(manifestPath)) {
+    throw new Error('manifest.json already exists in outputDir, choose another location');
+  }
 
   print(`Dumping ${lhrs.length} reports to disk at ${targetDir}...\n`);
   /** @type {Array<LHCI.UploadCommand.ManifestEntry>} */
@@ -554,7 +558,6 @@ async function runFilesystemTarget(options) {
     manifest.push(entry);
   }
 
-  const manifestPath = path.join(targetDir, 'manifest.json');
   fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2));
   print('Done writing reports to disk.\n');
 }

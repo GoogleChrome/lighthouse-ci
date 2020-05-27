@@ -9,6 +9,7 @@ declare global {
     namespace AutorunCommand {
       export interface Options {
         config?: string;
+        failOnUploadFailure?: boolean;
         collect?: CollectCommand.Options;
         assert?: AssertCommand.Options;
         upload?: UploadCommand.Options;

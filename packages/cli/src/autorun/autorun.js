@@ -36,6 +36,7 @@ const BUILD_DIR_PRIORITY = [
 function buildCommand(yargs) {
   return yargs.options({
     config: {description: 'The lighthouserc.json file preferences.'},
+    failOnUploadFailure: {description: 'Exit with an error code if upload fails.', type: 'boolean'},
     collect: {description: 'Overrides for the collect command. e.g. --collect.numberOfRuns=5'},
     assert: {description: 'Overrides for the assert command. e.g. --assert.preset=lighthouse:all'},
     upload: {description: 'Overrides for the upload command. e.g. --upload.token=$TOKEN'},
@@ -135,6 +136,7 @@ async function runCommand(options) {
   // We'll run upload only if they've configured the upload command
   if (ciConfiguration.upload) {
     const uploadStatus = runChildCommand('upload', defaultFlags).status;
+    if (options.failOnUploadFailure && uploadStatus !== 0) process.exit(uploadStatus);
     if (uploadStatus !== 0) process.stderr.write(`WARNING: upload command failed.\n`);
   }
 

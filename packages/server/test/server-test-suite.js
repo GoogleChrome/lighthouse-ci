@@ -376,7 +376,7 @@ function runTests(state) {
         doubleZeroBuild,
         singleZeroBuild,
       ]);
-    }, 60000);
+    }, 600e3); // this can take a really long time in CI, 00 = 1/256 chance, 0 = 1/16 chance
 
     it('should handle UUIDs that start with 0', async () => {
       const dummyProject = await client.createProject({name: 'dummy', externalUrl: ''});

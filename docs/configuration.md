@@ -152,7 +152,7 @@ lhci healthcheck --fatal --checks=githubToken
 
 ### `autorun`
 
-Automatically run, with sensible defaults, [`lhci collect`](#collect), [`lhci assert`](#assert) and [`lhci upload`](#upload), depending on the options in your config. `lhci autorun` does not have any specific options for itself. Options for individual commands can be set by prefixing the option with the command name.
+Automatically run, with sensible defaults, [`lhci collect`](#collect), [`lhci assert`](#assert) and [`lhci upload`](#upload), depending on the options in your config. `lhci autorun` does not have many specific options for itself. Options for individual commands can be set by prefixing the option with the command name.
 
 **Examples**
 
@@ -160,6 +160,10 @@ Automatically run, with sensible defaults, [`lhci collect`](#collect), [`lhci as
 lhci autorun --collect.numberOfRuns=5
 lhci autorun --upload.target=temporary-public-storage
 ```
+
+#### `failOnUploadFailure`
+
+Whether to consider failure to upload to the server a fatal error. By default, running upload through `autorun` only warns to avoid noisy failures from temporary connectivity loss.
 
 #### Detecting `collect.staticDistDir`
 

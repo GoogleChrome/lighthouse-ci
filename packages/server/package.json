@@ -31,7 +31,7 @@
     "uuid": "^3.3.2"
   },
   "devDependencies": {
-    "@babel/core": "^7.5.5",
+    "@babel/core": "^7.10.2",
     "clsx": "^1.0.4",
     "d3": "^5.15.0",
     "plotly.js": "^1.48.3",

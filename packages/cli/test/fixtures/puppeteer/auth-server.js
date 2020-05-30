@@ -43,4 +43,6 @@ app.get('/login', (_, res) => {
   res.redirect('/');
 });
 
+app.get('/public', (_, res) => res.send('<!DOCTYPE html><h1>Hello</h1>'));
+
 app.listen(52426, () => process.stdout.write('Listening...'));

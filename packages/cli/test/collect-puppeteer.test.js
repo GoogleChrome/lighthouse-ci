@@ -9,7 +9,9 @@ jest.retryTimes(3);
 
 /* eslint-env jest */
 
+const fs = require('fs');
 const path = require('path');
+const puppeteer = require('puppeteer');
 const {runCLI} = require('./test-utils.js');
 
 describe('Lighthouse CI collect CLI with puppeteer', () => {
@@ -48,6 +50,34 @@ describe('Lighthouse CI collect CLI with puppeteer', () => {
       "
     `);
     expect(status).toEqual(0);
+  }, 180000);
+
+  it('should run lighthouse using puppeteers chromium without puppeteer script', () => {
+    const {stdout, stderr, status} = runCLI(
+      [
+        'collect',
+        '-n=1',
+        '--url=http://localhost:52426/public',
+        '--start-server-command=node ./auth-server.js',
+        `--chrome-path=${puppeteer.executablePath()}`,
+      ],
+      {cwd: autorunDir}
+    );
+
+    expect(stdout).toMatchInlineSnapshot(`
+      "Started a web server with \\"node ./auth-server.js\\"...
+      Running Lighthouse 1 time(s) on http://localhost:XXXX/public
+      Run #1...done.
+      Done running Lighthouse!
+      "
+    `);
+    expect(stderr).toMatchInlineSnapshot(`""`);
+    expect(status).toEqual(0);
+
+    const files = fs.readdirSync(path.join(autorunDir, '.lighthouseci'));
+    const report = files.find(file => /lhr.*\.json$/.test(file));
+    const lhr = JSON.parse(fs.readFileSync(path.join(autorunDir, '.lighthouseci', report)));
+    expect(lhr.userAgent).toContain('HeadlessChrome/77.0.3835.0'); // make sure the right chrome was used
   }, 180000);
 
   it('should not fail on providing defaults without Chrome installations', () => {

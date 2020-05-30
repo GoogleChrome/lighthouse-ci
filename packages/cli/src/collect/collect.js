@@ -92,7 +92,7 @@ async function runOnUrl(url, options, context) {
     process.stdout.write(`Run #${i + 1}...`);
     try {
       const lhr = await runner.runUntilSuccess(url, {
-        headful: options.headful,
+        ...options,
         settings,
       });
       saveLHR(lhr);

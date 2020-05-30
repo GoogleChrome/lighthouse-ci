@@ -31,6 +31,12 @@ git checkout lerna.json # lerna prettifies the JSON and isn't useful
 # Do related releases
 ./scripts/deploy-gh-pages.sh
 
+# Update the next tag
+NEXT_VERSION=$(yarn info @lhci/cli | grep 'latest:' -A 1 | tail -n 1 | grep -o "'.*'" | sed s/\'//g)
+npm dist-tag add "@lhci/utils@$NEXT_VERSION" next
+npm dist-tag add "@lhci/server@$NEXT_VERSION" next
+npm dist-tag add "@lhci/cli@$NEXT_VERSION" next
+
 cd ./docs/recipes/docker-client
 ./update-dockerhub.sh
 cd ../../../

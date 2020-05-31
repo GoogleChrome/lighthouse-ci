@@ -71,7 +71,10 @@ function getCurrentHash() {
     encoding: 'utf8',
   });
   if (result.status !== 0) {
-    throw new Error('Unable to determine current hash with `git rev-parse HEAD`');
+    throw new Error(
+      'Unable to determine current hash with `git rev-parse HEAD`. ' +
+        'This can be overridden with setting LHCI_BUILD_CONTEXT__CURRENT_HASH env.'
+    );
   }
 
   return result.stdout.trim();
@@ -92,7 +95,10 @@ function getCommitTime(hash) {
     encoding: 'utf8',
   });
   if (result.status !== 0) {
-    throw new Error('Unable to retrieve committer timestamp from commit');
+    throw new Error(
+      'Unable to retrieve committer timestamp from commit. ' +
+        'This can be overridden with setting LHCI_BUILD_CONTEXT__COMMIT_TIME env.'
+    );
   }
 
   return result.stdout.trim();
@@ -126,7 +132,10 @@ function getCurrentBranchRaw_() {
 
   const branch = result.stdout.trim();
   if (result.status !== 0 || branch === 'HEAD') {
-    throw new Error('Unable to determine current branch with `git rev-parse --abbrev-ref HEAD`');
+    throw new Error(
+      'Unable to determine current branch with `git rev-parse --abbrev-ref HEAD`. ' +
+        'This can be overridden with setting LHCI_BUILD_CONTEXT__CURRENT_BRANCH env.'
+    );
   }
 
   return branch;
@@ -174,7 +183,10 @@ function getCommitMessage(hash = 'HEAD') {
     encoding: 'utf8',
   });
   if (result.status !== 0) {
-    throw new Error('Unable to determine commit message with `git log --format=%s -n 1`');
+    throw new Error(
+      'Unable to determine commit message with `git log --format=%s -n 1`. ' +
+        'This can be overridden with setting LHCI_BUILD_CONTEXT__COMMIT_MESSAGE env.'
+    );
   }
 
   return result.stdout.trim().slice(0, 80);
@@ -195,7 +207,10 @@ function getAuthor(hash = 'HEAD') {
     encoding: 'utf8',
   });
   if (result.status !== 0) {
-    throw new Error('Unable to determine commit author with `git log --format=%aN <%aE> -n 1`');
+    throw new Error(
+      'Unable to determine commit author with `git log --format=%aN <%aE> -n 1`. ' +
+        'This can be overridden with setting LHCI_BUILD_CONTEXT__AUTHOR env.'
+    );
   }
 
   return result.stdout.trim().slice(0, 256);
@@ -216,7 +231,10 @@ function getAvatarUrl(hash = 'HEAD') {
     encoding: 'utf8',
   });
   if (result.status !== 0) {
-    throw new Error('Unable to determine commit email with `git log --format=%aE -n 1`');
+    throw new Error(
+      "Couldn't get commit author's avatar url because application was unable to determine commit email with `git log --format=%aE -n 1`. " +
+        'This can be overridden with setting LHCI_BUILD_CONTEXT__AVATAR_URL env.'
+    );
   }
 
   // Use default gravatar image, see https://en.gravatar.com/site/implement/images/.

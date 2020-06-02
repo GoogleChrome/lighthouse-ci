@@ -206,7 +206,7 @@ Object.keys(testingLibrary.fireEvent).forEach(key => {
   };
 });
 
-const wait = testingLibrary.wait;
+const wait = testingLibrary.waitFor;
 
 const prettyDOM = testingLibrary.prettyDOM;
 

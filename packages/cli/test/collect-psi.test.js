@@ -19,9 +19,7 @@ describe('Lighthouse CI collect CLI using PSI', () => {
   const cwd = path.join(__dirname, 'fixtures/psi');
 
   beforeAll(async () => {
-    console.log('starting server');
     server = await createServer();
-    console.log('server up');
   });
 
   afterAll(async () => {
@@ -29,9 +27,7 @@ describe('Lighthouse CI collect CLI using PSI', () => {
   });
 
   it('should run lighthouse using PSI runner', async () => {
-    console.log(server);
-    await new Promise(r => setTimeout(r, 70000));
-    const {stdout, stderr, status} = runCLI(
+    const {stdout, stderr, status} = await runCLI(
       [
         'collect',
         '-n=1',
@@ -44,17 +40,38 @@ describe('Lighthouse CI collect CLI using PSI', () => {
     );
 
     expect(stdout).toMatchInlineSnapshot(`
-      "Started a web server with \\"node ./auth-server.js\\"...
-      Running Lighthouse 1 time(s) on http://localhost:XXXX
+      "Running Lighthouse 1 time(s) on http://localhost:XXXX
       Run #1...done.
       Done running Lighthouse!
       "
     `);
-    expect(stderr).toMatchInlineSnapshot(`
-      "WARNING: collect.settings.chromeFlags option will be ignored.
-      WARNING: If you want chromeFlags with puppeteerScript, use collect.puppeteerLaunchOptions.args option.
+    expect(stderr).toMatchInlineSnapshot(`""`);
+    expect(status).toEqual(0);
+  }, 180000);
+
+  it('should handle failure of lighthouse using PSI runner', async () => {
+    const {stdout, stderr, status} = await runCLI(
+      [
+        'collect',
+        '-n=1',
+        '--method=psi',
+        '--psi-api-key=invalid-key',
+        `--psi-api-endpoint=http://localhost:${server.port}/runPagespeed`,
+        `--url=http://localhost:${server.port}`,
+      ],
+      {cwd: cwd}
+    );
+
+    expect(stdout).toMatchInlineSnapshot(`
+      "Running Lighthouse 1 time(s) on http://localhost:XXXX
+      Run #1...failed!
       "
     `);
-    expect(status).toEqual(0);
+    expect(stderr).toMatchInlineSnapshot(`
+      "Error: PSI Failed (UNKNOWN): Oops
+          at PsiClient.run (/Users/patrick/Code/OpenSource/lighthouse-ci/packages/utils/src/psi-client.js:43:21)
+          at process._tickCallback (internal/process/next_tick.js:68:7)"
+    `);
+    expect(status).toEqual(1);
   }, 180000);
 });

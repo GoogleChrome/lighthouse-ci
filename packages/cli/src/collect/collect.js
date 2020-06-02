@@ -9,7 +9,8 @@ const path = require('path');
 const yargsParser = require('yargs-parser');
 const {determineChromePath} = require('../utils.js');
 const FallbackServer = require('./fallback-server.js');
-const LighthouseRunner = require('./lighthouse-runner.js');
+const PsiRunner = require('./psi-runner.js');
+const NodeRunner = require('./node-runner.js');
 const PuppeteerManager = require('./puppeteer-manager.js');
 const {saveLHR, clearSavedReportsAndLHRs} = require('@lhci/utils/src/saved-reports.js');
 const {
@@ -25,12 +26,25 @@ function buildCommand(yargs) {
   const naiveOptions = yargsParser(process.argv);
 
   return yargs.options({
-    method: {type: 'string', choices: ['node'], default: 'node'},
+    method: {
+      type: 'string',
+      description:
+        'The method of running Lighthouse to use. PSI will send the URL to a Google API and only be able to access URLs publicly available on the internet.',
+      choices: ['node', 'psi'],
+      default: 'node',
+    },
     headful: {type: 'boolean', description: 'Run with a headful Chrome'},
     additive: {type: 'boolean', description: 'Skips clearing of previous collect data'},
     url: {
       description:
         'A URL to run Lighthouse on. Use this flag multiple times to evaluate multiple URLs.',
+    },
+    psiApiKey: {
+      description: '[psi only] The API key to use for PageSpeed Insights runner method.',
+    },
+    psiApiEndpoint: {
+      description:
+        "[psi only] The endpoint to use for PageSpeed Insights runner method. You do not need to use this unless you've written a custom version.",
     },
     staticDistDir: {
       description: 'The build directory where your HTML files to run Lighthouse on are located.',
@@ -73,6 +87,12 @@ function buildCommand(yargs) {
   });
 }
 
+/** @param {LHCI.CollectCommand.Options} options @return {LHCI.CollectCommand.Runner} */
+function getRunner(options) {
+  if (options.method === 'psi') return new PsiRunner();
+  return new NodeRunner();
+}
+
 /**
  * @param {string} url
  * @param {LHCI.CollectCommand.Options} options
@@ -80,7 +100,7 @@ function buildCommand(yargs) {
  * @return {Promise<void>}
  */
 async function runOnUrl(url, options, context) {
-  const runner = new LighthouseRunner();
+  const runner = getRunner(options);
   process.stdout.write(`Running Lighthouse ${options.numberOfRuns} time(s) on ${url}\n`);
 
   const baseSettings = options.settings || {};
@@ -183,7 +203,6 @@ function checkIgnoredChromeFlagsOption(options) {
  * @return {Promise<void>}
  */
 async function runCommand(options) {
-  if (options.method !== 'node') throw new Error(`Method "${options.method}" not yet supported`);
   if (!options.additive) clearSavedReportsAndLHRs();
 
   checkIgnoredChromeFlagsOption(options);

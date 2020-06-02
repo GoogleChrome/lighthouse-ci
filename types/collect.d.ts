@@ -7,6 +7,10 @@
 declare global {
   namespace LHCI {
     namespace CollectCommand {
+      export interface Runner {
+        runUntilSuccess(url: string, options: Partial<Options>): Promise<string>;
+      }
+
       export interface LighthouseSettings {
         // From LH.SharedFlagsSettings
         locale?: string;
@@ -40,6 +44,8 @@ declare global {
 
       export interface Options {
         url?: string | string[];
+        psiApiKey?: string;
+        psiApiEndpoint?: string;
         staticDistDir?: string;
         isSinglePageApplication?: boolean;
         startServerCommand?: string;
@@ -49,7 +55,7 @@ declare global {
         puppeteerScript?: string;
         /** @see https://github.com/puppeteer/puppeteer/blob/v2.0.0/docs/api.md#puppeteerlaunchoptions */
         puppeteerLaunchOptions?: import('puppeteer').LaunchOptions;
-        method: 'node';
+        method: 'node' | 'psi';
         numberOfRuns: number;
         headful: boolean;
         additive: boolean;

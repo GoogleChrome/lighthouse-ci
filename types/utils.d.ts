@@ -8,6 +8,8 @@ import {ComponentChildren} from 'preact';
 
 declare global {
   namespace LHCI {
+    export type Unpromised<T extends Promise<U>> = U;
+
     export type YargsOptions = Partial<
       {extends?: string | undefined; config?: string} & AssertCommand.Options &
         CollectCommand.Options &

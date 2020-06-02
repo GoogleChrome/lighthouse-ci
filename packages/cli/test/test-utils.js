@@ -9,7 +9,7 @@ const os = require('os');
 const fs = require('fs');
 const path = require('path');
 const rimraf = require('rimraf');
-const {spawn, spawnSync} = require('child_process');
+const {spawn} = require('child_process');
 const testingLibrary = require('@testing-library/dom');
 const FallbackServer = require('../src/collect/fallback-server.js');
 
@@ -100,7 +100,7 @@ async function startServer(sqlFile, extraArgs = []) {
 }
 
 function waitForCondition(fn, label) {
-  return testingLibrary.wait(() => {
+  return testingLibrary.waitFor(() => {
     if (!fn()) {
       throw new Error(typeof label === 'function' ? label() : label || 'Condition not met');
     }
@@ -126,7 +126,7 @@ function getCleanEnvironment(extraEnvVars) {
 /**
  * @param {string[]} args
  * @param {{cwd?: string, env?: Record<string, string>}} [overrides]
- * @return {{stdout: string, stderr: string, status: number, matches: {uuids: RegExpMatchArray}}}
+ * @return {Promise<{stdout: string, stderr: string, status: number, matches: {uuids: RegExpMatchArray}}>}
  */
 async function runCLI(args, overrides = {}) {
   const {env: extraEnvVars, cwd} = overrides;

@@ -211,6 +211,9 @@ Options:
   --puppeteerScript          The path to a script that manipulates the browser with puppeteer before
                              running Lighthouse, used for auth.
   --puppeteerLaunchOptions   The object of puppeteer launch options
+  --psiApiKey                [psi only] The API key to use for PageSpeed Insights runner method.
+  --psiApiEndpoint           [psi only] The endpoint to use for PageSpeed Insights runner method.
+                             You do not need to use this unless you wrote a custom version.
   --startServerCommand       The command to run to start the server.
   --startServerReadyPattern  String pattern to listen for started server.
                                                                   [string] [default: "listen|ready"]
@@ -222,7 +225,9 @@ Options:
 
 #### `method`
 
-The method used to run Lighthouse. There is currently only a single option available, `"node"` which runs Lighthouse locally via `node`.
+The method used to run Lighthouse. There are currently two options available, `"node"` which runs Lighthouse locally via `node`, and `"psi"` which runs Lighthouse by making a request to the [PageSpeed Insights API](https://developers.google.com/speed/pagespeed/insights/).
+
+The PageSpeed Insights method has the major limitation that **only sites publicly available over the internet can be tested** and **no other collection options will be respected**.
 
 #### `headful`
 
@@ -296,6 +301,18 @@ For more information on how to use puppeteer, read up on [their API docs](https:
 #### `puppeteerLaunchOptions`
 
 An object of options to pass to puppeteer's [`launch` method](https://github.com/puppeteer/puppeteer/blob/v2.0.0/docs/api.md#puppeteerlaunchoptions). Only used when `puppeterScript` is set.
+
+#### `psiApiKey`
+
+_method=psi only_
+
+The API key to use for making PageSpeed Insights requests. Required if using `method=psi`. You can obtain a PSI API key [from Google APIs](https://developers.google.com/speed/docs/insights/v5/get-started#key).
+
+#### `psiApiEndpoint`
+
+_method=psi only_
+
+The API endpoint to hit for making a PageSpeed Insights request. It is very unlikely you should need to use this option. Only use this if you have self-hosted a custom version of the PSI API.
 
 #### `startServerCommand`
 

@@ -10,8 +10,8 @@
 const {runCLI} = require('./test-utils.js');
 
 describe('Lighthouse CI server CLI', () => {
-  it('should print debug information when port is invalid from env', () => {
-    const {status, stderr} = runCLI(['server'], {env: {LHCI_port: 'foo'}});
+  it('should print debug information when port is invalid from env', async () => {
+    const {status, stderr} = await runCLI(['server'], {env: {LHCI_port: 'foo'}});
     expect(status).toEqual(1);
     expect(stderr).toMatchInlineSnapshot(`
       "Invalid port option \\"NaN\\"
@@ -23,8 +23,8 @@ describe('Lighthouse CI server CLI', () => {
     `);
   });
 
-  it('should print debug information when port is invalid from args', () => {
-    const {status, stderr} = runCLI(['server', '-p=foo']);
+  it('should print debug information when port is invalid from args', async () => {
+    const {status, stderr} = await runCLI(['server', '-p=foo']);
     expect(status).toEqual(1);
     expect(stderr).toMatchInlineSnapshot(`
       "Invalid port option \\"NaN\\"
@@ -36,14 +36,14 @@ describe('Lighthouse CI server CLI', () => {
     `);
   });
 
-  it('should print debug information when port is invalid from config', () => {
+  it('should print debug information when port is invalid from config', async () => {
     const normalizePathsForWindows = stderr =>
       stderr
         .replace(__dirname, '.')
         .replace(__dirname, '.')
         .replace(/\\/g, '/');
 
-    const {status, stderr} = runCLI([
+    const {status, stderr} = await runCLI([
       'server',
       '--config',
       `${__dirname}/fixtures/lighthouserc-invalid-port.json`,

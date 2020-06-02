@@ -39,8 +39,8 @@ describe('Lighthouse CI autorun CLI with startServerCommand', () => {
     }
   });
 
-  it('should run all three steps', () => {
-    const {stdout, stderr, status} = runCLI(
+  it('should run all three steps', async () => {
+    const {stdout, stderr, status} = await runCLI(
       [
         'autorun',
         '--collect.url=http://localhost:52425',
@@ -84,7 +84,7 @@ describe('Lighthouse CI autorun CLI with startServerCommand', () => {
     expect(status).toEqual(1);
   }, 180000);
 
-  it('should run all three steps on an authenticated server', () => {
+  it('should run all three steps on an authenticated server', async () => {
     const config = {
       collect: {url: 'http://localhost:52425', numberOfRuns: 1},
       upload: {serverBaseUrl, token: project.token, basicAuth: {password: 'foobar'}},
@@ -92,7 +92,7 @@ describe('Lighthouse CI autorun CLI with startServerCommand', () => {
 
     fs.writeFileSync(tmpConfigFile, JSON.stringify({ci: config}));
 
-    const {stdout, stderr, status} = runCLI(['autorun', `--config=${tmpConfigFile}`], {
+    const {stdout, stderr, status} = await runCLI(['autorun', `--config=${tmpConfigFile}`], {
       cwd: autorunDir,
     });
 

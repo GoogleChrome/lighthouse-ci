@@ -19,14 +19,14 @@ describe('collect', () => {
   it(
     'should collect results from staticDistDir',
     () =>
-      withTmpDir(tmpDir => {
+      withTmpDir(async tmpDir => {
         const staticDistDir = path.join(fixturesDir, 'collect-static-dir-without-urls');
         const ciFolder = path.join(tmpDir, '.lighthouseci');
         fs.mkdirSync(ciFolder);
         fs.writeFileSync(path.join(ciFolder, 'lhr-123.html'), '<!DOCTYPE html>');
         fs.writeFileSync(path.join(ciFolder, 'lhr-123.json'), '{}');
 
-        const {stdout, stderr, status} = runCLI(
+        const {stdout, stderr, status} = await runCLI(
           ['collect', `--config=${rcFile}`, `--static-dist-dir=${staticDistDir}`],
           {
             // Run in temp dir to avoid conflicts with other tests
@@ -60,13 +60,13 @@ describe('collect', () => {
   );
 
   it('should collect results with a server command with custom start pattern', () =>
-    withTmpDir(tmpDir => {
+    withTmpDir(async tmpDir => {
       // FIXME: for some inexplicable reason this test cannot pass in Travis Windows
       if (os.platform() === 'win32') return;
 
       const serverPath = path.join(fixturesDir, 'autorun-start-server/autorun-server.js');
       const startCommand = `SERVER_START_PORT=52427 SERVER_START_MESSAGE='Running server' node ${serverPath}`;
-      const {stdout, stderr, status} = runCLI(
+      const {stdout, stderr, status} = await runCLI(
         [
           'collect',
           `-n=1`,
@@ -97,13 +97,13 @@ describe('collect', () => {
     }));
 
   it('should print timeout message for server command not printing a matchable pattern', () =>
-    withTmpDir(tmpDir => {
+    withTmpDir(async tmpDir => {
       // FIXME: for some inexplicable reason this test cannot pass in Travis Windows
       if (os.platform() === 'win32') return;
 
       const serverPath = path.join(fixturesDir, 'autorun-start-server/autorun-server.js');
       const startCommand = `SERVER_START_PORT=52428 SERVER_START_MESSAGE='Running server' node ${serverPath}`;
-      const {stdout, status} = runCLI(
+      const {stdout, status} = await runCLI(
         [
           'collect',
           `-n=1`,

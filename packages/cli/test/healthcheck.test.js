@@ -18,8 +18,8 @@ describe('Lighthouse CI healthcheck CLI', () => {
   const rcFile = path.join(autorunFixtureDir, 'lighthouserc.json');
 
   describe('configuration', () => {
-    it('should find an rc file with explicit path', () => {
-      const {stdout, stderr, status} = runCLI(['healthcheck', `--config=${rcFile}`]);
+    it('should find an rc file with explicit path', async () => {
+      const {stdout, stderr, status} = await runCLI(['healthcheck', `--config=${rcFile}`]);
       expect(status).toEqual(0);
       expect(stdout).toMatchInlineSnapshot(`
         "✅  .lighthouseci/ directory writable
@@ -32,10 +32,13 @@ describe('Lighthouse CI healthcheck CLI', () => {
       expect(stderr).toMatchInlineSnapshot(`""`);
     });
 
-    it('should find an rc file with explicit relative path', () => {
-      const {stdout, stderr, status} = runCLI(['healthcheck', `--config=../lighthouserc.js`], {
-        cwd: autorunFixtureDir,
-      });
+    it('should find an rc file with explicit relative path', async () => {
+      const {stdout, stderr, status} = await runCLI(
+        ['healthcheck', `--config=../lighthouserc.js`],
+        {
+          cwd: autorunFixtureDir,
+        }
+      );
       expect(status).toEqual(0);
       expect(stdout).toMatchInlineSnapshot(`
         "✅  .lighthouseci/ directory writable
@@ -48,8 +51,8 @@ describe('Lighthouse CI healthcheck CLI', () => {
       expect(stderr).toMatchInlineSnapshot(`""`);
     });
 
-    it('should find an rc file by autodetect', () => {
-      const {stdout, stderr, status} = runCLI(['healthcheck'], {
+    it('should find an rc file by autodetect', async () => {
+      const {stdout, stderr, status} = await runCLI(['healthcheck'], {
         cwd: autorunFixtureDir,
         env: {LHCI_NO_LIGHTHOUSERC: undefined}, // override the clean test env
       });
@@ -66,8 +69,8 @@ describe('Lighthouse CI healthcheck CLI', () => {
       expect(stderr).toMatchInlineSnapshot(`""`);
     });
 
-    it('should not find an rc file by autodetect recursively', () => {
-      const {stdout, stderr, status} = runCLI(['healthcheck'], {
+    it('should not find an rc file by autodetect recursively', async () => {
+      const {stdout, stderr, status} = await runCLI(['healthcheck'], {
         cwd: __dirname,
         env: {LHCI_NO_LIGHTHOUSERC: undefined}, // override the clean test env
       });
@@ -83,8 +86,8 @@ describe('Lighthouse CI healthcheck CLI', () => {
       expect(stderr).toMatchInlineSnapshot(`""`);
     });
 
-    it('should opt-out of autodetect via env variable', () => {
-      const {stdout, stderr, status} = runCLI(['healthcheck'], {
+    it('should opt-out of autodetect via env variable', async () => {
+      const {stdout, stderr, status} = await runCLI(['healthcheck'], {
         cwd: autorunFixtureDir,
         env: {LHCI_NO_LIGHTHOUSERC: '1'},
       });
@@ -100,8 +103,8 @@ describe('Lighthouse CI healthcheck CLI', () => {
       expect(stderr).toMatchInlineSnapshot(`""`);
     });
 
-    it('should opt-out of autodetect via flag', () => {
-      const {stdout, stderr, status} = runCLI(['healthcheck', '--no-lighthouserc'], {
+    it('should opt-out of autodetect via flag', async () => {
+      const {stdout, stderr, status} = await runCLI(['healthcheck', '--no-lighthouserc'], {
         cwd: autorunFixtureDir,
         env: {LHCI_NO_LIGHTHOUSERC: undefined},
       });
@@ -130,8 +133,8 @@ describe('Lighthouse CI healthcheck CLI', () => {
       rimraf.sync(fixtureDir);
     });
 
-    it('should find a chrome installation installed on the system', () => {
-      const {stdout, stderr, status} = runCLI(['healthcheck', '--fatal'], {
+    it('should find a chrome installation installed on the system', async () => {
+      const {stdout, stderr, status} = await runCLI(['healthcheck', '--fatal'], {
         cwd: fixtureDir,
       });
 
@@ -146,8 +149,8 @@ describe('Lighthouse CI healthcheck CLI', () => {
       expect(status).toEqual(0);
     });
 
-    it('should not find a chrome installation when ignored', () => {
-      const {stdout, stderr, status} = runCLI(['healthcheck', '--fatal'], {
+    it('should not find a chrome installation when ignored', async () => {
+      const {stdout, stderr, status} = await runCLI(['healthcheck', '--fatal'], {
         cwd: fixtureDir,
         env: {LHCITEST_IGNORE_CHROME_INSTALLATIONS: '1'},
       });
@@ -163,11 +166,11 @@ describe('Lighthouse CI healthcheck CLI', () => {
       expect(status).toEqual(1);
     });
 
-    it('should find a chrome installation when ignored but passed explicitly via config', () => {
+    it('should find a chrome installation when ignored but passed explicitly via config', async () => {
       const ci = {collect: {chromePath: fixtureDir}};
       fs.writeFileSync(path.join(fixtureDir, '.lighthouserc.json'), JSON.stringify({ci}));
 
-      const {stdout, stderr, status} = runCLI(['healthcheck', '--fatal'], {
+      const {stdout, stderr, status} = await runCLI(['healthcheck', '--fatal'], {
         cwd: fixtureDir,
         env: {LHCI_NO_LIGHTHOUSERC: undefined, LHCITEST_IGNORE_CHROME_INSTALLATIONS: '1'},
       });

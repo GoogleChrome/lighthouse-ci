@@ -64,7 +64,7 @@ describe('Lighthouse CI upload CLI', () => {
   it('should upload for a build', async () => {
     expect(await apiClient.getBuilds(project.id)).toHaveLength(0);
 
-    const {stdout, stderr, status} = runCLI(
+    const {stdout, stderr, status} = await runCLI(
       ['upload', `--serverBaseUrl=${serverBaseUrl}`, `--token=${project.token}`],
       {
         cwd: uploadDir,
@@ -89,7 +89,7 @@ describe('Lighthouse CI upload CLI', () => {
   it('should fail a duplicate upload for a build', async () => {
     expect(await apiClient.getBuilds(project.id)).toHaveLength(1);
 
-    const {stdout, stderr, status} = runCLI(
+    const {stdout, stderr, status} = await runCLI(
       ['upload', `--serverBaseUrl=${serverBaseUrl}`, `--token=${project.token}`],
       {
         cwd: uploadDir,
@@ -106,7 +106,7 @@ describe('Lighthouse CI upload CLI', () => {
   it('should ignore a duplicate upload for a build with flag', async () => {
     expect(await apiClient.getBuilds(project.id)).toHaveLength(1);
 
-    const {stdout, stderr, status} = runCLI(
+    const {stdout, stderr, status} = await runCLI(
       [
         'upload',
         `--serverBaseUrl=${serverBaseUrl}`,
@@ -134,7 +134,7 @@ describe('Lighthouse CI upload CLI', () => {
 
     expect(await apiClient.getBuilds(project.id)).toHaveLength(1);
 
-    const {stdout, stderr, status} = runCLI(
+    const {stdout, stderr, status} = await runCLI(
       ['upload', `--serverBaseUrl=${serverBaseUrl}`, `--token=${project.token}`],
       {
         cwd: uploadDir,
@@ -177,7 +177,7 @@ describe('Lighthouse CI upload CLI', () => {
     fs.writeFileSync(fakeLhrPath.replace(/\d+/, '3'), JSON.stringify(lhr));
     fs.unlinkSync(fakeLhrPath);
 
-    const {stdout, stderr, status} = runCLI(
+    const {stdout, stderr, status} = await runCLI(
       ['upload', `--target=filesystem`, `--outputDir=.lighthouseci/targetfs`],
       {cwd: uploadDir}
     );

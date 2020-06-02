@@ -15,8 +15,8 @@ const {runCLI} = require('./test-utils.js');
 describe('Lighthouse CI collect CLI', () => {
   const staticDistDir = path.join(__dirname, 'fixtures/collect-static-dir-with-urls');
 
-  it('should collect a static dir with explicit URLs', () => {
-    const {stdout, stderr, status} = runCLI(
+  it('should collect a static dir with explicit URLs', async () => {
+    const {stdout, stderr, status} = await runCLI(
       ['collect', '-n=1', '--staticDistDir=./', '--url=/child/grandchild.html'],
       {
         cwd: staticDistDir,

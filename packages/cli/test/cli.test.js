@@ -121,7 +121,7 @@ describe('Lighthouse CI CLI', () => {
     it('should pass when things are good', async () => {
       const LHCI_TOKEN = projectToken;
       const LHCI_SERVER_BASE_URL = `http://localhost:${server.port}`;
-      const {stdout, stderr, status} = runCLI(['healthcheck', `--fatal`], {
+      const {stdout, stderr, status} = await runCLI(['healthcheck', `--fatal`], {
         env: {LHCI_TOKEN, LHCI_SERVER_BASE_URL},
       });
 
@@ -145,7 +145,7 @@ describe('Lighthouse CI CLI', () => {
     it('should fail when things are bad', async () => {
       const LHCI_TOKEN = projectToken;
       const LHCI_SERVER_BASE_URL = `http://localhost:${server.port}`;
-      const {stdout, stderr, status} = runCLI(
+      const {stdout, stderr, status} = await runCLI(
         ['healthcheck', `--config=${rcFile}`, `--fatal`, '--checks=githubToken'],
         {env: {LHCI_TOKEN, LHCI_SERVER_BASE_URL}}
       );
@@ -170,12 +170,12 @@ describe('Lighthouse CI CLI', () => {
 
   // FIXME: Tests dependency. Moving these tests breaks others.
   describe('collect', () => {
-    it('should collect results with a server command', () => {
+    it('should collect results with a server command', async () => {
       // FIXME: for some inexplicable reason this test cannot pass in Travis Windows
       if (os.platform() === 'win32') return;
 
       const startCommand = `yarn start server -p=14927 --storage.sqlDatabasePath=${tmpSqlFilePath}`;
-      const {stdout, stderr, status} = runCLI([
+      const {stdout, stderr, status} = await runCLI([
         'collect',
         `-n=1`,
         `--config=${rcFile}`,
@@ -194,8 +194,8 @@ describe('Lighthouse CI CLI', () => {
       expect(stderr.toString()).toMatchInlineSnapshot(`""`);
       expect(status).toEqual(0);
     }, 60000);
-    it('should collect results from explicit urls', () => {
-      const {stdout, stderr, status} = runCLI([
+    it('should collect results from explicit urls', async () => {
+      const {stdout, stderr, status} = await runCLI([
         'collect',
         `--config=${rcFile}`,
         `--url=${urlToCollect}`,
@@ -215,8 +215,8 @@ describe('Lighthouse CI CLI', () => {
 
   describe('upload', () => {
     let uuids;
-    it('should read LHRs from folders', () => {
-      const {stdout, stderr, status, matches} = runCLI(
+    it('should read LHRs from folders', async () => {
+      const {stdout, stderr, status, matches} = await runCLI(
         ['upload', `--serverBaseUrl=http://localhost:${server.port}`],
         {env: {LHCI_TOKEN: projectToken}}
       );
@@ -237,7 +237,7 @@ describe('Lighthouse CI CLI', () => {
       expect(uuids).toHaveLength(5);
     });
 
-    it('should have written links to a file', () => {
+    it('should have written links to a file', async () => {
       const linksFile = path.join(process.cwd(), '.lighthouseci/links.json');
       const links = fs.readFileSync(linksFile, 'utf8');
       expect(cleanStdOutput(links)).toMatchInlineSnapshot(`
@@ -276,7 +276,10 @@ describe('Lighthouse CI CLI', () => {
     });
 
     it('should support target=temporary-public-storage', async () => {
-      const {stdout, stderr, status} = runCLI(['upload', `--target=temporary-public-storage`]);
+      const {stdout, stderr, status} = await runCLI([
+        'upload',
+        `--target=temporary-public-storage`,
+      ]);
 
       expect(stdout).toContain('...success!');
       expect(stdout).toContain('Open the report at');
@@ -284,7 +287,7 @@ describe('Lighthouse CI CLI', () => {
       expect(status).toEqual(0);
     });
 
-    it('should have written links to a file', () => {
+    it('should have written links to a file', async () => {
       const linksFile = path.join(process.cwd(), '.lighthouseci/links.json');
       const links = fs.readFileSync(linksFile, 'utf8');
       expect(links).toContain('http://localhost');
@@ -292,8 +295,8 @@ describe('Lighthouse CI CLI', () => {
       expect(links).toContain('storage.googleapis.com');
     });
 
-    it('should fail repeated attempts', () => {
-      const {stdout, stderr, status} = runCLI(
+    it('should fail repeated attempts', async () => {
+      const {stdout, stderr, status} = await runCLI(
         ['upload', `--serverBaseUrl=http://localhost:${server.port}`],
         {env: {LHCI_TOKEN: projectToken}}
       );
@@ -306,8 +309,8 @@ describe('Lighthouse CI CLI', () => {
   });
 
   describe('assert', () => {
-    it('should assert failures', () => {
-      const {stdout, stderr, status} = runCLI(['assert', `--assertions.works-offline=error`]);
+    it('should assert failures', async () => {
+      const {stdout, stderr, status} = await runCLI(['assert', `--assertions.works-offline=error`]);
 
       expect(stdout).toMatchInlineSnapshot(`""`);
       expect(stderr).toMatchInlineSnapshot(`
@@ -329,8 +332,8 @@ describe('Lighthouse CI CLI', () => {
       expect(status).toEqual(1);
     });
 
-    it('should assert failures from an rcfile', () => {
-      const {stdout, stderr, status} = runCLI([
+    it('should assert failures from an rcfile', async () => {
+      const {stdout, stderr, status} = await runCLI([
         'assert',
         `--assertions.first-contentful-paint=off`,
         `--assertions.speed-index=off`,
@@ -358,8 +361,8 @@ describe('Lighthouse CI CLI', () => {
       expect(status).toEqual(1);
     });
 
-    it('should assert failures from a matrix rcfile', () => {
-      const {stdout, stderr, status} = runCLI(['assert', `--config=${rcMatrixFile}`]);
+    it('should assert failures from a matrix rcfile', async () => {
+      const {stdout, stderr, status} = await runCLI(['assert', `--config=${rcMatrixFile}`]);
 
       expect(stdout).toMatchInlineSnapshot(`""`);
       expect(stderr).toMatchInlineSnapshot(`
@@ -381,8 +384,8 @@ describe('Lighthouse CI CLI', () => {
       expect(status).toEqual(1);
     });
 
-    it('should assert failures from an extended rcfile', () => {
-      const {stdout, stderr, status} = runCLI([
+    it('should assert failures from an extended rcfile', async () => {
+      const {stdout, stderr, status} = await runCLI([
         'assert',
         `--assertions.speed-index=off`,
         `--assertions.interactive=off`,
@@ -418,8 +421,8 @@ describe('Lighthouse CI CLI', () => {
       expect(status).toEqual(1);
     });
 
-    it('should assert failures from a budgets file', () => {
-      const {stdout, stderr, status} = runCLI(['assert', `--budgets-file=${budgetsFile}`]);
+    it('should assert failures from a budgets file', async () => {
+      const {stdout, stderr, status} = await runCLI(['assert', `--budgets-file=${budgetsFile}`]);
 
       expect(stdout).toMatchInlineSnapshot(`""`);
       expect(stderr).toMatchInlineSnapshot(`

@@ -17,8 +17,8 @@ const {runCLI} = require('./test-utils.js');
 describe('Lighthouse CI collect CLI with puppeteer', () => {
   const autorunDir = path.join(__dirname, 'fixtures/puppeteer');
 
-  it('should run lighthouse on an auth page', () => {
-    const {stdout, stderr, status} = runCLI(
+  it('should run lighthouse on an auth page', async () => {
+    const {stdout, stderr, status} = await runCLI(
       [
         'collect',
         '-n=1',
@@ -52,8 +52,8 @@ describe('Lighthouse CI collect CLI with puppeteer', () => {
     expect(status).toEqual(0);
   }, 180000);
 
-  it('should run lighthouse using puppeteers chromium without puppeteer script', () => {
-    const {stdout, stderr, status} = runCLI(
+  it('should run lighthouse using puppeteers chromium without puppeteer script', async () => {
+    const {stdout, stderr, status} = await runCLI(
       [
         'collect',
         '-n=1',
@@ -80,8 +80,8 @@ describe('Lighthouse CI collect CLI with puppeteer', () => {
     expect(lhr.userAgent).toContain('HeadlessChrome/77.0.3835.0'); // make sure the right chrome was used
   }, 180000);
 
-  it('should not fail on providing defaults without Chrome installations', () => {
-    const {stdout, stderr, status} = runCLI(['collect', '--help'], {
+  it('should not fail on providing defaults without Chrome installations', async () => {
+    const {stdout, stderr, status} = await runCLI(['collect', '--help'], {
       cwd: autorunDir,
       env: {LHCITEST_IGNORE_CHROME_INSTALLATIONS: '1'},
     });

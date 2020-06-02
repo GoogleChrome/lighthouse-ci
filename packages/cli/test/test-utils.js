@@ -128,17 +128,21 @@ function getCleanEnvironment(extraEnvVars) {
  * @param {{cwd?: string, env?: Record<string, string>}} [overrides]
  * @return {{stdout: string, stderr: string, status: number, matches: {uuids: RegExpMatchArray}}}
  */
-function runCLI(args, overrides = {}) {
+async function runCLI(args, overrides = {}) {
   const {env: extraEnvVars, cwd} = overrides;
   const env = getCleanEnvironment(extraEnvVars);
-  let {stdout = '', stderr = '', status = -1} = spawnSync('node', [CLI_PATH, ...args], {
+  const childProcess = spawn('node', [CLI_PATH, ...args], {
     cwd,
     env,
   });
 
-  stdout = stdout.toString();
-  stderr = stderr.toString();
-  status = status || 0;
+  let stdout = '';
+  let stderr = '';
+  let status = 0;
+  childProcess.stdout.on('data', chunk => (stdout += chunk.toString()));
+  childProcess.stderr.on('data', chunk => (stderr += chunk.toString()));
+  childProcess.once('exit', code => (status = code));
+  await new Promise(r => childProcess.once('exit', r));
 
   const uuids = stdout.match(UUID_REGEX);
   stdout = cleanStdOutput(stdout);

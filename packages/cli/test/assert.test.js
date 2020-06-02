@@ -19,8 +19,8 @@ describe('Lighthouse CI assert CLI', () => {
   const fixtureDir = path.join(__dirname, 'fixtures/assertions');
   // eslint-disable-next-line no-control-regex
   const replaceTerminalChars = s => s.replace(/\u001b/g, '').replace(/\[\d+m/g, '');
-  const run = args => {
-    const {status, stdout, stderr} = runCLI(['assert', ...args], {cwd: fixtureDir});
+  const run = async args => {
+    const {status, stdout, stderr} = await runCLI(['assert', ...args], {cwd: fixtureDir});
     const failures = (stderr.match(/\S+ failure/g) || []).map(replaceTerminalChars);
     const warnings = (stderr.match(/\S+ warning/g) || []).map(replaceTerminalChars);
     const passes = (stderr.match(/\S+ passing/g) || []).map(replaceTerminalChars);
@@ -49,8 +49,8 @@ describe('Lighthouse CI assert CLI', () => {
     writeLhr(['first-contentful-paint']);
   });
 
-  it('should run the recommended preset', () => {
-    const result = run([`--preset=lighthouse:recommended`]);
+  it('should run the recommended preset', async () => {
+    const result = await run([`--preset=lighthouse:recommended`]);
     expect(result.status).toEqual(1);
     expect(result.failures).toHaveLength(90);
     expect(result.warnings).toHaveLength(17);
@@ -59,8 +59,8 @@ describe('Lighthouse CI assert CLI', () => {
     expect(result.failures).toContain('viewport failure');
   });
 
-  it('should run the no-pwa preset', () => {
-    const result = run([`--preset=lighthouse:no-pwa`]);
+  it('should run the no-pwa preset', async () => {
+    const result = await run([`--preset=lighthouse:no-pwa`]);
     expect(result.status).toEqual(1);
     expect(result.failures).toHaveLength(79);
     expect(result.warnings).toHaveLength(15);
@@ -69,19 +69,19 @@ describe('Lighthouse CI assert CLI', () => {
     expect(result.failures).not.toContain('viewport failure');
   });
 
-  it('should run a preset with options', () => {
-    const result = run([`--preset=lighthouse:no-pwa`, '--assertions.deprecations=off']);
+  it('should run a preset with options', async () => {
+    const result = await run([`--preset=lighthouse:no-pwa`, '--assertions.deprecations=off']);
     expect(result.failures).not.toContain('deprecations failure');
     expect(result.failures).not.toContain('viewport failure');
   });
 
-  it('should run assertions from a config', () => {
-    const result = run([`--config=${fixtureDir}/../lighthouserc.json`]);
+  it('should run assertions from a config', async () => {
+    const result = await run([`--config=${fixtureDir}/../lighthouserc.json`]);
     expect(result.failures).toContain('speed-index failure');
   });
 
-  it('should return passing audits', () => {
-    const result = run([`--preset=lighthouse:recommended`, '--include-passed-assertions']);
+  it('should return passing audits', async () => {
+    const result = await run([`--preset=lighthouse:recommended`, '--include-passed-assertions']);
     expect(result.status).toEqual(1);
     expect(result.warnings).toHaveLength(17);
     expect(result.failures).toHaveLength(90);
@@ -90,24 +90,24 @@ describe('Lighthouse CI assert CLI', () => {
     expect(result.failures).toContain('viewport failure');
   });
 
-  it('should set the status code of failures appropriately', () => {
-    const result = run([`--assertions.deprecations=error`]);
+  it('should set the status code of failures appropriately', async () => {
+    const result = await run([`--assertions.deprecations=error`]);
     expect(result.status).toEqual(1);
     expect(result.failures).toHaveLength(1);
     expect(result.warnings).toHaveLength(0);
     expect(result.passes).toHaveLength(0);
   });
 
-  it('should set the status code of warnings appropriately', () => {
-    const result = run([`--assertions.deprecations=warn`, '--include-passed-assertions']);
+  it('should set the status code of warnings appropriately', async () => {
+    const result = await run([`--assertions.deprecations=warn`, '--include-passed-assertions']);
     expect(result.status).toEqual(0);
     expect(result.failures).toHaveLength(0);
     expect(result.warnings).toHaveLength(1);
     expect(result.passes).toHaveLength(0);
   });
 
-  it('should set the status code of passes appropriately', () => {
-    const result = run([
+  it('should set the status code of passes appropriately', async () => {
+    const result = await run([
       `--assertions.first-contentful-paint=error`,
       '--include-passed-assertions',
     ]);

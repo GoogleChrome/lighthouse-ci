@@ -400,6 +400,8 @@ The _build token_ is used by CI to upload new data to your server. It's not real
 
 The _admin token_ is used to edit or delete data within the project. **KEEP THIS SECRET - Anyone possessing the admin token can delete your entire project and all of the data within it**.
 
+If your lhci server is behind basic auth, you can provide the username and password via the `--basicAuth.password` and `--basicAuth.username` command line flags.
+
 ### Configuration
 
 With your server setup and the project created, all that's left to do is update your Lighthouse CI configuration file with the new URL and token. If you'd like to keep the token secret from contributors, you can use the `LHCI_TOKEN` environment variable instead of putting the token in plain text in your code.

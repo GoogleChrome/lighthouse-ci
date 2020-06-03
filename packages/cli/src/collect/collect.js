@@ -117,6 +117,11 @@ async function runOnUrl(url, options, context) {
       });
       saveLHR(lhr);
       process.stdout.write('done.\n');
+
+      // PSI caches results for a minute. Ensure each run is unique by waiting 60s between runs.
+      if (options.method === 'psi' && i < options.numberOfRuns - 1) {
+        await new Promise(r => setTimeout(r, 60e3));
+      }
     } catch (err) {
       process.stdout.write('failed!\n');
       throw err;

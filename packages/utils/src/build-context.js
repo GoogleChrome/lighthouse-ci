@@ -232,7 +232,7 @@ function getAvatarUrl(hash = 'HEAD') {
   });
   if (result.status !== 0) {
     throw new Error(
-      "Couldn't get commit author's avatar url because application was unable to determine commit email with `git log --format=%aE -n 1`. " +
+      "Unable to determine commit author's avatar URL because `git log --format=%aE -n 1` failed to provide author's email. " +
         'This can be overridden with setting LHCI_BUILD_CONTEXT__AVATAR_URL env.'
     );
   }

@@ -95,9 +95,9 @@ async function startServer(sqlFile, extraArgs = []) {
   serverProcess.stderr.on('data', chunk => (stderr += chunk.toString()));
 
   try {
-    await waitForCondition(() => stdout.includes('listening'));
+    await waitForCondition(() => stdout.includes('listening'), 'Server failed to start');
   } catch (err) {
-    throw new Error(`Server failed to start: ${err.message}\n\n${stdout}\n\n${stderr}`);
+    throw new Error(`${err.message}\nSTDOUT: ${stdout}\nSTDERR: ${stderr}`);
   }
 
   const port = stdout.match(/port (\d+)/)[1];

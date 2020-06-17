@@ -112,6 +112,14 @@ describe('build-context.js', () => {
     });
   });
 
+  describe('#getGravatarUrlFromEmail()', () => {
+    it('should work', () => {
+      expect(buildContext.getGravatarUrlFromEmail('patrick.hulce@gmail.com')).toEqual(
+        'https://www.gravatar.com/avatar/78bafdcaf40e20b90bb76b9aa5834e11.jpg?d=identicon'
+      );
+    });
+  });
+
   describe('#getAncestorHashForBase()', () => {
     it('should work', () => {
       expect(buildContext.getAncestorHashForBase(hash)).toEqual(

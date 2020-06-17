@@ -237,9 +237,17 @@ function getAvatarUrl(hash = 'HEAD') {
     );
   }
 
+  return getGravatarUrlFromEmail(result.stdout);
+}
+
+/**
+ * @param {string} email
+ * @return {string}
+ */
+function getGravatarUrlFromEmail(email) {
   // Use default gravatar image, see https://en.gravatar.com/site/implement/images/.
   const md5 = crypto.createHash('md5');
-  md5.update(result.stdout.trim().toLowerCase());
+  md5.update(email.trim().toLowerCase());
   return `https://www.gravatar.com/avatar/${md5.digest('hex')}.jpg?d=identicon`;
 }
 
@@ -331,6 +339,7 @@ module.exports = {
   getCommitMessage,
   getAuthor,
   getAvatarUrl,
+  getGravatarUrlFromEmail,
   getAncestorHash,
   getAncestorHashForBase,
   getAncestorHashForBranch,

@@ -9,7 +9,7 @@ const path = require('path');
 const yargsParser = require('yargs-parser');
 const {determineChromePath} = require('../utils.js');
 const FallbackServer = require('./fallback-server.js');
-const PsiRunner = require('./psi-runner.js');
+const PsiRunner = require('@lhci/utils/src/psi-runner.js');
 const NodeRunner = require('./node-runner.js');
 const PuppeteerManager = require('./puppeteer-manager.js');
 const {saveLHR, clearSavedReportsAndLHRs} = require('@lhci/utils/src/saved-reports.js');
@@ -120,7 +120,7 @@ async function runOnUrl(url, options, context) {
 
       // PSI caches results for a minute. Ensure each run is unique by waiting 60s between runs.
       if (options.method === 'psi' && i < options.numberOfRuns - 1) {
-        await new Promise(r => setTimeout(r, 60e3));
+        await new Promise(r => setTimeout(r, PsiRunner.CACHEBUST_TIMEOUT));
       }
     } catch (err) {
       process.stdout.write('failed!\n');

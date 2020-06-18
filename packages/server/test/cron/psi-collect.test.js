@@ -18,13 +18,14 @@ jest.mock('cron', () => ({
 const {psiCollectForProject, startPsiCollectCron} = require('../../src/cron/psi-collect.js');
 
 describe('cron/psi-collect', () => {
-  /** @type {{findProjectByToken: jest.MockInstance, createBuild: jest.MockInstance, createRun: jest.MockInstance}} */
+  /** @type {{findProjectBySlug: jest.MockInstance, createBuild: jest.MockInstance, createRun: jest.MockInstance, sealBuild: jest.MockInstance}} */
   let storageMethod;
 
   beforeEach(() => {
     storageMethod = {
-      findProjectByToken: jest.fn().mockResolvedValue({id: 1, baseBranch: 'main'}),
+      findProjectBySlug: jest.fn().mockResolvedValue({id: 1, baseBranch: 'main'}),
       createBuild: jest.fn().mockResolvedValue({id: 2}),
+      sealBuild: jest.fn().mockResolvedValue({}),
       createRun: jest.fn().mockResolvedValue({id: 3}),
     };
 
@@ -43,10 +44,10 @@ describe('cron/psi-collect', () => {
     });
 
     it('should throw for invalid tokens', async () => {
-      storageMethod.findProjectByToken.mockResolvedValue(undefined);
-      const site = {buildToken: 'invalid'};
+      storageMethod.findProjectBySlug.mockResolvedValue(undefined);
+      const site = {projectSlug: 'invalid'};
       await expect(psiCollectForProject(storageMethod, psi, site)).rejects.toMatchObject({
-        message: 'Invalid build token "invalid"',
+        message: 'Invalid project slug "invalid"',
       });
     });
 
@@ -76,6 +77,7 @@ describe('cron/psi-collect', () => {
         [{projectId: 1, buildId: 2, url: 'http://example.com', lhr: '{"lhr": true}'}],
         [{projectId: 1, buildId: 2, url: 'http://example.com', lhr: '{"lhr": true}'}],
       ]);
+      expect(storageMethod.sealBuild).toHaveBeenCalled();
     });
 
     it('should fill in all the branch requests', async () => {

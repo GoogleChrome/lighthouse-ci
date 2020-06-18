@@ -33,13 +33,13 @@ function normalizeCronSchedule(schedule) {
 /**
  * @param {LHCI.ServerCommand.StorageMethod} storageMethod
  * @param {PsiRunner} psi
- * @param {LHCI.ServerCommand.AutocollectEntry} site
+ * @param {LHCI.ServerCommand.PsiCollectEntry} site
  * @return {Promise<void>}
  */
 async function psiCollectForProject(storageMethod, psi, site) {
-  const {urls, buildToken, numberOfRuns = 3} = site;
-  const project = await storageMethod.findProjectByToken(buildToken);
-  if (!project) throw new Error(`Invalid build token "${buildToken}"`);
+  const {urls, projectSlug, numberOfRuns = 3} = site;
+  const project = await storageMethod.findProjectBySlug(projectSlug);
+  if (!project) throw new Error(`Invalid project slug "${projectSlug}"`);
   if (!urls || !urls.length) throw new Error('No URLs set');
 
   const build = await storageMethod.createBuild({
@@ -81,6 +81,8 @@ async function psiCollectForProject(storageMethod, psi, site) {
       }
     })
   );
+
+  await storageMethod.sealBuild(build.projectId, build.id);
 }
 
 /**
@@ -98,14 +100,15 @@ function startPsiCollectCron(storageMethod, options) {
   for (const site of options.psiCollectCron.sites) {
     const index = options.psiCollectCron.sites.indexOf(site);
     const label = site.label || `Site #${index}`;
+    log(`Scheduling cron for ${label} with schedule ${site.schedule}\n`);
     const cron = new CronJob(normalizeCronSchedule(site.schedule), () => {
-      log(`${new Date().toISOString()} - Starting autocollection for ${label}\n`);
+      log(`${new Date().toISOString()} - Starting PSI collection for ${label}\n`);
       psiCollectForProject(storageMethod, psi, site)
         .then(() => {
-          log(`${new Date().toISOString()} - Successfully completed autocollection for ${label}\n`);
+          log(`${new Date().toISOString()} - Successfully completed collection for ${label}\n`);
         })
         .catch(err => {
-          process.stderr.write(`Autocollection for ${label} failed.\n${err.stack}\n`);
+          process.stderr.write(`PSI Collection for ${label} failed.\n${err.stack}\n`);
         });
     });
     cron.start();

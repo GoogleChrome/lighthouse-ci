@@ -148,11 +148,11 @@ declare global {
 
       export type StorageMethod = StorageMethod_;
 
-      export interface AutocollectEntry {
+      export interface PsiCollectEntry {
         urls: string[];
         schedule: string;
         numberOfRuns?: number;
-        buildToken: string;
+        projectSlug: string;
         label?: string;
         branch?: string;
       }
@@ -181,7 +181,7 @@ declare global {
         psiCollectCron?: {
           psiApiKey: string;
           psiApiEndpoint?: string;
-          sites: Array<AutocollectEntry>;
+          sites: Array<PsiCollectEntry>;
         };
         basicAuth?: {
           username?: string;

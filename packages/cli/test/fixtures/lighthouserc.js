@@ -25,6 +25,18 @@ module.exports = {
       serverBaseUrl: 'http://localhost:9009',
     },
     server: {
+      psiCollectCron: process.env.PSI_API_KEY
+        ? {
+            psiApiKey: process.env.PSI_API_KEY,
+            sites: [
+              {
+                projectSlug: 'lighthouse-dashboard',
+                schedule: '*/2 * * * *',
+                urls: ['https://example.com'],
+              },
+            ],
+          }
+        : undefined,
       port: 9009,
       storage: {
         sqlDatabasePath: 'cli-test-fixtures.tmp.sql',

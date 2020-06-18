@@ -1148,7 +1148,7 @@ module.exports = {
           {
             label: 'Production',
             buildToken: process.env.LHCI_BUILD_TOKEN,
-            schedule: '* * * * 5',
+            schedule: '0 * * * *', // at the top of the hour, every hour
             numberOfRuns: 5,
             urls: ['http://example.com', 'http://example.com/pricing'],
           },
@@ -1156,7 +1156,7 @@ module.exports = {
             label: 'Development',
             branch: 'dev',
             buildToken: process.env.LHCI_BUILD_TOKEN,
-            schedule: '* * * * 5',
+            schedule: '*/10 * * * *', // every 10 minutes
             numberOfRuns: 3,
             urls: ['http://staging.example.com', 'http://staging.example.com/pricing'],
           },

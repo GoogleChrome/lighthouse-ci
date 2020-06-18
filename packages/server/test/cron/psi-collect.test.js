@@ -15,9 +15,9 @@ jest.mock('cron', () => ({
     return cronJob(...args);
   },
 }));
-const {autocollectForProject, startAutocollectCron} = require('../../src/cron/autocollect.js');
+const {psiCollectForProject, startPsiCollectCron} = require('../../src/cron/psi-collect.js');
 
-describe('cron/autocollect', () => {
+describe('cron/psi-collect', () => {
   /** @type {{findProjectByToken: jest.MockInstance, createBuild: jest.MockInstance, createRun: jest.MockInstance}} */
   let storageMethod;
 
@@ -31,7 +31,7 @@ describe('cron/autocollect', () => {
     cronJob = jest.fn().mockReturnValue({start: () => {}});
   });
 
-  describe('.autocollectForProject()', () => {
+  describe('.psiCollectForProject()', () => {
     /** @type {{runUntilSuccess: jest.MockInstance}} */
     let psi;
 
@@ -45,14 +45,14 @@ describe('cron/autocollect', () => {
     it('should throw for invalid tokens', async () => {
       storageMethod.findProjectByToken.mockResolvedValue(undefined);
       const site = {buildToken: 'invalid'};
-      await expect(autocollectForProject(storageMethod, psi, site)).rejects.toMatchObject({
+      await expect(psiCollectForProject(storageMethod, psi, site)).rejects.toMatchObject({
         message: 'Invalid build token "invalid"',
       });
     });
 
     it('should throw when urls are not set', async () => {
       const site = {};
-      await expect(autocollectForProject(storageMethod, psi, site)).rejects.toMatchObject({
+      await expect(psiCollectForProject(storageMethod, psi, site)).rejects.toMatchObject({
         message: 'No URLs set',
       });
     });
@@ -60,14 +60,14 @@ describe('cron/autocollect', () => {
     it('should throw when PSI fails', async () => {
       psi.runUntilSuccess.mockRejectedValue(new Error('PSI failure'));
       const site = {urls: ['http://example.com']};
-      await expect(autocollectForProject(storageMethod, psi, site)).rejects.toMatchObject({
+      await expect(psiCollectForProject(storageMethod, psi, site)).rejects.toMatchObject({
         message: 'PSI failure',
       });
     });
 
     it('should collect PSI results for site', async () => {
       const site = {urls: ['http://example.com']};
-      await autocollectForProject(storageMethod, psi, site);
+      await psiCollectForProject(storageMethod, psi, site);
       expect(storageMethod.createBuild.mock.calls).toMatchObject([
         [{projectId: 1, branch: 'main'}],
       ]);
@@ -80,7 +80,7 @@ describe('cron/autocollect', () => {
 
     it('should fill in all the branch requests', async () => {
       const site = {urls: ['http://example.com']};
-      await autocollectForProject(storageMethod, psi, site);
+      await psiCollectForProject(storageMethod, psi, site);
 
       expect(storageMethod.createBuild).toHaveBeenCalled();
       const buildArgument = storageMethod.createBuild.mock.calls[0][0];
@@ -107,13 +107,13 @@ describe('cron/autocollect', () => {
 
     it('should respect the branch setting', async () => {
       const site = {urls: ['http://example.com'], branch: 'dev'};
-      await autocollectForProject(storageMethod, psi, site);
+      await psiCollectForProject(storageMethod, psi, site);
       expect(storageMethod.createBuild.mock.calls).toMatchObject([[{projectId: 1, branch: 'dev'}]]);
     });
 
     it('should respect number of runs', async () => {
       const site = {urls: ['http://example.com'], numberOfRuns: 5};
-      await autocollectForProject(storageMethod, psi, site);
+      await psiCollectForProject(storageMethod, psi, site);
       expect(storageMethod.createRun.mock.calls).toMatchObject([
         [{projectId: 1, buildId: 2, url: 'http://example.com', lhr: '{"lhr": true}'}],
         [{projectId: 1, buildId: 2, url: 'http://example.com', lhr: '{"lhr": true}'}],
@@ -125,7 +125,7 @@ describe('cron/autocollect', () => {
 
     it('should collect all urls', async () => {
       const site = {urls: ['http://example.com/1', 'http://example.com/2'], numberOfRuns: 2};
-      await autocollectForProject(storageMethod, psi, site);
+      await psiCollectForProject(storageMethod, psi, site);
       expect(storageMethod.createRun.mock.calls).toMatchObject([
         [{projectId: 1, buildId: 2, url: 'http://example.com/1', lhr: '{"lhr": true}'}],
         [{projectId: 1, buildId: 2, url: 'http://example.com/2', lhr: '{"lhr": true}'}],
@@ -135,38 +135,38 @@ describe('cron/autocollect', () => {
     });
   });
 
-  describe('.startAutocollectCron', () => {
+  describe('.startPsiCollectCron', () => {
     const logLevel = 'silent';
 
     it('should schedule a cron job per site', () => {
-      const autocollect = {
+      const psiCollectCron = {
         sites: [
           {schedule: '0 * * * *', urls: ['http://example.com']},
           {schedule: '0 * * * *', urls: ['http://other-example.com']},
         ],
       };
 
-      startAutocollectCron(storageMethod, {logLevel, autocollect});
+      startPsiCollectCron(storageMethod, {logLevel, psiCollectCron});
       expect(cronJob).toHaveBeenCalledTimes(2);
     });
 
     it('should validate cron job', () => {
-      const autocollect = {
+      const psiCollectCron = {
         sites: [{schedule: '* * * * *', urls: ['http://example.com']}],
       };
 
-      expect(() => startAutocollectCron(storageMethod, {logLevel, autocollect})).toThrow(
+      expect(() => startPsiCollectCron(storageMethod, {logLevel, psiCollectCron})).toThrow(
         /too frequent/
       );
     });
 
     it('should validate invalid format', () => {
-      const autocollect = {
+      const psiCollectCron = {
         sites: [{schedule: '* * *', urls: ['http://example.com']}],
       };
 
-      expect(() => startAutocollectCron(storageMethod, {logLevel, autocollect})).toThrow(
-        /Invalid format/
+      expect(() => startPsiCollectCron(storageMethod, {logLevel, psiCollectCron})).toThrow(
+        /Invalid cron format/
       );
     });
   });

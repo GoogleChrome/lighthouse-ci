@@ -178,7 +178,7 @@ declare global {
         logLevel: 'silent' | 'verbose';
         port: number;
         storage: StorageOptions;
-        autocollect?: {
+        psiCollectCron?: {
           psiApiKey: string;
           psiApiEndpoint?: string;
           sites: Array<AutocollectEntry>;

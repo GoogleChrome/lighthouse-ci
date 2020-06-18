@@ -21,6 +21,8 @@ The LHCI server can be run in any node environment with persistent disk storage 
 
 If you'd like to run LHCI on your own infrastructure, you'll need a package.json to install the dependencies via npm. See the [Heroku](./recipes/heroku-server/README.md) and [docker](./recipes/docker-server/README.md) recipes for more examples on how to deploy the LHCI server.
 
+**NOTE:** LHCI really needs to own the entire origin to work as expected. However, if you can't do that and have to operate over a proxy, you can follow the [example of how to configure LHCI on a subpath](./recipes/lhci-server-vpn-proxy/README.md).
+
 ```
 npm install @lhci/server sqlite3
 ```

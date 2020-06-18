@@ -38,6 +38,7 @@
     "@testing-library/dom": "^5.4.0",
     "@types/body-parser": "^1.17.0",
     "@types/compression": "^1.0.1",
+    "@types/cron": "^1.7.2",
     "@types/d3": "^5.7.2",
     "@types/express": "^4.16.1",
     "@types/inquirer": "^6.0.3",

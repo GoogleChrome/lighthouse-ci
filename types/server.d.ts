@@ -148,6 +148,15 @@ declare global {
 
       export type StorageMethod = StorageMethod_;
 
+      export interface AutocollectEntry {
+        urls: string[];
+        schedule: string;
+        numberOfRuns?: number;
+        buildToken: string;
+        label?: string;
+        branch?: string;
+      }
+
       export interface StorageOptions {
         storageMethod: 'sql' | 'spanner';
         sqlDialect: 'sqlite' | 'mysql' | 'postgres';
@@ -169,6 +178,11 @@ declare global {
         logLevel: 'silent' | 'verbose';
         port: number;
         storage: StorageOptions;
+        autocollect?: {
+          psiApiKey: string;
+          psiApiEndpoint?: string;
+          sites: Array<AutocollectEntry>;
+        };
         basicAuth?: {
           username?: string;
           password?: string;

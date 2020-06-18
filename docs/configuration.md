@@ -1136,6 +1136,48 @@ module.exports = {
 };
 ```
 
+### Server Autocollection
+
+```js
+module.exports = {
+  ci: {
+    server: {
+      autocollect: {
+        psiApiKey: process.env.PSI_API_KEY,
+        sites: [
+          {
+            label: 'Production',
+            buildToken: process.env.LHCI_BUILD_TOKEN,
+            schedule: '* * * * 5',
+            numberOfRuns: 5,
+            urls: ['http://example.com', 'http://example.com/pricing'],
+          },
+          {
+            label: 'Development',
+            branch: 'dev',
+            buildToken: process.env.LHCI_BUILD_TOKEN,
+            schedule: '* * * * 5',
+            numberOfRuns: 3,
+            urls: ['http://staging.example.com', 'http://staging.example.com/pricing'],
+          },
+        ],
+      },
+      storage: {
+        storageMethod: 'sql',
+        sqlDialect: 'postgres',
+        sqlConnectionSsl: true,
+        sqlConnectionUrl: process.env.DATABASE_URL,
+        sequelizeOptions: {
+          pool: {
+            acquire: 30000,
+          },
+        },
+      },
+    },
+  },
+};
+```
+
 ### Custom Headers for Wizard
 
 If you're running the `lhci server` behind a reverse proxy or any other component that requires some extra headers you can configure them in the wizard section `extraHeaders`.

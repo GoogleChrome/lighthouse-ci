@@ -7,6 +7,8 @@
 
 const PsiClient = require('./psi-client.js');
 
+const CACHEBUST_TIMEOUT = Number(process.env.PSI_CACHEBUST_TIMEOUT_MS) || 60e3;
+
 class PsiRunner {
   /**
    * @param {{psiApiKey?: string, psiApiEndpoint?: string}} [options]
@@ -49,8 +51,12 @@ class PsiRunner {
   }
 
   /** @return {number} */
+  get CACHEBUST_TIMEOUT() {
+    return CACHEBUST_TIMEOUT;
+  }
+
   static get CACHEBUST_TIMEOUT() {
-    return Number(process.env.PSI_CACHEBUST_TIMEOUT_MS) || 60e3;
+    return CACHEBUST_TIMEOUT;
   }
 }
 

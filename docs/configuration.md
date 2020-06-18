@@ -1136,13 +1136,13 @@ module.exports = {
 };
 ```
 
-### Server Autocollection
+### Server Cron Job to Monitor Production URLs via PSI
 
 ```js
 module.exports = {
   ci: {
     server: {
-      autocollect: {
+      psiCollectCron: {
         psiApiKey: process.env.PSI_API_KEY,
         sites: [
           {

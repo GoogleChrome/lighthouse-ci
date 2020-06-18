@@ -36,7 +36,7 @@ function normalizeCronSchedule(schedule) {
  * @param {LHCI.ServerCommand.AutocollectEntry} site
  * @return {Promise<void>}
  */
-async function autocollectForProject(storageMethod, psi, site) {
+async function psiCollectForProject(storageMethod, psi, site) {
   const {urls, buildToken, numberOfRuns = 3} = site;
   const project = await storageMethod.findProjectByToken(buildToken);
   if (!project) throw new Error(`Invalid build token "${buildToken}"`);
@@ -88,19 +88,19 @@ async function autocollectForProject(storageMethod, psi, site) {
  * @param {LHCI.ServerCommand.Options} options
  * @return {void}
  */
-function startAutocollectCron(storageMethod, options) {
-  if (!options.autocollect) return;
+function startPsiCollectCron(storageMethod, options) {
+  if (!options.psiCollectCron) return;
 
   /** @type {(msg: string) => void} */
   const log = options.logLevel === 'silent' ? () => {} : msg => process.stdout.write(msg);
 
-  const psi = new PsiRunner(options.autocollect);
-  for (const site of options.autocollect.sites) {
-    const index = options.autocollect.sites.indexOf(site);
+  const psi = new PsiRunner(options.psiCollectCron);
+  for (const site of options.psiCollectCron.sites) {
+    const index = options.psiCollectCron.sites.indexOf(site);
     const label = site.label || `Site #${index}`;
     const cron = new CronJob(normalizeCronSchedule(site.schedule), () => {
       log(`${new Date().toISOString()} - Starting autocollection for ${label}\n`);
-      autocollectForProject(storageMethod, psi, site)
+      psiCollectForProject(storageMethod, psi, site)
         .then(() => {
           log(`${new Date().toISOString()} - Successfully completed autocollection for ${label}\n`);
         })
@@ -112,4 +112,4 @@ function startAutocollectCron(storageMethod, options) {
   }
 }
 
-module.exports = {startAutocollectCron, autocollectForProject};
+module.exports = {startPsiCollectCron, psiCollectForProject};

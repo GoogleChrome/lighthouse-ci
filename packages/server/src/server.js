@@ -17,7 +17,7 @@ const ApiClient = require('@lhci/utils/src/api-client.js');
 const createProjectsRouter = require('./api/routes/projects.js');
 const StorageMethod = require('./api/storage/storage-method.js');
 const {errorMiddleware, createBasicAuthMiddleware} = require('./api/express-utils.js');
-const {startAutocollectCron} = require('./cron/autocollect.js');
+const {startPsiCollectCron} = require('./cron/psi-collect.js');
 const version = require('../package.json').version;
 
 const DIST_FOLDER = path.join(__dirname, '../dist');
@@ -54,7 +54,7 @@ async function createApp(options) {
   app.get('/app/*', (_, res) => res.sendFile(path.join(DIST_FOLDER, 'index.html')));
   app.use(errorMiddleware);
 
-  startAutocollectCron(storageMethod, options);
+  startPsiCollectCron(storageMethod, options);
 
   return {app, storageMethod};
 }

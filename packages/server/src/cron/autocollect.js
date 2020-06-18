@@ -10,6 +10,27 @@ const {getGravatarUrlFromEmail} = require('@lhci/utils/src/build-context');
 const PsiRunner = require('@lhci/utils/src/psi-runner.js');
 
 /**
+ * @param {string} schedule
+ * @return {string}
+ */
+function normalizeCronSchedule(schedule) {
+  if (typeof schedule !== 'string') {
+    throw new Error(`Schedule must be provided`);
+  }
+
+  const parts = schedule.split(/\s+/).filter(Boolean);
+  if (parts.length !== 5) {
+    throw new Error(`Invalid cron format, expected <minutes> <hours> <day> <month> <day of week>`);
+  }
+
+  if (parts[0] === '*') {
+    throw new Error(`Cron schedule "${schedule}" is too frequent`);
+  }
+
+  return ['0', ...parts].join(' ');
+}
+
+/**
  * @param {LHCI.ServerCommand.StorageMethod} storageMethod
  * @param {PsiRunner} psi
  * @param {LHCI.ServerCommand.AutocollectEntry} site
@@ -77,7 +98,7 @@ function startAutocollectCron(storageMethod, options) {
   for (const site of options.autocollect.sites) {
     const index = options.autocollect.sites.indexOf(site);
     const label = site.label || `Site #${index}`;
-    const cron = new CronJob(site.schedule, () => {
+    const cron = new CronJob(normalizeCronSchedule(site.schedule), () => {
       log(`${new Date().toISOString()} - Starting autocollection for ${label}\n`);
       autocollectForProject(storageMethod, psi, site)
         .then(() => {

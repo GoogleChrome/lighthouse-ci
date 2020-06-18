@@ -7,22 +7,35 @@
 
 /* eslint-env jest */
 
-const {autocollectForProject} = require('../../src/cron/autocollect.js');
+/** @type {jest.MockInstance} */
+let cronJob = jest.fn().mockReturnValue({start: () => {}});
+jest.mock('cron', () => ({
+  CronJob: function(...args) {
+    // use this indirection because we have to invoke it with `new` and it's harder to mock assertions
+    return cronJob(...args);
+  },
+}));
+const {autocollectForProject, startAutocollectCron} = require('../../src/cron/autocollect.js');
 
 describe('cron/autocollect', () => {
+  /** @type {{findProjectByToken: jest.MockInstance, createBuild: jest.MockInstance, createRun: jest.MockInstance}} */
+  let storageMethod;
+
+  beforeEach(() => {
+    storageMethod = {
+      findProjectByToken: jest.fn().mockResolvedValue({id: 1, baseBranch: 'main'}),
+      createBuild: jest.fn().mockResolvedValue({id: 2}),
+      createRun: jest.fn().mockResolvedValue({id: 3}),
+    };
+
+    cronJob = jest.fn().mockReturnValue({start: () => {}});
+  });
+
   describe('.autocollectForProject()', () => {
-    /** @type {{findProjectByToken: jest.MockInstance, createBuild: jest.MockInstance, createRun: jest.MockInstance}} */
-    let storageMethod;
     /** @type {{runUntilSuccess: jest.MockInstance}} */
     let psi;
 
     beforeEach(() => {
-      storageMethod = {
-        findProjectByToken: jest.fn().mockResolvedValue({id: 1, baseBranch: 'main'}),
-        createBuild: jest.fn().mockResolvedValue({id: 2}),
-        createRun: jest.fn().mockResolvedValue({id: 3}),
-      };
-
       psi = {
         CACHEBUST_TIMEOUT: 0,
         runUntilSuccess: jest.fn().mockResolvedValue('{"lhr": true}'),
@@ -119,6 +132,42 @@ describe('cron/autocollect', () => {
         [{projectId: 1, buildId: 2, url: 'http://example.com/1', lhr: '{"lhr": true}'}],
         [{projectId: 1, buildId: 2, url: 'http://example.com/2', lhr: '{"lhr": true}'}],
       ]);
+    });
+  });
+
+  describe('.startAutocollectCron', () => {
+    const logLevel = 'silent';
+
+    it('should schedule a cron job per site', () => {
+      const autocollect = {
+        sites: [
+          {schedule: '0 * * * *', urls: ['http://example.com']},
+          {schedule: '0 * * * *', urls: ['http://other-example.com']},
+        ],
+      };
+
+      startAutocollectCron(storageMethod, {logLevel, autocollect});
+      expect(cronJob).toHaveBeenCalledTimes(2);
+    });
+
+    it('should validate cron job', () => {
+      const autocollect = {
+        sites: [{schedule: '* * * * *', urls: ['http://example.com']}],
+      };
+
+      expect(() => startAutocollectCron(storageMethod, {logLevel, autocollect})).toThrow(
+        /too frequent/
+      );
+    });
+
+    it('should validate invalid format', () => {
+      const autocollect = {
+        sites: [{schedule: '* * *', urls: ['http://example.com']}],
+      };
+
+      expect(() => startAutocollectCron(storageMethod, {logLevel, autocollect})).toThrow(
+        /Invalid format/
+      );
     });
   });
 });

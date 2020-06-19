@@ -15,7 +15,7 @@ const {spawn} = require('child_process');
 const testingLibrary = require('@testing-library/dom');
 const FallbackServer = require('../src/collect/fallback-server.js');
 
-jest.setTimeout(15000);
+jest.setTimeout(30e3);
 
 const CLI_PATH = path.join(__dirname, '../src/cli.js');
 const UUID_REGEX = /[0-9a-f-]{36}/gi;

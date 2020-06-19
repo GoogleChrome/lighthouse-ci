@@ -166,15 +166,15 @@ describe('Lighthouse CI upload CLI', () => {
     lhr.finalUrl = `https://www.example.com/page`;
     lhr.fetchTime = '2020-05-22T22:12:01.000Z';
     lhr.audits['first-contentful-paint'].numericValue = 900;
-    fs.writeFileSync(fakeLhrPath.replace(/\d+/, '1'), JSON.stringify(lhr));
+    fs.writeFileSync(fakeLhrPath.replace(/lhr-\d+/, 'lhr-1'), JSON.stringify(lhr));
     lhr.fetchTime = '2020-05-22T22:12:02.000Z';
     lhr.audits['first-contentful-paint'].numericValue = 1100;
-    fs.writeFileSync(fakeLhrPath.replace(/\d+/, '2'), JSON.stringify(lhr));
+    fs.writeFileSync(fakeLhrPath.replace(/lhr-\d+/, 'lhr-2'), JSON.stringify(lhr));
     // This is the median run now
     lhr.fetchTime = '2020-05-22T22:12:03.000Z';
     lhr.categories.performance = {score: 0.5};
     lhr.audits['first-contentful-paint'].numericValue = 1000;
-    fs.writeFileSync(fakeLhrPath.replace(/\d+/, '3'), JSON.stringify(lhr));
+    fs.writeFileSync(fakeLhrPath.replace(/lhr-\d+/, 'lhr-3'), JSON.stringify(lhr));
     fs.unlinkSync(fakeLhrPath);
 
     const {stdout, stderr, status} = await runCLI(

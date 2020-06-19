@@ -1,0 +1,86 @@
+name: CI
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+jobs:
+  basics:
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Windows
+            os: windows-latest
+          - name: macOS
+            os: macos-latest
+    env:
+      YARN_GPG: 'no'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Use Node.js 10.x
+        uses: actions/setup-node@v1
+        with:
+          node-version: 10.x
+      - run: yarn
+      - run: yarn build
+      - run: yarn test:unit
+      - if: ${{ failure() }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: screenshots
+          path: packages/server/test/ui/__image_snapshots__/__diff_output__/*.png
+      - if: ${{ failure() }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: screenshots
+          path: packages/server/test/e2e/__image_snapshots__/__diff_output__/*.png
+  complete:
+    name: Linux
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:12
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_ROOT_PASSWORD: mysql
+          MYSQL_DATABASE: test
+          MYSQL_ROOT_HOST: '%'
+        ports:
+          - 33306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Use Node.js 10.x
+        uses: actions/setup-node@v1
+        with:
+          node-version: 10.x
+      - name: Configure Environment
+        run: |-
+          echo "::set-env name=CHROME_PATH::$(which google-chrome-stable)"
+          echo "::set-env name=POSTGRES_DB_URL::postgres://postgres:postgres@localhost/lighthouse_ci_test"
+          echo "::set-env name=MYSQL_DB_URL::mysql://root:mysql@127.0.0.1:33306/lighthouse_ci_test"
+
+          export PGPASSWORD="postgres"
+          export MYSQL_PWD="mysql"
+          psql -h localhost -p 5432 -c 'create database lighthouse_ci_test;' -U postgres
+          mysql --host=127.0.0.1 --port=33306 -e 'create database lighthouse_ci_test;' -u root
+
+          google-chrome-stable --version
+      - run: yarn
+      - run: yarn build
+      - run: yarn test:unit

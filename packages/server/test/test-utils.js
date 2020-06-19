@@ -8,6 +8,7 @@
 /* eslint-env jest, browser */
 
 const fs = require('fs');
+const os = require('os');
 const path = require('path');
 const puppeteer = require('puppeteer');
 const {configureToMatchImageSnapshot} = require('jest-image-snapshot');
@@ -239,7 +240,7 @@ module.exports = {
   // Utils for E2E tests
   getTestLHRPath,
   createActualTestDataset,
-  shouldRunE2E: () => Boolean(!process.env.CI || process.env.RUN_E2E_TESTS),
+  shouldRunE2E: () => Boolean(!process.env.CI || os.platform() === 'darwin'),
   emptyTest: () => it.skip('not enabled', () => {}),
   setupImageSnapshots: () => {
     const toMatchImageSnapshot = configureToMatchImageSnapshot({

@@ -1,0 +1,54 @@
+name: CI
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+jobs:
+  build:
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Windows
+            os: windows-latest
+          - name: macOS
+            os: macos-latest
+          - name: Linux
+            os: ubuntu-latest
+    env:
+      YARN_GPG: 'no'
+    services:
+      postgres:
+        image: postgres:12
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      - name: Configure Linux Environment
+        if: runner.os == 'linux'
+        run: |-
+          echo "::set-env name=CHROME_PATH::$(which google-chrome-stable)"
+          echo "::set-env name=RUN_E2E_TESTS::true"
+          echo "::set-env name=POSTGRES_DB_URL::postgres://postgres:postgres@localhost/lighthouse_ci_test"
+          echo "::set-env name=MYSQL_DB_URL::mysql://root:root@localhost/lighthouse_ci_test"
+
+          export PGPASSWORD="postgres"
+          export MYSQL_PWD="root"
+          psql -c 'create database lighthouse_ci_test;' -U postgres
+          mysql -e 'create database lighthouse_ci_test;' -u root
+
+          google-chrome-stable --version
+      - name: Use Node.js 10.x
+        uses: actions/setup-node@v1
+        with:
+          node-version: 10.x
+      - run: yarn
+      - run: yarn build
+      - run: yarn test:unit

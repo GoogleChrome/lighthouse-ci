@@ -104,6 +104,10 @@ async function startServer(sqlFile, extraArgs = []) {
   return {port, process: serverProcess, sqlFile};
 }
 
+function waitForNonException(fn) {
+  return testingLibrary.wait(fn);
+}
+
 function waitForCondition(fn, label) {
   return testingLibrary.wait(() => {
     if (!fn()) {
@@ -131,9 +135,9 @@ function getCleanEnvironment(extraEnvVars) {
 /**
  * @param {string[]} args
  * @param {{cwd?: string, env?: Record<string, string>}} [overrides]
- * @return {Promise<{stdout: string, stderr: string, status: number, matches: {uuids: RegExpMatchArray}}>}
+ * @return {{stdout: string, stderr: string, status: number, matches: {uuids: RegExpMatchArray}, childProcess: NodeJS.ChildProcess, exitPromise: Promise<void>}}
  */
-async function runCLI(args, overrides = {}) {
+function runCLIWithoutWaiting(args, overrides = {}) {
   const {env: extraEnvVars, cwd} = overrides;
   const env = getCleanEnvironment(extraEnvVars);
   const childProcess = spawn('node', [CLI_PATH, ...args], {
@@ -141,19 +145,30 @@ async function runCLI(args, overrides = {}) {
     env,
   });
 
-  let stdout = '';
-  let stderr = '';
-  let status = 0;
-  childProcess.stdout.on('data', chunk => (stdout += chunk.toString()));
-  childProcess.stderr.on('data', chunk => (stderr += chunk.toString()));
-  childProcess.once('exit', code => (status = code));
-  await new Promise(r => childProcess.once('exit', r));
+  const results = {stdout: '', stderr: '', status: -1, matches: {uuids: []}};
+  childProcess.stdout.on('data', chunk => (results.stdout += chunk.toString()));
+  childProcess.stderr.on('data', chunk => (results.stderr += chunk.toString()));
+  childProcess.once('exit', code => (results.status = code));
+  const exitPromise = new Promise(r => childProcess.once('exit', r));
 
-  const uuids = stdout.match(UUID_REGEX);
-  stdout = cleanStdOutput(stdout);
-  stderr = cleanStdOutput(stderr);
+  results.exitPromise = exitPromise.then(() => {
+    results.matches.uuids = results.stdout.match(UUID_REGEX);
+    results.stdout = cleanStdOutput(results.stdout);
+    results.stderr = cleanStdOutput(results.stderr);
+  });
+  results.childProcess = childProcess;
+  return results;
+}
 
-  return {stdout, stderr, status, matches: {uuids}};
+/**
+ * @param {string[]} args
+ * @param {{cwd?: string, env?: Record<string, string>}} [overrides]
+ * @return {Promise<{stdout: string, stderr: string, status: number, matches: {uuids: RegExpMatchArray}}>}
+ */
+async function runCLI(args, overrides = {}) {
+  const results = runCLIWithoutWaiting(args, overrides);
+  await results.exitPromise;
+  return results;
 }
 
 /**
@@ -211,8 +226,10 @@ module.exports = {
   CLI_PATH,
   runCLI,
   runWizardCLI,
+  runCLIWithoutWaiting,
   startServer,
   waitForCondition,
+  waitForNonException,
   getSqlFilePath,
   safeDeleteFile,
   withTmpDir,

@@ -28,7 +28,7 @@ async function createApp() {
     const lighthouseResult = JSON.parse(JSON.stringify(LHR));
     lighthouseResult.finalUrl = url;
     lighthouseResult.initialUrl = url;
-    res.json({lighthouseResult});
+    setTimeout(() => res.json({lighthouseResult}), 2000);
   });
 
   return {app};

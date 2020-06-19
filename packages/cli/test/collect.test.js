@@ -56,7 +56,7 @@ describe('collect', () => {
         expect(filesInCiFolder).not.toContain('lhr-123.html');
         expect(filesInCiFolder).not.toContain('lhr-123.json');
       }),
-    90000
+    180e3
   );
 
   it(
@@ -97,7 +97,7 @@ describe('collect', () => {
         // Check script ran without errors.
         expect(status).toEqual(0);
       }),
-    90000
+    180e3
   );
 
   it(

@@ -13,7 +13,7 @@ const DEFAULT_HEIGHT = 600;
 
 let initStoryshots = initStoryshots_;
 
-if (process.env.TRAVIS && require('os').platform() !== 'darwin') {
+if (process.env.CI && require('os').platform() !== 'darwin') {
   initStoryshots = () => {
     describe('Storyshots', () => {
       it.skip('disabled in travis on non-mac for subtle font rendering issues', () => {

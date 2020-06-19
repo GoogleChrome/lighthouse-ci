@@ -18,6 +18,10 @@ function normalizeCronSchedule(schedule) {
     throw new Error(`Schedule must be provided`);
   }
 
+  if (process.env.OVERRIDE_SCHEDULE_FOR_TEST) {
+    return process.env.OVERRIDE_SCHEDULE_FOR_TEST;
+  }
+
   const parts = schedule.split(/\s+/).filter(Boolean);
   if (parts.length !== 5) {
     throw new Error(`Invalid cron format, expected <minutes> <hours> <day> <month> <day of week>`);
@@ -94,21 +98,35 @@ function startPsiCollectCron(storageMethod, options) {
   if (!options.psiCollectCron) return;
 
   /** @type {(msg: string) => void} */
-  const log = options.logLevel === 'silent' ? () => {} : msg => process.stdout.write(msg);
+  const log =
+    options.logLevel === 'silent'
+      ? () => {}
+      : msg => process.stdout.write(`${new Date().toISOString()} - ${msg}\n`);
 
   const psi = new PsiRunner(options.psiCollectCron);
   for (const site of options.psiCollectCron.sites) {
     const index = options.psiCollectCron.sites.indexOf(site);
     const label = site.label || `Site #${index}`;
-    log(`Scheduling cron for ${label} with schedule ${site.schedule}\n`);
+    log(`Scheduling cron for ${label} with schedule ${site.schedule}`);
+
+    let inProgress = false;
     const cron = new CronJob(normalizeCronSchedule(site.schedule), () => {
-      log(`${new Date().toISOString()} - Starting PSI collection for ${label}\n`);
+      if (inProgress) {
+        log(`Previous PSI collection for ${label} still in progress. Skipping...`);
+        return;
+      }
+
+      inProgress = true;
+      log(`Starting PSI collection for ${label}`);
       psiCollectForProject(storageMethod, psi, site)
         .then(() => {
-          log(`${new Date().toISOString()} - Successfully completed collection for ${label}\n`);
+          log(`Successfully completed collection for ${label}`);
         })
         .catch(err => {
-          process.stderr.write(`PSI Collection for ${label} failed.\n${err.stack}\n`);
+          log(`PSI collection failure for ${label}: ${err.message}`);
+        })
+        .finally(() => {
+          inProgress = false;
         });
     });
     cron.start();

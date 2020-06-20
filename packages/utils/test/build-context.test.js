@@ -212,6 +212,16 @@ describe('build-context.js', () => {
       );
     });
 
+    it('should work when git remote does not end in .git', () => {
+      process.env.LHCI_BUILD_CONTEXT__GIT_REMOTE = 'https://github.com/GoogleChrome/lighthouse';
+      expect(buildContext.getGitHubRepoSlug()).toEqual('GoogleChrome/lighthouse');
+    });
+
+    it('should work when git remote does end in .git', () => {
+      process.env.LHCI_BUILD_CONTEXT__GIT_REMOTE = 'git@github.com:example/repo.git';
+      expect(buildContext.getGitHubRepoSlug()).toEqual('example/repo');
+    });
+
     it('should fallback to getGitRemote result', () => {
       expect(buildContext.getGitHubRepoSlug()).toEqual('GoogleChrome/lighthouse-ci');
     });

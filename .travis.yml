@@ -11,45 +11,21 @@ stages:
   - test
 jobs:
   include:
-    - &base-test
-      os: osx
+    - os: linux
       language: node_js
       node_js: v10
       stage: test
+      before_script:
+        - google-chrome-stable --version
+        - export CHROME_PATH="$(which google-chrome-stable)"
       script:
         - yarn build
-        - yarn test:unit
+        - yarn ci:dogfood
       before_cache:
         # nyc, jest and other projects store files in here. They mess up the travis build cache.
         # fsevents somehow gets "changed" every build on mac and it takes forever to recache
         - rm -rf ./node_modules/.cache/ ./node_modules/fsevents/node_modules
+      services:
+        - xvfb
       addons:
         chrome: stable
-    - <<: *base-test
-      os: windows
-      before_install:
-        - export LHCI_GITHUB_TOKEN="" # prevent any accidental leaking of the token
-        - export LHCI_GITHUB_APP_TOKEN="" # prevent any accidental leaking of the token
-        - choco install googlechrome --ignore-checksums
-      before_script:
-        - ps -W | sort
-      after_script:
-        - ps -W | sort
-      env: YARN_GPG=no
-    - <<: *base-test
-      os: linux
-      before_script:
-        - google-chrome-stable --version
-        - export CHROME_PATH="$(which google-chrome-stable)"
-        - export POSTGRES_DB_URL="postgres://postgres@localhost/lighthouse_ci_test"
-        - psql -c 'create database lighthouse_ci_test;' -U postgres
-        - export MYSQL_DB_URL="mysql://root@localhost/lighthouse_ci_test"
-        - mysql -e 'create database if not exists lighthouse_ci_test;' -u root
-      script:
-        - yarn build
-        - yarn test
-        - yarn ci:dogfood
-      services:
-        - postgresql
-        - mysql
-        - xvfb

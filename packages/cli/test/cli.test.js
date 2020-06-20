@@ -23,6 +23,8 @@ const {
   runWizardCLI,
 } = require('./test-utils.js');
 
+jest.setTimeout(120e3);
+
 describe('Lighthouse CI CLI', () => {
   const rcFile = path.join(__dirname, 'fixtures/lighthouserc.json');
   const rcMatrixFile = path.join(__dirname, 'fixtures/lighthouserc-matrix.json');
@@ -88,7 +90,7 @@ describe('Lighthouse CI CLI', () => {
         .replace(log.bold, '')
         .replace(log.reset, '');
       projectAdminToken = adminSentence.match(/Use admin token (\w+)/)[1];
-    }, 30000);
+    });
 
     it('should create a new project with config file', async () => {
       const wizardTempConfigFile = {
@@ -112,7 +114,7 @@ describe('Lighthouse CI CLI', () => {
       expect(stderr).toEqual('');
       expect(status).toEqual(0);
       expect(stdout).toContain(`http://localhost:${server.port}`);
-    }, 30000);
+    });
   });
 
   describe('healthcheck', () => {
@@ -191,7 +193,7 @@ describe('Lighthouse CI CLI', () => {
       `);
       expect(stderr.toString()).toMatchInlineSnapshot(`""`);
       expect(status).toEqual(0);
-    }, 60000);
+    });
     it('should collect results from explicit urls', async () => {
       const {stdout, stderr, status} = await runCLI([
         'collect',
@@ -208,7 +210,7 @@ describe('Lighthouse CI CLI', () => {
       `);
       expect(stderr.toString()).toMatchInlineSnapshot(`""`);
       expect(status).toEqual(0);
-    }, 60000);
+    });
   });
 
   describe('upload', () => {

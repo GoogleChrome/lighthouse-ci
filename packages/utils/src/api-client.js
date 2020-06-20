@@ -46,7 +46,11 @@ class ApiClient {
    * @return {URL}
    */
   _normalizeURL(url) {
-    return new this._URL(url, this._rootURL);
+    if (!url.startsWith('/')) throw new Error(`Cannot normalize "${url}" without leading /`);
+    const rootWithoutSlash = this._rootURL.endsWith('/')
+      ? this._rootURL.slice(0, this._rootURL.length - 1)
+      : this._rootURL;
+    return new this._URL(`${rootWithoutSlash}${url}`);
   }
 
   /**

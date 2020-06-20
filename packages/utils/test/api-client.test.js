@@ -22,6 +22,11 @@ describe('Lighthouse CI API Client', () => {
     client = new ApiClient({rootURL: 'http://localhost:9000/', fetch: fetchMock});
     await client.getProjects();
     expect(fetchMock).toHaveBeenCalledWith(`http://localhost:9000/v1/projects`, {headers: {}});
+
+    fetchMock = jest.fn().mockImplementation(fetchMockImpl);
+    client = new ApiClient({rootURL: 'http://localhost:9000/lhci/', fetch: fetchMock});
+    await client.getProjects();
+    expect(fetchMock).toHaveBeenCalledWith(`http://localhost:9000/lhci/v1/projects`, {headers: {}});
   });
 
   it('should pass through headers', async () => {

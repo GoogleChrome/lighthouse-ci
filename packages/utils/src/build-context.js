@@ -310,7 +310,7 @@ function getGitHubRepoSlug(apiHost = undefined) {
 
   const remote = getGitRemote();
   if (remote && remote.includes('github.com')) {
-    const remoteMatch = remote.match(/github\.com.([^/]+\/.+)\.git/);
+    const remoteMatch = remote.match(/github\.com.([^/]+\/[^/]+?)(\.git|$)/);
     if (remoteMatch) return remoteMatch[1];
   }
 

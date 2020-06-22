@@ -212,7 +212,6 @@ Options:
                              running Lighthouse, used for auth.
   --puppeteerLaunchOptions   The object of puppeteer launch options
   --psiApiKey                [psi only] The API key to use for PageSpeed Insights runner method.
-  --psiApiEndpoint           [psi only] The endpoint to use for PageSpeed Insights runner method.
                              You do not need to use this unless you wrote a custom version.
   --startServerCommand       The command to run to start the server.
   --startServerReadyPattern  String pattern to listen for started server.
@@ -845,24 +844,118 @@ Starts the LHCI server. This command is unique in that it is likely run on infra
 Run Lighthouse CI server
 
 Options:
-  --logLevel                            [string] [choices: "silent", "verbose"] [default: "verbose"]
-  --port, -p                                                                [number] [default: 9001]
-  --storage.storageMethod                      [string] [choices: "sql", "spanner"] [default: "sql"]
-  --storage.sqlDialect         [string] [choices: "sqlite", "postgres", "mysql"] [default: "sqlite"]
+  --logLevel                                              [string] [choices: "silent", "verbose"] [default: "verbose"]
+  --port, -p                                                                                  [number] [default: 9001]
+  --storage.storageMethod                                                   [string] [choices: "sql"] [default: "sql"]
+  --storage.sqlDialect                           [string] [choices: "sqlite", "postgres", "mysql"] [default: "sqlite"]
   --storage.sqlDatabasePath              The path to a SQLite database on disk.
   --storage.sqlConnectionUrl             The connection url to a postgres or mysql database.
-  --storage.sqlConnectionSsl             Whether the SQL connection should force use of SSL
-                                                                          [boolean] [default: false]
-  --storage.sqlDangerouslyResetDatabase  Whether to force the database to the required schema.
-                                         WARNING: THIS WILL DELETE ALL DATA
-                                                                          [boolean] [default: false]
-  --basicAuth.username                   The username to protect the server with HTTP Basic
-                                         Authentication.                                    [string]
-  --basicAuth.password                   The password to protect the server with HTTP Basic
-                                         Authentication.                                    [string]
+  --storage.sqlConnectionSsl             Whether the SQL connection should force use of SSL [boolean] [default: false]
+  --storage.sqlDangerouslyResetDatabase  Whether to force the database to the required schema. WARNING: THIS WILL
+                                         DELETE ALL DATA                                    [boolean] [default: false]
+  --basicAuth.username                   The username to protect the server with HTTP Basic Authentication.   [string]
+  --basicAuth.password                   The password to protect the server with HTTP Basic Authentication.   [string]
 ```
 
+#### `port`
+
+The port for the server to listen on. A value of `0` will use a random available port.
+
+#### `storage`
+
+Options that control how the historical Lighthouse data is stored. Currently only SQL-based storage mechanisms are supported.
+
+##### `storage.sqlDialect`
+
+One of `mysql`, `postgres`, or `sqlite`. `sqlite` in a local file on disk has been sufficient for most use cases.
+
+##### `storage.sqlDatabasePath`
+
+_sqlDialect=sqlite only_
+
+The path to the sqlite database on the local filesystem relative to the current working directory.
+
+##### `storage.sqlConnectionUrl`
+
+_sqlDialect=mysql or sqlDialect=postgres only_
+
+The database connection URL string for the MySQL or PostgreSQL database of the form `<dialect>://<user>:<password>@<host>/<database>`.
+
+##### `storage.sqlDangerouslyResetDatabase`
+
+**WARNING: this option will delete all data in the database**
+
+Boolean flag useful during setup if things have gone wrong. This flag will reset the schema of all LHCI tables to factory fresh, **deleting all data in the process**.
+
+##### `storage.sequelizeOptions`
+
+Additional raw options object to pass to [sequelize](https://sequelize.org/v4/). Refer to the [sequelize documentation](https://sequelize.org/v4/) for more information on available settings.
+
+#### `psiCollectCron`
+
+The configuration to automatically collect results using the [PageSpeed Insights API](https://developers.google.com/speed/pagespeed/insights/).
+
+##### `psiCollectCron.psiApiKey`
+
+The API key to use with the PSI API. You can obtain a PSI API Key by following the [official documentation](https://developers.google.com/speed/docs/insights/v5/get-started).
+
+##### `psiCollectCron.sites`
+
+The array of sites to collect results for. This configuration will only be possible once the server has been setup and project have been created.
+
+##### `psiCollectCron.sites[i].urls`
+
+The array of URLs on which to run Lighthouse. These URLs must be publicly accessible to anyone on the internet in order for PSI to be able to run.
+
+##### `psiCollectCron.sites[i].schedule`
+
+The [cron-style](https://crontab.guru/) schedule on which to collect results.
+
 **Examples**
+
+Every 10 minutes, 24/7 - `*/10 * * * *`
+
+Daily at midnight - `0 0 * * *`
+
+Monday-Friday at 11:30 AM - `30 11 * * 1-5`
+
+##### `psiCollectCron.sites[i].projectSlug`
+
+The unique slug identifer of the project in which results should be saved. The easiest way to tell the project slug is to open the project on the server and look at the URL bar. The project slug for the URL below is `debugger-protocol-viewer`.
+
+![image](https://user-images.githubusercontent.com/2301202/85318719-18a05700-b486-11ea-831f-0e3636aa6550.png)
+
+You can also list projects from the API to find the `projectSlug`.
+
+```bash
+curl http://localhost:9001/v1/projects | jq '.[] |.name,.slug'
+```
+
+##### `psiCollectCron.sites[i].numberOfRuns`
+
+_Optional_ The number of reports to collect for each URL on each iteration of the schedule. Defaults to 5.
+
+##### `psiCollectCron.sites[i].label`
+
+_Optional_ The human friendly label for this set of URLs to use when logging status to stdout/stderr. Not used for anything other than logging.
+
+##### `psiCollectCron.sites[i].branch`
+
+_Optional_ The "branch" on which to report the results. Defaults to the base branch of the project referenced by `projectSlug`.
+
+#### `basicAuth`
+
+##### `basicAuth.username`
+
+##### `basicAuth.password`
+
+Protects the server from casual snooping by using single-user HTTP Basic auth. When enabled, _all_ requests to the server UI and API will require HTTP Basic authentication with the specified credentials.
+
+Read more about protecting the server in the [server security documentation](server.md#Security).
+
+#### Examples
+
+Many server examples require more advanced configuration than the CLI flags allow. See the [common examples section](#common-examples) for more complete usage examples using a config file.
 
 ```bash
 lhci server --storage.sqlDatabasePath=./lhci.db

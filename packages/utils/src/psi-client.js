@@ -33,6 +33,11 @@ class PsiClient {
     url.searchParams.set('locale', locale);
     url.searchParams.set('strategy', strategy);
     url.searchParams.set('key', this._apiKey);
+    url.searchParams.append('category', 'performance');
+    url.searchParams.append('category', 'accessibility');
+    url.searchParams.append('category', 'best-practices');
+    url.searchParams.append('category', 'pwa');
+    url.searchParams.append('category', 'seo');
 
     const response = await this._fetch(url.href);
     const body = await response.json();

@@ -41,7 +41,7 @@ function normalizeCronSchedule(schedule) {
  * @return {Promise<void>}
  */
 async function psiCollectForProject(storageMethod, psi, site) {
-  const {urls, projectSlug, numberOfRuns = 3} = site;
+  const {urls, projectSlug, numberOfRuns = 5} = site;
   const project = await storageMethod.findProjectBySlug(projectSlug);
   if (!project) throw new Error(`Invalid project slug "${projectSlug}"`);
   if (!urls || !urls.length) throw new Error('No URLs set');
@@ -96,6 +96,13 @@ async function psiCollectForProject(storageMethod, psi, site) {
  */
 function startPsiCollectCron(storageMethod, options) {
   if (!options.psiCollectCron) return;
+  const uniqueProjectBranches = new Set(
+    options.psiCollectCron.sites.map(site => `${site.projectSlug}@${site.branch}`)
+  );
+
+  if (uniqueProjectBranches.size < options.psiCollectCron.sites.length) {
+    throw new Error('Cannot configure more than one cron per project-branch pair');
+  }
 
   /** @type {(msg: string) => void} */
   const log =

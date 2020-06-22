@@ -76,6 +76,8 @@ describe('cron/psi-collect', () => {
         [{projectId: 1, buildId: 2, url: 'http://example.com', lhr: '{"lhr": true}'}],
         [{projectId: 1, buildId: 2, url: 'http://example.com', lhr: '{"lhr": true}'}],
         [{projectId: 1, buildId: 2, url: 'http://example.com', lhr: '{"lhr": true}'}],
+        [{projectId: 1, buildId: 2, url: 'http://example.com', lhr: '{"lhr": true}'}],
+        [{projectId: 1, buildId: 2, url: 'http://example.com', lhr: '{"lhr": true}'}],
       ]);
       expect(storageMethod.sealBuild).toHaveBeenCalled();
     });
@@ -114,10 +116,9 @@ describe('cron/psi-collect', () => {
     });
 
     it('should respect number of runs', async () => {
-      const site = {urls: ['http://example.com'], numberOfRuns: 5};
+      const site = {urls: ['http://example.com'], numberOfRuns: 4};
       await psiCollectForProject(storageMethod, psi, site);
       expect(storageMethod.createRun.mock.calls).toMatchObject([
-        [{projectId: 1, buildId: 2, url: 'http://example.com', lhr: '{"lhr": true}'}],
         [{projectId: 1, buildId: 2, url: 'http://example.com', lhr: '{"lhr": true}'}],
         [{projectId: 1, buildId: 2, url: 'http://example.com', lhr: '{"lhr": true}'}],
         [{projectId: 1, buildId: 2, url: 'http://example.com', lhr: '{"lhr": true}'}],
@@ -137,10 +138,22 @@ describe('cron/psi-collect', () => {
     });
   });
 
-  describe('.startPsiCollectCron', () => {
+  describe('.startPsiCollectCron()', () => {
     const logLevel = 'silent';
 
     it('should schedule a cron job per site', () => {
+      const psiCollectCron = {
+        sites: [
+          {schedule: '0 * * * *', urls: ['http://example.com'], projectSlug: 'a'},
+          {schedule: '0 * * * *', urls: ['http://other-example.com'], projectSlug: 'b'},
+        ],
+      };
+
+      startPsiCollectCron(storageMethod, {logLevel, psiCollectCron});
+      expect(cronJob).toHaveBeenCalledTimes(2);
+    });
+
+    it('should validate uniqueness', () => {
       const psiCollectCron = {
         sites: [
           {schedule: '0 * * * *', urls: ['http://example.com']},
@@ -148,8 +161,9 @@ describe('cron/psi-collect', () => {
         ],
       };
 
-      startPsiCollectCron(storageMethod, {logLevel, psiCollectCron});
-      expect(cronJob).toHaveBeenCalledTimes(2);
+      expect(() => startPsiCollectCron(storageMethod, {logLevel, psiCollectCron})).toThrow(
+        /more than one/
+      );
     });
 
     it('should validate cron job', () => {

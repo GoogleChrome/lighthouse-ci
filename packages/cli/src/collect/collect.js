@@ -42,10 +42,6 @@ function buildCommand(yargs) {
     psiApiKey: {
       description: '[psi only] The API key to use for PageSpeed Insights runner method.',
     },
-    psiApiEndpoint: {
-      description:
-        "[psi only] The endpoint to use for PageSpeed Insights runner method. You do not need to use this unless you've written a custom version.",
-    },
     staticDistDir: {
       description: 'The build directory where your HTML files to run Lighthouse on are located.',
     },

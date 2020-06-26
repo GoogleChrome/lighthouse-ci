@@ -64,7 +64,7 @@ const HoverCardWithDiff = props => {
     children = (
       <Fragment>
         {versionChange ? <VersionChangeWarning /> : null}
-        {hideInfoTip ? null : <InfoTip />}
+        {hideInfoTip || props.pinned ? null : <InfoTip />}
         <Gauge score={stat.value} diff={diff} />
         {diff ? <ScoreDeltaBadge diff={diff} /> : null}
       </Fragment>

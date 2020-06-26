@@ -36,9 +36,17 @@ const VersionChangeWarning = () => {
   );
 };
 
-/** @param {{selectedBuildId: string|undefined, medianStatistics: Array<StatisticWithBuild>, versionChanges: Array<{build: LHCI.ServerCommand.Build}>, pinned: boolean}} props */
+const InfoTip = () => {
+  return (
+    <div className="category-score-graph__version-change-warning">
+      <i className="material-icons">info</i> Click to pin
+    </div>
+  );
+};
+
+/** @param {{selectedBuildId: string|undefined, medianStatistics: Array<StatisticWithBuild>, versionChanges: Array<{build: LHCI.ServerCommand.Build}>, pinned: boolean, hideInfoTip: boolean}} props */
 const HoverCardWithDiff = props => {
-  const {selectedBuildId, medianStatistics: stats} = props;
+  const {selectedBuildId, medianStatistics: stats, hideInfoTip} = props;
   const statIndex = selectedBuildId ? stats.findIndex(s => s.buildId === selectedBuildId) : -1;
   const stat = statIndex !== -1 ? stats[statIndex] : undefined;
 
@@ -56,6 +64,7 @@ const HoverCardWithDiff = props => {
     children = (
       <Fragment>
         {versionChange ? <VersionChangeWarning /> : null}
+        {hideInfoTip ? null : <InfoTip />}
         <Gauge score={stat.value} diff={diff} />
         {diff ? <ScoreDeltaBadge diff={diff} /> : null}
       </Fragment>

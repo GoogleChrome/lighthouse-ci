@@ -44,7 +44,7 @@ const InfoTip = () => {
   );
 };
 
-/** @param {{selectedBuildId: string|undefined, medianStatistics: Array<StatisticWithBuild>, versionChanges: Array<{build: LHCI.ServerCommand.Build}>, pinned: boolean, hideInfoTip: boolean}} props */
+/** @param {{selectedBuildId: string|undefined, medianStatistics: Array<StatisticWithBuild>, versionChanges: Array<{build: LHCI.ServerCommand.Build}>, pinned: boolean, hideInfoTip?: boolean}} props */
 const HoverCardWithDiff = props => {
   const {selectedBuildId, medianStatistics: stats, hideInfoTip} = props;
   const statIndex = selectedBuildId ? stats.findIndex(s => s.buildId === selectedBuildId) : -1;

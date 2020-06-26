@@ -39,7 +39,7 @@ const VersionChangeWarning = () => {
 const InfoTip = () => {
   return (
     <div className="category-score-graph__version-change-warning">
-      <i className="material-icons">info</i> Click to pin
+      <i className="material-icons">info</i> Click graph to pin
     </div>
   );
 };

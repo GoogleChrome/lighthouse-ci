@@ -305,9 +305,6 @@ module.exports = async (browser, context) => {
   await page.type('#password', 'password');
   await page.click('[type="submit"]');
   await page.waitForNavigation();
-  // we're logged in, so test the page behind auth
-  // runs the url set in lighthouserc
-  await page.goto(context.url);
   // close session for next run
   await page.close()
 };

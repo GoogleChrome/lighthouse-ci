@@ -30,6 +30,7 @@ const {
   getAncestorHashForBase,
   getAncestorHashForBranch,
   getGitHubRepoSlug,
+  getCurrentBranchSafe,
 } = require('@lhci/utils/src/build-context.js');
 
 /** @param {string} message */
@@ -108,7 +109,7 @@ function buildCommand(yargs) {
       type: 'boolean',
       description:
         '[temporary-public-storage only] Whether to post links to historical base results to storage or not. Defaults to true only on master branch.',
-      default: getCurrentBranch() === 'master',
+      default: getCurrentBranchSafe() === 'master',
     },
     urlReplacementPatterns: {
       type: 'array',

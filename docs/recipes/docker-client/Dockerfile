@@ -1,7 +1,7 @@
 FROM node:12-buster-slim
 
 # Install utilities
-RUN apt-get update --fix-missing && apt-get -y upgrade && apt-get install -y wget gnupg && apt-get clean
+RUN apt-get update --fix-missing && apt-get -y upgrade && apt-get install -y git wget gnupg && apt-get clean
 
 # Install latest chrome stable package.
 RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -

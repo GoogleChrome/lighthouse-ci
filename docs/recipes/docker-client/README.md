@@ -32,6 +32,28 @@ docker tag lhci-client:latest <your username>/lhci-client:latest
 docker push <your username>/lhci-client:latest
 ```
 
+In some cases the docker instance requires more shared memory than the default 64Mb otherwise tests will fail.
+
+To increase shared memory in the docker use *--shm-size*:
+
+```
+docker container run --shm-size=2g --cap-add=SYS_ADMIN \
+  -v "$(pwd)/lhci-data:/home/lhci/reports/.lighthouseci" \
+  patrickhulce/lhci-client \
+  lhci collect --url="https://example.com"
+```
+
+Also, lighthouse results vary a lot based on the CPU performance of the machine on which tests are running.
+you can control the availability of CPU to docker using *--cpus*:
+
+```
+docker container run --cpus=".9" --shm-size=2g --cap-add=SYS_ADMIN \
+  -v "$(pwd)/lhci-data:/home/lhci/reports/.lighthouseci" \
+  patrickhulce/lhci-client \
+  lhci collect --url="https://example.com"
+```
+The above command will provide 0.9 CPU from the available CPUs. In a 2 core processor, docker will have access to 45% of the CPU cycles. You can tune it as per your need. Keep a check on CPU/Memory Power at the bottom of your lighthouse report for consistent results.
+
 ## `--no-sandbox` Issues Explained
 
 Chrome uses sandboxing to isolate renderer processes and restrict their capabilities. If a rogue website is able to discover a browser vulnerability and break out of JavaScript engine for example, they would find themselves in a very limited process that can't write to the filesystem, make network requests, mess with devices, etc.

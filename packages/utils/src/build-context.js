@@ -130,8 +130,8 @@ function getCurrentBranchRaw_() {
     encoding: 'utf8',
   });
 
-  const branch = result.stdout.trim();
-  if (result.status !== 0 || branch === 'HEAD') {
+  const branch = typeof result.stdout === 'string' && result.stdout.trim();
+  if (result.status !== 0 || !branch || branch === 'HEAD') {
     throw new Error(
       'Unable to determine current branch with `git rev-parse --abbrev-ref HEAD`. ' +
         'This can be overridden with setting LHCI_BUILD_CONTEXT__CURRENT_BRANCH env.'
@@ -142,12 +142,25 @@ function getCurrentBranchRaw_() {
 }
 
 /**
+ * Returns the current branch name. Throws if it could not be determined.
  * @return {string}
  */
 function getCurrentBranch() {
   const branch = getCurrentBranchRaw_();
   if (branch === 'HEAD') throw new Error('Unable to determine current branch');
   return branch.replace('refs/heads/', '').slice(0, 40);
+}
+
+/**
+ * Returns the current branch name. Returns `undefined` if it could not be determined.
+ * @return {string|undefined}
+ */
+function getCurrentBranchSafe() {
+  try {
+    return getCurrentBranch();
+  } catch (err) {
+    return undefined;
+  }
 }
 
 /**
@@ -335,6 +348,7 @@ module.exports = {
   getCurrentHash,
   getCommitTime,
   getCurrentBranch,
+  getCurrentBranchSafe,
   getExternalBuildUrl,
   getCommitMessage,
   getAuthor,

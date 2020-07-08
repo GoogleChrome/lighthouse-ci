@@ -35,6 +35,10 @@ function convertBudgetsToAssertions(budgets) {
     /** @type {LHCI.AssertCommand.Assertions} */
     const assertions = {};
 
+    for (const {metric, budget: maxNumericValue} of budget.timings || []) {
+      assertions[metric] = ['error', {maxNumericValue}];
+    }
+
     for (const {resourceType, budget: maxNumericValue} of budget.resourceCounts || []) {
       assertions[`resource-summary:${resourceType}:count`] = ['error', {maxNumericValue}];
     }

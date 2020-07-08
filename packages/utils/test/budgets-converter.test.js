@@ -73,6 +73,16 @@ describe('convertBudgetsToAssertions', () => {
   it('should convert budgets to assertions format', () => {
     const budgets = [
       {
+        timings: [
+          {
+            metric: 'interactive',
+            budget: 3000,
+          },
+          {
+            metric: 'first-meaningful-paint',
+            budget: 1000,
+          },
+        ],
         resourceSizes: [
           {
             resourceType: 'script',
@@ -111,6 +121,8 @@ describe('convertBudgetsToAssertions', () => {
         {
           matchingUrlPattern: '.*',
           assertions: {
+            interactive: ['error', {maxNumericValue: 3000}],
+            'first-meaningful-paint': ['error', {maxNumericValue: 1000}],
             'resource-summary:script:size': ['error', {maxNumericValue: 123 * 1024}],
             'resource-summary:image:size': ['error', {maxNumericValue: 456 * 1024}],
             'resource-summary:third-party:count': ['error', {maxNumericValue: 10}],

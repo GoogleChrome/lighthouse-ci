@@ -129,11 +129,17 @@ function buildCommand(yargs) {
       description: '[filesystem only] The pattern to use for naming Lighthouse reports.',
       default: '%%HOSTNAME%%-%%PATHNAME%%-%%DATETIME%%.report.%%EXTENSION%%',
     },
+    githubAppUrl: {
+      type: 'string',
+      default: GITHUB_APP_STATUS_CHECK_URL,
+      description:
+        "The URL of the GitHub app where PR status checks are POST'd. Defaults to the publicly hosted app. Most users will not need to change this.",
+    },
   });
 }
 
 /**
- * @param {{slug: string, hash: string, state: 'failure'|'success', targetUrl: string, description: string, context: string, githubToken?: string, githubAppToken?: string, githubApiHost?: string}} options
+ * @param {{slug: string, hash: string, state: 'failure'|'success', targetUrl: string, description: string, context: string, githubToken?: string, githubAppToken?: string, githubApiHost?: string, githubAppUrl?: string}} options
  */
 async function postStatusToGitHub(options) {
   const {
@@ -146,13 +152,13 @@ async function postStatusToGitHub(options) {
     githubToken,
     githubAppToken,
     githubApiHost = DEFAULT_GITHUB_API_HOST,
+    githubAppUrl = GITHUB_APP_STATUS_CHECK_URL,
   } = options;
 
   let response;
   if (githubAppToken) {
-    const url = GITHUB_APP_STATUS_CHECK_URL;
     const payload = {...options, token: githubAppToken};
-    response = await fetch(url, {
+    response = await fetch(githubAppUrl, {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify(payload),
@@ -220,7 +226,7 @@ function getGitHubContext(urlLabel, options) {
  * @return {Promise<void>}
  */
 async function runGithubStatusCheck(options, targetUrlMap) {
-  const {githubToken, githubAppToken, githubApiHost} = options;
+  const {githubToken, githubAppToken, githubApiHost, githubAppUrl} = options;
   const hash = getCurrentHash();
   const slug = getGitHubRepoSlug(githubApiHost);
 
@@ -262,6 +268,7 @@ async function runGithubStatusCheck(options, targetUrlMap) {
         githubToken,
         githubAppToken,
         githubApiHost,
+        githubAppUrl,
       });
     }
   } else {
@@ -294,6 +301,7 @@ async function runGithubStatusCheck(options, targetUrlMap) {
         githubToken,
         githubAppToken,
         githubApiHost,
+        githubAppUrl,
       });
     }
   }

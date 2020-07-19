@@ -69,3 +69,7 @@ A collection of unofficial blog posts, tutorials, and guides written by the comm
 **NOTE:** This is not official documentation. You're encouraged to familiarize yourself with Lighthouse CI and read through [Getting Started](./docs/getting-started.md) before continuing.
 
 - [Integrate Lighthouse CI for static website generator](https://blog.akansh.com/integrate-lighthouse-ci-with-static-site-generators/) - An article on integrating Lighthouse CI with static website generators like Gatsby, Jekyll, etc.
+
+## Contributing
+
+We welcome contributions to lighthouse-ci! Read our [contributing guide](./CONTRIBUTING.md) to get started.

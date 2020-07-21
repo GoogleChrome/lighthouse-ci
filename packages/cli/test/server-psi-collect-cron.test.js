@@ -89,13 +89,13 @@ describe('Lighthouse CI server CLI PSI collection test', () => {
       .replace(/[\s\S]+POST \/v1\/projects.*\n/m, '')
       .replace(/.*Previous PSI collection.*/g, 'InProgress')
       .replace(/(InProgress\n)+/g, 'InProgress\n')
-      .replace(/^\S+ - /gim, 'TIMESTAMP - ');
+      .replace(/^\S+ - /gim, 'TIMESTAMP - ')
+      .replace(/(completed collection.*)\n[\s\S]*/, '$1');
 
     expect(cleanedStdOut).toMatchInlineSnapshot(`
       "TIMESTAMP - Starting PSI collection for CronTest
       InProgress
-      TIMESTAMP - Successfully completed collection for CronTest
-      "
+      TIMESTAMP - Successfully completed collection for CronTest"
     `);
 
     expect(builds).toMatchObject([{branch: 'main', lifecycle: 'sealed'}]);

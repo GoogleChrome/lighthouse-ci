@@ -70,7 +70,7 @@ module.exports = {
 Next we need to configure the CI provider to run Lighthouse using the `lhci autorun` command. `autorun` will automatically execute a number of commands behind the scenes and infer sensible defaults for us. For more advanced use cases where you'd like to control the exact sequence of Lighthouse commands, refer to [the configuration documentation](./configuration.md).
 
 <details>
-<summary>Github Actions</summary>
+<summary>GitHub Actions</summary>
 <br />
 
 **.github/workflows/ci.yml**
@@ -285,7 +285,7 @@ Be sure to keep this token secret. Anyone in possession of this token will be ab
 
 #### Alternative: Personal Access Token Method
 
-If you don't want to use the Github App, you can also enable this via a personal access token. The only difference is that your user account (and its avatar) will post a status check. [Create a personal access token](https://github.com/settings/tokens/new) with the `repo:status` scope and add it to your environment as `LHCI_GITHUB_TOKEN`.
+If you don't want to use the GitHub App, you can also enable this via a personal access token. The only difference is that your user account (and its avatar) will post a status check. [Create a personal access token](https://github.com/settings/tokens/new) with the `repo:status` scope and add it to your environment as `LHCI_GITHUB_TOKEN`.
 
 Be sure to keep this token secret. Anyone in possession of this token will be able to set status checks on your repository.
 

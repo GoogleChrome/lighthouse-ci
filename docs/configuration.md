@@ -1205,6 +1205,26 @@ module.exports = {
 }
 ```
 
+### Socket Path for Database Connection
+
+```json
+{
+  "ci": {
+    "server": {
+      "storage": {
+        "sqlDialect": "mysql",
+        "sqlSocketPath": "/var/lib/mysql/mysql.sock",
+        "sequelizeOptions": {
+          "database": "reports",
+          "username": "admin",
+          "password": "password"
+        }
+      }
+    }
+  }
+}
+```
+
 ### Custom SSL Certificate for Database Connection
 
 ```js

@@ -92,6 +92,32 @@ function createSequelize(options) {
     });
   }
 
+  if (options.sqlSocketPath) {
+    if (
+      !options.sequelizeOptions ||
+      !options.sequelizeOptions.database ||
+      !options.sequelizeOptions.username ||
+      !options.sequelizeOptions.password
+    ) {
+      throw new Error(
+        `Cannot use ${dialect} with socketPath without database, username, or password`
+      );
+    }
+
+    return new Sequelize(
+      options.sequelizeOptions.database,
+      options.sequelizeOptions.username,
+      options.sequelizeOptions.password,
+      {
+        ...sequelizeOptions,
+        dialect: options.sqlDialect,
+        host: options.sqlSocketPath,
+        ssl: !!options.sqlConnectionSsl,
+        dialectOptions: options.sqlDialectOptions,
+      }
+    );
+  }
+
   if (!options.sqlConnectionUrl) throw new Error(`Cannot use ${dialect} without a database URL`);
 
   return new Sequelize(options.sqlConnectionUrl, {

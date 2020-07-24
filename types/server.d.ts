@@ -170,6 +170,7 @@ declare global {
         sqlDatabasePath?: string;
         sqlConnectionSsl?: string;
         sqlConnectionUrl?: string;
+        sqlSocketPath?: string;
         sqlDangerouslyResetDatabase?: boolean;
         sequelizeOptions?: import('sequelize').Options;
       }

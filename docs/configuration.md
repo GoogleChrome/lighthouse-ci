@@ -306,7 +306,7 @@ module.exports = async (browser, context) => {
   await page.click('[type="submit"]');
   await page.waitForNavigation();
   // close session for next run
-  await page.close()
+  await page.close();
 };
 ```
 
@@ -891,6 +891,15 @@ One of `mysql`, `postgres`, or `sqlite`. `sqlite` in a local file on disk has be
 _sqlDialect=sqlite only_
 
 The path to the sqlite database on the local filesystem relative to the current working directory.
+
+##### `storage.sqlSocketPath`
+
+_sqlDialect=mysql or sqlDialect=postgres only_
+
+The database Unix socket file path for the MySQL or PostgreSQL database.
+
+Note: If used, this option will require to specify the `database`, `username` and `password` sequelize options.
+See `storage.sequelizeOptions` for more information.
 
 ##### `storage.sqlConnectionUrl`
 

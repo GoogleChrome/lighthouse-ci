@@ -892,15 +892,6 @@ _sqlDialect=sqlite only_
 
 The path to the sqlite database on the local filesystem relative to the current working directory.
 
-##### `storage.sqlSocketPath`
-
-_sqlDialect=mysql or sqlDialect=postgres only_
-
-The database Unix socket file path for the MySQL or PostgreSQL database.
-
-Note: If used, this option will require to specify the `database`, `username` and `password` sequelize options.
-See `storage.sequelizeOptions` for more information.
-
 ##### `storage.sqlConnectionUrl`
 
 _sqlDialect=mysql or sqlDialect=postgres only_
@@ -1213,7 +1204,9 @@ module.exports = {
     "server": {
       "storage": {
         "sqlDialect": "mysql",
-        "sqlSocketPath": "/var/lib/mysql/mysql.sock",
+        "sqlDialectOptions": {
+          "socketPath": "/var/lib/mysql/mysql.sock"
+        },
         "sequelizeOptions": {
           "database": "reports",
           "username": "admin",

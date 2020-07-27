@@ -92,7 +92,7 @@ function createSequelize(options) {
     });
   }
 
-  if (options.sqlSocketPath) {
+  if (options.sqlDialectOptions && options.sqlDialectOptions.socketPath) {
     if (
       !options.sequelizeOptions ||
       !options.sequelizeOptions.database ||
@@ -111,7 +111,6 @@ function createSequelize(options) {
       {
         ...sequelizeOptions,
         dialect: options.sqlDialect,
-        host: options.sqlSocketPath,
         ssl: !!options.sqlConnectionSsl,
         dialectOptions: options.sqlDialectOptions,
       }

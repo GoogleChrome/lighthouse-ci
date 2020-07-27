@@ -161,6 +161,7 @@ declare global {
         storageMethod: 'sql' | 'spanner';
         sqlDialect: 'sqlite' | 'mysql' | 'postgres';
         sqlDialectOptions?: {
+          socketPath?: string;
           ssl?: {
             ca?: string;
             key?: string;
@@ -170,7 +171,6 @@ declare global {
         sqlDatabasePath?: string;
         sqlConnectionSsl?: string;
         sqlConnectionUrl?: string;
-        sqlSocketPath?: string;
         sqlDangerouslyResetDatabase?: boolean;
         sequelizeOptions?: import('sequelize').Options;
       }

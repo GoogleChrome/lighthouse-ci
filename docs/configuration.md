@@ -306,7 +306,7 @@ module.exports = async (browser, context) => {
   await page.click('[type="submit"]');
   await page.waitForNavigation();
   // close session for next run
-  await page.close()
+  await page.close();
 };
 ```
 
@@ -1190,6 +1190,28 @@ module.exports = {
       },
       "storage": {
         // ...
+      }
+    }
+  }
+}
+```
+
+### Socket Path for Database Connection
+
+```json
+{
+  "ci": {
+    "server": {
+      "storage": {
+        "sqlDialect": "mysql",
+        "sqlDialectOptions": {
+          "socketPath": "/var/lib/mysql/mysql.sock"
+        },
+        "sequelizeOptions": {
+          "database": "reports",
+          "username": "admin",
+          "password": "password"
+        }
       }
     }
   }

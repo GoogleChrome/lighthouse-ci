@@ -161,6 +161,7 @@ declare global {
         storageMethod: 'sql' | 'spanner';
         sqlDialect: 'sqlite' | 'mysql' | 'postgres';
         sqlDialectOptions?: {
+          socketPath?: string;
           ssl?: {
             ca?: string;
             key?: string;

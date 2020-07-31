@@ -171,6 +171,7 @@ Autorun will attempt to automatically detect the directory of your static site f
 
 - `dist` (default name for vue-cli, parcel, and webpack)
 - `build` (default name for create-react-app and preact-cli)
+- `out` (default name for Next.js, note this will only be generated with `next export`)
 - `public` (default name for gatsby)
 
 If your productionized static assets live in a different folder, you'd like to run Lighthouse CI on a specific subset of your static pages, your project does not use a build step at all or a different server, see the [`lhci collect` documentation](#collect) for how to configure your project.

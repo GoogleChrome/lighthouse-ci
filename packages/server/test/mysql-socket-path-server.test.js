@@ -28,6 +28,7 @@ describe('mysql server (socket path)', () => {
       storage: {
         storageMethod: 'sql',
         sqlDialect: 'mysql',
+        sqlDangerouslyResetDatabase: true,
         sqlDialectOptions: {
           socketPath: process.env.MYSQL_SOCKET_PATH,
         },

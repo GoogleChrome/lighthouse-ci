@@ -28,6 +28,7 @@ describe('postgres server', () => {
       storage: {
         storageMethod: 'sql',
         sqlDialect: 'postgres',
+        sqlDangerouslyResetDatabase: true,
         sqlDialectOptions: {
           socketPath: process.env.POSTGRES_SOCKET_PATH,
         },

@@ -63,7 +63,7 @@ jobs:
       postgressocket:
         image: postgres:12
         volumes:
-          - /mnt:/var/run/postgresql
+          - /mnt/psql:/var/run/postgresql
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
@@ -81,13 +81,13 @@ jobs:
           echo "::set-env name=CHROME_PATH::$(which google-chrome-stable)"
           echo "::set-env name=POSTGRES_DB_URL::postgres://postgres:postgres@localhost/lighthouse_ci_test"
           echo "::set-env name=MYSQL_DB_URL::mysql://root:mysql@127.0.0.1:33306/lighthouse_ci_test"
-          echo "::set-env name=POSTGRES_SOCKET_PATH::/mnt/.s.PGSQL.5432"
+          echo "::set-env name=POSTGRES_SOCKET_PATH::/mnt/psql/.s.PGSQL.5432"
 
           export PGPASSWORD="postgres"
           export MYSQL_PWD="mysql"
           psql -h localhost -p 5432 -c 'create database lighthouse_ci_test;' -U postgres
           mysql --host=127.0.0.1 --port=33306 -e 'create database lighthouse_ci_test;' -u root
-          psql --host /mnt -c 'create database lighthouse_ci_test;' -U postgres
+          psql --host /mnt/psql -c 'create database lighthouse_ci_test;' -U postgres
 
           google-chrome-stable --version
       - run: yarn

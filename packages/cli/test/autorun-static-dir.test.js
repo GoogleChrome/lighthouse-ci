@@ -16,12 +16,21 @@ describe('Lighthouse CI autorun CLI', () => {
   const autorunDir = path.join(__dirname, 'fixtures/autorun-static-dir');
 
   it('should run all three steps', async () => {
-    const {stdout, stderr, status} = await runCLI(['autorun', '--collect.numberOfRuns=1'], {
-      cwd: autorunDir,
-      env: {LHCI_NO_LIGHTHOUSERC: undefined},
-    });
+    const {stdout, stderr, status} = await runCLI(
+      ['autorun', '--collect.numberOfRuns=1', '--upload.uploadUrlMap=true'],
+      {
+        cwd: autorunDir,
+        env: {
+          LHCI_BUILD_CONTEXT__GITHUB_REPO_SLUG: 'GoogleChrome/lighthouse-ci-unit-tests',
+          LHCI_NO_LIGHTHOUSERC: undefined,
+        },
+      }
+    );
 
-    const stdoutClean = stdout.replace(/Open the report at.*\n/g, 'Open the report at <link>\n');
+    const stdoutClean = stdout
+      .replace(/(Open the report at).*\n/g, '$1 <link>\n')
+      .replace(/(Saving URL map for GitHub repository).*\n/g, '$1 <slug>\n');
+
     expect(stdoutClean).toMatchInlineSnapshot(`
       "✅  .lighthouseci/ directory writable
       ✅  Configuration file found
@@ -44,6 +53,7 @@ describe('Lighthouse CI autorun CLI', () => {
       Open the report at <link>
       Uploading median LHR of http://localhost:XXXX/subdir/index.html...success!
       Open the report at <link>
+      Saving URL map for GitHub repository <slug>
       No GitHub token set, skipping GitHub status check.
 
       "

@@ -343,19 +343,31 @@ async function getPreviousUrlMap(options) {
  */
 async function writeUrlMapToApi(urlMap) {
   const slug = getGitHubRepoSlug();
-  if (!slug) return;
+
+  if (!slug) {
+    print(`No GitHub repository slug found, skipping URL map upload.\n`);
+    return;
+  }
+  print(`Saving URL map for GitHub repository ${slug}...`);
 
   try {
     /** @type {Record<string, string>} */
     const payload = {slug};
     Array.from(urlMap.entries()).forEach(([k, v]) => (payload[k] = v));
-    await fetch(SAVE_URL_MAP_URL, {
+
+    const response = await fetch(SAVE_URL_MAP_URL, {
       method: 'POST',
       body: JSON.stringify(payload),
       headers: {'content-type': 'application/json'},
     });
+
+    if (response.ok) {
+      print(`success!\n`);
+    } else {
+      print(`failed!\n`);
+    }
   } catch (err) {
-    print(`Failed to save urlMap: ${err.message}`);
+    print(`Failed to save URL map: ${err.message}\n`);
   }
 }
 

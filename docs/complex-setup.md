@@ -144,7 +144,7 @@ The setup so far will automatically assert the Lighthouse team's recommended set
 
 **lighthouserc.json**
 
-```json
+```jsonc
 {
   "ci": {
     "assert": {

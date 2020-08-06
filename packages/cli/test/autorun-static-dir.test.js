@@ -27,9 +27,7 @@ describe('Lighthouse CI autorun CLI', () => {
       }
     );
 
-    const stdoutClean = stdout
-      .replace(/(Open the report at).*\n/g, '$1 <link>\n')
-      .replace(/(Saving URL map for GitHub repository).*\n/g, '$1 <slug>\n');
+    const stdoutClean = stdout.replace(/(Open the report at).*\n/g, '$1 <link>\n');
 
     expect(stdoutClean).toMatchInlineSnapshot(`
       "✅  .lighthouseci/ directory writable
@@ -53,7 +51,7 @@ describe('Lighthouse CI autorun CLI', () => {
       Open the report at <link>
       Uploading median LHR of http://localhost:XXXX/subdir/index.html...success!
       Open the report at <link>
-      Saving URL map for GitHub repository <slug>
+      Saving URL map for GitHub repository GoogleChrome/lighthouse-ci-unit-tests...success!
       No GitHub token set, skipping GitHub status check.
 
       "

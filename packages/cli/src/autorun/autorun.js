@@ -96,11 +96,12 @@ function getStartServerCommandFlag() {
 
 /**
  * @param {'collect'|'assert'|'upload'|'healthcheck'} command
+ * @param {string[]} [args]
  */
-function getOverrideArgsForCommand(command) {
+function getOverrideArgsForCommand(command, args = process.argv) {
   const argPrefix = `--${command}.`;
-  return process.argv
-    .filter(arg => arg.startsWith(argPrefix))
+  return args
+    .filter(arg => arg.startsWith(argPrefix) || /--no-?lighthouserc/i.test(arg))
     .map(arg => arg.replace(argPrefix, '--'));
 }
 
@@ -151,4 +152,4 @@ async function runCommand(options) {
   process.stdout.write(`Done running autorun.\n`);
 }
 
-module.exports = {buildCommand, runCommand};
+module.exports = {buildCommand, runCommand, getOverrideArgsForCommand};

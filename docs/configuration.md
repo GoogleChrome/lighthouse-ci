@@ -154,6 +154,8 @@ lhci healthcheck --fatal --checks=githubToken
 
 Automatically run, with sensible defaults, [`lhci collect`](#collect), [`lhci assert`](#assert) and [`lhci upload`](#upload), depending on the options in your config. `lhci autorun` does not have many specific options for itself. Options for individual commands can be set by prefixing the option with the command name.
 
+Note: in `autorun` all CLI flags for child commands **must** use the `=` syntax for atomic arguments. i.e. use `lhci autorun --collect.numberOfRuns=5` and NOT `lhci autorun --collect.numberOfRuns 5`.
+
 **Examples**
 
 ```bash

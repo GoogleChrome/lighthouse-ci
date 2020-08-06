@@ -21,7 +21,7 @@ jobs:
       - uses: actions/setup-node@v1
       - run: npm install && npm install -g @lhci/cli@0.4.x
       - run: npm run build
-      - run: lhci autorun --upload.target=temporary-public-storage
+      - run: lhci autorun
 ```
 
 ### Features

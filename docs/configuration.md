@@ -444,12 +444,13 @@ The target location to which Lighthouse CI should upload the reports.
 
 - You want to setup Lighthouse CI as quickly as possible without any costs.
 - You're OK with your reports being available to anyone on the internet with the link.
-- You're OK with your reports being automatically deleted after 7 days.
+- You're OK with your reports being automatically deleted after a few days.
 - You're OK with your reports being stored on GCP Cloud Storage.
+- You've read and agreed to the [full terms of service and privacy policy](./services-disclaimer.md#temporary-public-storage) of the service.
 
 **When to use `target=lhci`:**
 
-- You want to store Lighthouse reports for longer than 7 days.
+- You want to store Lighthouse reports for longer than a few days.
 - You want to control access to your Lighthouse reports.
 - You've setup a [Lighthouse CI server](./server.md).
 

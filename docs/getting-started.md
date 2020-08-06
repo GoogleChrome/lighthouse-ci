@@ -45,7 +45,7 @@ Before starting, your project should meet the following requirements:
 
 In this section, we'll configure Lighthouse CI to automatically find your project's static assets, run Lighthouse 3 times on each HTML file, and upload the reports to _temporary public_ storage where they'll be accessible to anyone with the URL.
 
-NOTE: As the name implies, this is _temporary_ and _public_ storage. If you're uncomfortable with the idea of your Lighthouse reports being stored on a public URL on Google Cloud, skip to the [add assertions](#add-assertions) or [Lighthouse CI server](#the-lighthouse-ci-server) steps. Reports are automatically deleted 7 days after upload.
+NOTE: As the name implies, this is _temporary_ and _public_ storage. If you're uncomfortable with the idea of your Lighthouse reports being stored on a public URL for anyone to see, skip to the [add assertions](#add-assertions) or [Lighthouse CI server](#the-lighthouse-ci-server) steps. Please read the [full terms of service and privacy policy](./services-disclaimer.md#temporary-public-storage) before deciding to upload your reports.
 
 ### Configure Lighthouse CI
 
@@ -279,6 +279,8 @@ GitHub status checks add additional granularity to your build reporting and dire
 
 #### GitHub App Method (Recommended)
 
+**NOTE: Before installing the GitHub App, refer to the [terms of service](./services-disclaimer.md#github-app).**
+
 To enable GitHub status checks via the official GitHub app, [install and authorize the app](https://github.com/apps/lighthouse-ci) with the owner of the target repo. If the repo is within an organization, organization approval might be necessary. Copy the app token provided on the authorization confirmation page and add it to your build environment as `LHCI_GITHUB_APP_TOKEN`. The next time your `lhci autorun` command runs it will also set the results as GitHub status checks!
 
 Be sure to keep this token secret. Anyone in possession of this token will be able to set status checks on your repository.
@@ -362,7 +364,7 @@ The Lighthouse CI server is an open source node server that can be setup on AWS,
 
 You can use the CI server to...
 
-- Store Lighthouse reports for more than 7 days
+- Store Lighthouse reports for more than a few days
 - Keep Lighthouse reports private on _your_ infrastructure
 - Generate graphs of improved category scores over time to impress your boss
 - Identify regressions in category score or metric performance to specific commits

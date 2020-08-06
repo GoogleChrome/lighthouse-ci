@@ -321,6 +321,7 @@ async function getPreviousUrlMap(options) {
     const fetchUrl = new URL(GET_URL_MAP_URL);
     fetchUrl.searchParams.set('slug', slug);
     const apiResponse = await fetch(fetchUrl.href);
+    if (!apiResponse.ok) return new Map();
     const {success, url} = await apiResponse.json();
     if (!success) return new Map();
     const mapResponse = await fetch(url);
@@ -487,7 +488,7 @@ async function runTemporaryPublicStorageTarget(options) {
         const urlReplaced = replaceUrlPatterns(lhr.finalUrl, options.urlReplacementPatterns);
         const urlToLinkTo = buildTemporaryStorageLink(url, urlReplaced, previousUrlMap);
         print(`success!\nOpen the report at ${urlToLinkTo}\n`);
-        targetUrlMap.set(lhr.finalUrl, urlToLinkTo);
+        targetUrlMap.set(lhr.finalUrl, url);
       } else {
         print(`failed!\n`);
       }

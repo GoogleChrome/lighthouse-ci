@@ -67,7 +67,7 @@ module.exports = {
 
 **`lighthouserc.json`:**
 
-```json
+```jsonc
 {
   "ci": {
     "collect": {
@@ -184,7 +184,7 @@ If no `staticDistDir` could be automatically detected, autorun will attempt to a
 
 example `package.json` excerpt:
 
-```json
+```jsonc
 {
   "scripts": {
     "serve:lhci": "NODE_ENV=production npm run server"
@@ -355,7 +355,7 @@ The [Lighthouse settings object](https://github.com/GoogleChrome/lighthouse/blob
 
 **Example:**
 
-```json
+```jsonc
 {
   "ci": {
     "collect": {
@@ -505,7 +505,7 @@ An object containing a username and password pair for authenicating with a Basic
 
 **Example:**
 
-```json
+```jsonc
 {
   "ci": {
     "upload": {
@@ -640,7 +640,7 @@ Options:
 
 The result of any audit in Lighthouse can be asserted. Assertions are keyed by the Lighthouse audit ID and follow an eslint-style format of `level | [level, options]`. For a reference of the audit IDs in each category, you can take a look at the [default Lighthouse config](https://github.com/GoogleChrome/lighthouse/blob/v5.5.0/lighthouse-core/config/default-config.js#L375-L407). When no options are set, the default options of `{"aggregationMethod": "optimistic", "minScore": 1}` are used.
 
-```json
+```jsonc
 {
   "ci": {
     "assert": {
@@ -658,7 +658,7 @@ The result of any audit in Lighthouse can be asserted. Assertions are keyed by t
 
 The score of any category in Lighthouse can also be asserted. Assertions are keyed by `categories:<categoryId>` and follow the same eslint-style format as audit assertions. Note that this just affects the _category score_ and will not affect any assertions on individual audits within the category.
 
-```json
+```jsonc
 {
   "ci": {
     "assert": {
@@ -683,7 +683,7 @@ There are three Lighthouse CI assertion levels.
 
 The `score`, `details.items.length`, and `numericValue` properties of audit results can all be checked against configurable thresholds. Use `minScore`, `maxLength`, and `maxNumericValue` properties, respectively, in the options object to control the assertion.
 
-```json
+```jsonc
 {
   "ci": {
     "assert": {
@@ -714,7 +714,7 @@ The general format for asserting against a user timing value is `"user-timings:<
 
 Note that only the first matching entry with the name will be used from each run and the rest will be ignored.
 
-```json
+```jsonc
 {
   "ci": {
     "assert": {
@@ -733,7 +733,7 @@ Note that only the first matching entry with the name will be used from each run
 
 The below example warns when FCP is above 2 seconds on _all_ pages **and** warns when TTI is above 5 seconds on all _secure_ pages _whose path starts with `/app`_. Assertion matrix configurations can be used to differentiate production from development, landing pages from single-page apps, and more.
 
-```json
+```jsonc
 {
   "ci": {
     "assert": {
@@ -766,7 +766,7 @@ There are three presets available to provide a good starting point. Presets can 
 
 The below example uses the `lighthouse:no-pwa` preset but disables a few audits we're not quite ready to pass yet and increases the limit on an audit with a `numericValue`.
 
-```json
+```jsonc
 {
   "ci": {
     "assert": {
@@ -786,7 +786,7 @@ The below example uses the `lighthouse:no-pwa` preset but disables a few audits 
 
 Instead of configuring using Lighthouse CI assertions against Lighthouse audits, a [budget.json](https://github.com/GoogleChrome/budget.json) file can be used instead. This option cannot be used in conjunction with any other assert option.
 
-```json
+```jsonc
 {
   "ci": {
     "assert": {
@@ -800,7 +800,7 @@ If you'd like to consolidate multiple assertion configuration files and avoid mu
 
 **Note:** when using the Lighthouse CI style assertions the `maxNumericValue` unit for file size is in _bytes_ while the budget.json unit for file size is in _kilobytes_.
 
-```json
+```jsonc
 {
   "ci": {
     "assert": {
@@ -993,7 +993,7 @@ If you're just beginning to measure your project with Lighthouse, start slowly a
 
 Combine this with [GitHub App](https://github.com/apps/lighthouse-ci) to get convenient links to your reports.
 
-```json
+```jsonc
 {
   "ci": {
     "upload": {
@@ -1009,7 +1009,7 @@ Combine this with [GitHub App](https://github.com/apps/lighthouse-ci) to get con
 
 If you're used to running Lighthouse on your project but still have some work to do, assert the recommended preset but disable the audits you're currently failing. Consider setting up the [Lighthouse CI server](./server.md) to track your scores over time.
 
-```json
+```jsonc
 {
   "ci": {
     "assert": {
@@ -1034,7 +1034,7 @@ If you're used to running Lighthouse on your project but still have some work to
 
 If you're a Lighthouse pro, assert the recommended preset, increase the number of runs, and set budgets for your performance metrics. Set up the [Lighthouse CI server](./server.md) to track your scores over time and receive build diffs when your metrics regress.
 
-```json
+```jsonc
 {
   "ci": {
     "collect": {
@@ -1063,7 +1063,7 @@ If you're a Lighthouse pro, assert the recommended preset, increase the number o
 
 ### Custom build directory
 
-```json
+```jsonc
 {
   "ci": {
     "collect": {
@@ -1075,7 +1075,7 @@ If you're a Lighthouse pro, assert the recommended preset, increase the number o
 
 ### Custom Lighthouse Config
 
-```json
+```jsonc
 {
   "ci": {
     "collect": {
@@ -1090,7 +1090,7 @@ If you're a Lighthouse pro, assert the recommended preset, increase the number o
 
 ### Custom Chrome Flags
 
-```json
+```jsonc
 {
   "ci": {
     "collect": {
@@ -1104,7 +1104,7 @@ If you're a Lighthouse pro, assert the recommended preset, increase the number o
 
 ### Page Behind Authentication
 
-```json
+```jsonc
 {
   "ci": {
     "collect": {
@@ -1130,7 +1130,7 @@ module.exports = {
 
 ### Non-NodeJS Development Server
 
-```json
+```jsonc
 {
   "ci": {
     "collect": {
@@ -1147,13 +1147,13 @@ module.exports = {
 
 ### Budgets.json
 
-```json
+```jsonc
 {
   "ci": {
     "collect": {
       "settings": {
         // This setting makes the budgets section appear in the Lighthouse report itself
-        "budgetsPath": "./path/to/budgets.json"
+        "budgetPath": "./path/to/budgets.json"
       }
     },
     "assert": {
@@ -1168,7 +1168,7 @@ module.exports = {
 
 ### Basic Auth (Client)
 
-```json
+```jsonc
 {
   "ci": {
     "upload": {
@@ -1183,7 +1183,7 @@ module.exports = {
 
 ### Basic Auth (Server)
 
-```json
+```jsonc
 {
   "ci": {
     "server": {
@@ -1201,7 +1201,7 @@ module.exports = {
 
 ### Socket Path for Database Connection
 
-```json
+```jsonc
 {
   "ci": {
     "server": {
@@ -1317,7 +1317,7 @@ module.exports = {
 
 If you're running the `lhci server` behind a reverse proxy or any other component that requires some extra headers you can configure them in the wizard section `extraHeaders`.
 
-```json
+```jsonc
 {
   "ci": {
     "wizard": {
@@ -1333,7 +1333,7 @@ If you're running the `lhci server` behind a reverse proxy or any other componen
 
 If you're running the `lhci wizard` multiple times, you can configure a default `serverBaseUrl` to avoid typing it in at each `lhci wizard` run.
 
-```json
+```jsonc
 {
   "ci": {
     "wizard": {

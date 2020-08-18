@@ -62,7 +62,7 @@ const checks = [
   {
     label: 'Chrome installation found',
     failureLabel: 'Chrome installation not found',
-    shouldTest: () => true,
+    shouldTest: opts => (opts && opts.method) !== 'psi',
     test: opts => {
       if (opts.chromePath) return canAccessPath(opts.chromePath);
       return canAccessPath(determineChromePath(opts) || '');

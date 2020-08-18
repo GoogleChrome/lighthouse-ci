@@ -10,6 +10,8 @@ import lhr5A_ from '../../../../test/fixtures/lh-5-6-0-verge-a.json';
 import lhr5B_ from '../../../../test/fixtures/lh-5-6-0-verge-b.json';
 import lhr6A_ from '../../../../test/fixtures/lh-6-0-0-coursehero-a.json';
 import lhr6B_ from '../../../../test/fixtures/lh-6-0-0-coursehero-b.json';
+import lhr62A_ from '../../../../test/fixtures/lh-6-2-0-coursehero-a.json';
+import lhr62B_ from '../../../../test/fixtures/lh-6-2-0-coursehero-b.json';
 
 export default {
   title: 'Build View/LHR Comparison',
@@ -21,6 +23,8 @@ const lhr5A = /** @type {any} */ (lhr5A_);
 const lhr5B = /** @type {any} */ (lhr5B_);
 const lhr6A = /** @type {any} */ (lhr6A_);
 const lhr6B = /** @type {any} */ (lhr6B_);
+const lhr62A = /** @type {any} */ (lhr62A_);
+const lhr62B = /** @type {any} */ (lhr62B_);
 
 /** @param {{children: LHCI.PreactNode}} props */
 const Wrapper = ({children}) => <div className="build-hash-selector">{children}</div>;
@@ -34,5 +38,11 @@ export const Default = () => (
 export const Version6 = () => (
   <Wrapper>
     <LhrComparison lhr={lhr6A} baseLhr={lhr6B} hookElements={{}} />
+  </Wrapper>
+);
+
+export const Version62 = () => (
+  <Wrapper>
+    <LhrComparison lhr={lhr62A} baseLhr={lhr62B} hookElements={{}} />
   </Wrapper>
 );

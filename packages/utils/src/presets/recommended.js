@@ -24,7 +24,9 @@ module.exports = {
     'uses-rel-preload': ['warn', {}],
     interactive: ['warn', {}],
     // Flaky score but non-flaky details (error, maxLength)
+    'duplicated-javascript': ['warn', {maxLength: 0}], // warn until https://github.com/GoogleChrome/lighthouse/issues/11285 is fixed
     'efficient-animated-content': ['error', {maxLength: 0}],
+    'legacy-javascript': ['warn', {maxLength: 0}], // warn until https://github.com/GoogleChrome/lighthouse/issues/11285 is fixed
     'offscreen-images': ['error', {maxLength: 0}],
     'unminified-css': ['error', {maxLength: 0}],
     'unminified-javascript': ['error', {maxLength: 0}],
@@ -37,6 +39,7 @@ module.exports = {
     // Audits that don't typically apply in dev environments or are more opinionated (warn)
     'redirects-http': ['off', {}], // not useful for the dev server
     'uses-http2': ['off', {}], // not useful for the dev server
+    'long-tasks': ['off', {}], // too strict
 
     'dom-size': ['warn', {}],
     'is-on-https': ['warn', {}], // passes on localhost, so OK to leave on

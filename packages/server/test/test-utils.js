@@ -86,12 +86,16 @@ function createActualTestDataset() {
       {...baseBuild, id: '1', hash: '1236', commitMessage: 'build 2', runAt: runAt(2)},
       {...baseBuild, id: '2', hash: '1237', commitMessage: 'build 3', runAt: runAt(3)},
       {...baseBuild, id: '3', hash: '1238', commitMessage: 'build 4', runAt: runAt(4)},
+      {...baseBuild, id: '4', hash: '1239', commitMessage: 'build 5', runAt: runAt(5)},
+      {...baseBuild, id: '5', hash: '1240', commitMessage: 'build 6', runAt: runAt(6)},
     ],
     runs: [
       {...baseRun, id: '0', buildId: '0', url, lhr: lhr('lh-5-6-0-verge-a.json')},
       {...baseRun, id: '1', buildId: '1', url, lhr: lhr('lh-5-6-0-verge-b.json')},
       {...baseRun, id: '2', buildId: '2', url, lhr: lhr('lh-6-0-0-coursehero-a.json')},
       {...baseRun, id: '3', buildId: '3', url, lhr: lhr('lh-6-0-0-coursehero-b.json')},
+      {...baseRun, id: '4', buildId: '4', url, lhr: lhr('lh-6-2-0-coursehero-a.json')},
+      {...baseRun, id: '5', buildId: '5', url, lhr: lhr('lh-6-2-0-coursehero-b.json')},
     ],
   };
 }

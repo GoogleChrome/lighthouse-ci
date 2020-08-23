@@ -22,6 +22,7 @@ export function openLhrInClassicViewer(lhr) {
     if (messageEvent.origin !== VIEWER_ORIGIN) {
       return;
     }
+    // https://github.com/GoogleChrome/lighthouse/blob/35f1a6f90e9443bdf42179a4c9823e6d4848a9e6/lighthouse-viewer/app/src/lighthouse-report-viewer.js#L415-L418
     if (popup && messageEvent.data.opened) {
       popup.postMessage({lhresults: lhr}, VIEWER_ORIGIN);
       window.removeEventListener('message', msgHandler);

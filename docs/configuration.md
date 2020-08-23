@@ -1082,7 +1082,8 @@ If you're a Lighthouse pro, assert the recommended preset, increase the number o
     "collect": {
       "settings": {
         "configPath": "./path/to/lighthouse/config.js",
-        "plugins": ["lighthouse-plugin-field-performance"]
+        "plugins": ["lighthouse-plugin-field-performance"],
+        "disableStorageReset": true
       }
     }
   }

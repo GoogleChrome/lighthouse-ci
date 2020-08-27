@@ -175,7 +175,6 @@ async function startServerAndDetermineUrls(options) {
   if (!urls.length) {
 
     if (typeof options.numberOfFiles !== "undefined" && options.numberOfFiles <= 0) {
-      console.warn("I AM HERE")
       urls.push(...server.getAvailableUrls())
     } else {
       urls.push(...server.getAvailableUrls().slice(0, options.numberOfFiles))

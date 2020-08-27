@@ -80,6 +80,12 @@ function buildCommand(yargs) {
       default: 3,
       type: 'number',
     },
+    numberOfFiles: {
+      alias: 'f',
+      description: 'The number of files to test. Disable limit by setting this to 0',
+      default: 5,
+      type: 'number',
+    },
   });
 }
 
@@ -167,7 +173,13 @@ async function startServerAndDetermineUrls(options) {
 
   const urls = urlsAsArray;
   if (!urls.length) {
-    urls.push(...server.getAvailableUrls().slice(0, 5));
+
+    if (typeof options.numberOfFiles !== "undefined" && options.numberOfFiles <= 0) {
+      console.warn("I AM HERE")
+      urls.push(...server.getAvailableUrls())
+    } else {
+      urls.push(...server.getAvailableUrls().slice(0, options.numberOfFiles))
+    }
   }
 
   if (!urls.length) {

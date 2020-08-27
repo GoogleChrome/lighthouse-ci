@@ -351,7 +351,7 @@ The maximum amount of time in milliseconds to wait for `startServerCommand` to p
 
 #### `settings`
 
-The [Lighthouse settings object](https://github.com/GoogleChrome/lighthouse/blob/master/docs/configuration.md#settings-objectundefined) to pass along to Lighthouse. This can be used to change configuration of it Lighthouse itself.
+The [Lighthouse settings object](https://github.com/GoogleChrome/lighthouse/blob/master/docs/configuration.md#settings-objectundefined) to pass along to Lighthouse. This can be used to change configuration of Lighthouse itself.
 
 **Example:**
 
@@ -368,6 +368,27 @@ The [Lighthouse settings object](https://github.com/GoogleChrome/lighthouse/blob
         "maxWaitForLoad": 90000,
         // Use applied throttling instead of simulated throttling
         "throttlingMethod": "devtools"
+      }
+    }
+  }
+}
+```
+
+You can use the `settings` property to configure Lighthouse for testing your site on an emulated desktop device:
+
+```jsonc
+{
+  "ci": {
+    "collect": {
+      "settings": {
+        // Set the screen size
+        "emulatedFormFactor": "desktop",
+        // Define CPU and network characteristics
+        "throttling": {
+          "rttMs": 40,
+          "throughputKbps": 10240,
+          "cpuSlowdownMultiplier": 1
+        }
       }
     }
   }

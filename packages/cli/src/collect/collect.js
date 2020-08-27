@@ -173,11 +173,10 @@ async function startServerAndDetermineUrls(options) {
 
   const urls = urlsAsArray;
   if (!urls.length) {
-
-    if (typeof options.numberOfFiles !== "undefined" && options.numberOfFiles <= 0) {
-      urls.push(...server.getAvailableUrls())
+    if (typeof options.numberOfFiles !== 'undefined' && options.numberOfFiles <= 0) {
+      urls.push(...server.getAvailableUrls());
     } else {
-      urls.push(...server.getAvailableUrls().slice(0, options.numberOfFiles))
+      urls.push(...server.getAvailableUrls().slice(0, options.numberOfFiles));
     }
   }
 

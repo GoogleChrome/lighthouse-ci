@@ -404,9 +404,8 @@ Saves the runs in the `.lighthouseci/` folder to desired target and sets a GitHu
 ```bash
 Options:
   --target                       The type of target to upload the data to. If set to anything other
-                                 than "lhci", some of the options will not apply.          [string]
-                                 [choices: "lhci", "temporary-public-storage", "filesytem"]
-                                 [default: "lhci"]
+                                 than "lhci", some of the options will not apply.
+               [string] [choices: "lhci", "temporary-public-storage", "filesytem"] [default: "lhci"]
   --token                        [lhci only] The Lighthouse CI build token for the project.[string]
   --ignoreDuplicateBuildFailure  [lhci only] Whether to ignore failures (still exit with code 0)
                                  caused by uploads of a duplicate build.                   [boolean]

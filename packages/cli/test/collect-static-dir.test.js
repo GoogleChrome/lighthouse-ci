@@ -15,7 +15,6 @@ const {runCLI} = require('./test-utils.js');
 describe('Lighthouse CI collect CLI', () => {
   describe('with URLs', () => {
     const staticDistDir = path.join(__dirname, 'fixtures/collect-static-dir-with-urls');
-
     it('should collect a static dir with explicit URLs', async () => {
       const {stdout, stderr, status} = await runCLI(
         ['collect', '-n=1', '--staticDistDir=./', '--url=/child/grandchild.html'],
@@ -23,7 +22,6 @@ describe('Lighthouse CI collect CLI', () => {
           cwd: staticDistDir,
         }
       );
-
       expect(stdout).toMatchInlineSnapshot(`
         "Started a web server on port XXXX...
         Running Lighthouse 1 time(s) on http://localhost:XXXX/child/grandchild.html
@@ -37,7 +35,7 @@ describe('Lighthouse CI collect CLI', () => {
   });
 
   describe('with autodiscover limit', () => {
-    const staticDistDir = path.join(__dirname, 'fixtures/collect-static-dir-without-urls');
+    const staticDistDir = path.join(__dirname, 'fixtures/collect-static-dir-autodiscover-limit');
     it('should collect a single page from static dir', async () => {
       const {stdout, stderr, status} = await runCLI(
         ['collect', '-n=1', '--staticDistDir=./', '--maxAutodiscoverUrls=1'],
@@ -85,9 +83,9 @@ describe('Lighthouse CI collect CLI', () => {
     }, 180000);
   });
   describe('by default', () => {
-    const staticDistDir = path.join(__dirname, 'fixtures/collect-static-dir-without-urls');
+    const staticDistDir = path.join(__dirname, 'fixtures/collect-static-dir-autodiscover-limit');
 
-    it('should collect 5 pages from static dir by default', async () => {
+    it('should collect 5 pages from static dir', async () => {
       const {stdout, stderr, status} = await runCLI(['collect', '-n=1', '--staticDistDir=./'], {
         cwd: staticDistDir,
       });

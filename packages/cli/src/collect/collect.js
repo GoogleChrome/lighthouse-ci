@@ -173,7 +173,7 @@ async function startServerAndDetermineUrls(options) {
 
   const urls = urlsAsArray;
   if (!urls.length) {
-    const maxNumberOfUrls = options.numberOfFiles || Infinity;
+    const maxNumberOfUrls = options.maxAutodiscoverUrls || Infinity;
     urls.push(...server.getAvailableUrls().slice(0, maxNumberOfUrls));
   }
 

@@ -80,6 +80,12 @@ function buildCommand(yargs) {
       default: 3,
       type: 'number',
     },
+    maxAutodiscoverUrls: {
+      description:
+        'The maximum number of pages to collect when using the staticDistDir option with no specified URLs. Disable this limit by setting to 0.',
+      default: 5,
+      type: 'number',
+    },
   });
 }
 
@@ -167,7 +173,8 @@ async function startServerAndDetermineUrls(options) {
 
   const urls = urlsAsArray;
   if (!urls.length) {
-    urls.push(...server.getAvailableUrls().slice(0, 5));
+    const maxNumberOfUrls = options.maxAutodiscoverUrls || Infinity;
+    urls.push(...server.getAvailableUrls().slice(0, maxNumberOfUrls));
   }
 
   if (!urls.length) {

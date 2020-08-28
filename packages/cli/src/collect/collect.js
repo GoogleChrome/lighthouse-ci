@@ -81,7 +81,6 @@ function buildCommand(yargs) {
       type: 'number',
     },
     numberOfFiles: {
-      alias: 'f',
       description: 'The number of files to test. Disable limit by setting this to 0',
       default: 5,
       type: 'number',

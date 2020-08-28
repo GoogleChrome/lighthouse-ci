@@ -81,7 +81,8 @@ function buildCommand(yargs) {
       type: 'number',
     },
     maxAutodiscoverUrls: {
-      description: 'The maximum number of pages to collect when using the staticDistDir option with no specified URLs. Disable this limit by setting to 0.',
+      description:
+        'The maximum number of pages to collect when using the staticDistDir option with no specified URLs. Disable this limit by setting to 0.',
       default: 5,
       type: 'number',
     },

@@ -60,7 +60,7 @@ declare global {
         headful: boolean;
         additive: boolean;
         settings?: LighthouseSettings;
-        numberOfFiles?: number;
+        maxAutodiscoverUrls?: number;
       }
     }
   }

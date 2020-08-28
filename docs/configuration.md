@@ -374,27 +374,6 @@ The [Lighthouse settings object](https://github.com/GoogleChrome/lighthouse/blob
 }
 ```
 
-You can use the `settings` property to configure Lighthouse for testing your site on an emulated desktop device:
-
-```jsonc
-{
-  "ci": {
-    "collect": {
-      "settings": {
-        // Set the screen size
-        "emulatedFormFactor": "desktop",
-        // Define CPU and network characteristics
-        "throttling": {
-          "rttMs": 40,
-          "throughputKbps": 10240,
-          "cpuSlowdownMultiplier": 1
-        }
-      }
-    }
-  }
-}
-```
-
 #### `numberOfRuns`
 
 The number of times to collect Lighthouse results on each `url`. This option helps mitigate fluctations due to natural page [variability](https://github.com/GoogleChrome/lighthouse/blob/v6.0.0-beta.0/docs/variability.md).
@@ -1105,6 +1084,27 @@ If you're a Lighthouse pro, assert the recommended preset, increase the number o
         "configPath": "./path/to/lighthouse/config.js",
         "plugins": ["lighthouse-plugin-field-performance"],
         "disableStorageReset": true
+      }
+    }
+  }
+}
+```
+
+### Desktop emulation
+
+```jsonc
+{
+  "ci": {
+    "collect": {
+      "settings": {
+        // Set the screen size
+        "emulatedFormFactor": "desktop",
+        // Define CPU and network characteristics
+        "throttling": {
+          "rttMs": 40,
+          "throughputKbps": 10240,
+          "cpuSlowdownMultiplier": 1
+        }
       }
     }
   }

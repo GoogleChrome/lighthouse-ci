@@ -223,6 +223,8 @@ Options:
                              continuing                                    [number] [default: 10000]
   --settings                 The Lighthouse settings and flags to use when collecting
   --numberOfRuns, -n         The number of times to run Lighthouse.            [number] [default: 3]
+  --maxAutodiscoverUrls      The maximum number of pages to collect when using the staticDistDir
+                             option with no specified URL                      [number] [default: 5]
 ```
 
 #### `method`

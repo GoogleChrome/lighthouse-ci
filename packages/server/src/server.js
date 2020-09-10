@@ -68,6 +68,21 @@ async function createServer(options) {
 
   return new Promise(resolve => {
     const server = createHttpServer(app);
+
+    // Node default socket timeout is 2 minutes.
+    // Some LHCI API operations (computing statistics) can take longer than that under heavy load.
+    // Set the timeout even higher to allow for these requests to complete.
+    server.on('connection', socket => {
+      socket.setTimeout(20 * 60 * 1000); // 20 minutes
+      socket.on('timeout', () => {
+        if (options.logLevel !== 'silent') {
+          process.stdout.write(`${new Date().toISOString()} - socket timed out\n`);
+        }
+
+        socket.end();
+      });
+    });
+
     server.listen(options.port, () => {
       const serverAddress = server.address();
       const listenPort =

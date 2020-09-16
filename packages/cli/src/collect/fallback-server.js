@@ -83,24 +83,29 @@ class FallbackServer {
    * @return {Array<{file: string, depth: number}>}
    */
   static readHtmlFilesInDirectory(directory, depth) {
-    const filesAndFolders = fs.readdirSync(directory);
-    const htmlFiles = filesAndFolders
-      .filter(file => file.endsWith('.html'))
-      .map(file => ({file, depth: 0}));
+    const filesAndFolders = fs.readdirSync(directory, {withFileTypes: true});
+
+    const files = filesAndFolders.filter(fileOrDir => fileOrDir.isFile()).map(file => file.name);
+    const folders = filesAndFolders
+      .filter(fileOrDir => fileOrDir.isDirectory())
+      .map(dir => dir.name);
+
+    const htmlFiles = files.filter(file => file.endsWith('.html')).map(file => ({file, depth: 0}));
+
     if (depth === 0) return htmlFiles;
 
-    for (const fileOrFolder of filesAndFolders) {
+    for (const folder of folders) {
       // Don't recurse into hidden folders, things that look like files, or dependency folders
-      if (fileOrFolder.includes('.')) continue;
-      if (IGNORED_FOLDERS_FOR_AUTOFIND.has(fileOrFolder)) continue;
+      if (folder.includes('.')) continue;
+      if (IGNORED_FOLDERS_FOR_AUTOFIND.has(folder)) continue;
 
       try {
-        const fullPath = path.join(directory, fileOrFolder);
+        const fullPath = path.join(directory, folder);
         if (!fs.statSync(fullPath).isDirectory()) continue;
 
         htmlFiles.push(
           ...FallbackServer.readHtmlFilesInDirectory(fullPath, depth - 1).map(({file, depth}) => {
-            return {file: `${fileOrFolder}/${file}`, depth: depth + 1};
+            return {file: `${folder}/${file}`, depth: depth + 1};
           })
         );
       } catch (err) {}

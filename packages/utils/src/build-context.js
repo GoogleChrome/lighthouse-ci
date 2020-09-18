@@ -230,27 +230,18 @@ function getAuthor(hash = 'HEAD') {
 }
 
 /**
- * @param {string} hash
+ * @param {string} author
  * @return {string}
  */
-function getAuthorEmail(hash = 'HEAD') {
-  const envHash = getEnvVarIfSet([
-    // Manual override
-    'LHCI_BUILD_CONTEXT__AUTHOR_EMAIL',
-  ]);
-  if (envHash) return envHash;
-
-  const result = childProcess.spawnSync('git', ['log', '--format=%aE', '-n', '1', hash], {
-    encoding: 'utf8',
-  });
-  if (result.status !== 0) {
+function getEmailFromAuthor(author) {
+  const emailRegex = new RegExp(/ <(\S+@\S+)>$/);
+  const emailMatch = author.match(emailRegex);
+  if (!emailMatch) {
     throw new Error(
-      'Unable to determine commit author email with `git log --format=%aE -n 1`. ' +
-        'This can be overridden with setting LHCI_BUILD_CONTEXT__AUTHOR_EMAIL env.'
+      'Unable to parse email from author, expected "' + author + '" to match / <(\\S+@\\S+)>$/'
     );
   }
-
-  return result.stdout.trim();
+  return emailMatch[1];
 }
 
 /**
@@ -264,7 +255,8 @@ function getAvatarUrl(hash = 'HEAD') {
   ]);
   if (envHash) return envHash;
 
-  const email = getAuthorEmail(hash);
+  const author = getAuthor(hash);
+  const email = getEmailFromAuthor(author);
 
   return getGravatarUrlFromEmail(email);
 }
@@ -368,7 +360,7 @@ module.exports = {
   getExternalBuildUrl,
   getCommitMessage,
   getAuthor,
-  getAuthorEmail,
+  getEmailFromAuthor,
   getAvatarUrl,
   getGravatarUrlFromEmail,
   getAncestorHash,

@@ -99,14 +99,65 @@ describe('build-context.js', () => {
     });
   });
 
-  describe('#getAuthorEmail()', () => {
+  describe('#getEmailFromAuthor', () => {
     it('should work', () => {
-      expect(buildContext.getAuthorEmail(hash)).toEqual('patrick.hulce@gmail.com');
+      expect(buildContext.getEmailFromAuthor('Patrick Hulce <patrick.hulce@gmail.com>')).toEqual(
+        'patrick.hulce@gmail.com'
+      );
     });
 
-    it('should respect env override', () => {
-      process.env.LHCI_BUILD_CONTEXT__AUTHOR_EMAIL = 'paulirish@google.com';
-      expect(buildContext.getAuthorEmail(hash)).toEqual('paulirish@google.com');
+    it('should not be overly strict about email format', () => {
+      expect(buildContext.getEmailFromAuthor('Patrick Hulce <a@b>')).toEqual('a@b');
+    });
+
+    it('should throw if there is not an @ sign', () => {
+      expect(() => buildContext.getEmailFromAuthor('Patrick Hulce <patrick>')).toThrow();
+    });
+
+    it('should throw if email does not have a user to the left of the @', () => {
+      expect(() => buildContext.getEmailFromAuthor('Patrick Hulce <@gmail.com>')).toThrow();
+    });
+
+    it('should throw if the user is just whitespace', () => {
+      expect(() => buildContext.getEmailFromAuthor('Patrick Hulce < @gmail.com>')).toThrow();
+    });
+
+    it('should throw if email does not have a host to the right of the @', () => {
+      expect(() => buildContext.getEmailFromAuthor('Patrick Hulce <patrick@>')).toThrow();
+    });
+
+    it('should throw if the host is just whitespace', () => {
+      expect(() => buildContext.getEmailFromAuthor('Patrick Hulce <patrick@ >')).toThrow();
+    });
+
+    it('should ignore angle brackets other than the last pair', () => {
+      expect(buildContext.getEmailFromAuthor('Patrick Hulce <fir@st> <se@cond>')).toEqual(
+        'se@cond'
+      );
+    });
+
+    it('should throw if there is not a space between name and email', () => {
+      expect(() =>
+        buildContext.getEmailFromAuthor('Patrick Hulce<patrick.hulce@gmail.com>')
+      ).toThrow();
+    });
+
+    it('should not be sensitive to the author name itself', () => {
+      expect(buildContext.getEmailFromAuthor(' <patrick.hulce@gmail.com>')).toEqual(
+        'patrick.hulce@gmail.com'
+      );
+    });
+
+    it('should throw if there are not angle brackets surrounding the email', () => {
+      expect(() =>
+        buildContext.getEmailFromAuthor('Patrick Hulce <patrick.hulce@gmail.com')
+      ).toThrow();
+    });
+
+    it('should throw if the email is not at the end of the string', () => {
+      expect(() =>
+        buildContext.getEmailFromAuthor('Patrick Hulce <patrick.hulce@gmail.com> ')
+      ).toThrow();
     });
   });
 

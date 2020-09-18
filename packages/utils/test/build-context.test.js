@@ -99,6 +99,17 @@ describe('build-context.js', () => {
     });
   });
 
+  describe('#getAuthorEmail()', () => {
+    it('should work', () => {
+      expect(buildContext.getAuthorEmail(hash)).toEqual('patrick.hulce@gmail.com');
+    });
+
+    it('should respect env override', () => {
+      process.env.LHCI_BUILD_CONTEXT__AUTHOR_EMAIL = 'paulirish@google.com';
+      expect(buildContext.getAuthorEmail(hash)).toEqual('paulirish@google.com');
+    });
+  });
+
   describe('#getAvatarUrl()', () => {
     it('should work', () => {
       expect(buildContext.getAvatarUrl(hash)).toEqual(

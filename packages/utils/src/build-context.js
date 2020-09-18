@@ -233,10 +233,10 @@ function getAuthor(hash = 'HEAD') {
  * @param {string} hash
  * @return {string}
  */
-function getAvatarUrl(hash = 'HEAD') {
+function getAuthorEmail(hash = 'HEAD') {
   const envHash = getEnvVarIfSet([
     // Manual override
-    'LHCI_BUILD_CONTEXT__AVATAR_URL',
+    'LHCI_BUILD_CONTEXT__AUTHOR_EMAIL',
   ]);
   if (envHash) return envHash;
 
@@ -245,12 +245,28 @@ function getAvatarUrl(hash = 'HEAD') {
   });
   if (result.status !== 0) {
     throw new Error(
-      "Unable to determine commit author's avatar URL because `git log --format=%aE -n 1` failed to provide author's email. " +
-        'This can be overridden with setting LHCI_BUILD_CONTEXT__AVATAR_URL env.'
+      'Unable to determine commit author email with `git log --format=%aE -n 1`. ' +
+        'This can be overridden with setting LHCI_BUILD_CONTEXT__AUTHOR_EMAIL env.'
     );
   }
 
-  return getGravatarUrlFromEmail(result.stdout);
+  return result.stdout.trim();
+}
+
+/**
+ * @param {string} hash
+ * @return {string}
+ */
+function getAvatarUrl(hash = 'HEAD') {
+  const envHash = getEnvVarIfSet([
+    // Manual override
+    'LHCI_BUILD_CONTEXT__AVATAR_URL',
+  ]);
+  if (envHash) return envHash;
+
+  const email = getAuthorEmail(hash);
+
+  return getGravatarUrlFromEmail(email);
 }
 
 /**
@@ -352,6 +368,7 @@ module.exports = {
   getExternalBuildUrl,
   getCommitMessage,
   getAuthor,
+  getAuthorEmail,
   getAvatarUrl,
   getGravatarUrlFromEmail,
   getAncestorHash,

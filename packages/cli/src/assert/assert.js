@@ -91,7 +91,7 @@ async function runCommand(options) {
 
       const auditTitlePart = result.auditTitle || '';
       const documentationPart = result.auditDocumentationLink || '';
-      const titleAndDocs = [auditTitlePart, documentationPart]
+      const titleAndDocs = [auditTitlePart, documentationPart, result.message]
         .filter(Boolean)
         .map(s => `       ` + s)
         .join('\n');

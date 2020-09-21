@@ -30,6 +30,9 @@ describe('getAllAssertionResults', () => {
             score: 0,
             details: {items: [1, 2, 3, 4]},
           },
+          'cumulative-layout-shift': {
+            numericValue: 0,
+          },
         },
       },
       {
@@ -45,6 +48,9 @@ describe('getAllAssertionResults', () => {
           'network-requests': {
             score: 0,
             details: {items: [1, 2]},
+          },
+          'cumulative-layout-shift': {
+            numericValue: 0,
           },
         },
       },
@@ -73,6 +79,7 @@ describe('getAllAssertionResults', () => {
     const assertions = {
       'first-contentful-paint': ['error', {minScore: 0.5}],
       'network-requests': ['warn', {maxLength: 10}],
+      'cumulative-layout-shift': ['error', {maxNumericValue: 1}],
     };
 
     const results = getAllAssertionResults({assertions}, lhrs);
@@ -201,6 +208,29 @@ describe('getAllAssertionResults', () => {
     expect(results).toMatchObject([{actual: 0.8, expected: 0.9}]);
   });
 
+  it('should warn on incorrect assertion type', () => {
+    const assertions = {
+      'network-requests': ['error', {maxNumericValue: 10}],
+    };
+
+    const results = getAllAssertionResults({assertions}, lhrs);
+    expect(results).toEqual([
+      {
+        actual: NaN,
+        auditId: 'network-requests',
+        expected: 10,
+        level: 'error',
+        message:
+          'Audit did not produce a value at all. "maxNumericValue" might not be a valid assertion for this audit.',
+        name: 'maxNumericValue',
+        operator: '<=',
+        passed: false,
+        url: 'http://page-1.com',
+        values: [NaN, NaN],
+      },
+    ]);
+  });
+
   it('should respect notApplicable', () => {
     const assertions = {
       'network-requests': 'error',
@@ -312,6 +342,7 @@ describe('getAllAssertionResults', () => {
       const assertions = {
         'first-contentful-paint': ['warn', {aggregationMethod: 'pessimistic', minScore: 1}],
         'network-requests': ['warn', {aggregationMethod: 'pessimistic', maxLength: 1}],
+        'cumulative-layout-shift': ['warn', {aggregationMethod: 'pessimistic', maxNumericValue: 1}],
       };
 
       const results = getAllAssertionResults({assertions}, lhrs);
@@ -425,7 +456,7 @@ describe('getAllAssertionResults', () => {
 
       lhrs[1].audits['first-contentful-paint'].score = null;
       const results = getAllAssertionResults({assertions}, lhrs);
-      expect(results).toMatchObject([{actual: 0, expected: 1, name: 'auditRan'}]);
+      expect(results).toMatchObject([{actual: NaN, expected: 0.9, name: 'minScore'}]);
     });
   });
 

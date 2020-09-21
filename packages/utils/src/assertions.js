@@ -6,6 +6,7 @@
 'use strict';
 
 const _ = require('./lodash.js');
+const preset = require('./presets/all.js');
 const {splitMarkdownLink} = require('./markdown.js');
 const {computeRepresentativeRuns} = require('./representative-runs.js');
 
@@ -152,9 +153,10 @@ function getAssertionResult(auditResults, aggregationMethod, assertionType, expe
 /**
  * @param {Array<LH.AuditResult|undefined>} possibleAuditResults
  * @param {LHCI.AssertCommand.AssertionOptions} options
+ * @param {string} [auditId]
  * @return {AssertionResultNoURL[]}
  */
-function getStandardAssertionResults(possibleAuditResults, options) {
+function getStandardAssertionResults(possibleAuditResults, options, auditId) {
   const {minScore, maxLength, maxNumericValue, aggregationMethod = 'optimistic'} = options;
   if (possibleAuditResults.some(result => result === undefined)) {
     return [
@@ -165,6 +167,10 @@ function getStandardAssertionResults(possibleAuditResults, options) {
         values: possibleAuditResults.map(result => (result === undefined ? 0 : 1)),
         operator: '>=',
         passed: false,
+        message:
+          auditId && !(auditId in preset.assertions)
+            ? `"${auditId}" is not a known audit.`
+            : undefined,
       },
     ];
   }
@@ -356,7 +362,7 @@ function getAssertionResultsForAudit(auditId, auditProperty, auditResults, asser
       auditProperty: userTimingName,
     }));
   } else {
-    return getStandardAssertionResults(auditResults, assertionOptions);
+    return getStandardAssertionResults(auditResults, assertionOptions, auditId);
   }
 }
 

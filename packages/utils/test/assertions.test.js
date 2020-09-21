@@ -65,6 +65,7 @@ describe('getAllAssertionResults', () => {
         url: 'http://page-1.com',
         actual: 0,
         auditId: 'missing',
+        message: '"missing" is not a known audit.',
         expected: 1,
         level: 'error',
         name: 'auditRan',

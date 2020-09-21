@@ -231,16 +231,12 @@ function getAuthor(hash = 'HEAD') {
 
 /**
  * @param {string} author
- * @return {string}
+ * @return {string | null}
  */
 function getEmailFromAuthor(author) {
   const emailRegex = new RegExp(/ <(\S+@\S+)>$/);
   const emailMatch = author.match(emailRegex);
-  if (!emailMatch) {
-    throw new Error(
-      'Unable to parse email from author, expected "' + author + '" to match / <(\\S+@\\S+)>$/'
-    );
-  }
+  if (!emailMatch) return null;
   return emailMatch[1];
 }
 
@@ -255,10 +251,23 @@ function getAvatarUrl(hash = 'HEAD') {
   ]);
   if (envHash) return envHash;
 
+  // Next try to parse the email from the complete author.
   const author = getAuthor(hash);
   const email = getEmailFromAuthor(author);
+  if (email) return getGravatarUrlFromEmail(email);
 
-  return getGravatarUrlFromEmail(email);
+  // Finally fallback to git again if we couldn't parse the email out of the author.
+  const result = childProcess.spawnSync('git', ['log', '--format=%aE', '-n', '1', hash], {
+    encoding: 'utf8',
+  });
+  if (result.status !== 0) {
+    throw new Error(
+      "Unable to determine commit author's avatar URL because `git log --format=%aE -n 1` failed to provide author's email. " +
+        'This can be overridden with setting LHCI_BUILD_CONTEXT__AVATAR_URL env.'
+    );
+  }
+
+  return getGravatarUrlFromEmail(result.stdout);
 }
 
 /**

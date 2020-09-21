@@ -25,6 +25,7 @@ const {computeRepresentativeRuns} = require('./representative-runs.js');
  * @property {string|undefined} [auditProperty]
  * @property {string|undefined} [auditTitle]
  * @property {string|undefined} [auditDocumentationLink]
+ * @property {string} [message]
  */
 
 /** @typedef {StrictOmit<AssertionResult, 'url'>} AssertionResultNoURL */
@@ -96,18 +97,40 @@ function getValueForAggregationMethod(values, aggregationMethod, assertionType) 
 function getAssertionResult(auditResults, aggregationMethod, assertionType, expectedValue) {
   const values = auditResults.map(AUDIT_TYPE_VALUE_GETTERS[assertionType]);
   const filteredValues = values.filter(isFiniteNumber);
+  const {operator, passedFn} = AUDIT_TYPE_OPERATORS[assertionType];
 
   if (
     (!filteredValues.length && aggregationMethod !== 'pessimistic') ||
     (filteredValues.length !== values.length && aggregationMethod === 'pessimistic')
   ) {
-    const didRun = values.map(value => (isFiniteNumber(value) ? 1 : 0));
+    /** @type {string|undefined} */
+    let message = undefined;
+    if (values.some(v => v === undefined)) {
+      const userAction = `"${assertionType}" might not be a valid assertion for this audit.`;
+      message = `Audit did not produce a value at all. ${userAction}`;
+    } else {
+      const userAction =
+        aggregationMethod === 'pessimistic'
+          ? 'Try using an aggregationMethod other than "pessimistic".'
+          : 'If this is reproducible, please file an issue on GitHub.';
+      message = `Audit failed to produce a valid value. ${userAction}`;
+    }
+
+    const didRun = values.map(value => (isFiniteNumber(value) ? value : NaN));
+
     return [
-      {name: 'auditRan', expected: 1, actual: 0, values: didRun, operator: '==', passed: false},
+      {
+        name: assertionType,
+        expected: expectedValue,
+        actual: NaN,
+        values: didRun,
+        operator,
+        passed: false,
+        message,
+      },
     ];
   }
 
-  const {operator, passedFn} = AUDIT_TYPE_OPERATORS[assertionType];
   const actualValue = getValueForAggregationMethod(
     filteredValues,
     aggregationMethod,

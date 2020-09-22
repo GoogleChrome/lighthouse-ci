@@ -903,7 +903,7 @@ The path to the sqlite database on the local filesystem relative to the current 
 
 _sqlDialect=mysql or sqlDialect=postgres only_
 
-The database connection URL string for the MySQL or PostgreSQL database of the form `<dialect>://<user>:<password>@<host>/<database>`.
+The database connection URL string for the MySQL or PostgreSQL database of the form `<dialect>://<user>:<password>@<host>:<port>/<database>`.
 
 ##### `storage.sqlDangerouslyResetDatabase`
 

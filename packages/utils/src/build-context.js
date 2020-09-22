@@ -230,6 +230,17 @@ function getAuthor(hash = 'HEAD') {
 }
 
 /**
+ * @param {string} author
+ * @return {string | null}
+ */
+function getEmailFromAuthor(author) {
+  const emailRegex = new RegExp(/ <(\S+@\S+)>$/);
+  const emailMatch = author.match(emailRegex);
+  if (!emailMatch) return null;
+  return emailMatch[1];
+}
+
+/**
  * @param {string} hash
  * @return {string}
  */
@@ -240,6 +251,12 @@ function getAvatarUrl(hash = 'HEAD') {
   ]);
   if (envHash) return envHash;
 
+  // Next try to parse the email from the complete author.
+  const author = getAuthor(hash);
+  const email = getEmailFromAuthor(author);
+  if (email) return getGravatarUrlFromEmail(email);
+
+  // Finally fallback to git again if we couldn't parse the email out of the author.
   const result = childProcess.spawnSync('git', ['log', '--format=%aE', '-n', '1', hash], {
     encoding: 'utf8',
   });
@@ -352,6 +369,7 @@ module.exports = {
   getExternalBuildUrl,
   getCommitMessage,
   getAuthor,
+  getEmailFromAuthor,
   getAvatarUrl,
   getGravatarUrlFromEmail,
   getAncestorHash,

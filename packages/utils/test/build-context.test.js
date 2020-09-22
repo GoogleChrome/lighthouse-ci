@@ -99,6 +99,64 @@ describe('build-context.js', () => {
     });
   });
 
+  describe('#getEmailFromAuthor', () => {
+    it('should work', () => {
+      expect(buildContext.getEmailFromAuthor('Patrick Hulce <patrick.hulce@gmail.com>')).toEqual(
+        'patrick.hulce@gmail.com'
+      );
+    });
+
+    it('should not be overly strict about email format', () => {
+      expect(buildContext.getEmailFromAuthor('Patrick Hulce <a@b>')).toEqual('a@b');
+    });
+
+    it('returns null if there is not an @ sign', () => {
+      expect(buildContext.getEmailFromAuthor('Patrick Hulce <patrick>')).toBeNull();
+    });
+
+    it('returns null if email does not have a user to the left of the @', () => {
+      expect(buildContext.getEmailFromAuthor('Patrick Hulce <@gmail.com>')).toBeNull();
+    });
+
+    it('returns null if the user is just whitespace', () => {
+      expect(buildContext.getEmailFromAuthor('Patrick Hulce < @gmail.com>')).toBeNull();
+    });
+
+    it('returns null if email does not have a host to the right of the @', () => {
+      expect(buildContext.getEmailFromAuthor('Patrick Hulce <patrick@>')).toBeNull();
+    });
+
+    it('returns null if the host is just whitespace', () => {
+      expect(buildContext.getEmailFromAuthor('Patrick Hulce <patrick@ >')).toBeNull();
+    });
+
+    it('should ignore angle brackets other than the last pair', () => {
+      expect(buildContext.getEmailFromAuthor('Patrick Hulce <fir@st> <se@cond>')).toEqual(
+        'se@cond'
+      );
+    });
+
+    it('returns null if there is not a space between name and email', () => {
+      expect(buildContext.getEmailFromAuthor('Patrick Hulce<patrick.hulce@gmail.com>')).toBeNull();
+    });
+
+    it('should not be sensitive to the author name itself', () => {
+      expect(buildContext.getEmailFromAuthor(' <patrick.hulce@gmail.com>')).toEqual(
+        'patrick.hulce@gmail.com'
+      );
+    });
+
+    it('returns null if there are not angle brackets surrounding the email', () => {
+      expect(buildContext.getEmailFromAuthor('Patrick Hulce <patrick.hulce@gmail.com')).toBeNull();
+    });
+
+    it('returns null if the email is not at the end of the string', () => {
+      expect(
+        buildContext.getEmailFromAuthor('Patrick Hulce <patrick.hulce@gmail.com> ')
+      ).toBeNull();
+    });
+  });
+
   describe('#getAvatarUrl()', () => {
     it('should work', () => {
       expect(buildContext.getAvatarUrl(hash)).toEqual(
@@ -109,6 +167,20 @@ describe('build-context.js', () => {
     it('should respect env override', () => {
       process.env.LHCI_BUILD_CONTEXT__AVATAR_URL = 'http://localhost:1234/profile.jpg';
       expect(buildContext.getAvatarUrl(hash)).toEqual('http://localhost:1234/profile.jpg');
+    });
+
+    it('should parse email from the complete author env override', () => {
+      process.env.LHCI_BUILD_CONTEXT__AUTHOR = 'Paul Irish <paulirish@google.com>';
+      expect(buildContext.getAvatarUrl(hash)).toEqual(
+        'https://www.gravatar.com/avatar/629999fcb3f6a928abe5f65ed0ab09c2.jpg?d=identicon'
+      );
+    });
+
+    it('should use git if author env override does not have an email', () => {
+      process.env.LHCI_BUILD_CONTEXT__AUTHOR = 'Paul Irish <localhost>';
+      expect(buildContext.getAvatarUrl(hash)).toEqual(
+        'https://www.gravatar.com/avatar/78bafdcaf40e20b90bb76b9aa5834e11.jpg?d=identicon'
+      );
     });
   });
 

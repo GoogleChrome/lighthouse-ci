@@ -47,20 +47,24 @@ function computeSelectedUrl(props, compareRuns) {
   return urlsInBothRuns[0] || fallbackUrl;
 }
 
-/** @param {{project: LHCI.ServerCommand.Project, build: LHCI.ServerCommand.Build, ancestorBuild: LHCI.ServerCommand.Build | null, runs: Array<LHCI.ServerCommand.Run>, compareUrl?: string, hasBaseOverride: boolean}} props */
+/** @param {{project: LHCI.ServerCommand.Project, build: LHCI.ServerCommand.Build, ancestorBuild: LHCI.ServerCommand.Build | null, runs: Array<LHCI.ServerCommand.Run>, baseUrl?: string, compareUrl?: string, hasBaseOverride: boolean}} props */
 const BuildView_ = props => {
   const [openBuildHash, setOpenBuild] = useState(/** @type {null|'base'|'compare'} */ (null));
-  const [isOpenLhrLinkHovered, setLhrLinkHover] = useState(false);
+  const [isOpenLhrBaseLinkHovered, setLhrBaseLinkHover] = useState(false);
+  const [isOpenLhrCompareLinkHovered, setLhrCompareLinkHover] = useState(false);
   const buildHashSelectorCloseFn = useCallback(() => setOpenBuild(null), [setOpenBuild]);
 
   const compareRuns = props.runs.filter(run => run.buildId === props.build.id);
-  const selectedUrl = computeSelectedUrl(props, compareRuns);
+  const compareUrl = props.compareUrl || computeSelectedUrl(props, compareRuns);
+  const baseUrl = props.baseUrl || compareUrl
   const availableUrls = [...new Set(compareRuns.map(run => run.url))];
-  const run = compareRuns.find(run => run.url === selectedUrl);
+  const run = compareRuns.find(run => run.url === compareUrl);
 
   const ancestorBuildId = props.ancestorBuild && props.ancestorBuild.id;
   const baseRuns = props.runs.filter(run => run.buildId === ancestorBuildId);
-  const baseRun = baseRuns.find(run => run.url === selectedUrl);
+  const baseRun = baseRuns.find(run => run.url === baseUrl);
+
+  const availableUrlOptions = availableUrls.map(url => ({value: url, label: url}))
 
   /** @type {LH.Result|undefined} */
   let lhr;
@@ -117,7 +121,7 @@ const BuildView_ = props => {
             lhr={baseLhr}
             isDimmed={openBuildHash === 'compare'}
             isOpen={openBuildHash === 'base'}
-            setLhrLinkHover={setLhrLinkHover}
+            setLhrLinkHover={setLhrBaseLinkHover}
             onClick={() => setOpenBuild(openBuildHash === 'base' ? null : 'base')}
           />
           <BuildSelectorHeaderSection
@@ -126,7 +130,7 @@ const BuildView_ = props => {
             lhr={lhr}
             isDimmed={openBuildHash === 'base'}
             isOpen={openBuildHash === 'compare'}
-            setLhrLinkHover={setLhrLinkHover}
+            setLhrLinkHover={setLhrCompareLinkHover}
             onClick={() => setOpenBuild(openBuildHash === 'compare' ? null : 'compare')}
           />
         </Fragment>
@@ -159,24 +163,42 @@ const BuildView_ = props => {
       <LhrComparison
         lhr={lhr}
         baseLhr={baseLhr}
-        className={clsx({'build-view--with-lhr-link-hover': isOpenLhrLinkHovered})}
+        className={clsx({
+          'build-view--with-lhr-base-link-hover': isOpenLhrBaseLinkHovered,
+          'build-view--with-lhr-compare-link-hover': isOpenLhrCompareLinkHovered
+        })}
         hookElements={{
           warnings: computeWarnings(warningProps).hasWarning ? (
             <BuildViewWarnings {...warningProps} />
           ) : (
             undefined
           ),
-          dropdowns: (
+          dropdownsBase: (
             <Dropdown
-              label="URL"
-              className="dropdown--url"
-              value={selectedUrl}
+              label="BaseUrl"
+              className="dropdown--url dropdown--base-url"
+              value={baseUrl}
               setValue={url => {
                 const to = new URL(window.location.href);
+                to.searchParams.set('baseUrl', url);
+                to.searchParams.set('compareUrl', compareUrl);
+                route(`${to.pathname}${to.search}`);
+              }}
+              options={availableUrlOptions}
+            />
+          ),
+          dropdownsCompare: (
+            <Dropdown
+              label="CompareUrl"
+              className="dropdown--url dropdown--compare-url"
+              value={compareUrl}
+              setValue={url => {
+                const to = new URL(window.location.href);
+                to.searchParams.set('baseUrl', baseUrl);
                 to.searchParams.set('compareUrl', url);
                 route(`${to.pathname}${to.search}`);
               }}
-              options={availableUrls.map(url => ({value: url, label: url}))}
+              options={availableUrlOptions}
             />
           ),
         }}
@@ -185,7 +207,7 @@ const BuildView_ = props => {
   );
 };
 
-/** @param {{projectSlug: string, partialBuildId: string, baseBuild?: string, compareUrl?: string}} props */
+/** @param {{projectSlug: string, partialBuildId: string, baseBuild?: string, baseUrl?: string, compareUrl?: string}} props */
 export const BuildView = props => {
   const projectLoadingData = useProjectBySlug(props.projectSlug);
   const projectId = projectLoadingData[1] && projectLoadingData[1].id;
@@ -232,6 +254,7 @@ export const BuildView = props => {
         <BuildView_
           project={project}
           build={build}
+          baseUrl={props.baseUrl}
           compareUrl={props.compareUrl}
           ancestorBuild={ancestorBuild}
           runs={runs.concat(baseRuns)}

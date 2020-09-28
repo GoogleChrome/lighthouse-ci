@@ -549,6 +549,7 @@ For example, by default Lighthouse CI will automatically replace the port of tes
 - There is no escape support for the delimiter, so you must choose a delimiter character that does not appear in your search regex or your replacement.
 - Beware of double-escaping requirements. If you're passing a string in JS or an argument through a shell, you may need to use `\\` in order for a `\` to be seen by Lighthouse CI.
 - If you set `urlReplacementPatterns` yourself, you will lose the defaults provided by Lighthouse CI. If you need the functionality provided by the defaults, be sure to copy them into your configuration as well.
+- You can quickly experiment with various replacement patterns using [this online REPL](https://repl.it/@hamstu/test-replaceUrlPatterns#index.js).
 
 **Examples:**
 

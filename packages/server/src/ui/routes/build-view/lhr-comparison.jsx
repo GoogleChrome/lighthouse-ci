@@ -113,14 +113,13 @@ export function computeAuditGroups(lhr, baseLhr, options) {
   return auditGroups;
 }
 
-/** @param {{hookElements: LHCI.HookElements<'dropdownsBase'|'dropdownsCompare'>, selectedAuditId?: string | null, lhr?: LH.Result, baseLhr?: LH.Result, percentAbsoluteDeltaThreshold: number, setPercentAbsoluteDeltaThreshold: (x: number) => void}} props */
+/** @param {{hookElements: LHCI.HookElements<'dropdowns'>, selectedAuditId?: string | null, lhr?: LH.Result, baseLhr?: LH.Result, percentAbsoluteDeltaThreshold: number, setPercentAbsoluteDeltaThreshold: (x: number) => void}} props */
 const LhrComparisonScoresAndUrl = props => {
   return (
     <div className="lhr-comparison__scores-and-dropdowns">
       <div className="container">
         <div className="lhr-comparison__dropdowns">
-          {props.hookElements.dropdownsBase}
-          {props.hookElements.dropdownsCompare}
+          {props.hookElements.dropdowns}
           <Dropdown
             label="Threshold"
             value={props.percentAbsoluteDeltaThreshold.toString()}
@@ -165,7 +164,7 @@ const AuditGroups = props => {
   );
 };
 
-/** @param {{lhr: LH.Result, baseLhr: LH.Result|undefined, hookElements: LHCI.HookElements<'dropdownsBase'|'dropdownsCompare'|'warnings'>, className?: string}} props */
+/** @param {{lhr: LH.Result, baseLhr: LH.Result|undefined, hookElements: LHCI.HookElements<'dropdowns'|'warnings'>, className?: string}} props */
 export const LhrComparison = props => {
   const {lhr, baseLhr} = props;
   const defaultAck = /** @type {'none'|'acknowledged'|'closed'} */ ('none');

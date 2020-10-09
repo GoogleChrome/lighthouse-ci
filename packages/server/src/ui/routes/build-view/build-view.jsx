@@ -173,33 +173,33 @@ const BuildView_ = props => {
           ) : (
             undefined
           ),
-          dropdownsBase: (
-            <Dropdown
-              label="BaseUrl"
-              className="dropdown--url dropdown--base-url"
-              value={baseUrl}
-              setValue={url => {
-                const to = new URL(window.location.href);
-                to.searchParams.set('baseUrl', url);
-                to.searchParams.set('compareUrl', compareUrl);
-                route(`${to.pathname}${to.search}`);
-              }}
-              options={availableUrlOptions}
-            />
-          ),
-          dropdownsCompare: (
-            <Dropdown
-              label="CompareUrl"
-              className="dropdown--url dropdown--compare-url"
-              value={compareUrl}
-              setValue={url => {
-                const to = new URL(window.location.href);
-                to.searchParams.set('baseUrl', baseUrl);
-                to.searchParams.set('compareUrl', url);
-                route(`${to.pathname}${to.search}`);
-              }}
-              options={availableUrlOptions}
-            />
+          dropdowns: (
+            <Fragment>
+              <Dropdown
+                label="Base Url"
+                className="dropdown--url dropdown--base-url"
+                value={baseUrl}
+                setValue={url => {
+                  const to = new URL(window.location.href);
+                  to.searchParams.set('baseUrl', url);
+                  to.searchParams.set('compareUrl', compareUrl);
+                  route(`${to.pathname}${to.search}`);
+                }}
+                options={availableUrlOptions}
+              />
+              <Dropdown
+                label="Compare Url"
+                className="dropdown--url dropdown--compare-url"
+                value={compareUrl}
+                setValue={url => {
+                  const to = new URL(window.location.href);
+                  to.searchParams.set('baseUrl', baseUrl);
+                  to.searchParams.set('compareUrl', url);
+                  route(`${to.pathname}${to.search}`);
+                }}
+                options={availableUrlOptions}
+              />
+            </Fragment>
           ),
         }}
       />

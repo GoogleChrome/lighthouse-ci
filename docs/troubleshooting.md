@@ -8,7 +8,7 @@ First, make sure you're using `lhci autorun` or invoking `lhci healthcheck --fat
 
 You have a couple of options to teach Lighthouse CI how to login to your page.
 
-- [`--collect.puppeteerScript`](./configuration.md#puppeter-script)
+- [`--collect.puppeteerScript`](./configuration.md#puppeteerscript)
 - [Configure Custom Headers](./configuration.md#page-behind-authentication)
 - [Other Lighthouse Auth Methods](https://github.com/GoogleChrome/lighthouse/blob/v5.6.0/docs/authenticated-pages.md)
 

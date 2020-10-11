@@ -188,7 +188,7 @@ const BuildView_ = props => {
                 options={availableUrlOptions}
               />
               <Dropdown
-                label="Compare Url"
+                label="Compare URL"
                 className="dropdown--url dropdown--compare-url"
                 value={compareUrl}
                 setValue={url => {

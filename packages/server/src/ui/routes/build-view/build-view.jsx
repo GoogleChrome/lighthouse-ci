@@ -176,7 +176,7 @@ const BuildView_ = props => {
           dropdowns: (
             <Fragment>
               <Dropdown
-                label="Base Url"
+                label="Base URL"
                 className="dropdown--url dropdown--base-url"
                 value={baseUrl}
                 setValue={url => {

@@ -44,6 +44,7 @@ declare global {
 
       export interface Options {
         url?: string | string[];
+        filterUrl?: string | string[];
         psiApiKey?: string;
         psiApiEndpoint?: string;
         staticDistDir?: string;

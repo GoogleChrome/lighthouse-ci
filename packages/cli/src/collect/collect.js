@@ -39,6 +39,10 @@ function buildCommand(yargs) {
       description:
         'A URL to run Lighthouse on. Use this flag multiple times to evaluate multiple URLs.',
     },
+    filterUrl: {
+      description:
+        'A URL to not include in Lighthouse testing when using staticDistDir. Use this flag multiple times to filter multiple URLs.',
+    },
     psiApiKey: {
       description: '[psi only] The API key to use for PageSpeed Insights runner method.',
     },
@@ -174,7 +178,13 @@ async function startServerAndDetermineUrls(options) {
   const urls = urlsAsArray;
   if (!urls.length) {
     const maxNumberOfUrls = options.maxAutodiscoverUrls || Infinity;
-    urls.push(...server.getAvailableUrls().slice(0, maxNumberOfUrls));
+    const filterUrlsAsArray = Array.isArray(options.filterUrl)
+      ? options.filterUrl
+      : options.filterUrl
+      ? [options.filterUrl]
+      : [];
+    urls.push(...server.getAvailableUrls().filter(url => 
+      !filterUrlsAsArray.some(pattern => url.endsWith(":" + server.port + pattern))).slice(0, maxNumberOfUrls));
   }
 
   if (!urls.length) {

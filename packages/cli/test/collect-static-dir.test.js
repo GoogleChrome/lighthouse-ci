@@ -82,6 +82,95 @@ describe('Lighthouse CI collect CLI', () => {
       expect(status).toEqual(0);
     }, 180000);
   });
+
+  describe('with filterurl', () => {
+    const staticDistDir = path.join(__dirname, 'fixtures/collect-static-dir-autodiscover-limit');
+    it('should not filter any files because it was not tested', async () => {
+      const {stdout, stderr, status} = await runCLI(
+        [
+          'collect',
+          '-n=1',
+          '--staticDistDir=./',
+          '--maxAutodiscoverUrls=1',
+          '--filterUrl=/team.html',
+        ],
+        {
+          cwd: staticDistDir,
+        }
+      );
+      expect(stdout).toMatchInlineSnapshot(`
+          "Started a web server on port XXXX...
+          Running Lighthouse 1 time(s) on http://localhost:XXXX/board.html
+          Run #1...done.
+          Done running Lighthouse!
+          "
+          `);
+      expect(stderr).toMatchInlineSnapshot(`""`);
+      expect(status).toEqual(0);
+    }, 180000);
+
+    it('should filter index file', async () => {
+      const {stdout, stderr, status} = await runCLI(
+        [
+          'collect',
+          '-n=1',
+          '--staticDistDir=./',
+          '--filterUrl=/index.html',
+        ],
+        {
+          cwd: staticDistDir,
+        }
+      );
+      expect(stdout).toMatchInlineSnapshot(`
+          "Started a web server on port XXXX...
+          Running Lighthouse 1 time(s) on http://localhost:XXXX/board.html
+          Run #1...done.
+          Running Lighthouse 1 time(s) on http://localhost:XXXX/checkout.html
+          Run #1...done.
+          Running Lighthouse 1 time(s) on http://localhost:XXXX/jobs.html
+          Run #1...done.
+          Running Lighthouse 1 time(s) on http://localhost:XXXX/shop.html
+          Run #1...done.
+          Running Lighthouse 1 time(s) on http://localhost:XXXX/team.html
+          Run #1...done.
+          Done running Lighthouse!
+          "
+          `);
+      expect(stderr).toMatchInlineSnapshot(`""`);
+      expect(status).toEqual(0);
+    }, 180000);
+
+    it('should filter index file and board file', async () => {
+      const {stdout, stderr, status} = await runCLI(
+        [
+          'collect',
+          '-n=1',
+          '--staticDistDir=./',
+          '--filterUrl=/index.html',
+          '--filterUrl=/board.html',
+        ],
+        {
+          cwd: staticDistDir,
+        }
+      );
+      expect(stdout).toMatchInlineSnapshot(`
+          "Started a web server on port XXXX...
+          Running Lighthouse 1 time(s) on http://localhost:XXXX/checkout.html
+          Run #1...done.
+          Running Lighthouse 1 time(s) on http://localhost:XXXX/jobs.html
+          Run #1...done.
+          Running Lighthouse 1 time(s) on http://localhost:XXXX/shop.html
+          Run #1...done.
+          Running Lighthouse 1 time(s) on http://localhost:XXXX/team.html
+          Run #1...done.
+          Done running Lighthouse!
+          "
+          `);
+      expect(stderr).toMatchInlineSnapshot(`""`);
+      expect(status).toEqual(0);
+    }, 180000);
+  });
+
   describe('by default', () => {
     const staticDistDir = path.join(__dirname, 'fixtures/collect-static-dir-autodiscover-limit');
 

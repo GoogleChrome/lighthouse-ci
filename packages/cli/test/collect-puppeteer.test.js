@@ -90,9 +90,9 @@ describe('Lighthouse CI collect CLI with puppeteer', () => {
     const chromePathHelp = stdout.match(/--chromePath.*\n.*\n.*/);
     expect(chromePathHelp).toMatchInlineSnapshot(`
       Array [
-        "--chromePath               The path to the Chrome or Chromium executable to use for collection.
-        --puppeteerScript          The path to a script that manipulates the browser with puppeteer before running Lighthouse, used for auth.
-        --puppeteerLaunchOptions   The object of puppeteer launch options",
+        "--chromePath                The path to the Chrome or Chromium executable to use for collection.
+        --puppeteerScript           The path to a script that manipulates the browser with puppeteer before running Lighthouse, used for auth.
+        --puppeteerLaunchOptions    The object of puppeteer launch options",
       ]
     `);
     expect(stderr).toMatchInlineSnapshot(`""`);

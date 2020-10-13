@@ -39,9 +39,9 @@ function buildCommand(yargs) {
       description:
         'A URL to run Lighthouse on. Use this flag multiple times to evaluate multiple URLs.',
     },
-    filterUrl: {
+    autodiscoverUrlBlocklist: {
       description:
-        'A URL to not include in Lighthouse testing when using staticDistDir. Use this flag multiple times to filter multiple URLs.',
+        'A URL to not include when autodiscovering urls from staticDistDir. Use this flag multiple times to filter multiple URLs.',
     },
     psiApiKey: {
       description: '[psi only] The API key to use for PageSpeed Insights runner method.',
@@ -178,13 +178,21 @@ async function startServerAndDetermineUrls(options) {
   const urls = urlsAsArray;
   if (!urls.length) {
     const maxNumberOfUrls = options.maxAutodiscoverUrls || Infinity;
-    const filterUrlsAsArray = Array.isArray(options.filterUrl)
-      ? options.filterUrl
-      : options.filterUrl
-      ? [options.filterUrl]
+    const autodiscoverUrlBlocklistAsArray = Array.isArray(options.autodiscoverUrlBlocklist)
+      ? options.autodiscoverUrlBlocklist
+      : options.autodiscoverUrlBlocklist
+      ? [options.autodiscoverUrlBlocklist]
       : [];
-    urls.push(...server.getAvailableUrls().filter(url => 
-      !filterUrlsAsArray.some(pattern => url.endsWith(":" + server.port + pattern))).slice(0, maxNumberOfUrls));
+    const availableUrls = server.getAvailableUrls();
+    const normalizedBlocklist = autodiscoverUrlBlocklistAsArray.map(
+      rawUrl => {
+        const url = new URL(rawUrl, 'http://localhost');
+        url.port = server.port.toString();
+        return url.href;
+      }
+    );
+    const urlsToUse = availableUrls.filter(url => !normalizedBlocklist.includes(url)).slice(0, maxNumberOfUrls)
+    urls.push(...urlsToUse);
   }
 
   if (!urls.length) {

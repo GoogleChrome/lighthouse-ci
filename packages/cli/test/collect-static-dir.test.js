@@ -83,7 +83,7 @@ describe('Lighthouse CI collect CLI', () => {
     }, 180000);
   });
 
-  describe('with filterurl', () => {
+  describe('with autodiscoverUrlBlocklist', () => {
     const staticDistDir = path.join(__dirname, 'fixtures/collect-static-dir-autodiscover-limit');
     it('should not filter any files because it was not tested', async () => {
       const {stdout, stderr, status} = await runCLI(
@@ -92,7 +92,7 @@ describe('Lighthouse CI collect CLI', () => {
           '-n=1',
           '--staticDistDir=./',
           '--maxAutodiscoverUrls=1',
-          '--filterUrl=/team.html',
+          '--autodiscoverUrlBlocklist=/team.html',
         ],
         {
           cwd: staticDistDir,
@@ -115,7 +115,7 @@ describe('Lighthouse CI collect CLI', () => {
           'collect',
           '-n=1',
           '--staticDistDir=./',
-          '--filterUrl=/index.html',
+          '--autodiscoverUrlBlocklist=/index.html',
         ],
         {
           cwd: staticDistDir,
@@ -146,8 +146,8 @@ describe('Lighthouse CI collect CLI', () => {
           'collect',
           '-n=1',
           '--staticDistDir=./',
-          '--filterUrl=/index.html',
-          '--filterUrl=/board.html',
+          '--autodiscoverUrlBlocklist=/index.html',
+          '--autodiscoverUrlBlocklist=/board.html',
         ],
         {
           cwd: staticDistDir,

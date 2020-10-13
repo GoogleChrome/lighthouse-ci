@@ -207,7 +207,7 @@ Options:
                              multiple URLs.
   --staticDistDir            The build directory where your HTML files to run Lighthouse on are
                              located.
-  --filterUrl                A URL to not include in Lighthouse testing when using staticDistDir.
+  --autodiscoverUrlBlocklist A URL to not include when autodiscovering urls from staticDistDir.
                              Use this flag multiple times to filter multiple URLs.
   --isSinglePageApplication  If the application is created by Single Page Application, enable
                              redirect to index.html.

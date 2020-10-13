@@ -191,7 +191,7 @@ async function startServerAndDetermineUrls(options) {
         return url.href;
       }
     );
-    const urlsToUse = availableUrls.filter(url => !normalizedBlocklist.includes(url)).slice(0, maxNumberOfUrls)
+    const urlsToUse = availableUrls.filter(url => !normalizedBlocklist.includes(url)).slice(0, maxNumberOfUrls);
     urls.push(...urlsToUse);
   }
 

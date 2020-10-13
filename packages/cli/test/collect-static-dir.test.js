@@ -111,12 +111,7 @@ describe('Lighthouse CI collect CLI', () => {
 
     it('should filter index file', async () => {
       const {stdout, stderr, status} = await runCLI(
-        [
-          'collect',
-          '-n=1',
-          '--staticDistDir=./',
-          '--autodiscoverUrlBlocklist=/index.html',
-        ],
+        ['collect', '-n=1', '--staticDistDir=./', '--autodiscoverUrlBlocklist=/index.html'],
         {
           cwd: staticDistDir,
         }

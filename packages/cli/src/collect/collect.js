@@ -184,14 +184,14 @@ async function startServerAndDetermineUrls(options) {
       ? [options.autodiscoverUrlBlocklist]
       : [];
     const availableUrls = server.getAvailableUrls();
-    const normalizedBlocklist = autodiscoverUrlBlocklistAsArray.map(
-      rawUrl => {
-        const url = new URL(rawUrl, 'http://localhost');
-        url.port = server.port.toString();
-        return url.href;
-      }
-    );
-    const urlsToUse = availableUrls.filter(url => !normalizedBlocklist.includes(url)).slice(0, maxNumberOfUrls);
+    const normalizedBlocklist = autodiscoverUrlBlocklistAsArray.map(rawUrl => {
+      const url = new URL(rawUrl, 'http://localhost');
+      url.port = server.port.toString();
+      return url.href;
+    });
+    const urlsToUse = availableUrls
+      .filter(url => !normalizedBlocklist.includes(url))
+      .slice(0, maxNumberOfUrls);
     urls.push(...urlsToUse);
   }
 

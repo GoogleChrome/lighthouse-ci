@@ -37,6 +37,11 @@ describe('Lighthouse CI CLI', () => {
   let projectAdminToken;
   let urlToCollect;
 
+  beforeAll(async () => {
+    server = await startServer();
+    urlToCollect = `http://localhost:${server.port}/app/`;
+  });
+
   afterAll(async () => {
     if (server) {
       server.process.kill();
@@ -47,11 +52,6 @@ describe('Lighthouse CI CLI', () => {
   });
 
   describe('server', () => {
-    it('should bring up the server and accept requests', async () => {
-      server = await startServer();
-      urlToCollect = `http://localhost:${server.port}/app/`;
-    });
-
     it('should accept requests', async () => {
       const response = await fetch(`http://localhost:${server.port}/v1/projects`);
       const projects = await response.json();

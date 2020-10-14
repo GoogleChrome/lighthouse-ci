@@ -88,6 +88,8 @@ function createActualTestDataset() {
       {...baseBuild, id: '3', hash: '1238', commitMessage: 'build 4', runAt: runAt(4)},
       {...baseBuild, id: '4', hash: '1239', commitMessage: 'build 5', runAt: runAt(5)},
       {...baseBuild, id: '5', hash: '1240', commitMessage: 'build 6', runAt: runAt(6)},
+      {...baseBuild, id: '6', hash: '1241', commitMessage: 'build 7', runAt: runAt(7)},
+      {...baseBuild, id: '7', hash: '1242', commitMessage: 'build 8', runAt: runAt(8)},
     ],
     runs: [
       {...baseRun, id: '0', buildId: '0', url, lhr: lhr('lh-5-6-0-verge-a.json')},
@@ -96,6 +98,8 @@ function createActualTestDataset() {
       {...baseRun, id: '3', buildId: '3', url, lhr: lhr('lh-6-0-0-coursehero-b.json')},
       {...baseRun, id: '4', buildId: '4', url, lhr: lhr('lh-6-2-0-coursehero-a.json')},
       {...baseRun, id: '5', buildId: '5', url, lhr: lhr('lh-6-2-0-coursehero-b.json')},
+      {...baseRun, id: '6', buildId: '6', url, lhr: lhr('lh-6-4-1-coursehero-a.json')},
+      {...baseRun, id: '7', buildId: '7', url, lhr: lhr('lh-6-4-1-coursehero-b.json')},
     ],
   };
 }

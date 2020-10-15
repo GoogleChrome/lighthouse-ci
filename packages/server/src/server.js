@@ -18,6 +18,7 @@ const createProjectsRouter = require('./api/routes/projects.js');
 const StorageMethod = require('./api/storage/storage-method.js');
 const {errorMiddleware, createBasicAuthMiddleware} = require('./api/express-utils.js');
 const {startPsiCollectCron} = require('./cron/psi-collect.js');
+const {startDeletingOldBuildsCron} = require('./cron/delete-old-builds');
 const version = require('../package.json').version;
 
 const DIST_FOLDER = path.join(__dirname, '../dist');
@@ -55,6 +56,7 @@ async function createApp(options) {
   app.use(errorMiddleware);
 
   startPsiCollectCron(storageMethod, options);
+  startDeletingOldBuildsCron(storageMethod, options);
 
   return {app, storageMethod};
 }

@@ -457,6 +457,19 @@ class SqlStorageMethod {
   }
 
   /**
+   * @param {Date} runAt
+   * @return {Promise<LHCI.ServerCommand.Build[]>}
+   */
+  async findOldBuilds(runAt) {
+    const {buildModel} = this._sql();
+    const oldBuilds = await buildModel.findAll({
+      where: {runAt: {[Sequelize.Op.lte]: runAt}},
+      order: [['runAt', 'ASC']],
+    });
+    return oldBuilds;
+  }
+
+  /**
    * @param {string} projectId
    * @param {string} buildId
    * @return {Promise<void>}

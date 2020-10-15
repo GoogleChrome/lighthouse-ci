@@ -173,6 +173,10 @@ declare global {
         sqlConnectionUrl?: string;
         sqlDangerouslyResetDatabase?: boolean;
         sequelizeOptions?: import('sequelize').Options;
+        deleteOldBuilds?: {
+          schedule: string;
+          dateRange: number;
+        }
       }
 
       export interface Options {

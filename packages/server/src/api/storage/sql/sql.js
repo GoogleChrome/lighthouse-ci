@@ -460,7 +460,7 @@ class SqlStorageMethod {
    * @param {Date} runAt
    * @return {Promise<LHCI.ServerCommand.Build[]>}
    */
-  async findOldBuilds(runAt) {
+  async findBuildsBeforeTimestamp(runAt) {
     const {buildModel} = this._sql();
     const oldBuilds = await buildModel.findAll({
       where: {runAt: {[Sequelize.Op.lte]: runAt}},

@@ -1,3 +1,8 @@
+/**
+ * @license Copyright 2020 Google Inc. All Rights Reserved.
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
+ */
 'use strict';
 
 /* eslint-env jest */
@@ -12,16 +17,16 @@ jest.mock('cron', () => ({
 }));
 
 const {
-  startDeletingOldBuildsCron,
+  startDeleteOldBuildsCron,
   deleteOldBuilds,
 } = require('../../src/cron/delete-old-builds.js');
 
 describe('cron/delete-old-builds', () => {
-  /** @type {{ findOldBuilds: jest.MockInstance, deleteBuild: jest.MockInstance}} */
+  /** @type {{ findBuildsBeforeTimestamp: jest.MockInstance, deleteBuild: jest.MockInstance}} */
   let storageMethod;
   beforeEach(() => {
     storageMethod = {
-      findOldBuilds: jest.fn().mockResolvedValue([]),
+      findBuildsBeforeTimestamp: jest.fn().mockResolvedValue([]),
       deleteBuild: jest.fn().mockResolvedValue({}),
     };
 
@@ -42,7 +47,7 @@ describe('cron/delete-old-builds', () => {
     it('should collect', async () => {
       storageMethod.deleteBuild.mockClear();
       const deleteObjects = [{id: 'id-1', projectId: 'pid-1'}, {id: 'id-2', projectId: 'pid-2'}];
-      storageMethod.findOldBuilds.mockResolvedValue(deleteObjects);
+      storageMethod.findBuildsBeforeTimestamp.mockResolvedValue(deleteObjects);
       await deleteOldBuilds(storageMethod, 30, new Date('2019-01-01'));
       expect(storageMethod.deleteBuild).toHaveBeenCalledTimes(deleteObjects.length);
 
@@ -53,17 +58,17 @@ describe('cron/delete-old-builds', () => {
     });
   });
 
-  describe('.startDeletingOldBuildsCron', () => {
+  describe('.startDeleteOldBuildsCron', () => {
     it.each([
       [
         'storageMethod is not sql',
         {
           storage: {
             storageMethod: 'notsql',
-            deleteOldBuilds: {
-              schedule: '0 * * * *',
-              dateRange: 30,
-            },
+          },
+          deleteOldBuildsCron: {
+            schedule: '0 * * * *',
+            maxAgeInDays: 30,
           },
         },
       ],
@@ -74,7 +79,7 @@ describe('cron/delete-old-builds', () => {
         },
       ],
     ])('should not schedule a cron job (%s)', (_, options) => {
-      startDeletingOldBuildsCron(storageMethod, options);
+      startDeleteOldBuildsCron(storageMethod, options);
       expect(cronJob).toHaveBeenCalledTimes(0);
     });
     it.each([
@@ -83,9 +88,9 @@ describe('cron/delete-old-builds', () => {
         {
           storage: {
             storageMethod: 'sql',
-            deleteOldBuilds: {
-              dateRange: 30,
-            },
+          },
+          deleteOldBuildsCron: {
+            maxAgeInDays: 30,
           },
         },
       ],
@@ -94,37 +99,37 @@ describe('cron/delete-old-builds', () => {
         {
           storage: {
             storageMethod: 'sql',
-            deleteOldBuilds: {
-              schedule: '0 * * * *',
-            },
+          },
+          deleteOldBuildsCron: {
+            schedule: '0 * * * *',
           },
         },
       ],
     ])('should throw for invalid options (%s)', (_, options) => {
-      expect(() => startDeletingOldBuildsCron(storageMethod, options)).toThrow(/Cannot configure/);
+      expect(() => startDeleteOldBuildsCron(storageMethod, options)).toThrow(/Cannot configure/);
     });
     it('should throw for invalid schedule', () => {
       const options = {
         storage: {
           storageMethod: 'sql',
-          deleteOldBuilds: {
-            schedule: '* * *',
-            dateRange: 30,
-          },
+        },
+        deleteOldBuildsCron: {
+          schedule: '* * *',
+          maxAgeInDays: 30,
         },
       };
-      expect(() => startDeletingOldBuildsCron(storageMethod, options)).toThrow(
+      expect(() => startDeleteOldBuildsCron(storageMethod, options)).toThrow(
         /Invalid cron format/
       );
     });
     it('should schedule a cron job', () => {
-      startDeletingOldBuildsCron(storageMethod, {
+      startDeleteOldBuildsCron(storageMethod, {
         storage: {
           storageMethod: 'sql',
-          deleteOldBuilds: {
-            schedule: '0 * * * *',
-            dateRange: 30,
-          },
+        },
+        deleteOldBuildsCron: {
+          schedule: '0 * * * *',
+          maxAgeInDays: 30,
         },
       });
       expect(cronJob).toHaveBeenCalledTimes(1);

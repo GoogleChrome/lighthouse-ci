@@ -153,7 +153,7 @@ class StorageMethod {
    * @return {Promise<LHCI.ServerCommand.Build[]>}
    */
   // eslint-disable-next-line no-unused-vars
-  async findOldBuilds(runAt) {
+  async findBuildsBeforeTimestamp(runAt) {
     throw new Error('Unimplemented');
   }
 

@@ -173,10 +173,6 @@ declare global {
         sqlConnectionUrl?: string;
         sqlDangerouslyResetDatabase?: boolean;
         sequelizeOptions?: import('sequelize').Options;
-        deleteOldBuilds?: {
-          schedule: string;
-          dateRange: number;
-        }
       }
 
       export interface Options {
@@ -188,6 +184,10 @@ declare global {
           psiApiEndpoint?: string;
           sites: Array<PsiCollectEntry>;
         };
+        deleteOldBuildsCron?: {
+          schedule: string;
+          maxAgeInDays: number;
+        }
         basicAuth?: {
           username?: string;
           password?: string;

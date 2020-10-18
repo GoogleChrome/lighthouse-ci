@@ -184,6 +184,10 @@ declare global {
           psiApiEndpoint?: string;
           sites: Array<PsiCollectEntry>;
         };
+        deleteOldBuildsCron?: {
+          schedule: string;
+          maxAgeInDays: number;
+        }
         basicAuth?: {
           username?: string;
           password?: string;

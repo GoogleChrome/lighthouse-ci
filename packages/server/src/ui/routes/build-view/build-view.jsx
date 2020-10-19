@@ -56,7 +56,7 @@ const BuildView_ = props => {
 
   const compareRuns = props.runs.filter(run => run.buildId === props.build.id);
   const compareUrl = props.compareUrl || computeSelectedUrl(props, compareRuns);
-  const baseUrl = props.baseUrl || compareUrl
+  const baseUrl = props.baseUrl || compareUrl;
   const availableUrls = [...new Set(compareRuns.map(run => run.url))];
   const run = compareRuns.find(run => run.url === compareUrl);
 
@@ -64,7 +64,7 @@ const BuildView_ = props => {
   const baseRuns = props.runs.filter(run => run.buildId === ancestorBuildId);
   const baseRun = baseRuns.find(run => run.url === baseUrl);
 
-  const availableUrlOptions = availableUrls.map(url => ({value: url, label: url}))
+  const availableUrlOptions = availableUrls.map(url => ({value: url, label: url}));
 
   /** @type {LH.Result|undefined} */
   let lhr;
@@ -165,7 +165,7 @@ const BuildView_ = props => {
         baseLhr={baseLhr}
         className={clsx({
           'build-view--with-lhr-base-link-hover': isOpenLhrBaseLinkHovered,
-          'build-view--with-lhr-compare-link-hover': isOpenLhrCompareLinkHovered
+          'build-view--with-lhr-compare-link-hover': isOpenLhrCompareLinkHovered,
         })}
         hookElements={{
           warnings: computeWarnings(warningProps).hasWarning ? (

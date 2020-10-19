@@ -16,10 +16,7 @@ jest.mock('cron', () => ({
   },
 }));
 
-const {
-  startDeleteOldBuildsCron,
-  deleteOldBuilds,
-} = require('../../src/cron/delete-old-builds.js');
+const {startDeleteOldBuildsCron, deleteOldBuilds} = require('../../src/cron/delete-old-builds.js');
 
 describe('cron/delete-old-builds', () => {
   /** @type {{ findBuildsBeforeTimestamp: jest.MockInstance, deleteBuild: jest.MockInstance}} */
@@ -118,9 +115,7 @@ describe('cron/delete-old-builds', () => {
           maxAgeInDays: 30,
         },
       };
-      expect(() => startDeleteOldBuildsCron(storageMethod, options)).toThrow(
-        /Invalid cron format/
-      );
+      expect(() => startDeleteOldBuildsCron(storageMethod, options)).toThrow(/Invalid cron format/);
     });
     it('should schedule a cron job', () => {
       startDeleteOldBuildsCron(storageMethod, {

@@ -12,10 +12,9 @@ const {normalizeCronSchedule} = require('./utils');
 /**
  * @param {LHCI.ServerCommand.StorageMethod} storageMethod
  * @param {number} maxAgeInDays
- * @param {Date} now
  * @return {Promise<void>}
  */
-async function deleteOldBuilds(storageMethod, maxAgeInDays, now = new Date()) {
+async function deleteOldBuilds(storageMethod, maxAgeInDays) {
   if (!maxAgeInDays || !Number.isInteger(maxAgeInDays) || maxAgeInDays <= 0) {
     throw new Error('Invalid range');
   }
@@ -42,6 +41,7 @@ function startDeleteOldBuildsCron(storageMethod, options) {
     throw new Error('Cannot configure schedule');
   }
 
+  /** @type {(s: string) => void} */
   const log =
     options.logLevel === 'silent'
       ? () => {}
@@ -58,7 +58,7 @@ function startDeleteOldBuildsCron(storageMethod, options) {
     }
     inProgress = true;
     log(`Starting delete old builds`);
-    deleteOldBuilds(storageMethod, maxAgeInDays, new Date())
+    deleteOldBuilds(storageMethod, maxAgeInDays)
       .then(() => {
         log(`Successfully delete old builds`);
       })

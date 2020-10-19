@@ -26,7 +26,7 @@ const {computeRepresentativeRuns} = require('./representative-runs.js');
  * @property {string|undefined} [auditProperty]
  * @property {string|undefined} [auditTitle]
  * @property {string|undefined} [auditDocumentationLink]
- * @property {string} [message]
+ * @property {string|undefined} [message]
  */
 
 /** @typedef {StrictOmit<AssertionResult, 'url'>} AssertionResultNoURL */

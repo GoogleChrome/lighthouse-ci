@@ -371,6 +371,15 @@ class ApiClient {
   }
 
   /**
+   * @param {Date} runAt
+   * @return {Promise<LHCI.ServerCommand.Build[]>}
+   */
+  // eslint-disable-next-line no-unused-vars
+  async findBuildsBeforeTimestamp(runAt) {
+    throw new Error('Unimplemented');
+  }
+
+  /**
    * @param {string} projectId
    * @return {Promise<string>}
    */

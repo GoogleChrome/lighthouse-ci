@@ -20,6 +20,7 @@ const BIG_PICTURE_LIMITS = {
   'estimated-input-latency': [0, 1500],
   'max-potential-fid': [0, 1500],
   'total-blocking-time': [0, 1500],
+  'cumulative-layout-shift': [0, 1],
   __default__: [0, 30 * 1000],
 };
 
@@ -46,6 +47,7 @@ const toNearestRoundNumber = (x, direction) => {
  * @return {'ms'|'bytes'|'none'}
  */
 const getUnitFromAudit = (audit, groupId) => {
+  if (audit && audit.id === 'cumulative-layout-shift') return 'none';
   if (groupId === 'metrics') return 'ms';
   if (groupId === 'load-opportunities') return 'ms';
   if (!audit) return 'none';
@@ -91,6 +93,11 @@ const toDisplay = (x, options) => {
   }
 
   if (unit === 'none') {
+    if (Math.abs(value) < 10) {
+      value = x;
+      fractionDigits = 1;
+    }
+
     if (Math.abs(value) >= 50) {
       value /= 1000;
       fractionDigits = 1;

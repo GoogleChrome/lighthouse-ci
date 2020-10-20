@@ -29,8 +29,6 @@ jobs:
           node-version: 10.x
       - run: yarn
       - run: yarn build
-      - run: yarn test:typecheck
-      - run: yarn test:lint
       - run: yarn test:unit
       - if: ${{ failure() }}
         uses: actions/upload-artifact@v2

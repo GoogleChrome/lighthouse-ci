@@ -14,6 +14,8 @@ import lhr6A_ from '../../../../../test/fixtures/lh-6-0-0-coursehero-a.json';
 import lhr6B_ from '../../../../../test/fixtures/lh-6-0-0-coursehero-b.json';
 import lhr62A_ from '../../../../../test/fixtures/lh-6-2-0-coursehero-a.json';
 import lhr62B_ from '../../../../../test/fixtures/lh-6-2-0-coursehero-b.json';
+import lhr641A_ from '../../../../../test/fixtures/lh-6-4-1-coursehero-a.json';
+import lhr641B_ from '../../../../../test/fixtures/lh-6-4-1-coursehero-b.json';
 
 export default {
   title: 'Build View/Audit Detail Pane',
@@ -27,10 +29,13 @@ const lhr6A = /** @type {any} */ (lhr6A_);
 const lhr6B = /** @type {any} */ (lhr6B_);
 const lhr62A = /** @type {any} */ (lhr62A_);
 const lhr62B = /** @type {any} */ (lhr62B_);
+const lhr641A = /** @type {any} */ (lhr641A_);
+const lhr641B = /** @type {any} */ (lhr641B_);
 
 const auditPairs5 = createAuditPairs(lhr5A, lhr5B);
 const auditPairs6 = createAuditPairs(lhr6A, lhr6B);
 const auditPairs62 = createAuditPairs(lhr62A, lhr62B);
+const auditPairs641 = createAuditPairs(lhr641A, lhr641B);
 
 export const Default = () => (
   <AuditDetailPane
@@ -56,6 +61,15 @@ export const Version62 = () => (
     setSelectedAuditId={action('setSelectedAuditId')}
     pairs={auditPairs62}
     baseLhr={lhr62B}
+  />
+);
+
+export const Version641 = () => (
+  <AuditDetailPane
+    selectedAuditId={auditPairs641[1].audit.id || ''}
+    setSelectedAuditId={action('setSelectedAuditId')}
+    pairs={auditPairs641}
+    baseLhr={lhr641B}
   />
 );
 

@@ -19,6 +19,15 @@ jest.setTimeout(30e3);
 
 const CLI_PATH = path.join(__dirname, '../src/cli.js');
 const UUID_REGEX = /[0-9a-f-]{36}/gi;
+const MOCK_LHR = JSON.stringify({
+  audits: {
+    viewport: {
+      title: 'Does not have a `<meta name="viewport">` tag with `width` or `initial-scale`',
+      description: `[Learn More](https://web.dev/viewport/)`,
+      score: 0,
+    },
+  },
+});
 
 function getSqlFilePath() {
   return `cli-test-${Math.round(Math.random() * 1e9)}.tmp.sql`;
@@ -134,12 +143,14 @@ function getCleanEnvironment(extraEnvVars) {
 
 /**
  * @param {string[]} args
- * @param {{cwd?: string, env?: Record<string, string>}} [overrides]
+ * @param {{cwd?: string, env?: Record<string, string>, useMockLhr?: boolean}} [overrides]
  * @return {{stdout: string, stderr: string, status: number, matches: {uuids: RegExpMatchArray}, childProcess: NodeJS.ChildProcess, exitPromise: Promise<void>}}
  */
 function runCLIWithoutWaiting(args, overrides = {}) {
-  const {env: extraEnvVars, cwd} = overrides;
+  const {env: extraEnvVars, cwd, useMockLhr = false} = overrides;
   const env = getCleanEnvironment(extraEnvVars);
+  if (useMockLhr) env.LHCITEST_MOCK_LHR = MOCK_LHR;
+
   const childProcess = spawn('node', [CLI_PATH, ...args], {
     cwd,
     env,
@@ -162,7 +173,7 @@ function runCLIWithoutWaiting(args, overrides = {}) {
 
 /**
  * @param {string[]} args
- * @param {{cwd?: string, env?: Record<string, string>}} [overrides]
+ * @param {{cwd?: string, env?: Record<string, string>, useMockLhr?: boolean}} [overrides]
  * @return {Promise<{stdout: string, stderr: string, status: number, matches: {uuids: RegExpMatchArray}}>}
  */
 async function runCLI(args, overrides = {}) {

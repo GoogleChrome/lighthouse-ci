@@ -19,6 +19,7 @@ describe('Lighthouse CI collect CLI', () => {
       const {stdout, stderr, status} = await runCLI(
         ['collect', '-n=1', '--staticDistDir=./', '--url=/child/grandchild.html'],
         {
+          useMockLhr: true,
           cwd: staticDistDir,
         }
       );
@@ -31,7 +32,7 @@ describe('Lighthouse CI collect CLI', () => {
         `);
       expect(stderr).toMatchInlineSnapshot(`""`);
       expect(status).toEqual(0);
-    }, 180000);
+    });
   });
 
   describe('with autodiscover limit', () => {
@@ -40,6 +41,7 @@ describe('Lighthouse CI collect CLI', () => {
       const {stdout, stderr, status} = await runCLI(
         ['collect', '-n=1', '--staticDistDir=./', '--maxAutodiscoverUrls=1'],
         {
+          useMockLhr: true,
           cwd: staticDistDir,
         }
       );
@@ -52,12 +54,13 @@ describe('Lighthouse CI collect CLI', () => {
           `);
       expect(stderr).toMatchInlineSnapshot(`""`);
       expect(status).toEqual(0);
-    }, 180000);
+    });
 
     it('should collect all available pages from static dir', async () => {
       const {stdout, stderr, status} = await runCLI(
         ['collect', '-n=1', '--staticDistDir=./', '--maxAutodiscoverUrls=0'],
         {
+          useMockLhr: true,
           cwd: staticDistDir,
         }
       );
@@ -80,7 +83,7 @@ describe('Lighthouse CI collect CLI', () => {
           `);
       expect(stderr).toMatchInlineSnapshot(`""`);
       expect(status).toEqual(0);
-    }, 180000);
+    });
   });
 
   describe('with autodiscoverUrlBlocklist', () => {
@@ -95,6 +98,7 @@ describe('Lighthouse CI collect CLI', () => {
           '--autodiscoverUrlBlocklist=/team.html',
         ],
         {
+          useMockLhr: true,
           cwd: staticDistDir,
         }
       );
@@ -107,12 +111,13 @@ describe('Lighthouse CI collect CLI', () => {
           `);
       expect(stderr).toMatchInlineSnapshot(`""`);
       expect(status).toEqual(0);
-    }, 180000);
+    });
 
     it('should filter index file', async () => {
       const {stdout, stderr, status} = await runCLI(
         ['collect', '-n=1', '--staticDistDir=./', '--autodiscoverUrlBlocklist=/index.html'],
         {
+          useMockLhr: true,
           cwd: staticDistDir,
         }
       );
@@ -133,7 +138,7 @@ describe('Lighthouse CI collect CLI', () => {
           `);
       expect(stderr).toMatchInlineSnapshot(`""`);
       expect(status).toEqual(0);
-    }, 180000);
+    });
 
     it('should filter index file and board file', async () => {
       const {stdout, stderr, status} = await runCLI(
@@ -145,6 +150,7 @@ describe('Lighthouse CI collect CLI', () => {
           '--autodiscoverUrlBlocklist=/board.html',
         ],
         {
+          useMockLhr: true,
           cwd: staticDistDir,
         }
       );
@@ -163,7 +169,7 @@ describe('Lighthouse CI collect CLI', () => {
           `);
       expect(stderr).toMatchInlineSnapshot(`""`);
       expect(status).toEqual(0);
-    }, 180000);
+    });
   });
 
   describe('by default', () => {
@@ -171,6 +177,7 @@ describe('Lighthouse CI collect CLI', () => {
 
     it('should collect 5 pages from static dir', async () => {
       const {stdout, stderr, status} = await runCLI(['collect', '-n=1', '--staticDistDir=./'], {
+        useMockLhr: true,
         cwd: staticDistDir,
       });
       expect(stdout).toMatchInlineSnapshot(`
@@ -190,6 +197,6 @@ describe('Lighthouse CI collect CLI', () => {
           `);
       expect(stderr).toMatchInlineSnapshot(`""`);
       expect(status).toEqual(0);
-    }, 180000);
+    });
   });
 });

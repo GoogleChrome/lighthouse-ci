@@ -23,6 +23,20 @@ class LighthouseRunner {
 
   /**
    * @param {string} url
+   * @param {Partial<LHCI.CollectCommand.Options>} [options]
+   * @return {Promise<string>}
+   */
+  static buildMockLhr(url, options = {}) {
+    /** @type {LH.Result} */
+    const lhr = JSON.parse(process.env.LHCITEST_MOCK_LHR || '{}');
+    lhr.requestedUrl = url;
+    lhr.finalUrl = url;
+    lhr.configSettings = lhr.configSettings || options.settings || {};
+    return Promise.resolve(JSON.stringify(lhr));
+  }
+
+  /**
+   * @param {string} url
    * @param {Partial<LHCI.CollectCommand.Options>} options
    * @return {{args: string[], cleanupFn: () => void}}
    */
@@ -64,6 +78,8 @@ class LighthouseRunner {
    * @return {Promise<string>}
    */
   run(url, options = {}) {
+    if (process.env.LHCITEST_MOCK_LHR) return LighthouseRunner.buildMockLhr(url, options);
+
     /** @type {(lhr: string) => void} */
     let resolve;
     /** @type {(e: Error) => void} */

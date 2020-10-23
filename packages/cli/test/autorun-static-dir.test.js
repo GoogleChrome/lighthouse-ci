@@ -19,6 +19,7 @@ describe('Lighthouse CI autorun CLI', () => {
     const {stdout, stderr, status} = await runCLI(
       ['autorun', '--collect.numberOfRuns=1', '--upload.uploadUrlMap=true'],
       {
+        useMockLhr: true,
         cwd: autorunDir,
         env: {
           LHCI_BUILD_CONTEXT__GITHUB_REPO_SLUG: 'GoogleChrome/lighthouse-ci-unit-tests',

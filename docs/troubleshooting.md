@@ -56,10 +56,24 @@ When using this option, you'll lose the default `:PORT` and `UUID` replacements,
 
 ## I'm seeing differences in the results even though I didn't change anything.
 
-Webpages are fickle beasts and variance is a common problem when measuring properties of pages in a real browser as Lighthouse does. The Lighthouse team has [several](https://github.com/GoogleChrome/lighthouse/blob/v5.0.0/docs/variability.md) good [documents](https://docs.google.com/document/d/1AujmeKvBhzr-d8IsB7zPeS-vOtxCdw2GnspKpxJ7d_I/edit) on the [subject](https://docs.google.com/document/d/1BqtL-nG53rxWOI5RO0pItSRPowZVnYJ_gBEQCJ5EeUE/edit?usp=sharing), but the tl;dr is...
+Webpages are fickle beasts and variance is a common problem when measuring properties of pages in a real browser as Lighthouse does. The Lighthouse team has [several](https://github.com/GoogleChrome/lighthouse/blob/v6.4.1/docs/variability.md) good [documents](https://docs.google.com/document/d/1AujmeKvBhzr-d8IsB7zPeS-vOtxCdw2GnspKpxJ7d_I/edit) on the [subject](https://docs.google.com/document/d/1BqtL-nG53rxWOI5RO0pItSRPowZVnYJ_gBEQCJ5EeUE/edit?usp=sharing), but the tl;dr is...
 
 - Run many times (LHCI runs 3 by default, use the `--collect.numberOfRuns=X` option to increase this).
 - Use reliable hardware (avoid underpowered CI systems like Appveyor and burstable instances, use dedicate machines with a minimum of 2 cores and 4GB of RAM).
 - Eliminate non-determinism (remove random `setTimeout` calls, A/B tests, etc).
 - Avoid external dependencies (disable variable third-party integrations like ads, YouTube embeds, analytics, etc).
 - Assert facts over conclusions (start with assertions on the number and size of your JavaScript requests rather than the value of TTI).
+
+## The results I'm seeing don't match the results I see in another environment.
+
+Different environments and ways of running Lighthouse will tend to see different results for the same underlying reasons described in the above FAQ on variance (see the [several](https://github.com/GoogleChrome/lighthouse/blob/v6.4.1/docs/variability.md) good [documents](https://docs.google.com/document/d/1AujmeKvBhzr-d8IsB7zPeS-vOtxCdw2GnspKpxJ7d_I/edit) on the [subject](https://docs.google.com/document/d/1BqtL-nG53rxWOI5RO0pItSRPowZVnYJ_gBEQCJ5EeUE/edit?usp=sharing)). Before resorting to variance isolation though, first double check that the different environments are actually being run with the same Lighthouse settings. The most common differences we see that folks might forget to consider...
+
+- Device form factor
+- Throttling settings (hint: desktop in Chrome DevTools/PSI doesn't *only* change the form factor, it [changes throttling too](https://github.com/GoogleChrome/lighthouse/blob/v6.4.1/lighthouse-core/config/lr-desktop-config.js))
+- Storage clearing settings
+- Login/Authentication state
+- Headless vs. headful Chrome
+- Hardware quality (free CI providers tend to have very underpowered CPUs)
+- Geographic location
+
+The team does not have the bandwidth to assist with debugging this problem. Please do _not_ file an issue about it if you're unable to get scores from different environments to match.

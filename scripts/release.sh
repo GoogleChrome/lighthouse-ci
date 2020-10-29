@@ -46,8 +46,8 @@ cd ./docs/recipes/docker-server
 cd ../../../
 
 git status
-git --no-pager diff .
-git add -A
+git --no-pager diff ./docs
+git add ./docs
 
 printf "Continue with the docker commit?\n"
 read -n 1 -p "Press any key to continue, Ctrl+C to exit..."

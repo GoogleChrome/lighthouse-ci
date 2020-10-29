@@ -209,6 +209,27 @@ describe('getAllAssertionResults', () => {
     expect(results).toMatchObject([{actual: 0.8, expected: 0.9}]);
   });
 
+  it('should assume a default items length of 0', () => {
+    const assertions = {
+      'first-contentful-paint': ['error', {maxLength: 10}],
+    };
+
+    const results = getAllAssertionResults({assertions, includePassedAssertions: true}, lhrs);
+    expect(results).toEqual([
+      {
+        actual: 0,
+        auditId: 'first-contentful-paint',
+        expected: 10,
+        level: 'error',
+        name: 'maxLength',
+        operator: '<=',
+        passed: true,
+        url: 'http://page-1.com',
+        values: [0, 0],
+      },
+    ]);
+  });
+
   it('should warn on incorrect assertion type', () => {
     const assertions = {
       'network-requests': ['error', {maxNumericValue: 10}],

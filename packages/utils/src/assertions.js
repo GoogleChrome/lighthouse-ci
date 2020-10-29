@@ -40,7 +40,7 @@ const AUDIT_TYPE_VALUE_GETTERS = {
     if (result.scoreDisplayMode === 'informative') return 0;
     return undefined;
   },
-  maxLength: result => result.details && result.details.items && result.details.items.length,
+  maxLength: result => (result.details && result.details.items && result.details.items.length) || 0,
   maxNumericValue: result => result.numericValue,
 };
 

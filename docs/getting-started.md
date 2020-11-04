@@ -84,6 +84,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
       - name: Use Node.js 10.x
         uses: actions/setup-node@v1
         with:
@@ -96,6 +98,8 @@ jobs:
         run: |
           npm install -g @lhci/cli@0.6.x
           lhci autorun
+        env:
+          LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
 ```
 
 </details>

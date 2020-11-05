@@ -12,6 +12,7 @@
 - [GitHub Status Checks](#github-status-checks)
   - [GitHub App Method (Recommended)](#github-app-method-recommended)
   - [Alternative: Personal Access Token Method](#alternative-personal-access-token-method)
+  - [Additional configuration for GitHub Actions as CI Provider](#additional-configuration-for-github-actions-as-ci-provider)
 - [Add Assertions](#add-assertions)
 - [The Lighthouse CI Server](#the-lighthouse-ci-server)
   - [Deployment](#deployment)
@@ -290,6 +291,37 @@ Be sure to keep this token secret. Anyone in possession of this token will be ab
 If you don't want to use the GitHub App, you can also enable this via a personal access token. The only difference is that your user account (and its avatar) will post a status check. [Create a personal access token](https://github.com/settings/tokens/new) with the `repo:status` scope and add it to your environment as `LHCI_GITHUB_TOKEN`.
 
 Be sure to keep this token secret. Anyone in possession of this token will be able to set status checks on your repository.
+
+#### Additional configuration for GitHub Actions as CI Provider
+
+Make sure you define the `LHCI_GITHUB_APP_TOKEN` as [enviroment variable](https://docs.github.com/en/free-pro-team@latest/actions/reference/environment-variables#about-environment-variables) on the workflow and ensure that the git history is available too.
+
+```yaml
+name: CI
+on: [push]
+jobs:
+  lhci:
+    name: Lighthouse
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - name: Use Node.js 10.x
+        uses: actions/setup-node@v1
+        with:
+          node-version: 10.x
+      - name: npm install, build
+        run: |
+          npm install
+          npm run build
+      - name: run Lighthouse CI
+        run: |
+          npm install -g @lhci/cli@0.6.x
+          lhci autorun
+        env:
+          LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
+```
 
 ## Add Assertions
 

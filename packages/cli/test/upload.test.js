@@ -107,14 +107,10 @@ describe('Lighthouse CI upload CLI', () => {
     expect(await apiClient.getBuilds(project.id)).toHaveLength(1);
 
     const {stdout, stderr, status} = await runCLI(
-      [
-        'upload',
-        `--serverBaseUrl=${serverBaseUrl}`,
-        `--token=${project.token}`,
-        '--ignoreDuplicateBuildFailure',
-      ],
+      ['upload', `--serverBaseUrl=${serverBaseUrl}`, `--token=${project.token}`],
       {
         cwd: uploadDir,
+        env: {LHCI_UPLOAD__IGNORE_DUPLICATE_BUILD_FAILURE: '1'},
       }
     );
 

@@ -19,8 +19,11 @@ describe('Lighthouse CI assert CLI', () => {
   const fixtureDir = path.join(__dirname, 'fixtures/assertions');
   // eslint-disable-next-line no-control-regex
   const replaceTerminalChars = s => s.replace(/\u001b/g, '').replace(/\[\d+m/g, '');
-  const run = async args => {
-    const {status, stdout, stderr} = await runCLI(['assert', ...args], {cwd: fixtureDir});
+  const run = async (args, options = {}) => {
+    const {status, stdout, stderr} = await runCLI(['assert', ...args], {
+      ...options,
+      cwd: fixtureDir,
+    });
     const failures = (stderr.match(/\S+ failure/g) || []).map(replaceTerminalChars);
     const warnings = (stderr.match(/\S+ warning/g) || []).map(replaceTerminalChars);
     const passes = (stderr.match(/\S+ passing/g) || []).map(replaceTerminalChars);
@@ -72,6 +75,11 @@ describe('Lighthouse CI assert CLI', () => {
   it('should run a preset with options', async () => {
     const result = await run([`--preset=lighthouse:no-pwa`, '--assertions.deprecations=off']);
     expect(result.failures).not.toContain('deprecations failure');
+    expect(result.failures).not.toContain('viewport failure');
+  });
+
+  it('should respect nested env vars', async () => {
+    const result = await run([], {env: {LHCI_ASSERT__PRESET: 'lighthouse:no-pwa'}});
     expect(result.failures).not.toContain('viewport failure');
   });
 

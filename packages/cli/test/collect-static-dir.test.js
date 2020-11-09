@@ -33,6 +33,28 @@ describe('Lighthouse CI collect CLI', () => {
       expect(stderr).toMatchInlineSnapshot(`""`);
       expect(status).toEqual(0);
     });
+
+    it('should respect nested environment variables', async () => {
+      const {stdout, stderr, status} = await runCLI(
+        ['collect', '--staticDistDir=./', '--url=/child/grandchild.html'],
+        {
+          useMockLhr: true,
+          cwd: staticDistDir,
+          env: {LHCI_COLLECT__NUMBER_OF_RUNS: '2'},
+        }
+      );
+
+      expect(stdout).toMatchInlineSnapshot(`
+        "Started a web server on port XXXX...
+        Running Lighthouse 2 time(s) on http://localhost:XXXX/child/grandchild.html
+        Run #1...done.
+        Run #2...done.
+        Done running Lighthouse!
+        "
+      `);
+      expect(stderr).toMatchInlineSnapshot(`""`);
+      expect(status).toEqual(0);
+    });
   });
 
   describe('with autodiscover limit', () => {

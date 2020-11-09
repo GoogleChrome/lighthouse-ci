@@ -40,6 +40,23 @@ function createYargsConfigArguments() {
   return [loadAndParseRcFile(rcFile)];
 }
 
+/**
+ * When the three core commands are run via autorun the user uses namespaced environment variables
+ * which aren't passed on by default. Make sure we can process these settings too.
+ *
+ * e.g. LHCI_UPLOAD__SERVER_BASE_URL=http://example.com -> `{upload: {serverBaseUrl: 'http://example.com'}}
+ * @see https://github.com/GoogleChrome/lighthouse-ci/issues/480
+ * @param {LHCI.YargsOptions & {collect?: LHCI.CollectCommand.Options; assert?: LHCI.AssertCommand.Options; upload?: LHCI.UploadCommand.Options}} argv
+ * @param {'collect'|'assert'|'upload'} command
+ * @return {*}
+ */
+function mergeInCommandSpecificEnvironments(argv, command) {
+  return {
+    ...argv,
+    ...(argv[command] || {}),
+  };
+}
+
 async function run() {
   /** @type {any} */
   const argv = yargs
@@ -83,13 +100,13 @@ async function run() {
 
   switch (argv._[0]) {
     case 'collect':
-      await collectCmd.runCommand(argv);
+      await collectCmd.runCommand(mergeInCommandSpecificEnvironments(argv, 'collect'));
       break;
     case 'assert':
-      await assertCmd.runCommand(argv);
+      await assertCmd.runCommand(mergeInCommandSpecificEnvironments(argv, 'assert'));
       break;
     case 'upload':
-      await uploadCmd.runCommand(argv);
+      await uploadCmd.runCommand(mergeInCommandSpecificEnvironments(argv, 'upload'));
       break;
     case 'autorun':
       await autorunCmd.runCommand(argv);

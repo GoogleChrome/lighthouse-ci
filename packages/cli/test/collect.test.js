@@ -31,6 +31,7 @@ describe('collect', () => {
           {
             // Run in temp dir to avoid conflicts with other tests
             cwd: tmpDir,
+            useMockLhr: true,
           }
         );
 
@@ -80,6 +81,7 @@ describe('collect', () => {
           {
             // Run in temp dir to avoid conflicts with other tests
             cwd: tmpDir,
+            useMockLhr: true,
           }
         );
 
@@ -120,6 +122,7 @@ describe('collect', () => {
           {
             // Run in temp dir to avoid conflicts with other tests
             cwd: tmpDir,
+            useMockLhr: true,
           }
         );
 

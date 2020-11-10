@@ -27,10 +27,9 @@ const {
   getCommitMessage,
   getAuthor,
   getAvatarUrl,
-  getAncestorHashForBase,
-  getAncestorHashForBranch,
   getGitHubRepoSlug,
   getCurrentBranchSafe,
+  getAncestorHash,
 } = require('@lhci/utils/src/build-context.js');
 
 /** @param {string} message */
@@ -405,8 +404,7 @@ async function runLHCITarget(options) {
   const baseBranch = project.baseBranch || 'master';
   const hash = getCurrentHash();
   const branch = getCurrentBranch();
-  const ancestorHash =
-    branch === baseBranch ? getAncestorHashForBase() : getAncestorHashForBranch('HEAD', baseBranch);
+  const ancestorHash = getAncestorHash('HEAD', baseBranch);
 
   const build = await api.createBuild({
     projectId: project.id,

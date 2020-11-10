@@ -282,10 +282,10 @@ function getGravatarUrlFromEmail(email) {
 }
 
 /**
- * @param {string} [hash]
+ * @param {string} hash
  * @return {string}
  */
-function getAncestorHashForBase(hash = 'HEAD') {
+function getAncestorHashForBase(hash) {
   const result = childProcess.spawnSync('git', ['rev-parse', `${hash}^`], {encoding: 'utf8'});
   // Ancestor hash is optional, so do not throw if it can't be computed.
   // See https://github.com/GoogleChrome/lighthouse-ci/issues/36
@@ -295,11 +295,11 @@ function getAncestorHashForBase(hash = 'HEAD') {
 }
 
 /**
- * @param {string} [hash]
- * @param {string} [baseBranch]
+ * @param {string} hash
+ * @param {string} baseBranch
  * @return {string}
  */
-function getAncestorHashForBranch(hash = 'HEAD', baseBranch = 'master') {
+function getAncestorHashForBranch(hash, baseBranch) {
   const result = runCommandsUntilFirstSuccess([
     ['git', ['merge-base', hash, `origin/${baseBranch}`]],
     ['git', ['merge-base', hash, baseBranch]],
@@ -313,19 +313,20 @@ function getAncestorHashForBranch(hash = 'HEAD', baseBranch = 'master') {
 }
 
 /**
- * @param {string} [hash]
+ * @param {string} hash
+ * @param {string} baseBranch
  * @return {string}
  */
-function getAncestorHash(hash = 'HEAD') {
+function getAncestorHash(hash, baseBranch) {
   const envHash = getEnvVarIfSet([
     // Manual override
     'LHCI_BUILD_CONTEXT__ANCESTOR_HASH',
   ]);
   if (envHash) return envHash;
 
-  return getCurrentBranch() === 'master'
+  return getCurrentBranch() === baseBranch
     ? getAncestorHashForBase(hash)
-    : getAncestorHashForBranch(hash);
+    : getAncestorHashForBranch(hash, baseBranch);
 }
 
 /** @param {string|undefined} apiHost */

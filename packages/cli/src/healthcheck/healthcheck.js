@@ -82,7 +82,11 @@ const checks = [
     failureLabel: 'Ancestor hash not determinable',
     // the test only makes sense if they've configured an LHCI server
     shouldTest: opts => Boolean(opts.serverBaseUrl && opts.token),
-    test: () => getAncestorHash().length > 0,
+    test: async opts => {
+      const client = getApiClient(opts);
+      const project = await client.findProjectByToken(opts.token || '');
+      return getAncestorHash('HEAD', (project && project.baseBranch) || 'master').length > 0;
+    },
   },
   {
     id: 'lhciServer',

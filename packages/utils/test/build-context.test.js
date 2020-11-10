@@ -192,6 +192,31 @@ describe('build-context.js', () => {
     });
   });
 
+  describe('#getAncestorHash()', () => {
+    it('should use for base', () => {
+      process.env.LHCI_BUILD_CONTEXT__CURRENT_BRANCH = 'main';
+      expect(buildContext.getAncestorHash(hash, 'main')).toEqual(
+        'ec95bc8ad992c9d68845040d612fbbbe94ad7f13'
+      );
+    });
+
+    it('should use for branch', () => {
+      process.env.LHCI_BUILD_CONTEXT__CURRENT_BRANCH = 'feature-branch';
+      expect(buildContext.getAncestorHash('HEAD', 'v0.3.12')).toEqual(versionHash);
+    });
+
+    it('should return empty string when it fails', () => {
+      process.env.LHCI_BUILD_CONTEXT__CURRENT_BRANCH = 'main';
+      expect(buildContext.getAncestorHash('random' + Math.random())).toEqual('');
+    });
+
+    it('should respect env override', () => {
+      process.env.LHCI_BUILD_CONTEXT__CURRENT_BRANCH = 'main';
+      process.env.LHCI_BUILD_CONTEXT__ANCESTOR_HASH = '123456789';
+      expect(buildContext.getAncestorHash(hash, 'foo')).toEqual('123456789');
+    });
+  });
+
   describe('#getAncestorHashForBase()', () => {
     it('should work', () => {
       expect(buildContext.getAncestorHashForBase(hash)).toEqual(
@@ -212,11 +237,11 @@ describe('build-context.js', () => {
   describe('#getAncestorHashForBranch()', () => {
     it('should work', () => {
       // the merge-base of master with itself is just itself.
-      expect(buildContext.getAncestorHashForBranch(hash)).toEqual(hash);
+      expect(buildContext.getAncestorHashForBranch(hash, 'master')).toEqual(hash);
     });
 
     it('should work for alternate branches', () => {
-      // the merge-base of master with itself is just itself.
+      // the merge-base of any branch with an older version is that older version
       expect(buildContext.getAncestorHashForBranch('HEAD', 'v0.3.12')).toEqual(versionHash);
     });
 

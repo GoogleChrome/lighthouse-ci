@@ -81,7 +81,7 @@
     "prop-types": "^15.7.2",
     "puppeteer": "^1.18.1",
     "rimraf": "^3.0.2",
-    "sqlite3": "^4.2.0",
+    "sqlite3": "^5.0.0",
     "typescript": "^3.9.3"
   }
 }

@@ -5707,6 +5707,13 @@ bl@^1.0.0:
     readable-stream "^2.3.5"
     safe-buffer "^5.1.1"
 
+block-stream@*:
+  version "0.0.9"
+  resolved "https://registry.yarnpkg.com/block-stream/-/block-stream-0.0.9.tgz#13ebfe778a03205cfe03751481ebb4b3300c126a"
+  integrity sha1-E+v+d4oDIFz+A3UUgeu0szAMEmo=
+  dependencies:
+    inherits "~2.0.0"
+
 bluebird@^3.3.5:
   version "3.7.2"
   resolved "https://registry.yarnpkg.com/bluebird/-/bluebird-3.7.2.tgz#9f229c15be272454ffa973ace0dbee79a1b0c36f"
@@ -9852,6 +9859,16 @@ fsevents@^2.1.2:
   resolved "https://registry.yarnpkg.com/fsevents/-/fsevents-2.1.3.tgz#fb738703ae8d2f9fe900c33836ddebee8b97f23e"
   integrity sha512-Auw9a4AxqWpa9GUfj370BMPzzyncfBABW8Mab7BGWBYDj4Isgq+cDKtx0i6u9jcX9pQDnswsaaOTgTmA5pEjuQ==
 
+fstream@^1.0.0, fstream@^1.0.12:
+  version "1.0.12"
+  resolved "https://registry.yarnpkg.com/fstream/-/fstream-1.0.12.tgz#4e8ba8ee2d48be4f7d0de505455548eae5932045"
+  integrity sha512-WvJ193OHa0GHPEL+AycEJgxvBEwyfRkN1vhjca23OaPVMCaLCXTd5qAu82AjTcgP1UJmytkOKb63Ypde7raDIg==
+  dependencies:
+    graceful-fs "^4.1.2"
+    inherits "~2.0.0"
+    mkdirp ">=0.5 0"
+    rimraf "2"
+
 function-bind@^1.0.2, function-bind@^1.1.1, function-bind@~1.1.1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/function-bind/-/function-bind-1.1.1.tgz#a56899d3ea3c9bab874bb9773b7c5ede92f4895d"
@@ -11422,7 +11439,7 @@ inflight@^1.0.4:
     once "^1.3.0"
     wrappy "1"
 
-inherits@2, inherits@^2.0.1, inherits@^2.0.3, inherits@~2.0.1, inherits@~2.0.4:
+inherits@2, inherits@^2.0.1, inherits@^2.0.3, inherits@~2.0.0, inherits@~2.0.1, inherits@~2.0.4:
   version "2.0.4"
   resolved "https://registry.yarnpkg.com/inherits/-/inherits-2.0.4.tgz#0fa2c64f932917c3433a0ded55363aae37416b7c"
   integrity sha512-k/vGaX4/Yla3WzyMCvTQOXYeIHvqOKtnqBduzTHpzpQZzAskKMhZ2K+EnBiSM9zGSoIFeMpXKxa4dYeZIQqewQ==
@@ -14202,7 +14219,7 @@ mkdirp@*, mkdirp@0.5.1, mkdirp@^0.5.0, mkdirp@^0.5.1, mkdirp@~0.5.1:
   dependencies:
     minimist "0.0.8"
 
-mkdirp@^0.5.3:
+"mkdirp@>=0.5 0", mkdirp@^0.5.3:
   version "0.5.5"
   resolved "https://registry.yarnpkg.com/mkdirp/-/mkdirp-0.5.5.tgz#d91cefd62d1436ca0f41620e251288d420099def"
   integrity sha512-NKmAlESf6jMGym1++R0Ra7wvhV+wFW63FaSOFPwRahvea0gMUcGUhVeAg/0BC0wiv9ih5NYPB1Wn1UEI1/L+xQ==
@@ -14372,11 +14389,6 @@ named-placeholders@^1.1.2:
   dependencies:
     lru-cache "^4.1.3"
 
-nan@^2.12.1:
-  version "2.14.1"
-  resolved "https://registry.yarnpkg.com/nan/-/nan-2.14.1.tgz#d7be34dfa3105b91494c3147089315eff8874b01"
-  integrity sha512-isWHgVjnFjh2x2yuJ/tj3JbwoHu3UC2dX5G/88Cm24yB6YopVgxvBObDY7n5xW6ExmFhJpSEQqFPvq9zaXc8Jw==
-
 nan@^2.9.2:
   version "2.13.2"
   resolved "https://registry.yarnpkg.com/nan/-/nan-2.13.2.tgz#f51dc7ae66ba7d5d55e1e6d4d8092e802c9aefe7"
@@ -14539,6 +14551,11 @@ no-case@^2.2.0:
   dependencies:
     lower-case "^1.1.1"
 
+node-addon-api@2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/node-addon-api/-/node-addon-api-2.0.0.tgz#f9afb8d777a91525244b01775ea0ddbe1125483b"
+  integrity sha512-ASCL5U13as7HhOExbT6OlWJJUV/lLzL2voOSP1UVehpRD8FbSrSDjfScK/KwAvVTI5AS6r4VwbOMlIqtvRidnA==
+
 node-addon-api@^1.6.0:
   version "1.6.3"
   resolved "https://registry.yarnpkg.com/node-addon-api/-/node-addon-api-1.6.3.tgz#3998d4593e2dca2ea82114670a4eb003386a9fe1"
@@ -14580,6 +14597,24 @@ node-forge@^0.8.1:
   version "0.8.2"
   resolved "https://registry.yarnpkg.com/node-forge/-/node-forge-0.8.2.tgz#b4bcc59fb12ce77a8825fc6a783dfe3182499c5a"
   integrity sha512-mXQ9GBq1N3uDCyV1pdSzgIguwgtVpM7f5/5J4ipz12PKWElmPpVWLDuWl8iXmhysr21+WmX/OJ5UKx82wjomgg==
+
+node-gyp@3.x:
+  version "3.8.0"
+  resolved "https://registry.yarnpkg.com/node-gyp/-/node-gyp-3.8.0.tgz#540304261c330e80d0d5edce253a68cb3964218c"
+  integrity sha512-3g8lYefrRRzvGeSowdJKAKyks8oUpLEd/DyPV4eMhVlhJ0aNaZqIrNUIPuEWWTAoPqyFkfGrM67MC69baqn6vA==
+  dependencies:
+    fstream "^1.0.0"
+    glob "^7.0.3"
+    graceful-fs "^4.1.2"
+    mkdirp "^0.5.0"
+    nopt "2 || 3"
+    npmlog "0 || 1 || 2 || 3 || 4"
+    osenv "0"
+    request "^2.87.0"
+    rimraf "2"
+    semver "~5.3.0"
+    tar "^2.0.0"
+    which "1"
 
 node-gyp@^5.0.2:
   version "5.0.3"
@@ -15219,7 +15254,7 @@ os-tmpdir@^1.0.0, os-tmpdir@~1.0.2:
   resolved "https://registry.yarnpkg.com/os-tmpdir/-/os-tmpdir-1.0.2.tgz#bbe67406c79aa85c5cfec766fe5734555dfa1274"
   integrity sha1-u+Z0BseaqFxc/sdm/lc0VV36EnQ=
 
-osenv@^0.1.4, osenv@^0.1.5:
+osenv@0, osenv@^0.1.4, osenv@^0.1.5:
   version "0.1.5"
   resolved "https://registry.yarnpkg.com/osenv/-/osenv-0.1.5.tgz#85cdfafaeb28e8677f416e287592b5f3f49ea410"
   integrity sha512-0CWcCECdMVc2Rw3U5w9ZjqX6ga6ubk1xDVKxtBQPK7wis/0F2r9T6k4ydGYhecl7YUBxBVxhL5oisPsNxAPe2g==
@@ -18965,13 +19000,15 @@ sprintf-js@~1.0.2:
   resolved "https://registry.yarnpkg.com/sprintf-js/-/sprintf-js-1.0.3.tgz#04e6926f662895354f3dd015203633b857297e2c"
   integrity sha1-BOaSb2YolTVPPdAVIDYzuFcpfiw=
 
-sqlite3@^4.2.0:
-  version "4.2.0"
-  resolved "https://registry.yarnpkg.com/sqlite3/-/sqlite3-4.2.0.tgz#49026d665e9fc4f922e56fb9711ba5b4c85c4901"
-  integrity sha512-roEOz41hxui2Q7uYnWsjMOTry6TcNUNmp8audCx18gF10P2NknwdpF+E+HKvz/F2NvPKGGBF4NGc+ZPQ+AABwg==
+sqlite3@^5.0.0:
+  version "5.0.0"
+  resolved "https://registry.yarnpkg.com/sqlite3/-/sqlite3-5.0.0.tgz#1bfef2151c6bc48a3ab1a6c126088bb8dd233566"
+  integrity sha512-rjvqHFUaSGnzxDy2AHCwhHy6Zp6MNJzCPGYju4kD8yi6bze4d1/zMTg6C7JI49b7/EM7jKMTvyfN/4ylBKdwfw==
   dependencies:
-    nan "^2.12.1"
+    node-addon-api "2.0.0"
     node-pre-gyp "^0.11.0"
+  optionalDependencies:
+    node-gyp "3.x"
 
 sqlstring@^2.3.1:
   version "2.3.1"
@@ -19570,6 +19607,15 @@ tape@^4.0.0:
     resumer "~0.0.0"
     string.prototype.trim "~1.1.2"
     through "~2.3.8"
+
+tar@^2.0.0:
+  version "2.2.2"
+  resolved "https://registry.yarnpkg.com/tar/-/tar-2.2.2.tgz#0ca8848562c7299b8b446ff6a4d60cdbb23edc40"
+  integrity sha512-FCEhQ/4rE1zYv9rYXJw/msRqsnmlje5jHP6huWeBZ704jUTy02c5AZyWujpMR1ax6mVw9NyJMfuK2CMDWVIfgA==
+  dependencies:
+    block-stream "*"
+    fstream "^1.0.12"
+    inherits "2"
 
 tar@^4:
   version "4.4.8"

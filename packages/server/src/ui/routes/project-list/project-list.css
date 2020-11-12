@@ -25,8 +25,10 @@
 
 .project-list .paper {
   max-width: 50vw;
+  max-height: 100%;
   padding: calc(var(--paper-padding) * 2);
   z-index: 2;
+  overflow: auto;
 }
 
 .project-list img {

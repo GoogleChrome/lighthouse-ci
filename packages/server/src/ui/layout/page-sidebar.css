@@ -46,7 +46,9 @@
 }
 
 .page-sidebar__content {
-  padding: 0 var(--page-header-horizontal-padding);
+  padding: 0 var(--page-header-horizontal-padding) var(--page-header-vertical-padding) var(--page-header-horizontal-padding);
+  max-height: calc(100% - var(--subtext-font-size) - var(--page-header-height) - var(--page-header-vertical-padding) * 2);
+  overflow: auto;
 }
 
 .page-sidebar__content ul {

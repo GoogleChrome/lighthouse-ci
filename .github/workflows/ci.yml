@@ -71,9 +71,9 @@ jobs:
           node-version: 10.x
       - name: Configure Environment
         run: |-
-          echo "::set-env name=CHROME_PATH::$(which google-chrome-stable)"
-          echo "::set-env name=POSTGRES_DB_URL::postgres://postgres:postgres@localhost/lighthouse_ci_test"
-          echo "::set-env name=MYSQL_DB_URL::mysql://root:mysql@127.0.0.1:33306/lighthouse_ci_test"
+          echo "CHROME_PATH=$(which google-chrome-stable)" >> $GITHUB_ENV
+          echo "POSTGRES_DB_URL=postgres://postgres:postgres@localhost/lighthouse_ci_test" >> $GITHUB_ENV
+          echo "MYSQL_DB_URL=mysql://root:mysql@127.0.0.1:33306/lighthouse_ci_test" >> $GITHUB_ENV
 
           export PGPASSWORD="postgres"
           export MYSQL_PWD="mysql"

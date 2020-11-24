@@ -970,6 +970,18 @@ _Optional_ The human friendly label for this set of URLs to use when logging sta
 
 _Optional_ The "branch" on which to report the results. Defaults to the base branch of the project referenced by `projectSlug`.
 
+#### `deleteOldBuildsCron`
+
+The configuration to automatically delete old records. This job only works when `storage.storageMethod` is set `sql`.
+
+##### `deleteOldBuildsCron.schedule`
+
+The [cron-style](https://crontab.guru/) schedule on which to collect results.
+
+##### `deleteOldBuildsCron.maxAgeInDays`
+
+A number of days to keep a records.
+
 #### `basicAuth`
 
 ##### `basicAuth.username`

@@ -32,3 +32,4 @@ There are many CI providers out there to choose from. Lighthouse CI works with a
 - [GitLab CI](https://docs.gitlab.com/ee/ci/quick_start/)
 - [Travis CI](https://docs.travis-ci.com/user/tutorial/)
 - [Circle CI](https://circleci.com/docs/2.0/getting-started/)
+- [Google Cloudbuild](https://cloud.google.com/cloud-build/docs/quickstart-build)

@@ -168,7 +168,7 @@ module.exports = {
 **.gitlab-ci.yml**
 
 ```yaml
-image: cypress/browsers:node10.16.0-chrome77
+image: cypress/browsers:node14.15.0-chrome86-ff82
 lhci:
   script:
     - npm install
@@ -217,6 +217,58 @@ export LHCI_BUILD_CONTEXT__EXTERNAL_BUILD_URL="$BUILD_URL"
 
 npm install -g @lhci/cli@0.6.x
 lhci autorun
+```
+
+</details>
+
+<details>
+<summary>Google Cloudbuild</summary>
+<br />
+
+**NOTE:** Learn more about the [security tradeoffs](./recipes/docker-client/README.md#--no-sandbox-container-tradeoffs) behind use of the `--no-sandbox` Chrome option before proceeding.
+
+**.lighthouserc.js**
+
+```js
+module.exports = {
+  ci: {
+    collect: {
+      settings: {chromeFlags: '--no-sandbox'},
+    },
+    upload: {
+      target: 'temporary-public-storage',
+    },
+  },
+};
+```
+
+**Notes**
+* `LHCI_BUILD_CONTEXT__CURRENT_BRANCH` doesn't pick up the right variables in cloudbuild so passing through `$BRANCH_NAME` will fix this.
+* `machineType` defines the machine you can pick. The bigger the better (see: https://github.com/GoogleChrome/lighthouse/blob/master/docs/variability.md). Look through the [Cloudbuild machine pricing](https://cloud.google.com/cloud-build/pricing)
+
+**cloudbuild.yml**
+
+```yaml
+steps:
+  - id: 'install'
+    args: ['npm', 'ci']
+    name: node:14-alpine
+
+  - id: 'build'
+    waitFor: ['install']
+    name: node:14-alpine
+    args: ['npm', 'run', 'build']
+
+  - id: 'lighthouse'
+    waitFor: ['build']
+    name: cypress/browsers:node14.15.0-chrome86-ff82
+    entrypoint: '/bin/sh'
+    args: ['-c', 'npm install -g @lhci/cli@0.6.x && lhci autorun --failOnUploadFailure']
+    env:
+      - 'LHCI_BUILD_CONTEXT__CURRENT_BRANCH=$BRANCH_NAME'
+
+options:
+  machineType: 'N1_HIGHCPU_32'
 ```
 
 </details>

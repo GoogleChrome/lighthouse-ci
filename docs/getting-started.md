@@ -244,7 +244,7 @@ module.exports = {
 
 **Notes**
 * `LHCI_BUILD_CONTEXT__CURRENT_BRANCH` doesn't pick up the right variables in cloudbuild so passing through `$BRANCH_NAME` will fix this.
-* `machineType` defines the machine you can pick. The bigger the better (see: https://github.com/GoogleChrome/lighthouse/blob/master/docs/variability.md). Look through the [Cloudbuild machine pricing](https://cloud.google.com/cloud-build/pricing)
+* `machineType` defines the machine you can pick. The bigger the machine the more stable the performance results will be (see [Lighthouse variability documentation](https://github.com/GoogleChrome/lighthouse/blob/master/docs/variability.md)). WARNING: Look through the [Cloudbuild machine pricing](https://cloud.google.com/cloud-build/pricing) before deciding on a machine type.
 
 **cloudbuild.yml**
 

@@ -268,7 +268,7 @@ steps:
       - 'LHCI_BUILD_CONTEXT__CURRENT_BRANCH=$BRANCH_NAME'
 
 options:
-  machineType: 'N1_HIGHCPU_32'
+  machineType: 'N1_HIGHCPU_8'
 ```
 
 </details>

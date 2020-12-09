@@ -64,6 +64,8 @@ function getCurrentHash() {
     'CIRCLE_SHA1',
     // GitLab CI
     'CI_COMMIT_SHA',
+    // Drone CI
+    'DRONE_COMMIT_SHA',
   ]);
   if (envHash) return envHash;
 
@@ -123,6 +125,8 @@ function getCurrentBranchRaw_() {
     'CI_EXTERNAL_PULL_REQUEST_SOURCE_BRANCH_NAME',
     'CI_MERGE_REQUEST_SOURCE_BRANCH_NAME',
     'CI_COMMIT_REF_NAME',
+    // Drone CI, see https://docs.drone.io/pipeline/environment/reference/
+    'DRONE_BRANCH',
   ]);
   if (envBranch) return envBranch;
 
@@ -339,6 +343,8 @@ function getGitHubRepoSlug(apiHost = undefined) {
     'TRAVIS_REPO_SLUG',
     // GitHub Actions
     'GITHUB_REPOSITORY',
+    // Drone CI
+    'DRONE_REPO',
   ]);
   if (envSlug) return envSlug;
 

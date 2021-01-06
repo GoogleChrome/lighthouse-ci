@@ -18,7 +18,7 @@ Checkout the [issues in Lighthouse](https://github.com/GoogleChrome/lighthouse/i
 
 - **Missing Chrome**: You don't have Chrome available on your machine. Follow the examples in the [getting started guide](./getting-started.md#collect-lighthouse-results) to add Chrome to your CI provider. Follow the Jenkins setup section if you're running in a custom environment.
 - **Protocol Error: X.Y wasn't found**: Your version of Chrome is incompatible with the Lighthouse version, latest Lighthouse CI supports stable Chrome and later. This is especially common when used in combination with Puppeteer, try updating your `puppeteer` version first, or follow the examples in the [getting started guide](./getting-started.md#collect-lighthouse-results) to add Chrome to your CI provider.
-- **No usable sandbox**: Your OS wasn't configured to support Chrome process sandboxing, try [creating a Chrome usergroup](https://github.com/GoogleChromeLabs/lighthousebot/blob/a4bfc0857741c1cd6bde9ded967971fd27254ed6/builder/Dockerfile#L35-L40) or running with `--collect.settings.chromeFlags="--no-sandbox"`.
+- **No usable sandbox**: Your OS wasn't configured to support Chrome process sandboxing, try [creating a Chrome usergroup](https://github.com/GoogleChromeLabs/lighthousebot/blob/a4bfc0857741c1cd6bde9ded967971fd27254ed6/builder/Dockerfile#L35-L40) or running with `--collect.settings.chromeFlags="--no-sandbox"`. If running in a docker container, ensure the container has [SYS_ADMIN privileges](./recipes/docker-client/README.md#--no-sandbox-issues-explained).
 
 ## The GitHub App/LHCI server upload isn't working on PRs from external contributors.
 

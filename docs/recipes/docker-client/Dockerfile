@@ -12,7 +12,6 @@ RUN apt-get update \
 
 # Install Lighthouse CI
 RUN npm install -g @lhci/cli@0.6.1
-RUN npm install -g lighthouse
 
 # Setup a user to avoid doing everything as root
 RUN groupadd --system lhci && \

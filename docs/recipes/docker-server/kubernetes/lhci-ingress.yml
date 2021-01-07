@@ -1,0 +1,31 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: lhci-server
+spec:
+  ports:
+  - port: 80
+    targetPort: 9001
+  selector:
+    name: lhci-server
+  type: NodePort
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: lhci-server
+  annotations:
+    kubernetes.io/ingress.global-static-ip-name: lhci-example-com
+    networking.gke.io/managed-certificates: lhci-example-com
+spec:
+  backend:
+    serviceName: lhci-server
+    servicePort: 80
+---
+apiVersion: networking.gke.io/v1beta2
+kind: ManagedCertificate
+metadata:
+  name: lhci-example-com
+spec:
+  domains:
+    - lhci.example.com

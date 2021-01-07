@@ -55,17 +55,16 @@ gcloud config set compute/zone "$COMPUTE_ZONE"
 # Create our Kubernetes cluster for LHCI
 gcloud container clusters create lhci-cluster --num-nodes=1
 
-# Deploy the LHCI server pod
-curl https://raw.githubusercontent.com/GoogleChrome/lighthouse-ci/master/docs/recipes/docker-server/kubernetes/lhci-data-claim.yml > lhci-data-claim.yml
-curl https://raw.githubusercontent.com/GoogleChrome/lighthouse-ci/master/docs/recipes/docker-server/kubernetes/lhci-pod.yml > lhci-pod.yml
+# Deploy the LHCI server
+curl -O https://raw.githubusercontent.com/GoogleChrome/lighthouse-ci/master/docs/recipes/docker-server/kubernetes/lhci-data-claim.yml
+curl -O https://raw.githubusercontent.com/GoogleChrome/lighthouse-ci/master/docs/recipes/docker-server/kubernetes/lhci-deployment.yml
+curl -O https://raw.githubusercontent.com/GoogleChrome/lighthouse-ci/master/docs/recipes/docker-server/kubernetes/lhci-service.yml
 kubectl apply -f ./lhci-data-claim.yml
-kubectl apply -f ./lhci-pod.yml
+kubectl apply -f ./lhci-deployment.yml
+kubectl apply -f ./lhci-service.yml
 
-# Make sure our pod was created successfully
-kubectl get pods
-
-# Expose LHCI to the internet
-kubectl expose pod lhci-pod --type=LoadBalancer --port 80 --target-port 9001 --name=lhci-server
+# Make sure our deployment was created successfully
+kubectl get deployment
 
 # Check the IP of your LHCI server installation!
 kubectl get service

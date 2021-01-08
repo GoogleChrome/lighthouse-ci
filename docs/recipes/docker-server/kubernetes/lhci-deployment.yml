@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lhci-server
+spec:
+  selector:
+    matchLabels:
+      name: lhci-server
+  # there can be only one pod at a time because of the persistent volume claim
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      name: lhci-pod
+      labels:
+        name: lhci-server
+    spec:
+      containers:
+        - name: lhci-server
+          image: docker.io/patrickhulce/lhci-server:0.6.1
+          volumeMounts:
+            - mountPath: '/data'
+              name: lhci-data-volume
+          # required for ingress health checks to work
+          ports:
+            - containerPort: 9001
+          readinessProbe:
+            httpGet:
+              path: /app/
+              port: 9001
+      volumes:
+        - name: lhci-data-volume
+          persistentVolumeClaim:
+            claimName: lhci-data-claim

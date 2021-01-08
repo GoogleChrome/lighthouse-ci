@@ -14,7 +14,7 @@ read -n 1 -p "Press any key to continue, Ctrl+C to exit..."
 
 printf "\nUpdating local files...\n\n"
 
-sed -i "" "s/$CURRENT_VERSION/$LATEST_VERSION/" package.json kubernetes/lhci-pod.yml
+sed -i "" "s/$CURRENT_VERSION/$LATEST_VERSION/" package.json kubernetes/lhci-deployment.yml
 git --no-pager diff .
 
 printf "Continue publishing $LATEST_VERSION?\n"

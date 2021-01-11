@@ -44,7 +44,10 @@ async function createApp(options) {
   // 2. Support JSON primitives because `PUT /builds/<id>/lifecycle "sealed"`
   app.use(bodyParser.json({limit: '10mb', strict: false}));
 
-  // The entire server can be protected by HTTP Basic Authentication
+  // Add a health check route before auth
+  app.use('/healthz', (_, res) => res.send('healthy'));
+
+  // The rest of the server can be protected by HTTP Basic Authentication
   const authMiddleware = createBasicAuthMiddleware(context);
   if (authMiddleware) app.use(authMiddleware);
 

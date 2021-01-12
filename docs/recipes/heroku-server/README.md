@@ -15,7 +15,7 @@ mkdir lhci-heroku && cd lhci-heroku && git init
 curl https://raw.githubusercontent.com/GoogleChrome/lighthouse-ci/master/docs/recipes/heroku-server/package.json > package.json
 curl https://raw.githubusercontent.com/GoogleChrome/lighthouse-ci/master/docs/recipes/heroku-server/server.js > server.js
 # Create the project's first commit
-git add -A && git commit -m 'Initial commit'
+git add package.json server.js && git commit -m 'Initial commit'
 ```
 
 ## Setting Up Heroku
@@ -28,7 +28,7 @@ heroku create
 # Add a free database to your project
 heroku addons:create heroku-postgresql:hobby-dev
 # Deploy your code to heroku
-git push heroku master
+git push heroku main
 # Ensure heroku is running your app and open the URL
 heroku ps:scale web=1
 heroku open
@@ -44,7 +44,7 @@ Updates are made to the LHCI server from time to time and you'll want to keep up
 # Update LHCI
 npm install --save @lhci/server@latest
 # Create a commit with your update
-git add -A && git commit -m 'update LHCI'
+git add package.json && git commit -m 'update LHCI'
 # Deploy your update to heroku
-git push heroku master
+git push heroku main
 ```

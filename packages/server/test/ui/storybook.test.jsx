@@ -60,7 +60,7 @@ initStoryshots({
       await page.setViewport({width, height});
     },
     getMatchOptions: () => ({
-      failureThreshold: 0.0015,
+      failureThreshold: process.env.CI ? 0.005 : 0.0015,
       failureThresholdType: 'percent',
     }),
     getScreenshotOptions: () => ({

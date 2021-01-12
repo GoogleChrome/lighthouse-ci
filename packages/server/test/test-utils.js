@@ -252,8 +252,8 @@ module.exports = {
   emptyTest: () => it.skip('not enabled', () => {}),
   setupImageSnapshots: () => {
     const toMatchImageSnapshot = configureToMatchImageSnapshot({
-      // FIXME: we're more forgiving in Travis where font rendering on linux creates small changes
-      failureThreshold: process.env.TRAVIS && require('os').platform() !== 'darwin' ? 0.05 : 0.001,
+      // FIXME: we're more forgiving in CI where font rendering creates small changes.
+      failureThreshold: process.env.CI ? 0.005 : 0.001,
       failureThresholdType: 'percent',
     });
 

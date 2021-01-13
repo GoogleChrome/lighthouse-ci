@@ -77,5 +77,10 @@ describe('sqlite server (authenticated)', () => {
         expect(body.length).toBeGreaterThan(4);
       });
     }
+
+    it(`should allow unauthorized requests for /healthz`, async () => {
+      const response = await fetch(`http://localhost:${state.port}/healthz`);
+      expect(response.status).toEqual(200);
+    });
   });
 });

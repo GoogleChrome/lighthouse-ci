@@ -31,6 +31,17 @@ function runTests(state) {
     client = new ApiClient({rootURL, extraHeaders: state.extraHeaders});
   });
 
+  describe('/healthz', () => {
+    it('should return healthy', async () => {
+      const response = await fetch(`${rootURL}/healthz`, {
+        extraHeaders: state.extraHeaders,
+      });
+      expect(response.status).toEqual(200);
+      const responseText = await response.text();
+      expect(responseText).toEqual('healthy');
+    });
+  });
+
   describe('/version', () => {
     it('should return the version', async () => {
       const version = await client.getVersion();

@@ -26,7 +26,7 @@ spec:
             - containerPort: 9001
           readinessProbe:
             httpGet:
-              path: /app/
+              path: /healthz
               port: 9001
       volumes:
         - name: lhci-data-volume

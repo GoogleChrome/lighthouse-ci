@@ -10,7 +10,7 @@
     "access": "public"
   },
   "dependencies": {
-    "isomorphic-fetch": "^2.2.1",
+    "isomorphic-fetch": "^3.0.0",
     "js-yaml": "^3.13.1",
     "lighthouse": "6.4.1",
     "tree-kill": "^1.2.1"

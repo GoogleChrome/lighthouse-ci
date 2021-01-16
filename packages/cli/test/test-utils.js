@@ -58,6 +58,7 @@ function cleanStdOutput(output) {
     .replace(/:\d{4,6}/g, ':XXXX')
     .replace(/port \d{4,6}/, 'port XXXX')
     .replace(/(\s+at \S+) .*/g, '$1')
+    .replace(/\s+at (async|processTicksAndRejections|process._tickCallback)(?=\n|$)/g, '')
     .replace(
       /appspot.com\/reports\/[0-9-]+.report.html/,
       'appspot.com/reports/XXXX-XXXX.report.html'

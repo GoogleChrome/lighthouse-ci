@@ -130,7 +130,7 @@ describe('convertBudgetsToAssertions', () => {
           },
         },
         {
-          matchingUrlPattern: 'https?:\\/\\/[^\\/]+\\/second\\-path',
+          matchingUrlPattern: 'https?:\\/\\/[^/]+\\/second\\-path',
           assertions: {
             'resource-summary:script:size': ['error', {maxNumericValue: 1000 * 1024}],
           },

@@ -16,6 +16,7 @@
     "@lhci/utils": "0.1.0",
     "chrome-launcher": "^0.13.4",
     "compression": "^1.7.4",
+    "debug": "^4.3.1",
     "express": "^4.17.1",
     "inquirer": "^6.3.1",
     "isomorphic-fetch": "^3.0.0",

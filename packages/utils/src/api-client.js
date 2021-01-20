@@ -5,6 +5,7 @@
  */
 'use strict';
 
+const log = require('debug')('lhci:utils:api-client');
 const URL = require('url').URL;
 const fetch = require('isomorphic-fetch');
 
@@ -410,6 +411,7 @@ class ApiClient {
    * @param {string} serverVersion
    */
   static isApiVersionCompatible(clientVersion, serverVersion) {
+    log(`checking for client (${clientVersion}) server (${serverVersion}) compatibility`);
     const partsClient = clientVersion.match(/(\d+)\.(\d+)\.\d+/);
     const partsServer = serverVersion.match(/(\d+)\.(\d+)\.\d+/);
     if (!partsClient || !partsServer) return false;

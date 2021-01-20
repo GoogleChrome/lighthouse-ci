@@ -33,7 +33,7 @@ Before contributing to the code, get an overview of how Lighthouse works in the 
 
 ## Monorepo
 
-The codebase is organized in a typical monorepo setup using [yarn workspaces](https://classic.yarnpkg.com/en/docs/workspaces/) and [lerna](https://github.com/lerna/lerna). Individual packages are located in `packages/*` directories each with their own `package.json`, scripts, and tests. Running `yarn` at the repository root will create symlinks for all local packages in `node_modules/@lhci` meaning changes you make in `packages/utils` will automatically be used by `require('@lhci/utils')` in `packages/cli` without further build steps. 
+The codebase is organized in a typical monorepo setup using [yarn workspaces](https://classic.yarnpkg.com/en/docs/workspaces/) and [lerna](https://github.com/lerna/lerna). Individual packages are located in `packages/*` directories each with their own `package.json`, scripts, and tests. Running `yarn` at the repository root will create symlinks for all local packages in `node_modules/@lhci` meaning changes you make in `packages/utils` will automatically be used by `require('@lhci/utils')` in `packages/cli` without further build steps.
 
 ## Dependencies
 
@@ -48,6 +48,23 @@ When working on the CLI, simply make your changes to `packages/cli` or `packages
 
 When working on the server, you'll need to start parcel in watch mode. In one terminal run `yarn build:watch` from the repo root. In another terminal run `yarn start:server`. If you made any changes to the APIs of the server, you will need to restart the `yarn start:server` command, but UI changes should be picked up on refresh without restarting the server process. Once the server is up and running you can fill it with some test data by running `yarn start:seed-database` in another terminal.
 
+## Updating the Lighthouse Version
+
+Updating the Lighthouse version used by LHCI involves more than a simple `package.json` update. When the Lighthouse version changes, it is usually a _breaking change_ for Lighthouse CI (see [version policy](./docs/version-policy.md)) and triggers many corresponding updates, including the following:
+
+- Update the `package.json` version in @lhci/utils and @lhci/cli.
+- Run the new `lighthouse` version on a sufficiently complex URL (https://www.coursehero.com/ or https://www.theverge.com) and commit the LHR.
+  - `lighthouse https://www.coursehero.com/ --output=json > ./packages/server/test/fixtures/lh-7-0-0-a.json`
+  - `lighthouse https://www.coursehero.com/ --output=json > ./packages/server/test/fixtures/lh-7-0-0-b.json`
+- Add the new fixture LHRs to the tests.
+  - packages/server/test/test-utils.js
+  - packages/server/test/api/statistic-definitions.test.js
+  - packages/server/src/ui/routes/build-view/lhr-comparison.stories.jsx
+  - packages/server/src/ui/routes/build-view/audit-detail/audit-detail-pane.stories.jsx
+- Update the presets with any new or removed audits.
+  - packages/utils/src/presets/all.js
+- Update test snapshots with `yarn test:unit -u`
+
 ## Server Organization
 
 The server has three primary components: the API, the UI, and cron jobs.
@@ -60,7 +77,7 @@ The cron jobs are periodic tasks that run while the server is alive. Code for th
 
 ## Tests
 
-Any non-trivial functionality should be accompanied by a test. [jest](https://jestjs.io/) is our test runner for unit and integration tests. Front-end components use [storybook](https://storybook.js.org/) examples and/or end-to-end puppeteer tests that get run in the same steps as unit tests. 
+Any non-trivial functionality should be accompanied by a test. [jest](https://jestjs.io/) is our test runner for unit and integration tests. Front-end components use [storybook](https://storybook.js.org/) examples and/or end-to-end puppeteer tests that get run in the same steps as unit tests.
 
 Typechecking is performed by [TypeScript's checkJs option](https://www.typescriptlang.org/docs/handbook/type-checking-javascript-files.html). All new code should leverage JSDoc type annotations and avoid the use of `any`.
 

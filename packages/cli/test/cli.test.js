@@ -310,7 +310,10 @@ describe('Lighthouse CI CLI', () => {
 
   describe('assert', () => {
     it('should assert failures', async () => {
-      const {stdout, stderr, status} = await runCLI(['assert', `--assertions.works-offline=error`]);
+      const {stdout, stderr, status} = await runCLI([
+        'assert',
+        `--assertions.installable-manifest=error`,
+      ]);
 
       expect(stdout).toMatchInlineSnapshot(`""`);
       expect(stderr).toMatchInlineSnapshot(`
@@ -318,9 +321,9 @@ describe('Lighthouse CI CLI', () => {
 
         1 result(s) for [1mhttp://localhost:XXXX/app/[0m :
 
-          [31mX[0m  [1mworks-offline[0m failure for [1mminScore[0m assertion
-               Current page does not respond with a 200 when offline
-               https://web.dev/works-offline/
+          [31mX[0m  [1minstallable-manifest[0m failure for [1mminScore[0m assertion
+               Web app manifest or service worker do not meet the installability requirements
+               https://web.dev/installable-manifest/
 
                 expected: >=[32m0.9[0m
                    found: [31m0[0m
@@ -370,9 +373,9 @@ describe('Lighthouse CI CLI', () => {
 
         1 result(s) for [1mhttp://localhost:XXXX/app/[0m :
 
-          [31mX[0m  [1mworks-offline[0m failure for [1mminScore[0m assertion
-               Current page does not respond with a 200 when offline
-               https://web.dev/works-offline/
+          [31mX[0m  [1minstallable-manifest[0m failure for [1mminScore[0m assertion
+               Web app manifest or service worker do not meet the installability requirements
+               https://web.dev/installable-manifest/
 
                 expected: >=[32m0.9[0m
                    found: [31m0[0m

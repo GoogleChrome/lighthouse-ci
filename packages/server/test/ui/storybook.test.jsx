@@ -57,6 +57,8 @@ initStoryshots({
         await page.waitFor(parameters.waitFor);
       }
 
+      width = Math.ceil(width);
+      height = Math.ceil(height);
       await page.setViewport({width, height});
     },
     getMatchOptions: () => ({

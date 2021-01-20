@@ -28,11 +28,9 @@ module.exports = {
         'apple-touch-icon': 'off',
         'maskable-icon': 'off',
         'installable-manifest': 'off',
-        'offline-start-url': 'off',
         'service-worker': 'off',
         'splash-screen': 'off',
         'themed-omnibox': 'off',
-        'works-offline': 'off',
       },
     },
     upload: {

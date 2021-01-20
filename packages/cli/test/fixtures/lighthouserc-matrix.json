@@ -5,7 +5,7 @@
         {
           "matchingUrlPattern": "app",
           "assertions": {
-            "works-offline": "error"
+            "installable-manifest": "error"
           }
         },
         {

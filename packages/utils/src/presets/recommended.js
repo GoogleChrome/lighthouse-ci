@@ -17,7 +17,6 @@ module.exports = {
     'first-cpu-idle': ['warn', {}],
     'first-meaningful-paint': ['warn', {}],
     'largest-contentful-paint': ['warn', {}],
-    'load-fast-enough-for-pwa': ['warn', {}],
     'mainthread-work-breakdown': ['warn', {}],
     'max-potential-fid': ['warn', {}],
     'speed-index': ['warn', {}],

@@ -54,8 +54,8 @@ Updating the Lighthouse version used by LHCI involves more than a simple `packag
 
 - Update the `package.json` version in @lhci/utils and @lhci/cli.
 - Run the new `lighthouse` version on a sufficiently complex URL (https://www.coursehero.com/ or https://www.theverge.com) and commit the LHR.
-  - `lighthouse https://www.coursehero.com/ --output=json > ./packages/server/test/fixtures/lh-7-0-0-a.json`
-  - `lighthouse https://www.coursehero.com/ --output=json > ./packages/server/test/fixtures/lh-7-0-0-b.json`
+  - `lighthouse https://www.coursehero.com/ --output=json > ./packages/server/test/fixtures/lh-7-0-0-coursehero-a.json`
+  - `lighthouse https://www.coursehero.com/ --output=json > ./packages/server/test/fixtures/lh-7-0-0-coursehero-b.json`
 - Add the new fixture LHRs to the tests.
   - packages/server/test/test-utils.js
   - packages/server/test/api/statistic-definitions.test.js

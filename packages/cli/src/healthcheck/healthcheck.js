@@ -5,6 +5,7 @@
  */
 'use strict';
 
+const log = require('debug')('lhci:cli:healthcheck');
 const {canAccessPath, determineChromePath} = require('../utils.js');
 const ApiClient = require('@lhci/utils/src/api-client.js');
 const {loadAndParseRcFile, resolveRcFilePath} = require('@lhci/utils/src/lighthouserc.js');
@@ -56,6 +57,7 @@ const checks = [
     test: opts => {
       const rcFile = resolveRcFilePath(opts.config);
       if (!rcFile) return false;
+      log('checking for config file at', rcFile);
       return Boolean(loadAndParseRcFile(rcFile));
     },
   },
@@ -64,8 +66,9 @@ const checks = [
     failureLabel: 'Chrome installation not found',
     shouldTest: opts => (opts && opts.method) !== 'psi',
     test: opts => {
-      if (opts.chromePath) return canAccessPath(opts.chromePath);
-      return canAccessPath(determineChromePath(opts) || '');
+      const chromePath = opts.chromePath || determineChromePath(opts) || '';
+      log('checking chrome path', chromePath || 'NONE_FOUND');
+      return canAccessPath(chromePath);
     },
   },
   {
@@ -83,6 +86,7 @@ const checks = [
     // the test only makes sense if they've configured an LHCI server
     shouldTest: opts => Boolean(opts.serverBaseUrl && opts.token),
     test: async opts => {
+      log('checking project at API', opts.serverBaseUrl, 'with token', opts.token);
       const client = getApiClient(opts);
       const project = await client.findProjectByToken(opts.token || '');
       return getAncestorHash('HEAD', (project && project.baseBranch) || 'master').length > 0;
@@ -112,6 +116,7 @@ const checks = [
     // the test only makes sense if they've configured an LHCI server
     shouldTest: opts => Boolean(opts.serverBaseUrl && opts.token),
     test: async opts => {
+      log('checking project at API', opts.serverBaseUrl, 'with token', opts.token);
       const client = getApiClient(opts);
       const project = await client.findProjectByToken(opts.token || '');
       return Boolean(project);
@@ -127,10 +132,10 @@ const checks = [
       const client = getApiClient(opts);
       const project = await client.findProjectByToken(opts.token || '');
       if (!project) return true;
-      const builds = await client.getBuilds(project.id, {
-        branch: getCurrentBranch(),
-        hash: getCurrentHash(),
-      });
+      const branch = getCurrentBranch();
+      const hash = getCurrentHash();
+      const builds = await client.getBuilds(project.id, {branch, hash});
+      log(`checking for pre-existing builds on branch "${branch}" and hash "${hash}"`);
       return builds.length === 0;
     },
   },

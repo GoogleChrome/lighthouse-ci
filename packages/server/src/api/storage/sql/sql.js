@@ -5,6 +5,8 @@
  */
 'use strict';
 
+const log = require('debug')('lhci:server:sql');
+const logVerbose = require('debug')('lhci:server:sql:verbose');
 const path = require('path');
 const uuid = require('uuid');
 const Umzug = require('umzug');
@@ -433,24 +435,31 @@ class SqlStorageMethod {
     if (build.projectId !== projectId) throw new E422('Invalid project');
     build = {...clone(build), lifecycle: 'sealed'};
 
+    log('[sealBuild] validating buildId');
     const runs = await this.getRuns(projectId, buildId);
     if (!runs.length) throw new E422('Invalid build');
 
+    log('[sealBuild] starting transaction');
     const transaction = await sequelize.transaction();
 
     try {
+      log('[sealBuild] updating lifecycle');
       await buildModel.update({lifecycle: 'sealed'}, {where: {id: build.id}, transaction});
 
+      log('[sealBuild] creating statistics');
       const {representativeRuns} = await StorageMethod.createStatistics(this, build, {transaction});
       const runIds = representativeRuns.map(run => run.id);
 
+      log('[sealBuild] updating run representative flag');
       await runModel.update(
         {representative: true},
         {where: {id: {[Sequelize.Op.in]: runIds}}, transaction}
       );
 
+      log('[sealBuild] committing transaction');
       await transaction.commit();
     } catch (err) {
+      log('[sealBuild] rolling back transaction');
       await transaction.rollback();
       throw err;
     }
@@ -645,6 +654,7 @@ class SqlStorageMethod {
   async _createOrUpdateStatistic(unsavedStatistic, context) {
     const transaction = context && context.transaction;
     const {statisticModel} = this._sql();
+    logVerbose('[_createOrUpdateStatistic] looking up existing statistic');
     const existing = await statisticModel.findOne({
       where: {
         projectId: unsavedStatistic.projectId,
@@ -658,11 +668,13 @@ class SqlStorageMethod {
     /** @type {LHCI.ServerCommand.Statistic} */
     let statistic;
     if (existing) {
+      logVerbose('[_createOrUpdateStatistic] existing statistic found, updating data');
       await statisticModel.update({...unsavedStatistic}, {where: {id: existing.id}, transaction});
       const updated = await this._findByPk(statisticModel, existing.id);
       if (!updated) throw new Error('Failed to update statistic');
       statistic = updated;
     } else {
+      logVerbose('[_createOrUpdateStatistic] no existing statistic found, creating one');
       statistic = await statisticModel.create({...unsavedStatistic, id: uuid.v4()}, {transaction});
     }
 

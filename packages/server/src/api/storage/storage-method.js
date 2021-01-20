@@ -5,6 +5,7 @@
  */
 'use strict';
 
+const log = require('debug')('lhci:server:storage-method');
 const _ = require('@lhci/utils/src/lodash.js');
 const PRandom = require('@lhci/utils/src/seed-data/prandom.js');
 const {computeRepresentativeRuns} = require('@lhci/utils/src/representative-runs.js');
@@ -13,6 +14,18 @@ const {
   VERSION: STATISTIC_VERSION,
 } = require('../statistic-definitions.js');
 const {E404} = require('../express-utils.js');
+const Bluebird = require('bluebird');
+
+/** @param {string} name @return {{end(): void}} */
+const startDebugTimer = name => {
+  const start = Date.now();
+  return {
+    end: () => {
+      const duration = Date.now() - start;
+      log(`${name} took ${duration}ms`);
+    },
+  };
+};
 
 class StorageMethod {
   /**
@@ -301,18 +314,25 @@ class StorageMethod {
     const {id: buildId, projectId, lifecycle} = build;
     if (lifecycle !== 'sealed') throw new Error('Cannot create statistics for unsealed build');
 
+    const runsTimer = startDebugTimer('createStatistics.getRuns');
     const runs = await storageMethod.getRuns(projectId, buildId);
     /** @type {Array<Array<[LHCI.ServerCommand.Run, LH.Result]>>} */
     const runsByUrl = _.groupBy(runs.map(run => [run, JSON.parse(run.lhr)]), ([run, _]) => run.url);
+    runsTimer.end();
 
+    log(`creating statistics for ${runs.length} run(s)`);
     const statisicDefinitionEntries = Object.entries(statisticDefinitions);
     const existingStatistics = context.existingStatistics || [];
 
-    const statistics = await Promise.all(
-      statisicDefinitionEntries.map(([key, fn]) => {
+    const statisticsTimer = startDebugTimer('createStatistics.getStatistics');
+    const statistics = await Bluebird.map(
+      statisicDefinitionEntries,
+      async ([key, fn]) => {
         const name = /** @type {LHCI.ServerCommand.StatisticName} */ (key);
-        return Promise.all(
-          runsByUrl.map(runs => {
+
+        const statistics = Bluebird.map(
+          runsByUrl,
+          runs => {
             const url = runs[0][0].url;
             const {value} = fn(runs.map(([_, lhr]) => lhr));
             const existing = existingStatistics.find(
@@ -331,10 +351,16 @@ class StorageMethod {
               },
               context
             );
-          })
+          },
+          {concurrency: 4}
         );
-      })
+
+        log(`created statistics for ${name}`);
+        return statistics;
+      },
+      {concurrency: 8}
     );
+    statisticsTimer.end();
 
     return {
       statistics: statistics.reduce((a, b) => a.concat(b)),

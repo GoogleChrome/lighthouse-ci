@@ -21,10 +21,12 @@
   },
   "dependencies": {
     "@lhci/utils": "0.1.0",
+    "bluebird": "^3.7.2",
     "body-parser": "^1.18.3",
     "compression": "^1.7.4",
     "cron": "^1.8.2",
     "dayjs": "^1.8.28",
+    "debug": "^4.3.1",
     "express": "^4.16.4",
     "express-basic-auth": "^1.2.0",
     "morgan": "^1.9.1",

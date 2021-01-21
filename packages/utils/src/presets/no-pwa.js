@@ -11,9 +11,6 @@ module.exports = {
   assertions: {
     ...recommended.assertions,
     // Every PWA audit is disabled
-    'load-fast-enough-for-pwa': 'off',
-    'works-offline': 'off',
-    'offline-start-url': 'off',
     'is-on-https': 'off',
     'service-worker': 'off',
     'installable-manifest': 'off',
@@ -22,7 +19,6 @@ module.exports = {
     'themed-omnibox': 'off',
     'content-width': 'off',
     viewport: 'off',
-    'without-javascript': 'off',
     'apple-touch-icon': 'off',
     'maskable-icon': 'off',
   },

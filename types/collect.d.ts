@@ -19,7 +19,7 @@ declare global {
         blockedUrlPatterns?: string[] | null;
         additionalTraceCategories?: string | null;
         disableStorageReset?: boolean;
-        emulatedFormFactor?: 'mobile' | 'desktop' | 'none';
+        formFactor?: 'none';
         throttlingMethod?: 'devtools' | 'simulate' | 'provided';
         throttling?: Record<string, number>;
         onlyAudits?: string[] | null;

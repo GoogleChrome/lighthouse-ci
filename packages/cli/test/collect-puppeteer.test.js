@@ -24,11 +24,12 @@ describe('Lighthouse CI collect CLI with puppeteer', () => {
         '-n=1',
         '--url=http://localhost:52426',
         '--start-server-command=node ./auth-server.js',
-        '--settings.emulatedFormFactor=none',
-        '--settings.chromeFlags="user-agent=lighthouseci"',
+        '--settings.preset=desktop',
+        '--settings.chromeFlags="user-agent=unused"',
+        '--settings.emulatedUserAgent=lighthouseci',
         '--puppeteer-script=./auth-server-script.js',
         '--puppeteer-launch-options.args=--no-sandbox',
-        '--puppeteer-launch-options.args=--user-agent=lighthouseci',
+        '--puppeteer-launch-options.args=--user-agent=unused',
       ],
       {cwd: autorunDir}
     );

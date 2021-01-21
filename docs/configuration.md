@@ -226,7 +226,7 @@ Options:
   --settings                 The Lighthouse settings and flags to use when collecting
   --numberOfRuns, -n         The number of times to run Lighthouse.            [number] [default: 3]
   --maxAutodiscoverUrls      The maximum number of pages to collect when using the staticDistDir
-                             option with no specified URL. Disable this limit by setting to 0.                                                
+                             option with no specified URL. Disable this limit by setting to 0.
                                                                                [number] [default: 5]
 ```
 
@@ -653,7 +653,7 @@ The result of any audit in Lighthouse can be asserted. Assertions are keyed by t
     "assert": {
       "assertions": {
         "first-contentful-paint": "off",
-        "works-offline": ["warn", {"minScore": 1}],
+        "installable-manifest": ["warn", {"minScore": 1}],
         "uses-responsive-images": ["error", {"maxLength": 0}]
       }
     }
@@ -1115,14 +1115,7 @@ If you're a Lighthouse pro, assert the recommended preset, increase the number o
   "ci": {
     "collect": {
       "settings": {
-        // Set the screen size
-        "emulatedFormFactor": "desktop",
-        // Define CPU and network characteristics
-        "throttling": {
-          "rttMs": 40,
-          "throughputKbps": 10240,
-          "cpuSlowdownMultiplier": 1
-        }
+        "preset": "desktop"
       }
     }
   }

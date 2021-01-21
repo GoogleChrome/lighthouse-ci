@@ -15,6 +15,8 @@ const baseLhr6_ = require('../fixtures/lh-6-0-0-coursehero-a.json');
 const baseLhr62_ = require('../fixtures/lh-6-2-0-coursehero-a.json');
 /** @type {any} */
 const baseLhr641_ = require('../fixtures/lh-6-4-1-coursehero-a.json');
+/** @type {any} */
+const baseLhr700_ = require('../fixtures/lh-7-0-0-coursehero-a.json');
 const {definitions} = require('../../src/api/statistic-definitions.js');
 
 describe('Statistic Definitions', () => {
@@ -26,6 +28,8 @@ describe('Statistic Definitions', () => {
   const baseLhr62 = baseLhr62_;
   /** @type {LH.Result} */
   const baseLhr641 = baseLhr641_;
+  /** @type {LH.Result} */
+  const baseLhr700 = baseLhr700_;
 
   describe('meta_lighthouse_version()', () => {
     const run = definitions.meta_lighthouse_version;
@@ -35,6 +39,7 @@ describe('Statistic Definitions', () => {
       expect(run([baseLhr6])).toEqual({value: 60000});
       expect(run([baseLhr62])).toEqual({value: 60200});
       expect(run([baseLhr641])).toEqual({value: 60401});
+      expect(run([baseLhr700])).toEqual({value: 70000});
       expect(run([{...baseLhr5, lighthouseVersion: '1.2.3-beta.0'}])).toEqual({value: 10203});
     });
 
@@ -56,6 +61,7 @@ describe('Statistic Definitions', () => {
       expect(run([baseLhr6, low, high]).value).toBeCloseTo(20253.43);
       expect(run([high, baseLhr62, low]).value).toBeCloseTo(19669.83);
       expect(run([high, baseLhr641, low]).value).toBeCloseTo(19945.48);
+      expect(run([high, baseLhr700, low]).value).toBeCloseTo(21206.92);
     });
   });
 
@@ -71,6 +77,7 @@ describe('Statistic Definitions', () => {
       expect(run([baseLhr6, low, high]).value).toBeCloseTo(0.16);
       expect(run([high, baseLhr62, low]).value).toBeCloseTo(0.28);
       expect(run([high, baseLhr641, low]).value).toBeCloseTo(0.2);
+      expect(run([high, baseLhr700, low]).value).toBeCloseTo(0.18);
     });
   });
 
@@ -86,6 +93,7 @@ describe('Statistic Definitions', () => {
       expect(run([baseLhr6, low, high]).value).toBeCloseTo(0.01);
       expect(run([high, baseLhr62, low]).value).toBeCloseTo(0.01);
       expect(run([high, baseLhr641, low]).value).toBeCloseTo(0.01);
+      expect(run([high, baseLhr700, low]).value).toBeCloseTo(0.01);
     });
   });
 
@@ -101,6 +109,7 @@ describe('Statistic Definitions', () => {
       expect(run([baseLhr6, low, high]).value).toBeCloseTo(0.99);
       expect(run([high, baseLhr62, low]).value).toBeCloseTo(0.99);
       expect(run([high, baseLhr641, low]).value).toBeCloseTo(0.99);
+      expect(run([high, baseLhr700, low]).value).toBeCloseTo(0.99);
     });
   });
 
@@ -110,14 +119,17 @@ describe('Statistic Definitions', () => {
       expect(definitions['auditgroup_a11y-aria_pass']([baseLhr6])).toEqual({value: 10});
       expect(definitions['auditgroup_a11y-aria_pass']([baseLhr62])).toEqual({value: 10});
       expect(definitions['auditgroup_a11y-aria_pass']([baseLhr641])).toEqual({value: 10});
+      expect(definitions['auditgroup_a11y-aria_pass']([baseLhr700])).toEqual({value: 10});
       expect(definitions['auditgroup_a11y-color-contrast_fail']([baseLhr5])).toEqual({value: 0});
       expect(definitions['auditgroup_a11y-color-contrast_fail']([baseLhr6])).toEqual({value: 1});
       expect(definitions['auditgroup_a11y-color-contrast_fail']([baseLhr62])).toEqual({value: 1});
       expect(definitions['auditgroup_a11y-color-contrast_fail']([baseLhr641])).toEqual({value: 1});
+      expect(definitions['auditgroup_a11y-color-contrast_fail']([baseLhr700])).toEqual({value: 1});
       expect(definitions['auditgroup_a11y-aria_na']([baseLhr5])).toEqual({value: 0});
       expect(definitions['auditgroup_a11y-aria_na']([baseLhr6])).toEqual({value: 2});
       expect(definitions['auditgroup_a11y-aria_na']([baseLhr62])).toEqual({value: 2});
       expect(definitions['auditgroup_a11y-aria_na']([baseLhr641])).toEqual({value: 2});
+      expect(definitions['auditgroup_a11y-aria_na']([baseLhr700])).toEqual({value: 7});
     });
   });
 });

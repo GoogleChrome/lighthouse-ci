@@ -35,7 +35,6 @@ async function runNewProjectWizard(options) {
       type: 'input',
       name: 'serverBaseUrl',
       message: 'What is the URL of your LHCI server?',
-      validate: input => !!input.length,
       default: 'https://your-lhci-server.example.com/',
     });
   }

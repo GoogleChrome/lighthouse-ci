@@ -29,33 +29,47 @@ async function runNewProjectWizard(options) {
   const fallbackProjectName = path.basename(process.cwd());
   const [defaultProjectName = fallbackProjectName] = (repoSlug && repoSlug.match(/[^/]+$/)) || [];
 
-  const responses = await inquirer.prompt([
-    {
+  const prompts = [];
+  if (!options.serverBaseUrl) {
+    prompts.push({
       type: 'input',
       name: 'serverBaseUrl',
       message: 'What is the URL of your LHCI server?',
-      default: options.serverBaseUrl || 'https://your-lhci-server.example.com/',
-    },
-    {
+      validate: input => !!input.length,
+      default: 'https://your-lhci-server.example.com/',
+    });
+  }
+  if (!options.projectName) {
+    prompts.push({
       type: 'input',
       name: 'projectName',
       message: 'What would you like to name the project?',
       validate: input => !!input.length,
       default: defaultProjectName,
-    },
-    {
+    });
+  }
+  if (!options.projectExternalUrl) {
+    prompts.push({
       type: 'input',
       name: 'projectExternalUrl',
       message: "Where is the project's code hosted?",
       default: `https://github.com/${repoSlug || '<org>/<repo>'}`,
-    },
-    {
+    });
+  }
+
+  if (!options.projectBaseBranch) {
+    prompts.push({
       type: 'input',
       name: 'projectBaseBranch',
       message: "What branch is considered the repo's trunk or main branch?",
       default: 'master',
-    },
-  ]);
+    });
+  }
+
+  const responses = {
+    ...options,
+    ...(await inquirer.prompt(prompts)),
+  };
 
   const api = new ApiClient({
     ...options,

@@ -486,7 +486,17 @@ The _build token_ is used by CI to upload new data to your server. It's not real
 
 The _admin token_ is used to edit or delete data within the project. **KEEP THIS SECRET - Anyone possessing the admin token can delete your entire project and all of the data within it**.
 
-If your lhci server is behind basic auth, you can provide the username and password via the `--basicAuth.password` and `--basicAuth.username` command line flags.
+All these options are available for `lhci wizard`
+
+| name                   | description                                       |
+| ---------------------- | ------------------------------------------------- |
+| `--wizard`             | new-project, reset-build-token, reset-admin-token |
+| `--serverBaseUrl`      | LHCI server url                                   |
+| `--basicAuth.username` | LHCI server username if any                       |
+| `--basicAuth.password` | LHCI server password if any                       |
+| `--projectName`        | Project name                                      |
+| `--projectExternalUrl` | Project repo url                                  |
+| `--projectBaseBranch`  | project base branch                               |
 
 ### Configuration
 

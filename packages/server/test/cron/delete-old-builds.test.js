@@ -45,13 +45,39 @@ describe('cron/delete-old-builds', () => {
       storageMethod.deleteBuild.mockClear();
       const deleteObjects = [{id: 'id-1', projectId: 'pid-1'}, {id: 'id-2', projectId: 'pid-2'}];
       storageMethod.findBuildsBeforeTimestamp.mockResolvedValue(deleteObjects);
-      await deleteOldBuilds(storageMethod, 30, new Date('2019-01-01'));
+      await deleteOldBuilds(storageMethod, 30, null, null);
       expect(storageMethod.deleteBuild).toHaveBeenCalledTimes(deleteObjects.length);
 
       expect(storageMethod.deleteBuild.mock.calls).toMatchObject([
         ['pid-1', 'id-1'],
         ['pid-2', 'id-2'],
       ]);
+    });
+
+    it('should delete only specified branches', async () => {
+      storageMethod.deleteBuild.mockClear();
+      const deleteObjects = [
+        {id: 'id-1', branch: 'master', projectId: 'pid-1'},
+        {id: 'id-2', branch: '123', projectId: 'pid-2'},
+      ];
+      storageMethod.findBuildsBeforeTimestamp.mockResolvedValue(deleteObjects);
+      await deleteOldBuilds(storageMethod, 30, null, ['master']);
+      expect(storageMethod.deleteBuild).toHaveBeenCalledTimes(1);
+
+      expect(storageMethod.deleteBuild.mock.calls).toMatchObject([['pid-1', 'id-1']]);
+    });
+
+    it('should exclude only specified branches', async () => {
+      storageMethod.deleteBuild.mockClear();
+      const deleteObjects = [
+        {id: 'id-1', branch: 'master', projectId: 'pid-1'},
+        {id: 'id-2', branch: '123', projectId: 'pid-2'},
+      ];
+      storageMethod.findBuildsBeforeTimestamp.mockResolvedValue(deleteObjects);
+      await deleteOldBuilds(storageMethod, 30, ['master'], null);
+      expect(storageMethod.deleteBuild).toHaveBeenCalledTimes(1);
+
+      expect(storageMethod.deleteBuild.mock.calls).toMatchObject([['pid-2', 'id-2']]);
     });
   });
 

@@ -12,16 +12,28 @@ const {normalizeCronSchedule} = require('./utils');
 /**
  * @param {LHCI.ServerCommand.StorageMethod} storageMethod
  * @param {number} maxAgeInDays
+ * @param {string[] | null} filterOutBranches
+ * @param {string[] | null} onlyBranches
  * @return {Promise<void>}
  */
-async function deleteOldBuilds(storageMethod, maxAgeInDays) {
+async function deleteOldBuilds(storageMethod, maxAgeInDays, filterOutBranches, onlyBranches) {
   if (!maxAgeInDays || !Number.isInteger(maxAgeInDays) || maxAgeInDays <= 0) {
     throw new Error('Invalid range');
   }
 
   const DAY_IN_MS = 24 * 60 * 60 * 1000;
   const cutoffTime = new Date(Date.now() - maxAgeInDays * DAY_IN_MS);
-  const oldBuilds = await storageMethod.findBuildsBeforeTimestamp(cutoffTime);
+  const oldBuilds = (await storageMethod.findBuildsBeforeTimestamp(cutoffTime)).filter(
+    ({branch}) => {
+      if (Array.isArray(filterOutBranches) && filterOutBranches.includes(branch)) {
+        return false;
+      }
+      if (Array.isArray(onlyBranches) && !onlyBranches.includes(branch)) return false;
+
+      return true;
+    }
+  );
+
   for (const {projectId, id} of oldBuilds) {
     await storageMethod.deleteBuild(projectId, id);
   }
@@ -37,19 +49,42 @@ function startDeleteOldBuildsCron(storageMethod, options) {
     return;
   }
 
-  if (!options.deleteOldBuildsCron.schedule || !options.deleteOldBuildsCron.maxAgeInDays) {
-    throw new Error('Cannot configure schedule');
-  }
-
   /** @type {(s: string) => void} */
   const log =
     options.logLevel === 'silent'
       ? () => {}
       : msg => process.stdout.write(`${new Date().toISOString()} - ${msg}\n`);
 
+  /**
+   *
+   * @type {LHCI.ServerCommand.DeleteOldBuildsCron[]}
+   */
+  const cronConfig = Array.isArray(options.deleteOldBuildsCron)
+    ? options.deleteOldBuildsCron
+    : [options.deleteOldBuildsCron];
+
+  cronConfig.forEach((config, index) => {
+    if (!config.schedule || !config.maxAgeInDays) {
+      throw new Error(
+        `Cannot configure schedule, because I haven't specified schedule field of maxAgeInDays field in item with index: ${index +
+          1}`
+      );
+    }
+
+    runCronJob(storageMethod, log, config);
+  });
+}
+
+/**
+ *
+ * @param {LHCI.ServerCommand.StorageMethod} storageMethod
+ * @param {(s: string) => void} log
+ * @param {LHCI.ServerCommand.DeleteOldBuildsCron} cronConfig
+ */
+function runCronJob(storageMethod, log, cronConfig) {
   let inProgress = false;
 
-  const {schedule, maxAgeInDays} = options.deleteOldBuildsCron;
+  const {schedule, maxAgeInDays, filterOutBranches = null, onlyBranches = null} = cronConfig;
 
   const cron = new CronJob(normalizeCronSchedule(schedule), () => {
     if (inProgress) {
@@ -58,7 +93,7 @@ function startDeleteOldBuildsCron(storageMethod, options) {
     }
     inProgress = true;
     log(`Starting delete old builds`);
-    deleteOldBuilds(storageMethod, maxAgeInDays)
+    deleteOldBuilds(storageMethod, maxAgeInDays, filterOutBranches, onlyBranches)
       .then(() => {
         log(`Successfully delete old builds`);
       })
@@ -69,6 +104,8 @@ function startDeleteOldBuildsCron(storageMethod, options) {
         inProgress = false;
       });
   });
+
   cron.start();
 }
+
 module.exports = {startDeleteOldBuildsCron, deleteOldBuilds};

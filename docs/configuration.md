@@ -973,14 +973,23 @@ _Optional_ The "branch" on which to report the results. Defaults to the base bra
 #### `deleteOldBuildsCron`
 
 The configuration to automatically delete old records. This job only works when `storage.storageMethod` is set `sql`.
+Might be an array of objects, or just a single object.
 
-##### `deleteOldBuildsCron.schedule`
+##### `deleteOldBuildsCron[i].schedule`
 
 The [cron-style](https://crontab.guru/) schedule on which to collect results.
 
-##### `deleteOldBuildsCron.maxAgeInDays`
+##### `deleteOldBuildsCron[i].maxAgeInDays`
 
 A number of days to keep a records.
+
+##### `deleteOldBuildsCron[i].onlyBranches`
+
+Array of branch names, which should be deleted
+
+##### `deleteOldBuildsCron[i].filterOutBranches`
+
+Array of branch names, which should be excluded during cleanup
 
 #### `basicAuth`
 

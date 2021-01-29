@@ -987,7 +987,7 @@ A number of days to keep a records.
 
 Array of branch names, which should be deleted
 
-##### `deleteOldBuildsCron[i].filterOutBranches`
+##### `deleteOldBuildsCron[i].skipBranches`
 
 Array of branch names, which should be excluded during cleanup
 

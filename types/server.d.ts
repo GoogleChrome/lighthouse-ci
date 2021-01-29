@@ -195,7 +195,7 @@ declare global {
         schedule: string;
         maxAgeInDays: number;
         onlyBranches?: string[];
-        filterOutBranches?: string[];
+        skipBranches?: string[];
       }
     }
   }

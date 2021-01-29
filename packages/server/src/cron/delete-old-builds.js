@@ -12,11 +12,11 @@ const {normalizeCronSchedule} = require('./utils');
 /**
  * @param {LHCI.ServerCommand.StorageMethod} storageMethod
  * @param {number} maxAgeInDays
- * @param {string[] | null} filterOutBranches
+ * @param {string[] | null} skipBranches
  * @param {string[] | null} onlyBranches
  * @return {Promise<void>}
  */
-async function deleteOldBuilds(storageMethod, maxAgeInDays, filterOutBranches, onlyBranches) {
+async function deleteOldBuilds(storageMethod, maxAgeInDays, skipBranches, onlyBranches) {
   if (!maxAgeInDays || !Number.isInteger(maxAgeInDays) || maxAgeInDays <= 0) {
     throw new Error('Invalid range');
   }
@@ -25,7 +25,7 @@ async function deleteOldBuilds(storageMethod, maxAgeInDays, filterOutBranches, o
   const cutoffTime = new Date(Date.now() - maxAgeInDays * DAY_IN_MS);
   const oldBuilds = (await storageMethod.findBuildsBeforeTimestamp(cutoffTime)).filter(
     ({branch}) => {
-      if (Array.isArray(filterOutBranches) && filterOutBranches.includes(branch)) {
+      if (Array.isArray(skipBranches) && skipBranches.includes(branch)) {
         return false;
       }
       if (Array.isArray(onlyBranches) && !onlyBranches.includes(branch)) return false;
@@ -66,7 +66,7 @@ function startDeleteOldBuildsCron(storageMethod, options) {
   cronConfig.forEach((config, index) => {
     if (!config.schedule || !config.maxAgeInDays) {
       throw new Error(
-        `Cannot configure schedule, because I haven't specified schedule field of maxAgeInDays field in item with index: ${index +
+        `Can't configure schedule because you didn't specify 'schedule' field or 'maxAgeInDays' field in item with index: ${index +
           1}`
       );
     }
@@ -84,7 +84,7 @@ function startDeleteOldBuildsCron(storageMethod, options) {
 function runCronJob(storageMethod, log, cronConfig) {
   let inProgress = false;
 
-  const {schedule, maxAgeInDays, filterOutBranches = null, onlyBranches = null} = cronConfig;
+  const {schedule, maxAgeInDays, skipBranches = null, onlyBranches = null} = cronConfig;
 
   const cron = new CronJob(normalizeCronSchedule(schedule), () => {
     if (inProgress) {
@@ -93,7 +93,7 @@ function runCronJob(storageMethod, log, cronConfig) {
     }
     inProgress = true;
     log(`Starting delete old builds`);
-    deleteOldBuilds(storageMethod, maxAgeInDays, filterOutBranches, onlyBranches)
+    deleteOldBuilds(storageMethod, maxAgeInDays, skipBranches, onlyBranches)
       .then(() => {
         log(`Successfully delete old builds`);
       })

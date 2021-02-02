@@ -66,8 +66,7 @@ function startDeleteOldBuildsCron(storageMethod, options) {
   cronConfig.forEach((config, index) => {
     if (!config.schedule || !config.maxAgeInDays) {
       throw new Error(
-        `Can't configure schedule because you didn't specify 'schedule' field or 'maxAgeInDays' field in item with index: ${index +
-          1}`
+        `Can't configure schedule because you didn't specify 'schedule' field or 'maxAgeInDays' field in item with index: ${index}`
       );
     }
 

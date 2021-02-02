@@ -116,9 +116,10 @@ describe('cron/delete-old-builds', () => {
             maxAgeInDays: 30,
           },
         },
+        "Can't configure schedule because you didn't specify 'schedule' field or 'maxAgeInDays' field in item with index: 0",
       ],
       [
-        'no dateRagne',
+        'no dateRange',
         {
           storage: {
             storageMethod: 'sql',
@@ -127,9 +128,46 @@ describe('cron/delete-old-builds', () => {
             schedule: '0 * * * *',
           },
         },
+        "Can't configure schedule because you didn't specify 'schedule' field or 'maxAgeInDays' field in item with index: 0",
       ],
-    ])('should throw for invalid options (%s)', (_, options) => {
-      expect(() => startDeleteOldBuildsCron(storageMethod, options)).toThrow(/Cannot configure/);
+      [
+        "item doesn't have schedule",
+        {
+          storage: {
+            storageMethod: 'sql',
+          },
+          deleteOldBuildsCron: [
+            {
+              schedule: '0 * * * *',
+              maxAgeInDays: 30,
+            },
+            {
+              maxAgeInDays: 30,
+            },
+          ],
+        },
+        "Can't configure schedule because you didn't specify 'schedule' field or 'maxAgeInDays' field in item with index: 1",
+      ],
+      [
+        "item doesn't have dateRange",
+        {
+          storage: {
+            storageMethod: 'sql',
+          },
+          deleteOldBuildsCron: [
+            {
+              schedule: '0 * * * *',
+              maxAgeInDays: 30,
+            },
+            {
+              schedule: '0 * * * *',
+            },
+          ],
+        },
+        "Can't configure schedule because you didn't specify 'schedule' field or 'maxAgeInDays' field in item with index: 1",
+      ],
+    ])('should throw for invalid options (%s)', (_, options, expectedErrorMessage) => {
+      expect(() => startDeleteOldBuildsCron(storageMethod, options)).toThrow(expectedErrorMessage);
     });
     it('should throw for invalid schedule', () => {
       const options = {

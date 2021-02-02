@@ -184,18 +184,23 @@ declare global {
           psiApiEndpoint?: string;
           sites: Array<PsiCollectEntry>;
         };
-        deleteOldBuildsCron?: {
-          schedule: string;
-          maxAgeInDays: number;
-        }
+        deleteOldBuildsCron?: DeleteOldBuildsCron | DeleteOldBuildsCron[];
         basicAuth?: {
           username?: string;
           password?: string;
         };
       }
+
+      export interface DeleteOldBuildsCron {
+        schedule: string;
+        maxAgeInDays: number;
+        onlyBranches?: string[];
+        skipBranches?: string[];
+      }
     }
   }
 }
+
 
 // empty export to keep file a module
 export {};

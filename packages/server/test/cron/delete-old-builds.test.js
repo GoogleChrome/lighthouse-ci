@@ -45,13 +45,39 @@ describe('cron/delete-old-builds', () => {
       storageMethod.deleteBuild.mockClear();
       const deleteObjects = [{id: 'id-1', projectId: 'pid-1'}, {id: 'id-2', projectId: 'pid-2'}];
       storageMethod.findBuildsBeforeTimestamp.mockResolvedValue(deleteObjects);
-      await deleteOldBuilds(storageMethod, 30, new Date('2019-01-01'));
+      await deleteOldBuilds(storageMethod, 30, null, null);
       expect(storageMethod.deleteBuild).toHaveBeenCalledTimes(deleteObjects.length);
 
       expect(storageMethod.deleteBuild.mock.calls).toMatchObject([
         ['pid-1', 'id-1'],
         ['pid-2', 'id-2'],
       ]);
+    });
+
+    it('should delete only specified branches', async () => {
+      storageMethod.deleteBuild.mockClear();
+      const deleteObjects = [
+        {id: 'id-1', branch: 'master', projectId: 'pid-1'},
+        {id: 'id-2', branch: '123', projectId: 'pid-2'},
+      ];
+      storageMethod.findBuildsBeforeTimestamp.mockResolvedValue(deleteObjects);
+      await deleteOldBuilds(storageMethod, 30, null, ['master']);
+      expect(storageMethod.deleteBuild).toHaveBeenCalledTimes(1);
+
+      expect(storageMethod.deleteBuild.mock.calls).toMatchObject([['pid-1', 'id-1']]);
+    });
+
+    it('should exclude only specified branches', async () => {
+      storageMethod.deleteBuild.mockClear();
+      const deleteObjects = [
+        {id: 'id-1', branch: 'master', projectId: 'pid-1'},
+        {id: 'id-2', branch: '123', projectId: 'pid-2'},
+      ];
+      storageMethod.findBuildsBeforeTimestamp.mockResolvedValue(deleteObjects);
+      await deleteOldBuilds(storageMethod, 30, ['master'], null);
+      expect(storageMethod.deleteBuild).toHaveBeenCalledTimes(1);
+
+      expect(storageMethod.deleteBuild.mock.calls).toMatchObject([['pid-2', 'id-2']]);
     });
   });
 
@@ -90,9 +116,10 @@ describe('cron/delete-old-builds', () => {
             maxAgeInDays: 30,
           },
         },
+        "Can't configure schedule because you didn't specify 'schedule' field or 'maxAgeInDays' field in item with index: 0",
       ],
       [
-        'no dateRagne',
+        'no dateRange',
         {
           storage: {
             storageMethod: 'sql',
@@ -101,9 +128,46 @@ describe('cron/delete-old-builds', () => {
             schedule: '0 * * * *',
           },
         },
+        "Can't configure schedule because you didn't specify 'schedule' field or 'maxAgeInDays' field in item with index: 0",
       ],
-    ])('should throw for invalid options (%s)', (_, options) => {
-      expect(() => startDeleteOldBuildsCron(storageMethod, options)).toThrow(/Cannot configure/);
+      [
+        "item doesn't have schedule",
+        {
+          storage: {
+            storageMethod: 'sql',
+          },
+          deleteOldBuildsCron: [
+            {
+              schedule: '0 * * * *',
+              maxAgeInDays: 30,
+            },
+            {
+              maxAgeInDays: 30,
+            },
+          ],
+        },
+        "Can't configure schedule because you didn't specify 'schedule' field or 'maxAgeInDays' field in item with index: 1",
+      ],
+      [
+        "item doesn't have dateRange",
+        {
+          storage: {
+            storageMethod: 'sql',
+          },
+          deleteOldBuildsCron: [
+            {
+              schedule: '0 * * * *',
+              maxAgeInDays: 30,
+            },
+            {
+              schedule: '0 * * * *',
+            },
+          ],
+        },
+        "Can't configure schedule because you didn't specify 'schedule' field or 'maxAgeInDays' field in item with index: 1",
+      ],
+    ])('should throw for invalid options (%s)', (_, options, expectedErrorMessage) => {
+      expect(() => startDeleteOldBuildsCron(storageMethod, options)).toThrow(expectedErrorMessage);
     });
     it('should throw for invalid schedule', () => {
       const options = {

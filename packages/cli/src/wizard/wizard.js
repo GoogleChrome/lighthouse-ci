@@ -29,7 +29,9 @@ async function runNewProjectWizard(options) {
   const fallbackProjectName = path.basename(process.cwd());
   const [defaultProjectName = fallbackProjectName] = (repoSlug && repoSlug.match(/[^/]+$/)) || [];
 
+  /** @type {Array<import('inquirer').Question>} */
   const prompts = [];
+
   if (!options.serverBaseUrl) {
     prompts.push({
       type: 'input',
@@ -43,6 +45,10 @@ async function runNewProjectWizard(options) {
       type: 'input',
       name: 'projectName',
       message: 'What would you like to name the project?',
+      /**
+       * @param {string} input
+       * @return {boolean}
+       */
       validate: input => !!input.length,
       default: defaultProjectName,
     });

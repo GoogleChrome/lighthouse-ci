@@ -74,6 +74,34 @@ describe('wizard CLI', () => {
       });
     }, 30000);
 
+    it('should create a new project with arguments', async () => {
+      server.process.kill();
+      server = await startServer(server.sqlFile, ['--basicAuth.password=lighthouse']);
+
+      const {stdout, stderr, status} = await runWizardCLI(
+        [
+          '--wizard=new-project',
+          '--basicAuth.username=admin',
+          '--basicAuth.password=io',
+          '--serverBaseUrl="https://lighthouse.hello.world"',
+          '--projectName="some-new-project"',
+          '--projectExternalUrl="https://somewhere.else"',
+          '--projectBaseBranch="master"',
+        ],
+        [
+          // '', // Just ENTER key to select "new-project"
+          // '', // Just ENTER key to use serverBaseUrl from config file
+          // 'OtherCIProjectName', // Project name
+          // 'https://example.com', // External build URL
+          // '', // Default baseBranch
+        ]
+      );
+
+      expect(stderr).toEqual('');
+      expect(status).toEqual(0);
+      expect(stdout).toContain(`http://localhost:${server.port}`);
+    }, 30000);
+
     it('should create a new project with config file', async () => {
       server.process.kill();
       server = await startServer(server.sqlFile, ['--basicAuth.password=lighthouse']);

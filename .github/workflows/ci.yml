@@ -87,3 +87,8 @@ jobs:
       - run: yarn test:lint
       - name: Run yarn test:unit
         run: yarn test:unit || yarn test:unit || yarn test:unit
+      - run: yarn ci:dogfood
+        env:
+          LHCI_CANARY_SERVER_URL: https://lhci-canary.herokuapp.com/
+          LHCI_CANARY_SERVER_TOKEN: ${{ secrets.LHCI_CANARY_SERVER_TOKEN }}
+          LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}

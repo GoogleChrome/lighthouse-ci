@@ -56,9 +56,9 @@ gcloud config set compute/zone "$COMPUTE_ZONE"
 gcloud container clusters create lhci-cluster --num-nodes=1
 
 # Deploy the LHCI server
-curl -O https://raw.githubusercontent.com/GoogleChrome/lighthouse-ci/master/docs/recipes/docker-server/kubernetes/lhci-data-claim.yml
-curl -O https://raw.githubusercontent.com/GoogleChrome/lighthouse-ci/master/docs/recipes/docker-server/kubernetes/lhci-deployment.yml
-curl -O https://raw.githubusercontent.com/GoogleChrome/lighthouse-ci/master/docs/recipes/docker-server/kubernetes/lhci-service.yml
+curl -O https://raw.githubusercontent.com/GoogleChrome/lighthouse-ci/main/docs/recipes/docker-server/kubernetes/lhci-data-claim.yml
+curl -O https://raw.githubusercontent.com/GoogleChrome/lighthouse-ci/main/docs/recipes/docker-server/kubernetes/lhci-deployment.yml
+curl -O https://raw.githubusercontent.com/GoogleChrome/lighthouse-ci/main/docs/recipes/docker-server/kubernetes/lhci-service.yml
 kubectl apply -f ./lhci-data-claim.yml
 kubectl apply -f ./lhci-deployment.yml
 kubectl apply -f ./lhci-service.yml

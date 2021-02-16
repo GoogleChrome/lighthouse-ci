@@ -8,8 +8,8 @@ if [ -n "$(git status --porcelain)" ]; then
   exit 1
 fi
 
-if [[ "$(git rev-parse --abbrev-ref HEAD)" != "master" ]]; then
-  echo "Cannot deploy to gh-pages on a branch other than master!"
+if [[ "$(git rev-parse --abbrev-ref HEAD)" != "main" ]]; then
+  echo "Cannot deploy to gh-pages on a branch other than main!"
   git --no-pager branch
   exit 1
 fi
@@ -36,4 +36,4 @@ git commit -m 'gh pages deploy'
 git push -uf origin gh-pages
 
 # Cleanup
-git checkout -f master
+git checkout -f main

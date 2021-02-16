@@ -4,9 +4,9 @@
 
 ## About
 
-The Lighthouse CI CLI enables running Lighthouse from various CI environments.  Read the [Lighthouse CI docs](https://github.com/GoogleChrome/lighthouse-ci/blob/master/README.md) to learn more.
+The Lighthouse CI CLI enables running Lighthouse from various CI environments. Read the [Lighthouse CI docs](https://github.com/GoogleChrome/lighthouse-ci/blob/main/README.md) to learn more.
 
 ## Acronyms
 
-* CI: Continuous Integration
-* CLI: Command Line Interface
+- CI: Continuous Integration
+- CLI: Command Line Interface

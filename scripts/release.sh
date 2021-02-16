@@ -8,14 +8,14 @@ if [ -n "$(git status --porcelain)" ]; then
   exit 1
 fi
 
-if [[ "$(git rev-parse --abbrev-ref HEAD)" != "master" ]]; then
-  echo "Cannot release on a branch other than master!"
+if [[ "$(git rev-parse --abbrev-ref HEAD)" != "main" ]]; then
+  echo "Cannot release on a branch other than main!"
   git --no-pager branch
   exit 1
 fi
 
-git fetch origin master
-if [[ "$(git rev-parse master)" != "$(git rev-parse origin/master)" ]]; then
+git fetch origin main
+if [[ "$(git rev-parse main)" != "$(git rev-parse origin/main)" ]]; then
   echo "Can only publish when changes are synced with origin."
   exit 1
 fi

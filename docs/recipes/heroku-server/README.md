@@ -12,8 +12,8 @@ The LHCI server can be run in any node environment with persistent disk storage 
 # Create a directory and repo for your heroku project
 mkdir lhci-heroku && cd lhci-heroku && git init
 # Setup the LHCI files
-curl https://raw.githubusercontent.com/GoogleChrome/lighthouse-ci/master/docs/recipes/heroku-server/package.json > package.json
-curl https://raw.githubusercontent.com/GoogleChrome/lighthouse-ci/master/docs/recipes/heroku-server/server.js > server.js
+curl https://raw.githubusercontent.com/GoogleChrome/lighthouse-ci/main/docs/recipes/heroku-server/package.json > package.json
+curl https://raw.githubusercontent.com/GoogleChrome/lighthouse-ci/main/docs/recipes/heroku-server/server.js > server.js
 # Create the project's first commit
 git add package.json server.js && git commit -m 'Initial commit'
 ```

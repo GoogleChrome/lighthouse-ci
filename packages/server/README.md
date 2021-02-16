@@ -4,7 +4,7 @@
 
 ## About
 
-The Lighthouse CI Server enables running a server to display Lighthouse CI results. Read the [Lighthouse CI docs](https://github.com/GoogleChrome/lighthouse-ci/blob/master/README.md) and specifically the [LHCI Server docs](https://github.com/GoogleChrome/lighthouse-ci/blob/master/docs/server.md) to learn more.
+The Lighthouse CI Server enables running a server to display Lighthouse CI results. Read the [Lighthouse CI docs](https://github.com/GoogleChrome/lighthouse-ci/blob/main/README.md) and specifically the [LHCI Server docs](https://github.com/GoogleChrome/lighthouse-ci/blob/main/docs/server.md) to learn more.
 
 ## Acronyms
 

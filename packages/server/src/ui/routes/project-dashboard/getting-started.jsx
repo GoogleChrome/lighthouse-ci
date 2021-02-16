@@ -23,7 +23,7 @@ export const ProjectGettingStarted = props => {
           No build data yet for {props.project.name}! Add the <pre>@lhci/cli</pre> package to your
           continuous integration to{' '}
           <a
-            href="https://github.com/GoogleChrome/lighthouse-ci/blob/master/docs/getting-started.md"
+            href="https://github.com/GoogleChrome/lighthouse-ci/blob/main/docs/getting-started.md"
             target="_blank"
             rel="noopener noreferrer"
           >

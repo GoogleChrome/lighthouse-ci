@@ -24,7 +24,7 @@ describe('Lighthouse CI autorun CLI with startServerCommand', () => {
     server = await startServer(undefined, ['--basicAuth.password=foobar']);
     serverBaseUrl = `http://localhost:${server.port}/`;
     const apiClient = new ApiClient({rootURL: serverBaseUrl, basicAuth: {password: 'foobar'}});
-    project = await apiClient.createProject({name: 'Test'});
+    project = await apiClient.createProject({name: 'Test', baseBranch: 'main'});
 
     const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'lighthouse-ci-'));
     tmpConfigFile = path.join(tmpDir, 'config.json');

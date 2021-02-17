@@ -16,6 +16,7 @@ module.exports = {
         'uses-rel-preload': 'off',
         'uses-responsive-images': 'off',
         'uses-rel-preconnect': 'off',
+        'preload-lcp-image': 'off',
         'offscreen-images': 'off',
         'unused-javascript': 'off',
 

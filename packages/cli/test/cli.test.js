@@ -68,7 +68,7 @@ describe('Lighthouse CI CLI', () => {
           `http://localhost:${server.port}`, // The base URL to talk to
           'AwesomeCIProjectName', // Project name
           'https://example.com', // External build URL
-          '', // Default baseBranch
+          'main', // main baseBranch
         ]
       );
 

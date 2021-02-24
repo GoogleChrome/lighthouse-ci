@@ -455,7 +455,7 @@ You can use the CI server to...
 - Identify regressions in category score or metric performance to specific commits
 - View detailed diffs between any two Lighthouse reports to find the root cause of a regression
 
-The process for setting up the server involve commands across a couple different machines and will very depending on your specific infrastructure setup,
+The process for setting up the server involve commands across a couple different machines and will vary depending on your specific infrastructure setup.
 
 ### Deployment
 

@@ -194,7 +194,7 @@ function getCommitMessage(hash = 'HEAD') {
     // Manual override
     'LHCI_BUILD_CONTEXT__COMMIT_MESSAGE',
   ]);
-  if (envHash) return envHash;
+  if (envHash) return envHash.trim().slice(0, 80);
 
   const result = childProcess.spawnSync('git', ['log', '--format=%s', '-n', '1', hash], {
     encoding: 'utf8',
@@ -218,7 +218,7 @@ function getAuthor(hash = 'HEAD') {
     // Manual override
     'LHCI_BUILD_CONTEXT__AUTHOR',
   ]);
-  if (envHash) return envHash;
+  if (envHash) return envHash.trim().slice(0, 256);
 
   const result = childProcess.spawnSync('git', ['log', '--format=%aN <%aE>', '-n', '1', hash], {
     encoding: 'utf8',

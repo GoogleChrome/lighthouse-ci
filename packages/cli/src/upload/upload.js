@@ -560,10 +560,13 @@ async function runFilesystemTarget(options) {
       isRepresentativeRun: representativeLhrs.includes(lhr),
       htmlPath: path.join(targetDir, htmlPath),
       jsonPath: path.join(targetDir, jsonPath),
-      summary: Object.keys(lhr.categories).reduce((summary, key) => {
-        summary[key] = lhr.categories[key].score;
-        return summary;
-      }, /** @type {Record<string, number>} */ ({})),
+      summary: Object.keys(lhr.categories).reduce(
+        (summary, key) => {
+          summary[key] = lhr.categories[key].score;
+          return summary;
+        },
+        /** @type {Record<string, number>} */ ({})
+      ),
     };
 
     fs.writeFileSync(entry.htmlPath, getHTMLReportForLHR(lhr));

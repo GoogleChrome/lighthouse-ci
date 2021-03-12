@@ -247,8 +247,8 @@ async function runGithubStatusCheck(options, targetUrlMap) {
     for (const group of groupedResults) {
       const rawUrl = group[0].url;
       const urlLabel = getUrlLabelForGithub(rawUrl, options);
-      const failedResults = group.filter(result => result.level === 'error' && result.passed === false);
-      const warnResults = group.filter(result => result.level === 'warn' && result.passed === false);
+      const failedResults = group.filter(result => result.level === 'error' && !result.passed);
+      const warnResults = group.filter(result => result.level === 'warn' && !result.passed);
       const state = failedResults.length ? 'failure' : 'success';
       const context = getGitHubContext(urlLabel, options);
       const warningsLabel = warnResults.length ? ` with ${warnResults.length} warning(s)` : '';
@@ -560,13 +560,10 @@ async function runFilesystemTarget(options) {
       isRepresentativeRun: representativeLhrs.includes(lhr),
       htmlPath: path.join(targetDir, htmlPath),
       jsonPath: path.join(targetDir, jsonPath),
-      summary: Object.keys(lhr.categories).reduce(
-        (summary, key) => {
-          summary[key] = lhr.categories[key].score;
-          return summary;
-        },
-        /** @type {Record<string, number>} */ ({})
-      ),
+      summary: Object.keys(lhr.categories).reduce((summary, key) => {
+        summary[key] = lhr.categories[key].score;
+        return summary;
+      }, /** @type {Record<string, number>} */ ({})),
     };
 
     fs.writeFileSync(entry.htmlPath, getHTMLReportForLHR(lhr));

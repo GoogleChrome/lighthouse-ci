@@ -165,6 +165,9 @@ async function postStatusToGitHub(options) {
   } else {
     const url = `${githubApiHost}/repos/${slug}/statuses/${hash}`;
     const payload = {state, context, description, target_url: targetUrl};
+    if (process.env.NODE_ENV === 'test') {
+      console.debug(payload);
+    }
     response = await fetch(url, {
       method: 'POST',
       headers: {'Content-Type': 'application/json', Authorization: `token ${githubToken}`},

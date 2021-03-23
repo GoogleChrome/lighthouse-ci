@@ -91,9 +91,9 @@ describe('Lighthouse CI autorun CLI with GitHub status check', () => {
       {\\"message\\":\\"Bad credentials\\",\\"documentation_url\\":\\"https://docs.github.com/rest\\"}
 
       {
-        state: 'failure',
+        state: 'success',
         context: 'lhci/url/good.html',
-        description: 'Failed 1 assertion(s)',
+        description: 'Passed',
         target_url: 'https://storage.googleapis.com/lighthouse-infrastructure.appspot.com/reports/XXXX-XXXX.report.html'
       }
       GitHub responded with 401

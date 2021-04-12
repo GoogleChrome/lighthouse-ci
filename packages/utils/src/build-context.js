@@ -200,7 +200,7 @@ function getCommitMessage(hash = 'HEAD') {
     // GitLab CI
     'CI_COMMIT_MESSAGE',
   ]);
-  if (envHash) return envHash;
+  if (envHash) return envHash.trim().slice(0, 80);
 
   const result = childProcess.spawnSync('git', ['log', '--format=%s', '-n', '1', hash], {
     encoding: 'utf8',
@@ -226,7 +226,7 @@ function getAuthor(hash = 'HEAD') {
     // GitLab CI: https://gitlab.com/gitlab-org/gitlab/-/issues/284079
     'CI_COMMIT_AUTHOR',
   ]);
-  if (envHash) return envHash;
+  if (envHash) return envHash.trim().slice(0, 256);
 
   const result = childProcess.spawnSync('git', ['log', '--format=%aN <%aE>', '-n', '1', hash], {
     encoding: 'utf8',

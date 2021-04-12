@@ -225,8 +225,10 @@ class SqlStorageMethod {
     if (!statisticModelDefn.attributes.projectId.references) throw new Error('Invalid runModel');
     if (!statisticModelDefn.attributes.buildId.references) throw new Error('Invalid runModel');
 
+    log('[initialize] initializing database connection');
     const sequelize = createSequelize(options);
 
+    log('[initialize] defining models');
     const projectModel = sequelize.define(projectModelDefn.tableName, projectModelDefn.attributes);
 
     buildModelDefn.attributes.projectId.references.model = projectModel;
@@ -245,10 +247,13 @@ class SqlStorageMethod {
 
     const umzug = createUmzug(sequelize, options);
     if (options.sqlDangerouslyResetDatabase) {
+      log('[initialize] resetting database');
       await umzug.down({to: 0});
     }
 
+    log('[initialize] running migrations');
     await umzug.up();
+    log('[initialize] migrations performed');
 
     this._sequelize = {sequelize, projectModel, buildModel, runModel, statisticModel};
   }

@@ -132,7 +132,7 @@ version: 2.1
 jobs:
   build:
     docker:
-      - image: circleci/node:10.16-browsers
+      - image: circleci/node:15.12-browsers
     working_directory: ~/your-project
     steps:
       - checkout

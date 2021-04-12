@@ -86,6 +86,11 @@ describe('build-context.js', () => {
       process.env.LHCI_BUILD_CONTEXT__COMMIT_MESSAGE = 'Daily run';
       expect(buildContext.getCommitMessage(hash)).toEqual('Daily run');
     });
+
+    it('should limit the message to 80 characters', () => {
+      process.env.LHCI_BUILD_CONTEXT__COMMIT_MESSAGE = 'a'.repeat(1000);
+      expect(buildContext.getCommitMessage(hash)).toEqual('a'.repeat(80));
+    });
   });
 
   describe('#getAuthor()', () => {
@@ -96,6 +101,11 @@ describe('build-context.js', () => {
     it('should respect env override', () => {
       process.env.LHCI_BUILD_CONTEXT__AUTHOR = 'Paul Irish <paulirish@google.com>';
       expect(buildContext.getAuthor(hash)).toEqual('Paul Irish <paulirish@google.com>');
+    });
+
+    it('should limit the message to 256 characters', () => {
+      process.env.LHCI_BUILD_CONTEXT__AUTHOR = 'a'.repeat(1000);
+      expect(buildContext.getAuthor(hash)).toEqual('a'.repeat(256));
     });
   });
 

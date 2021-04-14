@@ -80,7 +80,7 @@ function validatePartialUuidOrUndefined(id) {
 function createSequelize(options) {
   const dialect = options.sqlDialect;
   const sequelizeOptions = {
-    logging: msg => logVerbose('[sequelize]', msg),
+    logging: /** @param {*} msg */ msg => logVerbose('[sequelize]', msg),
     ...options.sequelizeOptions,
     operatorsAliases: false,
   };
@@ -134,7 +134,7 @@ function createSequelize(options) {
  */
 function createUmzug(sequelize, options) {
   return new Umzug({
-    logging: msg => logVerbose('[umzug]', msg),
+    logging: /** @param {*} msg */ msg => logVerbose('[umzug]', msg),
     storage: 'sequelize',
     storageOptions: {sequelize: /** @type {*} */ (sequelize)},
     migrations: {

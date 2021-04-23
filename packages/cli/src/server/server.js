@@ -23,7 +23,7 @@ function buildCommand(yargs) {
       type: 'number',
       default: 9001,
     },
-    listenHost: {
+    host: {
       type: 'string',
     },
     'storage.storageMethod': {

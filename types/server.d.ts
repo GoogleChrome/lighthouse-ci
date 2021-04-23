@@ -178,7 +178,7 @@ declare global {
       export interface Options {
         logLevel: 'silent' | 'verbose';
         port: number;
-        listenHost?: string
+        host?: string
         storage: StorageOptions;
         psiCollectCron?: {
           psiApiKey: string;

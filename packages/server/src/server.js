@@ -96,7 +96,7 @@ async function createServer(options) {
 
     const listenOptions = {
       port: options.port,
-      host: options.listenHost,
+      host: options.host,
     };
 
     server.listen(listenOptions, () => {

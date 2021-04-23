@@ -887,6 +887,10 @@ Options:
 #### `port`
 
 The port for the server to listen on. A value of `0` will use a random available port.
+https://nodejs.org/api/net.html#net_server_listen_port_host_backlog_callback
+#### `host`
+
+The host to bind the server to. The [default](https://nodejs.org/api/net.html#net_server_listen_port_host_backlog_callback) is to use the [unspecified IPv6 address](https://en.wikipedia.org/wiki/IPv6_address#Unspecified_address) (::) when IPv6 is available, or the [unspecified IPv4 address](https://en.wikipedia.org/wiki/0.0.0.0) (0.0.0.0) otherwise. To only accept connections on IPv4 use `0.0.0.0` as host.
 
 #### `storage`
 

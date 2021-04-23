@@ -94,7 +94,12 @@ async function createServer(options) {
 
     server.on('error', err => reject(err));
 
-    server.listen(options.port, () => {
+    const listenOptions = {
+      port: options.port,
+      host: options.host,
+    };
+
+    server.listen(listenOptions, () => {
       const serverAddress = server.address();
       const listenPort =
         typeof serverAddress === 'string' || !serverAddress ? options.port : serverAddress.port;

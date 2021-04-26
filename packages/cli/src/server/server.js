@@ -23,6 +23,9 @@ function buildCommand(yargs) {
       type: 'number',
       default: 9001,
     },
+    host: {
+      type: 'string',
+    },
     'storage.storageMethod': {
       type: 'string',
       choices: ['sql', 'spanner'],

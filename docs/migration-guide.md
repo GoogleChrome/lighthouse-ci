@@ -12,6 +12,45 @@ Patch version updates typically require no specific action on the user's part (s
 
 LHCI commits to ensuring that the CLI of version `n` will always be compatible with the server of version `n - 1`. This ensures that smooth migrations between versions proceed by first updating your `@lhci/cli` dependencies followed by updating the server to match. The reverse statement is not true. Upgrading the server before upgrading clients may result in lost data.
 
+## `0.6.0` to `0.7.0`
+
+### Affected Usage Patterns
+
+- `lighthouse:*` assertion preset usage (new audits asserted, assertions could fail)
+- `assert` usage (some audits removed and scores changed, assertions could fail)
+
+If your use of Lighthouse CI doesn't follow any of these patterns, you will likely see no breaking changes.
+
+### Breaking Changes
+
+- [Lighthouse 7.0.0](https://github.com/GoogleChrome/lighthouse/releases/tag/v7.0.0) is now used, several category score changes and different audits in the recommended preset.
+
+## `0.5.0` to `0.6.0`
+
+### Affected Usage Patterns
+
+- `lighthouse:*` assertion preset usage (new audits asserted, assertions could fail)
+- `assert` usage (some audits removed and scores changed, assertions could fail)
+
+If your use of Lighthouse CI doesn't follow any of these patterns, you will likely see no breaking changes.
+
+### Breaking Changes
+
+- Lighthouse 6.4.1 is now used, several category score changes and new audits in the recommended preset.
+
+## `0.4.0` to `0.5.0`
+
+### Affected Usage Patterns
+
+- `lighthouse:*` assertion preset usage (new audits asserted, assertions could fail)
+- `assert` usage (some audits removed and scores changed, assertions could fail)
+
+If your use of Lighthouse CI doesn't follow any of these patterns, you will likely see no breaking changes.
+
+### Breaking Changes
+
+- Lighthouse 6.2.0 is now used, several category score changes and new audits in the recommended preset.
+
 ## `0.3.0` to `0.4.0`
 
 ### Affected Usage Patterns

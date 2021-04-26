@@ -85,10 +85,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Use Node.js 10.x
+      - name: Use Node.js 12.x
         uses: actions/setup-node@v1
         with:
-          node-version: 10.x
+          node-version: 12.x
       - name: npm install, build
         run: |
           npm install
@@ -132,7 +132,7 @@ version: 2.1
 jobs:
   build:
     docker:
-      - image: circleci/node:10.16-browsers
+      - image: circleci/node:15.12-browsers
     working_directory: ~/your-project
     steps:
       - checkout
@@ -455,7 +455,7 @@ You can use the CI server to...
 - Identify regressions in category score or metric performance to specific commits
 - View detailed diffs between any two Lighthouse reports to find the root cause of a regression
 
-The process for setting up the server involve commands across a couple different machines and will very depending on your specific infrastructure setup,
+The process for setting up the server involves commands across a couple different machines and will vary depending on your specific infrastructure setup.
 
 ### Deployment
 

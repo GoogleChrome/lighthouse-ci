@@ -37,6 +37,8 @@ function getGitRemote() {
   const envHash = getEnvVarIfSet([
     // Manual override
     'LHCI_BUILD_CONTEXT__GIT_REMOTE',
+    // GitLab CI
+    'CI_REPOSITORY_URL',
   ]);
   if (envHash) return envHash;
 
@@ -90,6 +92,8 @@ function getCommitTime(hash) {
   const envHash = getEnvVarIfSet([
     // Manual override
     'LHCI_BUILD_CONTEXT__COMMIT_TIME',
+    // GitLab CI
+    'CI_COMMIT_TIMESTAMP',
   ]);
   if (envHash) return envHash;
 
@@ -193,8 +197,10 @@ function getCommitMessage(hash = 'HEAD') {
   const envHash = getEnvVarIfSet([
     // Manual override
     'LHCI_BUILD_CONTEXT__COMMIT_MESSAGE',
+    // GitLab CI
+    'CI_COMMIT_MESSAGE',
   ]);
-  if (envHash) return envHash;
+  if (envHash) return envHash.trim().slice(0, 80);
 
   const result = childProcess.spawnSync('git', ['log', '--format=%s', '-n', '1', hash], {
     encoding: 'utf8',
@@ -217,8 +223,10 @@ function getAuthor(hash = 'HEAD') {
   const envHash = getEnvVarIfSet([
     // Manual override
     'LHCI_BUILD_CONTEXT__AUTHOR',
+    // GitLab CI: https://gitlab.com/gitlab-org/gitlab/-/issues/284079
+    'CI_COMMIT_AUTHOR',
   ]);
-  if (envHash) return envHash;
+  if (envHash) return envHash.trim().slice(0, 256);
 
   const result = childProcess.spawnSync('git', ['log', '--format=%aN <%aE>', '-n', '1', hash], {
     encoding: 'utf8',
@@ -325,8 +333,10 @@ function getAncestorHash(hash, baseBranch) {
   const envHash = getEnvVarIfSet([
     // Manual override
     'LHCI_BUILD_CONTEXT__ANCESTOR_HASH',
+    // GitLab CI
+    'CI_COMMIT_BEFORE_SHA',
   ]);
-  if (envHash) return envHash;
+  if (envHash && envHash !== '0000000000000000000000000000000000000000') return envHash;
 
   return getCurrentBranch() === baseBranch
     ? getAncestorHashForBase(hash)

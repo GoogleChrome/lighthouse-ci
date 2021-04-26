@@ -7,6 +7,7 @@
 
 /** @typedef {{port: number, close: () => Promise<void>, storageMethod: StorageMethod}} ServerInstance */
 
+const log = require('debug')('lhci:server:sql');
 const path = require('path');
 const createHttpServer = require('http').createServer;
 const express = require('express');
@@ -30,9 +31,11 @@ const DIST_FOLDER = path.join(__dirname, '../dist');
 async function createApp(options) {
   const {storage} = options;
 
+  log('[createApp] initializing storage method');
   const storageMethod = StorageMethod.from(storage);
   await storageMethod.initialize(storage);
 
+  log('[createApp] creating express app');
   const context = {storageMethod, options};
   const app = express();
   if (options.logLevel !== 'silent') app.use(morgan('short'));
@@ -58,6 +61,7 @@ async function createApp(options) {
   app.get('/app/*', (_, res) => res.sendFile(path.join(DIST_FOLDER, 'index.html')));
   app.use(errorMiddleware);
 
+  log('[createApp] launching cron jobs');
   startPsiCollectCron(storageMethod, options);
   startDeleteOldBuildsCron(storageMethod, options);
 
@@ -71,7 +75,7 @@ async function createApp(options) {
 async function createServer(options) {
   const {app, storageMethod} = await createApp(options);
 
-  return new Promise(resolve => {
+  return new Promise((resolve, reject) => {
     const server = createHttpServer(app);
 
     // Node default socket timeout is 2 minutes.
@@ -88,7 +92,14 @@ async function createServer(options) {
       });
     });
 
-    server.listen(options.port, () => {
+    server.on('error', err => reject(err));
+
+    const listenOptions = {
+      port: options.port,
+      host: options.host,
+    };
+
+    server.listen(listenOptions, () => {
       const serverAddress = server.address();
       const listenPort =
         typeof serverAddress === 'string' || !serverAddress ? options.port : serverAddress.port;

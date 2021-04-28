@@ -247,8 +247,8 @@ async function runGithubStatusCheck(options, targetUrlMap) {
     for (const group of groupedResults) {
       const rawUrl = group[0].url;
       const urlLabel = getUrlLabelForGithub(rawUrl, options);
-      const failedResults = group.filter(result => result.level === 'error');
-      const warnResults = group.filter(result => result.level === 'warn');
+      const failedResults = group.filter(result => result.level === 'error' && !result.passed);
+      const warnResults = group.filter(result => result.level === 'warn' && !result.passed);
       const state = failedResults.length ? 'failure' : 'success';
       const context = getGitHubContext(urlLabel, options);
       const warningsLabel = warnResults.length ? ` with ${warnResults.length} warning(s)` : '';

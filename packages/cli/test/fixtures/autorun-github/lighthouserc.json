@@ -1,0 +1,20 @@
+{
+  "ci": {
+    "collect": {
+      "numberOfRuns": 1
+    },
+    "assert": {
+      "assertMatrix": [
+        {
+          "assertions": {
+            "viewport": "error"
+          }
+        }
+      ],
+      "includePassedAssertions": true
+    },
+    "upload": {
+      "target": "temporary-public-storage"
+    }
+  }
+}

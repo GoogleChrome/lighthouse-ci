@@ -1,4 +1,4 @@
-FROM node:12-buster-slim
+FROM node:14.16.1-buster-slim
 
 WORKDIR /usr/src/lhci
 COPY package.json .

@@ -23,6 +23,7 @@
     "test:lint:js": "eslint ./packages/*/src",
     "test:lint:jsx": "eslint -c ./.eslintrc.ui.js --ext jsx ./packages/server/src/ui ./packages/viewer/src/ui",
     "test:lint:tests": "eslint -c ./.eslintrc.tests.js ./packages/*/test",
+    "test:docker": "bash scripts/test-docker.sh",
     "test:unit": "jest --maxWorkers=2"
   },
   "devDependencies": {

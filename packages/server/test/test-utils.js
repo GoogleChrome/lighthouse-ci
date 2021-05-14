@@ -231,7 +231,7 @@ const snapshotDOM = (el, maxLength) => {
   return prettified.replace(/\[\d{1,2}m/g, '');
 };
 
-/** @param {'5.6.0'} version_ @param {'verge'} site @param {'a'|'b'} variant  */
+/** @param {'5.6.0'|'7.0.0'} version_ @param {'verge'|'coursehero'|'coursehero-perf'} site @param {'a'|'b'} variant  */
 function getTestLHRPath(version_, site, variant) {
   const version = version_.replace(/\./g, '-');
   return path.join(__dirname, 'fixtures', `lh-${version}-${site}-${variant}.json`);

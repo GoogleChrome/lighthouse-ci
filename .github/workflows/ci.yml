@@ -87,6 +87,7 @@ jobs:
       - run: yarn test:lint
       - name: Run yarn test:unit
         run: yarn test:unit || yarn test:unit || yarn test:unit
+      - run: yarn test:docker
       - run: yarn ci:dogfood
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

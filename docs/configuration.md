@@ -1307,6 +1307,10 @@ module.exports = {
         sqlDialect: 'postgres',
         sqlConnectionSsl: true,
         sqlConnectionUrl: process.env.DATABASE_URL,
+        sqlDialectOptions: {
+          // this flag also needs to be set in order to make a secure connection if not setting custom certificates
+          ssl: true,
+        },
         sequelizeOptions: {
           pool: {
             acquire: 30000,
@@ -1349,6 +1353,9 @@ module.exports = {
         sqlDialect: 'postgres',
         sqlConnectionSsl: true,
         sqlConnectionUrl: process.env.DATABASE_URL,
+        sqlDialectOptions: {
+          ssl: true,
+        },
         sequelizeOptions: {
           pool: {
             acquire: 30000,

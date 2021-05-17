@@ -107,7 +107,9 @@ export const LhrComparisonScores = props => {
   const {lhr, baseLhr} = props;
   if (!lhr) return null;
 
-  const categoryIds = Object.keys(lhr.categories);
+  const compareCategoryIds = Object.keys(lhr.categories);
+  const baseCategoryIds = baseLhr ? Object.keys(baseLhr.categories) : compareCategoryIds;
+  const categoryIds = compareCategoryIds.filter(id => baseCategoryIds.includes(id));
 
   return (
     <div className="lhr-comparison-scores">

@@ -124,8 +124,8 @@ const checks = [
   },
   {
     id: 'lhciServer',
-    label: 'LHCI server unique build for this hash',
-    failureLabel: 'LHCI server non-unique build for this hash',
+    label: 'LHCI server can accept a build for this commit hash',
+    failureLabel: 'LHCI server already has a build for this commit hash',
     // the test only makes sense if they've configured an LHCI server
     shouldTest: opts => Boolean(opts.serverBaseUrl && opts.token),
     test: async opts => {

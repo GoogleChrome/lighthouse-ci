@@ -105,7 +105,7 @@ describe('Lighthouse CI autorun CLI with startServerCommand', () => {
       ✅  LHCI server reachable
       ✅  LHCI server API-compatible
       ✅  LHCI server token valid
-      ✅  LHCI server unique build for this hash
+      ✅  LHCI server can accept a build for this commit hash
       Healthcheck passed!
 
       Started a web server with \\"node autorun-server.js\\"...

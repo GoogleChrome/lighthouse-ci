@@ -134,7 +134,7 @@ describe('Lighthouse CI CLI', () => {
         ✅  LHCI server reachable
         ✅  LHCI server API-compatible
         ✅  LHCI server token valid
-        ✅  LHCI server unique build for this hash
+        ✅  LHCI server can accept a build for this commit hash
         Healthcheck passed!
         "
       `);
@@ -159,7 +159,7 @@ describe('Lighthouse CI CLI', () => {
         ✅  LHCI server reachable
         ✅  LHCI server API-compatible
         ✅  LHCI server token valid
-        ✅  LHCI server unique build for this hash
+        ✅  LHCI server can accept a build for this commit hash
         Healthcheck failed!
         "
       `);

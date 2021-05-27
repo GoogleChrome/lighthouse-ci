@@ -39,7 +39,7 @@ async function runCommand(options) {
   }
 
   for (const lhr of representativeLhrs) {
-    if (options.url && (lhr.finalUrl !== options.url && !options.url.some(item => lhr.finalUrl.includes(item)))) continue;
+    if (targetUrls.size && !targetUrls.has(lhr.finalUrl)) continue;
 
     process.stdout.write(`Opening median report for ${lhr.finalUrl}...\n`);
     const tmpFile = tmp.fileSync({postfix: '.html'});

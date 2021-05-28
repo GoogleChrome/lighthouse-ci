@@ -37,10 +37,8 @@ async function runCommand(options) {
   if (!representativeLhrs.length) {
     process.stdout.write('No available reports to open. ');
   }
-  
-  const targetUrls = typeof options.url === 'string' ? 
-    [options.url] : 
-    (options.url || []);
+
+  const targetUrls = typeof options.url === 'string' ? [options.url] : options.url || [];
 
   for (const lhr of representativeLhrs) {
     if (targetUrls.length && !targetUrls.includes(lhr.finalUrl)) continue;

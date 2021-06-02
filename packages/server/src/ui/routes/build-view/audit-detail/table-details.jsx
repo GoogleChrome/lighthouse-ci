@@ -84,15 +84,23 @@ export const TableDetails = props => {
                     diff => diff.type === 'itemDelta' && diff.itemKey === heading.key
                   );
 
+                  // With the introduction of subitems, not every item will have a value for every heading.
+                  const compareItem = heading.key && compare && compare.item[heading.key];
+                  const baseItem = heading.key && base && base.item[heading.key];
+
                   return (
                     <Fragment key={j}>
                       <td className={`table-column--${itemType}`}>
-                        <SimpleDetails
-                          type={itemType}
-                          compareValue={compare && compare.item[heading.key]}
-                          baseValue={base && base.item[heading.key]}
-                          diff={diff}
-                        />
+                        {compareItem || baseItem ? (
+                          <SimpleDetails
+                            type={itemType}
+                            compareValue={compareItem}
+                            baseValue={baseItem}
+                            diff={diff}
+                          />
+                        ) : (
+                          <Fragment />
+                        )}
                       </td>
                       {insertRowLabelAfterIndex === j ? (
                         <td className="table-column--row-label">

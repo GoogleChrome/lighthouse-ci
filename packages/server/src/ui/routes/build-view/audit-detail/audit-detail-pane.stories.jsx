@@ -18,6 +18,8 @@ import lhr641A_ from '../../../../../test/fixtures/lh-6-4-1-coursehero-a.json';
 import lhr641B_ from '../../../../../test/fixtures/lh-6-4-1-coursehero-b.json';
 import lhr700A_ from '../../../../../test/fixtures/lh-7-0-0-coursehero-a.json';
 import lhr700B_ from '../../../../../test/fixtures/lh-7-0-0-coursehero-b.json';
+import lhrSubitemsA_ from '../../../../../test/fixtures/lh-subitems-a.json';
+import lhrSubitemsB_ from '../../../../../test/fixtures/lh-subitems-b.json';
 
 export default {
   title: 'Build View/Audit Detail Pane',
@@ -35,12 +37,24 @@ const lhr641A = /** @type {any} */ (lhr641A_);
 const lhr641B = /** @type {any} */ (lhr641B_);
 const lhr700A = /** @type {any} */ (lhr700A_);
 const lhr700B = /** @type {any} */ (lhr700B_);
+const lhrSubitemsA = /** @type {any} */ (lhrSubitemsA_);
+const lhrSubitemsB = /** @type {any} */ (lhrSubitemsB_);
 
 const auditPairs5 = createAuditPairs(lhr5A, lhr5B);
 const auditPairs6 = createAuditPairs(lhr6A, lhr6B);
 const auditPairs62 = createAuditPairs(lhr62A, lhr62B);
 const auditPairs641 = createAuditPairs(lhr641A, lhr641B);
 const auditPairs700 = createAuditPairs(lhr700A, lhr700B);
+const auditPairsSubitems = createAuditPairs(lhrSubitemsA, lhrSubitemsB, {
+  filter: pair =>
+    [
+      'third-party-summary',
+      'third-party-facades',
+      'valid-source-maps',
+      'unused-javascript',
+      'legacy-javascript',
+    ].includes(pair.audit.id || ''),
+});
 
 export const Default = () => (
   <AuditDetailPane
@@ -87,18 +101,34 @@ export const Version700 = () => (
   />
 );
 
+export const VersionSubitems = () => (
+  <AuditDetailPane
+    selectedAuditId={auditPairsSubitems[1].audit.id || ''}
+    setSelectedAuditId={action('setSelectedAuditId')}
+    pairs={auditPairsSubitems}
+    baseLhr={lhrSubitemsA}
+  />
+);
+
 /**
  * @param {LH.Result} lhrA
  * @param {LH.Result} lhrB
+ * @param {{sample?: boolean, filter?: (pair: LHCI.AuditPair, i: number) => boolean}} [options]
  * @return {Array<LHCI.AuditPair>}
  */
-function createAuditPairs(lhrA, lhrB) {
-  return (
-    computeAuditGroups(lhrA, lhrB, {percentAbsoluteDeltaThreshold: 0.05})
-      .filter(group => !group.showAsUnchanged)
-      .map(group => group.pairs)
-      .reduce((a, b) => a.concat(b))
-      // We don't need *all* the audits, so sample ~1/2 of them.
-      .filter((pair, i) => i % 2 === 0 && pair.audit.id !== 'uses-long-cache-ttl')
-  );
+function createAuditPairs(lhrA, lhrB, options) {
+  const {sample = true, filter} = options || {};
+  return computeAuditGroups(lhrA, lhrB, {percentAbsoluteDeltaThreshold: 0.05})
+    .filter(group => !group.showAsUnchanged)
+    .map(group => group.pairs)
+    .reduce((a, b) => a.concat(b))
+    .filter((pair, i) => {
+      if (filter) return filter(pair, i);
+      // A superlong set of details that breaks diff comparisons, always discard.
+      if (pair.audit.id === 'uses-long-cache-ttl') return false;
+      // If we're sampling, then keep half of them.
+      if (sample) return i % 2 === 0;
+      // Otherwise return them all.
+      return true;
+    });
 }

@@ -40,7 +40,8 @@ declare global {
         overallSavingsMs?: number;
         overallSavingsBytes?: number;
         headings?: Array<{
-          key: string;
+          key: string | null;
+          subItemsHeading?: {key: string};
           valueType?: DetailsType;
           itemType?: DetailsType;
           label?: string;

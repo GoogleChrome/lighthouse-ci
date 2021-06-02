@@ -358,6 +358,29 @@ describe('#findAuditDiffs', () => {
     ]);
   });
 
+  it('should not find a details item property diff for subItems', () => {
+    const detailsItem = {url: 'http://example.com/foo.js'};
+    const baseAudit = {
+      id: 'audit',
+      score: 0.5,
+      details: {
+        headings: [{key: null, subItemsHeading: {key: 'label'}}, {key: 'timeSpent'}],
+        items: [{...detailsItem, timeSpent: 1000, subItems: [{label: 'Label 1'}]}],
+      },
+    };
+
+    const compareAudit = {
+      id: 'audit',
+      score: 0.5,
+      details: {
+        headings: [{key: null, subItemsHeading: {key: 'label'}}, {key: 'timeSpent'}],
+        items: [{...detailsItem, timeSpent: 1000, subItems: [{label: 'Label 2'}]}],
+      },
+    };
+
+    expect(findAuditDiffs(baseAudit, compareAudit)).toEqual([]);
+  });
+
   it('should find a details item addition/removal diff', () => {
     const baseAudit = {
       id: 'audit',

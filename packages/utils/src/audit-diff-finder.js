@@ -249,7 +249,7 @@ function createAuditDiff(diff) {
  * @param {string} auditId
  * @param {DetailItemEntry} baseEntry
  * @param {DetailItemEntry} compareEntry
- * @param {Array<{key: string}>} headings
+ * @param {Array<{key: string | null}>} headings
  * @return {Array<LHCI.AuditDiff>}
  */
 function findAuditDetailItemKeyDiffs(auditId, baseEntry, compareEntry, headings) {
@@ -466,7 +466,7 @@ function sortZippedBaseAndCompareItems(diffs, zippedItems) {
  * @param {string} auditId
  * @param {Array<Record<string, any>>} baseItems
  * @param {Array<Record<string, any>>} compareItems
- * @param {Array<{key: string}>} headings
+ * @param {Array<{key: string | null}>} headings
  * @return {Array<LHCI.AuditDiff>}
  */
 function findAuditDetailItemsDiffs(auditId, baseItems, compareItems, headings) {

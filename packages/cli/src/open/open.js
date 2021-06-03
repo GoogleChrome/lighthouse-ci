@@ -38,8 +38,10 @@ async function runCommand(options) {
     process.stdout.write('No available reports to open. ');
   }
 
+  const targetUrls = typeof options.url === 'string' ? [options.url] : options.url || [];
+
   for (const lhr of representativeLhrs) {
-    if (options.url && lhr.finalUrl !== options.url) continue;
+    if (targetUrls.length && !targetUrls.includes(lhr.finalUrl)) continue;
 
     process.stdout.write(`Opening median report for ${lhr.finalUrl}...\n`);
     const tmpFile = tmp.fileSync({postfix: '.html'});

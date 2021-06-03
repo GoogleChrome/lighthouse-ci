@@ -14,7 +14,6 @@ module.exports = {
     'bootup-time': ['warn', {}],
     'cumulative-layout-shift': ['warn', {}],
     'first-contentful-paint': ['warn', {}],
-    'first-cpu-idle': ['warn', {}],
     'first-meaningful-paint': ['warn', {}],
     'largest-contentful-paint': ['warn', {}],
     'mainthread-work-breakdown': ['warn', {}],
@@ -42,9 +41,9 @@ module.exports = {
 
     'dom-size': ['warn', {}],
     'is-on-https': ['warn', {}], // passes on localhost, so OK to leave on
+    'modern-image-formats': ['warn', {maxLength: 0}],
     'render-blocking-resources': ['warn', {maxLength: 0}],
     'server-response-time': ['warn', {}],
     'uses-long-cache-ttl': ['warn', {maxLength: 0}],
-    'uses-webp-images': ['warn', {maxLength: 0}],
   },
 };

@@ -18,6 +18,8 @@ import lhr641A_ from '../../../../../test/fixtures/lh-6-4-1-coursehero-a.json';
 import lhr641B_ from '../../../../../test/fixtures/lh-6-4-1-coursehero-b.json';
 import lhr700A_ from '../../../../../test/fixtures/lh-7-0-0-coursehero-a.json';
 import lhr700B_ from '../../../../../test/fixtures/lh-7-0-0-coursehero-b.json';
+import lhr800A_ from '../../../../../test/fixtures/lh-8-0-0-coursehero-a.json';
+import lhr800B_ from '../../../../../test/fixtures/lh-8-0-0-coursehero-b.json';
 import lhrSubitemsA_ from '../../../../../test/fixtures/lh-subitems-a.json';
 import lhrSubitemsB_ from '../../../../../test/fixtures/lh-subitems-b.json';
 
@@ -37,6 +39,8 @@ const lhr641A = /** @type {any} */ (lhr641A_);
 const lhr641B = /** @type {any} */ (lhr641B_);
 const lhr700A = /** @type {any} */ (lhr700A_);
 const lhr700B = /** @type {any} */ (lhr700B_);
+const lhr800A = /** @type {any} */ (lhr800A_);
+const lhr800B = /** @type {any} */ (lhr800B_);
 const lhrSubitemsA = /** @type {any} */ (lhrSubitemsA_);
 const lhrSubitemsB = /** @type {any} */ (lhrSubitemsB_);
 
@@ -45,6 +49,7 @@ const auditPairs6 = createAuditPairs(lhr6A, lhr6B);
 const auditPairs62 = createAuditPairs(lhr62A, lhr62B);
 const auditPairs641 = createAuditPairs(lhr641A, lhr641B);
 const auditPairs700 = createAuditPairs(lhr700A, lhr700B);
+const auditPairs800 = createAuditPairs(lhr800A, lhr800B);
 const auditPairsSubitems = createAuditPairs(lhrSubitemsA, lhrSubitemsB, {
   filter: pair =>
     [
@@ -98,6 +103,15 @@ export const Version700 = () => (
     setSelectedAuditId={action('setSelectedAuditId')}
     pairs={auditPairs700}
     baseLhr={lhr700B}
+  />
+);
+
+export const Version800 = () => (
+  <AuditDetailPane
+    selectedAuditId={auditPairs800[1].audit.id || ''}
+    setSelectedAuditId={action('setSelectedAuditId')}
+    pairs={auditPairs800}
+    baseLhr={lhr800B}
   />
 );
 

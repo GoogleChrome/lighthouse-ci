@@ -50,7 +50,7 @@ When working on the server, you'll need to start parcel in watch mode. In one te
 
 ## Updating the Lighthouse Version
 
-Updating the Lighthouse version used by LHCI involves more than a simple `package.json` update. When the Lighthouse version changes, it is usually a _breaking change_ for Lighthouse CI (see [version policy](./docs/version-policy.md)) and triggers many corresponding updates, including the following:
+Updating the Lighthouse version used by LHCI involves more than a simple `package.json` update. When the Lighthouse version changes, it is usually a _breaking change_ for Lighthouse CI (see [version policy](./docs/version-policy.md)) and triggers many corresponding updates, including the following ([Example PR](https://github.com/GoogleChrome/lighthouse-ci/pull/621)):
 
 - Update the `package.json` version in @lhci/utils and @lhci/cli.
 - Run the new `lighthouse` version on a sufficiently complex URL (https://www.coursehero.com/ or https://www.theverge.com) and commit the LHR.

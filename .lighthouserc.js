@@ -12,6 +12,7 @@ module.exports = {
       assertions: {
         'dom-size': ['error', {maxNumericValue: 3000}],
 
+        'csp-xss': 'off',
         'unsized-images': 'off',
         'uses-rel-preload': 'off',
         'uses-responsive-images': 'off',

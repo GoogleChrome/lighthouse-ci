@@ -39,9 +39,7 @@ module.exports = {
         : undefined,
       port: 9009,
       storage: {
-        sqlDialect: 'postgres',
-        sqlConnectionUrl: 'postgres://postgres:mysecretpassword@localhost:54320/postgres',
-        // sqlDatabasePath: 'cli-test-fixtures.tmp.sql',
+        sqlDatabasePath: 'cli-test-fixtures.tmp.sql',
       },
     },
   },

@@ -234,7 +234,7 @@ function createRouter(context) {
     })
   );
 
-  // GET /projects/<id>/builds/<id>/runs
+  // GET /projects/<id>/masterHash/<masterHashId>/slaveHash/<slaveHashId>/runs
   router.get(
     '/:projectId/masterHash/:masterHashId/slaveHash/:slaveHashId/runs',
     handleAsyncError(async (req, res) => {

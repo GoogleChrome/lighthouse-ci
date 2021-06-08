@@ -215,6 +215,26 @@ class SqlStorageMethod {
   }
 
   /**
+   * @template T1
+   * @template T2
+   * @param {import('sequelize').Model<T1, T2>} model
+   * @param {import('sequelize').FindOptions<T1 & T2>} options
+   */
+  async _findOne(model, options) {
+    if (options.where) {
+      options.where = {...options.where};
+
+      for (const key of Object.keys(options.where)) {
+        if (!key.endsWith('Id') && key !== 'token') continue;
+        // @ts-ignore - `options.where` is not indexable in tsc's eyes
+        options.where[key] = validateUuidOrEmpty(options.where[key]);
+      }
+    }
+
+    return model.findOne(options);
+  }
+
+  /**
    * @param {LHCI.ServerCommand.StorageOptions} options
    * @return {Promise<void>}
    */
@@ -607,6 +627,21 @@ class SqlStorageMethod {
     const {runModel} = this._sql();
     const runs = await this._findAll(runModel, {where: {...options, projectId, buildId}, order});
     return clone(runs);
+  }
+
+  /**
+   * @param {string} projectId
+   * @param {string} masterHashId
+   * @param {string} slaveHashId
+   * @return {Promise<LHCI.ServerCommand.{ masterRun: Run, slaveRun: Run }>}
+   */
+  async getHashRuns(projectId, masterHashId, slaveHashId) {
+    const {buildModel, runModel} = this._sql();
+    const buildMaster = await this._findOne(buildModel, {where: {projectId: projectId, hash: masterHashId}});
+    const buildSlave = await this._findOne(buildModel, {where: {projectId: projectId, hash: slaveHashId}});
+    const masterRun = await this._findOne(runModel, {where: {projectId: projectId, buildId: buildMaster?.id}});
+    const slaveRun = await this._findOne(runModel, {where: {projectId: projectId, buildId: buildSlave?.id}});
+    return clone({ masterRun, slaveRun });
   }
 
   /**

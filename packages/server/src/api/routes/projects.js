@@ -234,6 +234,24 @@ function createRouter(context) {
     })
   );
 
+  // GET /projects/<id>/builds/<id>/runs
+  router.get(
+    '/:projectId/masterHash/:masterHashId/slaveHash/:slaveHashId/runs',
+    handleAsyncError(async (req, res) => {
+      if (typeof req.query.representative === 'string') {
+        req.query.representative = req.query.representative === 'true';
+      }
+
+      const runs = await context.storageMethod.getHashRuns(
+        req.params.projectId,
+        req.params.masterHashId,
+        req.params.slaveHashId,
+        req.query
+      );
+      res.json(runs);
+    })
+  );
+
   return router;
 }
 

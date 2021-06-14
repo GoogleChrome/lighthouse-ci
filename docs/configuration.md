@@ -356,7 +356,17 @@ The maximum amount of time in milliseconds to wait for `startServerCommand` to p
 
 #### `settings`
 
-The [Lighthouse settings object](https://github.com/GoogleChrome/lighthouse/blob/master/docs/configuration.md#settings-objectundefined) to pass along to Lighthouse. This can be used to change configuration of Lighthouse itself.
+The [Lighthouse CLI flags](https://github.com/GoogleChrome/lighthouse/#cli-options) to pass along to Lighthouse. This can be used to change configuration of Lighthouse itself. See [Lighthouse documentation on custom configs](https://github.com/GoogleChrome/lighthouse/blob/master/docs/configuration.md) for more.
+
+Note that the following options cannot be used because LHCI uses them internally:
+
+- `port`
+- `auditMode`
+- `gatherMode`
+- `output`
+- `outputPath`
+- `channel`
+- `cli-flags-path`
 
 **Example:**
 
@@ -372,7 +382,9 @@ The [Lighthouse settings object](https://github.com/GoogleChrome/lighthouse/blob
         // Wait up to 90s for the page to load
         "maxWaitForLoad": 90000,
         // Use applied throttling instead of simulated throttling
-        "throttlingMethod": "devtools"
+        "throttlingMethod": "devtools",
+        // Use a custom Lighthouse config file.
+        "configPath": "path/to/custom/config.js"
       }
     }
   }
@@ -888,6 +900,7 @@ Options:
 
 The port for the server to listen on. A value of `0` will use a random available port.
 https://nodejs.org/api/net.html#net_server_listen_port_host_backlog_callback
+
 #### `host`
 
 The host to bind the server to. The [default](https://nodejs.org/api/net.html#net_server_listen_port_host_backlog_callback) is to use the [unspecified IPv6 address](https://en.wikipedia.org/wiki/IPv6_address#Unspecified_address) (::) when IPv6 is available, or the [unspecified IPv4 address](https://en.wikipedia.org/wiki/0.0.0.0) (0.0.0.0) otherwise. To only accept connections on IPv4 use `0.0.0.0` as host.

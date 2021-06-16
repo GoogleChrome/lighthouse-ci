@@ -47,6 +47,7 @@ declare global {
         autodiscoverUrlBlocklist?: string | string[];
         psiApiKey?: string;
         psiApiEndpoint?: string;
+        psiStrategy?: 'mobile'|'desktop';
         staticDistDir?: string;
         isSinglePageApplication?: boolean;
         startServerCommand?: string;

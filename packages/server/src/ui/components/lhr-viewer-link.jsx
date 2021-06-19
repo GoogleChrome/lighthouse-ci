@@ -13,7 +13,8 @@ import './lhr-viewer-link.css';
 
 /** @param {LH.Result} lhr */
 export function openLhrInClassicViewer(lhr) {
-  const VIEWER_ORIGIN = 'https://googlechrome.github.io';
+  // Allows for self-hosted viewer uri instead of linking externally
+  const VIEWER_ORIGIN = process.env.VIEWER_ORIGIN != null ? process.env.VIEWER_ORIGIN : 'https://googlechrome.github.io';
   // Chrome doesn't allow us to immediately postMessage to a popup right
   // after it's created. Normally, we could also listen for the popup window's
   // load event, however it is cross-domain and won't fire. Instead, listen

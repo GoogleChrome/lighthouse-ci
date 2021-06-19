@@ -20,6 +20,8 @@
     "start:storybook": "start-storybook -p 6006 --no-dll"
   },
   "dependencies": {
+    "@fontsource/material-icons": "^4.4.5",
+    "@fontsource/roboto": "^4.4.5",
     "@lhci/utils": "0.1.0",
     "bluebird": "^3.7.2",
     "body-parser": "^1.18.3",

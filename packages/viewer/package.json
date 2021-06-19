@@ -21,5 +21,10 @@
   },
   "alias": {
     "isomorphic-fetch": "clsx"
+  },
+  "dependencies": {
+    "@fontsource/material-icons": "^4.4.5",
+    "@fontsource/roboto": "^4.4.5",
+    "@fontsource/roboto-mono": "^4.4.5"
   }
 }

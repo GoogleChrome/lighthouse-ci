@@ -133,7 +133,3 @@ const lhci = require('@lhci/server');
 ### Firewall Rules
 
 You can also protect your server through firewall rules to prevent it from being accessed from outside your internal network. Refer to your infrastructure provider's documentation on how to setup firewall rules to block external IP addresses from accessing the server. Don't forget to allow your CI machines!
-
-```
-
-```

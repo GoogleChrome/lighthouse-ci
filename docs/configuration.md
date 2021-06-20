@@ -218,7 +218,8 @@ Options:
   --puppeteerLaunchOptions   The object of puppeteer launch options
   --psiApiKey                [psi only] The API key to use for PageSpeed Insights runner method.
                              You do not need to use this unless you wrote a custom version.
-  --psiStrategy              [psi only] The strategy to use for PageSpeed Insights runner method. Use mobile or desktop. The                                default value is mobile
+  --psiStrategy              [psi only] The strategy to use for PageSpeed Insights runner method. 
+                              Use mobile or desktop. The default value is mobile
   --startServerCommand       The command to run to start the server.
   --startServerReadyPattern  String pattern to listen for started server.
                                                                   [string] [default: "listen|ready"]

@@ -20,8 +20,6 @@
     "start:storybook": "start-storybook -p 6006 --no-dll"
   },
   "dependencies": {
-    "@fontsource/material-icons": "^4.4.5",
-    "@fontsource/roboto": "^4.4.5",
     "@lhci/utils": "0.1.0",
     "bluebird": "^3.7.2",
     "body-parser": "^1.18.3",
@@ -43,7 +41,10 @@
     "plotly.js": "^1.48.3",
     "preact": "^10.0.1",
     "preact-async-route": "^2.2.1",
-    "preact-router": "^3.1.0"
+    "preact-router": "^3.1.0",
+    "@fontsource/material-icons": "^4.4.5",
+    "@fontsource/roboto": "^4.4.5",
+    "@fontsource/roboto-mono": "^4.4.5"
   },
   "alias": {
     "isomorphic-fetch": "clsx"

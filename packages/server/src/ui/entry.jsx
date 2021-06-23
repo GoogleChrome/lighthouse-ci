@@ -10,6 +10,8 @@ import {App} from './app.jsx';
 // Fontsource for fonts/icons instead of google cdn
 import "@fontsource/roboto/400.css";
 import "@fontsource/roboto/500.css";
+import "@fontsource/roboto-mono/400.css";
+import "@fontsource/roboto-mono/500.css";
 import "@fontsource/material-icons";
 
 const preactRoot = document.getElementById('preact-root');

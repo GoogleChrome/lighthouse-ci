@@ -14,7 +14,7 @@ alt="Screenshot of the Lighthouse CI server diff UI" width="48%">
 
 The LHCI server can be run in any node environment with persistent disk storage or network access to a postgres/mysql database.
 
-- Node v10 LTS or later
+- Node v12 LTS
 - Database Storage (sqlite, mysql, or postgresql)
 
 ### General
@@ -103,6 +103,32 @@ lhci autorun --upload.basicAuth.username=myusername --upload.basicAuth.password=
 When navigating to your server's URL to view results you'll be presented with the classic browser login UI. Provide the same username and password configured on the server and you're in!
 
 ![screenshot of classic HTTP Basic auth prompt](https://user-images.githubusercontent.com/2301202/79480775-2d6af500-7fd4-11ea-8841-eb5e85a9fc09.png)
+
+### Custom Middleware
+
+The server also exposes the created express app directly, so you can add your own custom middleware, routes, anything you like!
+
+See [Using Express Middleware documentation](https://expressjs.com/en/guide/using-middleware.html) for more details on how to use express.
+
+```js
+const express = require('express');
+const lhci = require('@lhci/server');
+
+(async () => {
+  const app = express();
+  const {app: lhciApp} = await lhci.createApp({
+    storage: {
+      storageMethod: 'sql',
+      sqlDialect: 'sqlite',
+      // see configuration...
+    },
+  });
+
+  app.use((req, res, next) => handleCustomAuthentication(req, res, next));
+  app.use(lhciApp);
+  app.listen();
+})();
+```
 
 ### Firewall Rules
 

@@ -102,4 +102,4 @@ jobs:
 
 The additions are `fetch-depth: 20` added to `actions/checkout@v2` and a new step to fetch base_ref HEAD to use it as ancestor hash in LHCI.
 
-The fetch depth set to 20 is a good default, but might not work in all cases, you can adjut it based on your needs.
+The fetch depth set to 20 is a good default, but might not work in all cases, you can adjust it based on your needs.

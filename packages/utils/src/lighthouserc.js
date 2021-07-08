@@ -11,6 +11,8 @@ const yaml = require('js-yaml');
 const _ = require('./lodash.js');
 
 const RC_FILE_NAMES = [
+  '.lighthouserc.cjs',
+  'lighthouserc.cjs',
   '.lighthouserc.js',
   'lighthouserc.js',
   '.lighthouserc.json',
@@ -21,7 +23,7 @@ const RC_FILE_NAMES = [
   'lighthouserc.yaml',
 ];
 
-const JS_FILE_EXTENSION_REGEX = /\.(js)$/i;
+const JS_FILE_EXTENSION_REGEX = /\.(cjs|js)$/i;
 const YAML_FILE_EXTENSION_REGEX = /\.(yml|yaml)$/i;
 
 /**

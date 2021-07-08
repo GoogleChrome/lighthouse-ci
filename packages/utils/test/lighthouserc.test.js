@@ -232,6 +232,12 @@ describe('lighthouserc.js', () => {
         tempFile = null;
       });
 
+      it('.cjs', () => {
+        tempFile = path.join(tempDir, 'lighthouserc.cjs');
+        writeJsFile(tempFile, {});
+        expect(rc.findRcFile(tempDir)).toEqual(tempFile);
+      });
+
       it('.js', () => {
         tempFile = path.join(tempDir, 'lighthouserc.js');
         writeJsFile(tempFile, {});

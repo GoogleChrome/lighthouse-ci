@@ -53,6 +53,10 @@ function buildCommand(yargs) {
       type: 'boolean',
       default: false,
     },
+    'storage.sqlMigrationOptions.tableName': {
+      type: 'string',
+      description: 'Use a different Sequelize table name.',
+    },
     'basicAuth.username': {
       type: 'string',
       description: 'The username to protect the server with HTTP Basic Authentication.',

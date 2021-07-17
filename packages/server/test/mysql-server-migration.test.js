@@ -9,8 +9,9 @@
 
 const runTests = require('./server-test-suite.js').runTests;
 const runServer = require('../src/server.js').createServer;
+const { Sequelize } = require('sequelize');
 
-describe('mysql server', () => {
+describe('mysql server sqlMigrationOptions', () => {
   if (!process.env.MYSQL_DB_URL) {
     it.skip('should work on mysql', () => {});
     return;
@@ -21,6 +22,8 @@ describe('mysql server', () => {
     closeServer: undefined,
   };
 
+  const customSequelizeTableName = 'sequelize_meta';
+
   beforeAll(async () => {
     const {port, close, storageMethod} = await runServer({
       logLevel: 'silent',
@@ -30,7 +33,7 @@ describe('mysql server', () => {
         sqlDialect: 'mysql',
         sqlConnectionUrl: process.env.MYSQL_DB_URL,
         sqlConnectionSsl: !!process.env.MYSQL_DB_SSL,
-        sqlMigrationOptions: {tableName: 'sequelize_meta'},
+        sqlMigrationOptions: {tableName: customSequelizeTableName},
       },
     });
 
@@ -41,6 +44,15 @@ describe('mysql server', () => {
 
   afterAll(() => {
     state.closeServer();
+  });
+
+  describe('sqlMigrationOptions', () => {
+    it('should use the renamed table', async () => {
+      const sequelize = new Sequelize(process.env.MYSQL_DB_URL);
+      const tables = await sequelize.query('show tables');
+      await sequelize.close();
+      expect(JSON.stringify(tables)).toContain(customSequelizeTableName);
+    });
   });
 
   runTests(state);

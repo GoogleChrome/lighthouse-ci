@@ -9,7 +9,7 @@
 
 const runTests = require('./server-test-suite.js').runTests;
 const runServer = require('../src/server.js').createServer;
-const { Sequelize } = require('sequelize');
+const Sequelize = require('sequelize').Sequelize;
 
 describe('mysql server sqlMigrationOptions', () => {
   if (!process.env.MYSQL_DB_URL) {
@@ -49,9 +49,12 @@ describe('mysql server sqlMigrationOptions', () => {
   describe('sqlMigrationOptions', () => {
     it('should use the renamed table', async () => {
       const sequelize = new Sequelize(process.env.MYSQL_DB_URL);
-      const tables = await sequelize.query('show tables');
-      await sequelize.close();
-      expect(JSON.stringify(tables)).toContain(customSequelizeTableName);
+      try {
+        const tables = await sequelize.query('show tables');
+        expect(JSON.stringify(tables)).toContain(customSequelizeTableName);
+      } finally {
+        await sequelize.close();
+      }
     });
   });
 

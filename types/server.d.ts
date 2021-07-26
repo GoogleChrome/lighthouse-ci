@@ -173,6 +173,9 @@ declare global {
         sqlConnectionUrl?: string;
         sqlDangerouslyResetDatabase?: boolean;
         sequelizeOptions?: import('sequelize').Options;
+        sqlMigrationOptions?: {
+          tableName?: string
+        }
       }
 
       export interface Options {

@@ -136,7 +136,10 @@ function createUmzug(sequelize, options) {
   return new Umzug({
     logging: /** @param {*} msg */ msg => logVerbose('[umzug]', msg),
     storage: 'sequelize',
-    storageOptions: {sequelize: /** @type {*} */ (sequelize)},
+    storageOptions: {
+      sequelize: /** @type {*} */ (sequelize),
+      tableName: options.sqlMigrationOptions && options.sqlMigrationOptions.tableName,
+    },
     migrations: {
       path: path.join(__dirname, 'migrations'),
       params: [sequelize.getQueryInterface(), Sequelize, options],

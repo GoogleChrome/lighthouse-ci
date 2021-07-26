@@ -891,17 +891,18 @@ Starts the LHCI server. This command is unique in that it is likely run on infra
 Run Lighthouse CI server
 
 Options:
-  --logLevel                                              [string] [choices: "silent", "verbose"] [default: "verbose"]
-  --port, -p                                                                                  [number] [default: 9001]
-  --storage.storageMethod                                                   [string] [choices: "sql"] [default: "sql"]
-  --storage.sqlDialect                           [string] [choices: "sqlite", "postgres", "mysql"] [default: "sqlite"]
-  --storage.sqlDatabasePath              The path to a SQLite database on disk.
-  --storage.sqlConnectionUrl             The connection url to a postgres or mysql database.
-  --storage.sqlConnectionSsl             Whether the SQL connection should force use of SSL [boolean] [default: false]
-  --storage.sqlDangerouslyResetDatabase  Whether to force the database to the required schema. WARNING: THIS WILL
-                                         DELETE ALL DATA                                    [boolean] [default: false]
-  --basicAuth.username                   The username to protect the server with HTTP Basic Authentication.   [string]
-  --basicAuth.password                   The password to protect the server with HTTP Basic Authentication.   [string]
+  --logLevel                                               [string] [choices: "silent", "verbose"] [default: "verbose"]
+  --port, -p                                                                                   [number] [default: 9001]
+  --storage.storageMethod                                                    [string] [choices: "sql"] [default: "sql"]
+  --storage.sqlDialect                            [string] [choices: "sqlite", "postgres", "mysql"] [default: "sqlite"]
+  --storage.sqlDatabasePath               The path to a SQLite database on disk.
+  --storage.sqlConnectionUrl              The connection url to a postgres or mysql database.
+  --storage.sqlConnectionSsl              Whether the SQL connection should force use of SSL [boolean] [default: false]
+  --storage.sqlDangerouslyResetDatabase   Whether to force the database to the required schema. WARNING: THIS WILL
+                                          DELETE ALL DATA                                    [boolean] [default: false]
+  --storage.sqlMigrationOptions.tableName Use a different Sequelize table name.                                [string]
+  --basicAuth.username                    The username to protect the server with HTTP Basic Authentication.   [string]
+  --basicAuth.password                    The password to protect the server with HTTP Basic Authentication.   [string]
 ```
 
 #### `port`
@@ -942,6 +943,10 @@ Boolean flag useful during setup if things have gone wrong. This flag will reset
 ##### `storage.sequelizeOptions`
 
 Additional raw options object to pass to [sequelize](https://sequelize.org/v4/). Refer to the [sequelize documentation](https://sequelize.org/v4/) for more information on available settings.
+
+##### `storage.sqlMigrationOptions.tableName`
+
+Use a different Sequelize table name. Default: `SequelizeMeta`. Refer to the [sequelize migrations documentation](https://sequelize.org/v4/manual/tutorial/migrations.html#migration-storage) for more information.
 
 #### `psiCollectCron`
 

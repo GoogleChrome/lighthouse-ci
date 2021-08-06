@@ -24,6 +24,7 @@ declare global {
       | 'link'
       | 'source-location'
       | 'thumbnail'
+      | 'debugdata'
       | 'unknown';
 
     export interface AuditResult {

@@ -381,6 +381,34 @@ describe('#findAuditDiffs', () => {
     expect(findAuditDiffs(baseAudit, compareAudit)).toEqual([]);
   });
 
+  it('should handle preact mutations', () => {
+    // Create a circular data structure that would fail serialization.
+    const circular = {x: {}};
+    circular.x = circular;
+
+    // Ensure the two audits are otherwise identical, so serialization is triggered.
+    const baseAudit = {
+      id: 'audit',
+      score: 0.5,
+      details: {
+        headings: [{key: null, subItemsHeading: {key: 'label'}}, {key: 'timeSpent'}],
+        items: [{timeSpent: 1000, subItems: [{label: 'Label 1', _circular: circular}]}],
+      },
+    };
+
+    const compareAudit = {
+      id: 'audit',
+      score: 0.5,
+      details: {
+        headings: [{key: null, subItemsHeading: {key: 'label'}}, {key: 'timeSpent'}],
+        items: [{timeSpent: 1000, subItems: [{label: 'Label 1'}], _circular: circular}],
+      },
+    };
+
+    // Assert that everything passes.
+    expect(findAuditDiffs(baseAudit, compareAudit)).toEqual([]);
+  });
+
   it('should find a details item addition/removal diff', () => {
     const baseAudit = {
       id: 'audit',

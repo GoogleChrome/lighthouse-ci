@@ -351,6 +351,33 @@ function replaceNondeterministicStrings(s) {
   );
 }
 
+/**
+ * The items passed to this method can be dirtied by other libraries and contain circular structures.
+ * Prune any private-looking properties that start with `_` throughout the entire object.
+ *
+ * @see https://github.com/GoogleChrome/lighthouse-ci/issues/666
+ * @param {unknown} item
+ * @return {unknown}
+ */
+function deepPruneItemForKeySerialization(item) {
+  if (typeof item !== 'object') return item;
+  if (item === null) return item;
+
+  if (Array.isArray(item)) {
+    return item.map(entry => deepPruneItemForKeySerialization(entry));
+  } else {
+    const itemAsRecord = /** @type {Record<string, unknown>} */ (item);
+    const keys = Object.keys(item);
+    const keysToKeep = keys.filter(key => !key.startsWith('_'));
+    /** @type {Record<string, any>} */
+    const copy = {};
+    for (const key of keysToKeep) {
+      copy[key] = deepPruneItemForKeySerialization(itemAsRecord[key]);
+    }
+    return copy;
+  }
+}
+
 /** @param {Record<string, any>} item @return {string} */
 function getItemKey(item) {
   // For most opportunities, diagnostics, etc where 1 row === 1 resource
@@ -371,7 +398,7 @@ function getItemKey(item) {
   if (item.entity && typeof item.entity.text === 'string') return item.entity.text;
 
   // For everything else, use the entire object, actually works OK on most nodes.
-  return JSON.stringify(item);
+  return JSON.stringify(deepPruneItemForKeySerialization(item));
 }
 
 /**

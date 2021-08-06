@@ -63,7 +63,7 @@ export const SimpleDetails = props => {
       return (
         <img
           style={{width: 48, height: 48, objectFit: 'cover'}}
-          src={'asdfasjdfoiasjdfosdj'}
+          src={value}
           onError={evt => {
             const img = evt.srcElement;
             if (!(img instanceof HTMLImageElement)) return;
@@ -123,6 +123,9 @@ export const SimpleDetails = props => {
           {url}:{line}:{column}
         </pre>
       );
+    }
+    case 'debugdata': {
+      return <></>;
     }
     default: {
       const debugdata = JSON.stringify(props);

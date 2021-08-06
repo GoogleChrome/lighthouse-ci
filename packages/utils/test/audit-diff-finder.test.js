@@ -435,6 +435,22 @@ describe('#findAuditDiffs', () => {
       },
     ]);
   });
+
+  it('should not find a details item addition/removal diff for debugdata', () => {
+    const baseAudit = {
+      id: 'audit',
+      score: 0.5,
+      details: {type: 'debugdata', items: [{url: 'http://example.com/foo.js'}]},
+    };
+
+    const compareAudit = {
+      id: 'audit',
+      score: 0.5,
+      details: {type: 'debugdata', items: [{url: 'http://example.com/foo2.js'}]},
+    };
+
+    expect(findAuditDiffs(baseAudit, compareAudit)).toEqual([]);
+  });
 });
 
 describe('#getDiffSeverity', () => {

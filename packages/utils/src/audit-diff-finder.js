@@ -614,9 +614,13 @@ function findAuditDiffs(baseAudit, compareAudit, options = {}) {
   }
 
   let hasItemDetails = false;
+  /** @type {Partial<LH.AuditResult['details']>} */
+  const baseAuditDetails = baseAudit.details || {};
+  /** @type {Partial<LH.AuditResult['details']>} */
+  const compareAuditDetails = compareAudit.details || {};
   if (
-    (baseAudit.details && baseAudit.details.items) ||
-    (compareAudit.details && compareAudit.details.items)
+    (baseAuditDetails.type !== 'debugdata' && baseAuditDetails.items) ||
+    (compareAuditDetails.type !== 'debugdata' && compareAuditDetails.items)
   ) {
     hasItemDetails = true;
     const {items: baseItems, headings: baseHeadings} = normalizeDetails(baseAudit);

@@ -190,9 +190,9 @@
       "description": "Cumulative Layout Shift measures the movement of visible elements within the viewport. [Learn more](https://web.dev/cls/).",
       "score": 0.76,
       "scoreDisplayMode": "numeric",
-      "numericValue": 0.15116118706597223,
+      "numericValue": 0.1116118706597223,
       "numericUnit": "unitless",
-      "displayValue": "0.151",
+      "displayValue": "0.112",
       "details": {
         "type": "debugdata",
         "items": [

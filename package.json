@@ -4,7 +4,7 @@
     "packages/*"
   ],
   "scripts": {
-    "clean": "lerna exec --parallel 'rm -rf ./dist'",
+    "clean": "lerna exec --parallel 'rm -rf ./dist ./.cache'",
     "ci:dogfood": "./scripts/ci-dogfood.sh",
     "build": "lerna run --scope @lhci/server --scope @lhci/viewer build",
     "build:storybook": "lerna run --scope @lhci/server build:storybook",

@@ -527,7 +527,7 @@ A map of additional headers to add the requests made to the LHCI server. Useful 
 
 _target=lhci only_
 
-An object containing a username and password pair for authenicating with a Basic auth protected LHCI server. Use this setting when you've protected your LHCI server with Basic auth.
+An object containing a username and password pair for authenticating with a Basic auth protected LHCI server. Use this setting when you've protected your LHCI server with Basic auth.
 
 **Example:**
 

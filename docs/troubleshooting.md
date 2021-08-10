@@ -80,7 +80,7 @@ The team does not have the bandwidth to assist with debugging this problem. Plea
 
 ## Running LHCI in Github Actions I constantly get Ancestor hash not determinable
 
-If you are using `actions/checkout@v2` to checkout your repository and based on the size and traffic on your repo this error might happen due to how he checkout action is configured and is not a LHCI issue.
+If you are using `actions/checkout@v2` to checkout your repository and based on the size and traffic on your repo this error might happen due to how the checkout action is configured and is not a LHCI issue.
 
 Checkout action by default doesn't clone the entire repo and the number of commits to fetch is set to 1 for performance reasons. When LHCI runs the health check the ancestor hash might be missing because the branch / hash is not there in the local history.
 

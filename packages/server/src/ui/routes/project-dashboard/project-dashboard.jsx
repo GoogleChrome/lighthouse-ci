@@ -100,7 +100,7 @@ const UrlAndBranchSelector = props => {
           to.searchParams.set('runUrl', url);
           route(`${to.pathname}${to.search}`);
         }}
-        options={props.availableUrls.map(({url}) => ({value: url, label: url}))}
+        options={props.availableUrls.map(({url}) => ({value: url, label: decodeURI(url)}))}
       />
       <Dropdown
         label="Branch"

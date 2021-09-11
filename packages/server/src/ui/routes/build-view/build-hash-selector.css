@@ -122,8 +122,6 @@
   flex-grow: 1;
   flex-shrink: 10;
   text-overflow: ellipsis;
-  
-  
   overflow: hidden;
 }
 

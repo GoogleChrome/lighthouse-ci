@@ -56,7 +56,6 @@
   display: flex;
   flex-direction: row;
   align-items: center;
-  
   height: var(--line-item-height);
   padding: calc(var(--base-spacing) / 2);
 }

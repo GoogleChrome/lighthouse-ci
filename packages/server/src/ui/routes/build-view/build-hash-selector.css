@@ -122,6 +122,7 @@
   flex-shrink: 10;
   text-overflow: ellipsis;
   overflow: hidden;
+  white-space: nowrap;
 }
 
 .build-hash-selector__links {

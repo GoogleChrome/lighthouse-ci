@@ -56,7 +56,6 @@
   display: flex;
   flex-direction: row;
   align-items: center;
-
   height: var(--line-item-height);
   padding: calc(var(--base-spacing) / 2);
 }
@@ -122,8 +121,8 @@
   flex-grow: 1;
   flex-shrink: 10;
   text-overflow: ellipsis;
-  white-space: pre;
   overflow: hidden;
+  white-space: nowrap;
 }
 
 .build-hash-selector__links {

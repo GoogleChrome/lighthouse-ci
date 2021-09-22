@@ -166,9 +166,9 @@ class ApiClient {
     const response = await this._fetch(this._normalizeURL('/version').href, {
       headers: {...this._extraHeaders},
     });
-    
+
     const body = response.text();
-    
+
     if (!response.ok) {
       /** @type {Error & {status?: number, body?: any}} */
       const error = new Error(`Unexpected status code ${response.status}\n  ${body}`);
@@ -176,7 +176,7 @@ class ApiClient {
       error.body = body;
       throw error;
     }
-    
+
     return body;
   }
 

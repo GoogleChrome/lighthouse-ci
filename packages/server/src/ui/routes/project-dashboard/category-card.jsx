@@ -130,7 +130,7 @@ const MetricDistributionGraphs = props => {
       />
       <MetricDistributionGraph
         abbreviation={'LCP'}
-        label={'First Contentful Paint'}
+        label={'Largest Contentful Paint'}
         statistics={stats('audit_largest-contentful-paint_median')}
         scoreLevels={SCORE_LEVEL_METRIC_THRESHOLDS['largest-contentful-paint']}
       />

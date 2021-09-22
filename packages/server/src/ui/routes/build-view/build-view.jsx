@@ -64,7 +64,7 @@ const BuildView_ = props => {
   const baseRuns = props.runs.filter(run => run.buildId === ancestorBuildId);
   const baseRun = baseRuns.find(run => run.url === baseUrl);
 
-  const availableUrlOptions = availableUrls.map(url => ({value: url, label: url}));
+  const availableUrlOptions = availableUrls.map(url => ({value: url, label: decodeURI(url)}));
 
   /** @type {LH.Result|undefined} */
   let lhr;

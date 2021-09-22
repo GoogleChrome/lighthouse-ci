@@ -170,6 +170,7 @@ class ApiClient {
     const body = response.text();
     
     if (!response.ok) {
+      /** @type {Error & {status: number, body: any}} */
       const error = new Error(`Unexpected status code ${response.status}\n  ${body}`);
       error.status = response.status;
       error.body = body;

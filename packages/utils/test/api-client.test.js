@@ -10,7 +10,8 @@
 const ApiClient = require('../src/api-client.js');
 
 describe('Lighthouse CI API Client', () => {
-  const fetchMockImpl = () => ({json: () => ({}), text: () => ''});
+  const fetchMockImpl = () => ({json: () => ({}), text: () => '', ok: true});
+  const failedFetchMockImpl = () => ({json: () => ({}), text: () => '', ok: false, status: 500});
 
   it('should normalize URLs relative to root', async () => {
     let fetchMock = jest.fn().mockImplementation(fetchMockImpl);
@@ -47,6 +48,17 @@ describe('Lighthouse CI API Client', () => {
       body: JSON.stringify({name: 'Foo'}),
       headers: {Authorization: 'Bearer 1234', 'content-type': 'application/json'},
     });
+  });
+
+  it('should fail on error status codes', async () => {
+    const fetchMock = jest.fn().mockImplementation(failedFetchMockImpl);
+    const client = new ApiClient({
+      rootURL: 'http://localhost:9000',
+      fetch: fetchMock,
+      extraHeaders: {Authorization: 'Bearer 1234'},
+    });
+
+    await expect(client.getVersion()).rejects.toBeTruthy();
   });
 
   describe('getBuilds', () => {

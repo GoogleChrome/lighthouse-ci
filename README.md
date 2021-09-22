@@ -72,7 +72,6 @@ A collection of unofficial blog posts, tutorials, and guides written by the comm
 
 - [Integrate Lighthouse CI for static website generator](https://blog.akansh.com/integrate-lighthouse-ci-with-static-site-generators/) - An article on integrating Lighthouse CI with static website generators like Gatsby, Jekyll, etc.
 - [Automating Google Lighthouse audits and uploading results to Azure](https://keepinguptodate.com/pages/2021/07/automating-google-lighthouse-upload-to-azure/) - This article covers configuring Lighthouse CI to run against a website and uploading the results to a Lighthouse CI server Docker container running both locally and in Azure.
-- [Creating a Google Lighthouse custom audit that checks DOM elements](https://keepinguptodate.com/pages/2021/08/custom-lighthouse-audit/) - This article covers creating a Lighthouse custom audit and gatherer to perform checks against DOM elements.
 
 ## Contributing
 

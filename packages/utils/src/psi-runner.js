@@ -19,7 +19,7 @@ class PsiRunner {
 
   /**
    * @param {string} url
-   * @param {{psiApiKey?: string, psiApiEndpoint?: string, psiStrategy?: 'mobile'|'desktop', categories?: Array<'performance' | 'accessibility' | 'best-practices' | 'pwa' | 'seo'>}} [options]
+   * @param {{psiApiKey?: string, psiApiEndpoint?: string, psiStrategy?: 'mobile'|'desktop', psiCategories?: Array<'performance' | 'accessibility' | 'best-practices' | 'pwa' | 'seo'>}} [options]
    * @return {Promise<string>}
    */
   async run(url, options) {
@@ -28,13 +28,13 @@ class PsiRunner {
     if (!apiKey) throw new Error('PSI API key must be provided to use the PSI runner');
     const client = new PsiClient({apiKey, endpointURL: options.psiApiEndpoint});
     return JSON.stringify(
-      await client.run(url, {strategy: options.psiStrategy, categories: options.categories})
+      await client.run(url, {strategy: options.psiStrategy, categories: options.psiCategories})
     );
   }
 
   /**
    * @param {string} url
-   * @param {{psiApiKey?: string, psiApiEndpoint?: string, psiStrategy?: 'mobile'|'desktop', categories?: Array<'performance' | 'accessibility' | 'best-practices' | 'pwa' | 'seo'>}} [options]
+   * @param {{psiApiKey?: string, psiApiEndpoint?: string, psiStrategy?: 'mobile'|'desktop', psiCategories?: Array<'performance' | 'accessibility' | 'best-practices' | 'pwa' | 'seo'>}} [options]
    * @return {Promise<string>}
    */
   async runUntilSuccess(url, options = {}) {

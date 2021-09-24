@@ -1002,7 +1002,7 @@ _Optional_ The "branch" on which to report the results. Defaults to the base bra
 
 ##### `psiCollectCron.sites[i].maxNumberOfParallelUrls`
 
-_Optional_ The maximum number of requests to send to the pagespeed insights api concurrently. Defaults to `Infinity` (all urls sent in parallel).
+_Optional_ The maximum number of requests to send to the PageSpeed Insights API concurrently. Defaults to `Infinity` (all urls sent in parallel).
 
 ##### `psiCollectCron.sites[i].categories`
 
@@ -1010,7 +1010,7 @@ _Optional_ An array containing the categories to test for each url in this site.
 
 ##### `psiCollectCron.sites[i].strategy`
 
-_Optional_ The strategy that the pagespeed insights api should use when testing each url in this site. Can be either `desktop` or `mobile`. Defaults to `mobile`.
+_Optional_ The strategy that the PageSpeed Insights API should use when testing each url in this site. Can be either `desktop` or `mobile`. Defaults to `mobile`.
 
 #### `deleteOldBuildsCron`
 

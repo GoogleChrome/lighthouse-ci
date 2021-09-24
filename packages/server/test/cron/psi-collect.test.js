@@ -100,11 +100,11 @@ describe('cron/psi-collect', () => {
 
       expect(psi.runUntilSuccess).toHaveBeenCalledWith(
         'http://example.com',
-        expect.objectContaining({categories: site.categories})
+        expect.objectContaining({psiCategories: site.categories})
       );
       expect(psi.runUntilSuccess).toHaveBeenCalledWith(
         'http://example2.com',
-        expect.objectContaining({categories: site.categories})
+        expect.objectContaining({psiCategories: site.categories})
       );
     });
 

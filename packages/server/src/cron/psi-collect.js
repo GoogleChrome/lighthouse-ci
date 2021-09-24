@@ -23,7 +23,6 @@ async function psiCollectForProject(storageMethod, psi, site) {
     projectSlug,
     numberOfRuns = 5,
     maxNumberOfParallelUrls = Infinity,
-    categories = ['performance', 'accessibility', 'best-practices', 'pwa', 'seo'],
     strategy = 'mobile',
   } = site;
   const project = await storageMethod.findProjectBySlug(projectSlug);
@@ -57,7 +56,10 @@ async function psiCollectForProject(storageMethod, psi, site) {
     urls,
     async url => {
       for (let i = 0; i < numberOfRuns; i++) {
-        const lhr = await psi.runUntilSuccess(url, {psiStrategy: strategy, categories: categories});
+        const lhr = await psi.runUntilSuccess(url, {
+          psiStrategy: strategy,
+          psiCategories: site.categories,
+        });
         await storageMethod.createRun({
           projectId: project.id,
           buildId: build.id,

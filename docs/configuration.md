@@ -1000,6 +1000,18 @@ _Optional_ The human friendly label for this set of URLs to use when logging sta
 
 _Optional_ The "branch" on which to report the results. Defaults to the base branch of the project referenced by `projectSlug`.
 
+##### `psiCollectCron.sites[i].maxNumberOfParallelUrls`
+
+_Optional_ The maximum number of requests to send to the pagespeed insights api concurrently. Defaults to `Infinity` (all urls sent in parallel).
+
+##### `psiCollectCron.sites[i].categories`
+
+_Optional_ An array containing the categories to test for each url in this site. Defaults to `['performance', 'accessibility', 'best-practices', 'pwa', 'seo']` (all categories).
+
+##### `psiCollectCron.sites[i].strategy`
+
+_Optional_ The strategy that the pagespeed insights api should use when testing each url in this site. Can be either `desktop` or `mobile`. Defaults to `mobile`.
+
 #### `deleteOldBuildsCron`
 
 The configuration to automatically delete old records. This job only works when `storage.storageMethod` is set `sql`.

@@ -15,6 +15,7 @@ jest.mock('cron', () => ({
     return cronJob(...args);
   },
 }));
+const Bluebird = require('bluebird');
 const {psiCollectForProject, startPsiCollectCron} = require('../../src/cron/psi-collect.js');
 
 describe('cron/psi-collect', () => {
@@ -58,6 +59,13 @@ describe('cron/psi-collect', () => {
       });
     });
 
+    it('should throw when maxNumberOfParallelUrls is < 1', async () => {
+      const site = {maxNumberOfParallelUrls: 0, urls: ['http://example.com']};
+      await expect(psiCollectForProject(storageMethod, psi, site)).rejects.toMatchObject({
+        message: 'maxNumberOfParallelUrls must be a positive integer > 0',
+      });
+    });
+
     it('should throw when PSI fails', async () => {
       psi.runUntilSuccess.mockRejectedValue(new Error('PSI failure'));
       const site = {urls: ['http://example.com']};
@@ -80,6 +88,24 @@ describe('cron/psi-collect', () => {
         [{projectId: 1, buildId: 2, url: 'http://example.com', lhr: '{"lhr": true}'}],
       ]);
       expect(storageMethod.sealBuild).toHaveBeenCalled();
+    });
+
+    it('should pass categories to PsiRunner', async () => {
+      const site = {
+        strategy: 'desktop',
+        urls: ['http://example.com', 'http://example2.com'],
+        categories: ['pwa', 'seo'],
+      };
+      await psiCollectForProject(storageMethod, psi, site);
+
+      expect(psi.runUntilSuccess).toHaveBeenCalledWith(
+        'http://example.com',
+        expect.objectContaining({psiCategories: site.categories})
+      );
+      expect(psi.runUntilSuccess).toHaveBeenCalledWith(
+        'http://example2.com',
+        expect.objectContaining({psiCategories: site.categories})
+      );
     });
 
     it('should fill in all the branch requests', async () => {
@@ -126,8 +152,25 @@ describe('cron/psi-collect', () => {
       ]);
     });
 
+    it('should respect maxNumberOfParallelUrls', async () => {
+      const mapSpy = jest.spyOn(Bluebird, 'map');
+      const site = {
+        maxNumberOfParallelUrls: 1,
+        urls: ['http://example.com', 'http://example2.com'],
+      };
+      await psiCollectForProject(storageMethod, psi, site);
+      expect(mapSpy).toHaveBeenCalledWith(
+        site.urls,
+        expect.any(Function),
+        expect.objectContaining({concurrency: site.maxNumberOfParallelUrls})
+      );
+    });
+
     it('should collect all urls', async () => {
-      const site = {urls: ['http://example.com/1', 'http://example.com/2'], numberOfRuns: 2};
+      const site = {
+        urls: ['http://example.com/1', 'http://example.com/2'],
+        numberOfRuns: 2,
+      };
       await psiCollectForProject(storageMethod, psi, site);
       expect(storageMethod.createRun.mock.calls).toMatchObject([
         [{projectId: 1, buildId: 2, url: 'http://example.com/1', lhr: '{"lhr": true}'}],

@@ -23,21 +23,21 @@ class PsiClient {
 
   /**
    * @param {string} urlToTest
-   * @param {{strategy?: 'mobile'|'desktop', locale?: string}} [options]
+   * @param {{strategy?: 'mobile'|'desktop', locale?: string, categories?: Array<'performance' | 'accessibility' | 'best-practices' | 'pwa' | 'seo'>}} [options]
    * @return {Promise<LH.Result>}
    */
   async run(urlToTest, options = {}) {
-    const {strategy = 'mobile', locale = 'en_US'} = options;
+    const {
+      strategy = 'mobile',
+      locale = 'en_US',
+      categories = ['performance', 'accessibility', 'best-practices', 'pwa', 'seo'],
+    } = options;
     const url = new this._URL(this._endpointURL);
     url.searchParams.set('url', urlToTest);
     url.searchParams.set('locale', locale);
     url.searchParams.set('strategy', strategy);
     url.searchParams.set('key', this._apiKey);
-    url.searchParams.append('category', 'performance');
-    url.searchParams.append('category', 'accessibility');
-    url.searchParams.append('category', 'best-practices');
-    url.searchParams.append('category', 'pwa');
-    url.searchParams.append('category', 'seo');
+    categories.forEach(category => url.searchParams.append('category', category));
 
     const response = await this._fetch(url.href);
     const body = await response.json();

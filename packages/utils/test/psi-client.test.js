@@ -37,4 +37,16 @@ describe('PSI API Client', () => {
       },
     });
   });
+
+  it('should respect provided options', async () => {
+    const lighthouseResult = {finalUrl: 'https://example.com/'};
+    fetchJsonMock = jest.fn().mockResolvedValue({lighthouseResult});
+    const fetchMock = jest.fn().mockImplementation(fetchMockImpl);
+    const runOptions = {strategy: 'desktop', categories: ['accessibility', 'pwa', 'seo']};
+    const client = new PsiClient({apiKey, fetch: fetchMock});
+    expect(await client.run('https://example.com', runOptions)).toEqual(lighthouseResult);
+    expect(fetchMock).toHaveBeenCalledWith(
+      'https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=https%3A%2F%2Fexample.com&locale=en_US&strategy=desktop&key=the-key&category=accessibility&category=pwa&category=seo'
+    );
+  });
 });

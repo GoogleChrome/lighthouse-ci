@@ -6,6 +6,7 @@
 'use strict';
 
 const {CronJob} = require('cron');
+const Bluebird = require('bluebird');
 const {getGravatarUrlFromEmail} = require('@lhci/utils/src/build-context');
 const PsiRunner = require('@lhci/utils/src/psi-runner.js');
 const {normalizeCronSchedule} = require('./utils');
@@ -17,10 +18,20 @@ const {normalizeCronSchedule} = require('./utils');
  * @return {Promise<void>}
  */
 async function psiCollectForProject(storageMethod, psi, site) {
-  const {urls, projectSlug, numberOfRuns = 5} = site;
+  const {
+    urls,
+    projectSlug,
+    numberOfRuns = 5,
+    maxNumberOfParallelUrls = Infinity,
+    categories = ['performance', 'accessibility', 'best-practices', 'pwa', 'seo'],
+    strategy = 'mobile',
+  } = site;
   const project = await storageMethod.findProjectBySlug(projectSlug);
   if (!project) throw new Error(`Invalid project slug "${projectSlug}"`);
   if (!urls || !urls.length) throw new Error('No URLs set');
+  if (maxNumberOfParallelUrls < 1) {
+    throw new Error('maxNumberOfParallelUrls must be a positive integer > 0');
+  }
 
   const build = await storageMethod.createBuild({
     projectId: project.id,
@@ -41,11 +52,12 @@ async function psiCollectForProject(storageMethod, psi, site) {
     committedAt: new Date().toISOString(),
   });
 
-  // Run all URLs in parallel
-  await Promise.all(
-    urls.map(async url => {
+  // Run 'maxNumberOfParallelUrls' URLs in parallel
+  await Bluebird.map(
+    urls,
+    async url => {
       for (let i = 0; i < numberOfRuns; i++) {
-        const lhr = await psi.runUntilSuccess(url);
+        const lhr = await psi.runUntilSuccess(url, {psiStrategy: strategy, categories: categories});
         await storageMethod.createRun({
           projectId: project.id,
           buildId: build.id,
@@ -59,7 +71,8 @@ async function psiCollectForProject(storageMethod, psi, site) {
           await new Promise(r => setTimeout(r, psi.CACHEBUST_TIMEOUT));
         }
       }
-    })
+    },
+    {concurrency: maxNumberOfParallelUrls}
   );
 
   await storageMethod.sealBuild(build.projectId, build.id);

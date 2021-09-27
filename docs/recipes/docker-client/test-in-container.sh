@@ -15,5 +15,5 @@ git commit -m 'initial commit'
 # Run our LHCI commands
 which lhci
 lhci healthcheck
-lhci collect --url=https://example.com -n=1 --settings.chromeFlags=--no-sandbox
+lhci collect --url=https://example.com -n=1 --settings.chromeFlags="--no-sandbox --disable-dev-shm-usage"
 lhci upload --target=filesystem

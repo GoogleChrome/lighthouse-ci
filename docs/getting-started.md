@@ -347,7 +347,7 @@ Be sure to keep this token secret. Anyone in possession of this token will be ab
 
 #### Additional configuration for GitHub Actions as CI Provider
 
-Make sure you define the `LHCI_GITHUB_APP_TOKEN` as [enviroment variable](https://docs.github.com/en/free-pro-team@latest/actions/reference/environment-variables#about-environment-variables) on the workflow and ensure that the git history is available too.
+Make sure you define the `LHCI_GITHUB_APP_TOKEN` as [environment variable](https://docs.github.com/en/free-pro-team@latest/actions/reference/environment-variables#about-environment-variables) on the workflow and ensure that the git history is available too.
 
 ```yaml
 name: CI

@@ -96,11 +96,11 @@ async function runNewProjectWizard(options) {
     process.stdout.write(`Use admin token ${log.bold}${adminToken}${log.reset} ${adminWarning}\n`);
   } else {
     process.stdout.write(
-        [
-          `WARNING: The server you've used is out-of-date and cannot issue admin tokens.`,
-          `         Upgrade your server to take advantage of administrator functions.`,
-          '',
-        ].join('\n')
+      [
+        `WARNING: The server you've used is out-of-date and cannot issue admin tokens.`,
+        `         Upgrade your server to take advantage of administrator functions.`,
+        '',
+      ].join('\n')
     );
   }
 }
@@ -135,11 +135,11 @@ async function runResetTokenWizard(type, options) {
       name: 'project',
       message: 'Which project would you like to reset?',
       choices: projects
-          .map(project => ({
-            name: project.name,
-            value: project,
-          }))
-          .sort((a, b) => a.name.localeCompare(b.name)),
+        .map(project => ({
+          name: project.name,
+          value: project,
+        }))
+        .sort((a, b) => a.name.localeCompare(b.name)),
     },
     {
       type: 'input',
@@ -154,9 +154,9 @@ async function runResetTokenWizard(type, options) {
   }
 
   const newToken =
-      type === 'admin'
-          ? await storageMethod._resetAdminToken(project.id)
-          : await storageMethod._resetProjectToken(project.id);
+    type === 'admin'
+      ? await storageMethod._resetAdminToken(project.id)
+      : await storageMethod._resetProjectToken(project.id);
   const adminWarning = type === 'admin' ? ' to manage data. KEEP THIS SECRET!' : '';
   process.stdout.write(`Reset token for project ${project.name} (${project.id})!\n`);
   process.stdout.write(`Use ${type} token ${log.bold}${newToken}${log.reset}${adminWarning}\n`);
@@ -168,8 +168,8 @@ async function runResetTokenWizard(type, options) {
  */
 async function runCommand(options) {
   const whichWizardPrompt = options.wizard
-      ? options
-      : await inquirer.prompt([
+    ? options
+    : await inquirer.prompt([
         {
           type: 'list',
           name: 'wizard',

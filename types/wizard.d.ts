@@ -12,6 +12,9 @@ declare global {
         extraHeaders?: Record<string, string>;
         basicAuth?: ServerCommand.Options['basicAuth'];
         serverBaseUrl?: string;
+        projectName?: string;
+        projectExternalUrl?: string;
+        projectBaseBranch?: string;
         storage?: ServerCommand.StorageOptions;
       }
     }

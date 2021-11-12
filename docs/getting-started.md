@@ -489,6 +489,18 @@ The _admin token_ is used to edit or delete data within the project. **KEEP THIS
 
 If your lhci server is behind basic auth, you can provide the username and password via the `--basicAuth.password` and `--basicAuth.username` command line flags.
 
+All these options are available for `lhci wizard`
+
+| name                   | description                                       |
+| ---------------------- | ------------------------------------------------- |
+| `--wizard`             | new-project, reset-build-token, reset-admin-token |
+| `--serverBaseUrl`      | LHCI server url                                   |
+| `--basicAuth.username` | LHCI server username if any                       |
+| `--basicAuth.password` | LHCI server password if any                       |
+| `--projectName`        | Project name                                      |
+| `--projectExternalUrl` | Project repo url                                  |
+| `--projectBaseBranch`  | project base branch                               |
+
 ### Configuration
 
 With your server setup and the project created, all that's left to do is update your Lighthouse CI configuration file with the new URL and token. If you'd like to keep the token secret from contributors, you can use the `LHCI_TOKEN` environment variable instead of putting the token in plain text in your code.

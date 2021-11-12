@@ -14,7 +14,7 @@ const btoa = typeof window === 'undefined' ? s => Buffer.from(s).toString('base6
 
 class ApiClient {
   /**
-   * @param {{rootURL: string, fetch?: import('isomorphic-fetch'), URL?: typeof import('url').URL, extraHeaders?: Record<string, string>, basicAuth?: LHCI.ServerCommand.Options['basicAuth']}} options
+   * @param {{projectExternalUrl?: string, serverBaseUrl?: string, basicAuth?: LHCI.ServerCommand.Options["basicAuth"], wizard?: "new-project" | "reset-admin-token" | "reset-build-token", extraHeaders?: Record<string, string>, storage?: LHCI.ServerCommand.StorageOptions, projectName?: string, projectBaseBranch?: string, rootURL: string}} options
    */
   constructor(options) {
     this._rootURL = options.rootURL;

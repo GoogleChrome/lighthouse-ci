@@ -76,9 +76,14 @@ async function runNewProjectWizard(options) {
     ...(await inquirer.prompt(prompts)),
   };
 
+  if (!responses.serverBaseUrl) throw new Error('Failed to respond with a server URL');
+  if (!responses.projectExternalUrl) throw new Error('Failed to respond with a project external URL');
+  if (!responses.projectName) throw new Error('Failed to respond with a project external URL');
+  if (!responses.projectBaseBranch) throw new Error('Failed to respond with a project base branch');
+
   const api = new ApiClient({
     ...options,
-    rootURL: responses.serverBaseUrl || options.serverBaseUrl,
+    rootURL: responses.serverBaseUrl,
   });
   const project = await api.createProject({
     name: responses.projectName,

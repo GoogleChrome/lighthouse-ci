@@ -18,6 +18,7 @@
     "compression": "^1.7.4",
     "debug": "^4.3.1",
     "express": "^4.17.1",
+    "https-proxy-agent": "^5.0.0",
     "inquirer": "^6.3.1",
     "isomorphic-fetch": "^3.0.0",
     "lighthouse": "8.0.0",

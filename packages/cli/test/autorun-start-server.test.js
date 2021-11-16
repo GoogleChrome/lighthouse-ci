@@ -71,7 +71,7 @@ describe('Lighthouse CI autorun CLI with startServerCommand', () => {
 
         [31mX[0m  [1mviewport[0m failure for [1mminScore[0m assertion
              Does not have a \`<meta name=\\"viewport\\">\` tag with \`width\` or \`initial-scale\`
-             https://web.dev/viewport/
+             https://developers.google.com/web/updates/XXXX/12/300ms-tap-delay-gone-away
 
               expected: >=[32m0.9[0m
                  found: [31m0[0m

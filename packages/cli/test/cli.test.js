@@ -348,17 +348,7 @@ describe('Lighthouse CI CLI', () => {
       expect(stderr).toMatchInlineSnapshot(`
         "Checking assertions against 1 URL(s), 2 total run(s)
 
-        1 result(s) for [1mhttp://localhost:XXXX/app/[0m :
-
-          [31mX[0m  [1mperformance-budget[0m.script.size failure for [1mmaxNumericValue[0m assertion
-               Performance budget
-               https://developers.google.com/web/tools/lighthouse/audits/budgets
-
-                expected: <=[32mXXXX[0m
-                   found: [31mXXXX[0m
-              [2mall values: XXXX[0m
-
-        Assertion failed. Exiting with status code 1.
+        All results processed!
         "
       `);
       expect(status).toEqual(1);
@@ -399,7 +389,7 @@ describe('Lighthouse CI CLI', () => {
       expect(stderr).toMatchInlineSnapshot(`
         "Checking assertions against 1 URL(s), 2 total run(s)
 
-        2 result(s) for [1mhttp://localhost:XXXX/app/[0m :
+        1 result(s) for [1mhttp://localhost:XXXX/app/[0m :
 
           [31mX[0m  [1mfirst-contentful-paint[0m failure for [1mmaxNumericValue[0m assertion
                First Contentful Paint
@@ -408,15 +398,6 @@ describe('Lighthouse CI CLI', () => {
                 expected: <=[32m1[0m
                    found: [31mXXXX[0m
               [2mall values: XXXX, XXXX[0m
-
-
-          [31mX[0m  [1mperformance-budget[0m.script.size failure for [1mmaxNumericValue[0m assertion
-               Performance budget
-               https://developers.google.com/web/tools/lighthouse/audits/budgets
-
-                expected: <=[32mXXXX[0m
-                   found: [31mXXXX[0m
-              [2mall values: XXXX[0m
 
         Assertion failed. Exiting with status code 1.
         "

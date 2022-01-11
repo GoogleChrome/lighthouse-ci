@@ -20,8 +20,8 @@ import lhr700A_ from '../../../../../test/fixtures/lh-7-0-0-coursehero-a.json';
 import lhr700B_ from '../../../../../test/fixtures/lh-7-0-0-coursehero-b.json';
 import lhr800A_ from '../../../../../test/fixtures/lh-8-0-0-coursehero-a.json';
 import lhr800B_ from '../../../../../test/fixtures/lh-8-0-0-coursehero-b.json';
-import lhr900A_ from '../../../../../test/fixtures/lh-9-0-0-coursehero-a.json';
-import lhr900B_ from '../../../../../test/fixtures/lh-9-0-0-coursehero-b.json';
+import lhr920A_ from '../../../../../test/fixtures/lh-9-2-0-coursehero-a.json';
+import lhr920B_ from '../../../../../test/fixtures/lh-9-2-0-coursehero-b.json';
 import lhrSubitemsA_ from '../../../../../test/fixtures/lh-subitems-a.json';
 import lhrSubitemsB_ from '../../../../../test/fixtures/lh-subitems-b.json';
 import lhrPsi800A_ from '../../../../../test/fixtures/psi-8-0-0-dkdev-a.json';
@@ -45,8 +45,8 @@ const lhr700A = /** @type {any} */ (lhr700A_);
 const lhr700B = /** @type {any} */ (lhr700B_);
 const lhr800A = /** @type {any} */ (lhr800A_);
 const lhr800B = /** @type {any} */ (lhr800B_);
-const lhr900A = /** @type {any} */ (lhr900A_);
-const lhr900B = /** @type {any} */ (lhr900B_);
+const lhr920A = /** @type {any} */ (lhr920A_);
+const lhr920B = /** @type {any} */ (lhr920B_);
 const lhrSubitemsA = /** @type {any} */ (lhrSubitemsA_);
 const lhrSubitemsB = /** @type {any} */ (lhrSubitemsB_);
 const lhrPsi800A = /** @type {any} */ (lhrPsi800A_);
@@ -58,7 +58,7 @@ const auditPairs62 = createAuditPairs(lhr62A, lhr62B);
 const auditPairs641 = createAuditPairs(lhr641A, lhr641B);
 const auditPairs700 = createAuditPairs(lhr700A, lhr700B);
 const auditPairs800 = createAuditPairs(lhr800A, lhr800B);
-const auditPairs900 = createAuditPairs(lhr900A, lhr900B);
+const auditPairs900 = createAuditPairs(lhr920A, lhr920B);
 const auditPairsPsi800 = createAuditPairs(lhrPsi800A, lhrPsi800B);
 const auditPairsSubitems = createAuditPairs(lhrSubitemsA, lhrSubitemsB, {
   filter: pair =>
@@ -130,7 +130,7 @@ export const Version900 = () => (
     selectedAuditId={auditPairs900[1].audit.id || ''}
     setSelectedAuditId={action('setSelectedAuditId')}
     pairs={auditPairs900}
-    baseLhr={lhr900B}
+    baseLhr={lhr920B}
   />
 );
 

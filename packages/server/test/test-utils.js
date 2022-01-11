@@ -110,8 +110,8 @@ function createActualTestDataset() {
       {...baseRun, id: '9', buildId: '9', url, lhr: lhr('lh-7-0-0-coursehero-b.json')},
       {...baseRun, id: '10', buildId: '10', url, lhr: lhr('lh-8-0-0-coursehero-a.json')},
       {...baseRun, id: '11', buildId: '11', url, lhr: lhr('lh-8-0-0-coursehero-b.json')},
-      {...baseRun, id: '12', buildId: '12', url, lhr: lhr('lh-9-0-0-coursehero-a.json')},
-      {...baseRun, id: '13', buildId: '13', url, lhr: lhr('lh-9-0-0-coursehero-b.json')},
+      {...baseRun, id: '12', buildId: '12', url, lhr: lhr('lh-9-2-0-coursehero-a.json')},
+      {...baseRun, id: '13', buildId: '13', url, lhr: lhr('lh-9-2-0-coursehero-b.json')},
     ],
   };
 }

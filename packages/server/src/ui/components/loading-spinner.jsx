@@ -8,7 +8,7 @@ import {h} from 'preact';
 import clsx from 'clsx';
 import './loading-spinner.css';
 
-// @ts-ignore - tsc doesn't understand parcel :)
+// @ts-ignore - tsc doesn't understand bundlers :)
 const SVG_PATH = require('./loading-spinner.svg');
 
 const LoadingSpinner_ = () => {

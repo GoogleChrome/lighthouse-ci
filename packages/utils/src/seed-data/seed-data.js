@@ -28,6 +28,7 @@ async function writeSeedDataToApi(client, rawData) {
   /** @type {Array<LHCI.ServerCommand.Project>} */
   const projects = [];
   for (const project of data.projects) {
+    // @ts-expect-error - controlled deletion of test data, before sending to API.
     delete project.id;
     projects.push(await client.createProject(project));
   }
@@ -35,6 +36,7 @@ async function writeSeedDataToApi(client, rawData) {
   /** @type {Array<LHCI.ServerCommand.Build>} */
   const builds = [];
   for (const build of data.builds) {
+    // @ts-expect-error - controlled deletion of test data, before sending to API.
     delete build.id;
     const project = projects[Number(build.projectId)];
     build.projectId = project.id;
@@ -44,6 +46,7 @@ async function writeSeedDataToApi(client, rawData) {
   }
 
   for (const run of data.runs) {
+    // @ts-expect-error - controlled deletion of test data, before sending to API.
     delete run.id;
     run.projectId = projects[Number(run.projectId)].id;
     run.buildId = builds[Number(run.buildId)].id;
@@ -51,7 +54,7 @@ async function writeSeedDataToApi(client, rawData) {
     await client.createRun({
       ...run,
       lhr:
-        // @ts-ignore - allow programmatic creation of LHR
+        // @ts-expect-error - allow programmatic creation of LHR
         typeof run.lhr === 'function' ? run.lhr() : run.lhr,
     });
   }

@@ -155,7 +155,10 @@ async function cleanupE2E(state) {
   }
 }
 
-/** @param {import('puppeteer').Page} page */
+/**
+ * @param {import('puppeteer').Page} page
+ * @return {Promise<void>}
+ */
 function waitForNetworkIdle0(page) {
   /** @type {NodeJS.Timeout} */
   let idleTimeout;

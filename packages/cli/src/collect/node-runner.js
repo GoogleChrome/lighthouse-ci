@@ -138,7 +138,7 @@ class LighthouseRunner {
     while (attempts.length < 3) {
       try {
         return await this.run(url, options);
-      } catch (/** @type {any} */ err) {
+      } catch (err) {
         attempts.push(err);
       }
     }

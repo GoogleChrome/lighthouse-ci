@@ -156,7 +156,7 @@ async function runCommand(options) {
     let message = '';
     try {
       result = await check.test(options);
-    } catch (/** @type {any} */ err) {
+    } catch (err) {
       result = false;
       message = `\n    ERROR: ${err.message}`;
     }

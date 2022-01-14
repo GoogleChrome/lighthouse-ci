@@ -75,13 +75,13 @@ const BuildView_ = props => {
 
   try {
     lhr = useMemo(() => run && JSON.parse(run.lhr), [run]);
-  } catch (/** @type {any} */ err) {
+  } catch (err) {
     lhrError = err;
   }
 
   try {
     baseLhr = useMemo(() => baseRun && JSON.parse(baseRun.lhr), [baseRun]);
-  } catch (/** @type {any} */ err) {
+  } catch (err) {
     lhrError = err;
   }
 

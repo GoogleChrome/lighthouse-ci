@@ -329,7 +329,7 @@ async function getPreviousUrlMap(options) {
     return new Map(
       entries.map(([k, v]) => [replaceUrlPatterns(k, options.urlReplacementPatterns), v])
     );
-  } catch (/** @type {any} */ err) {
+  } catch (err) {
     print(`Error while fetching previous urlMap: ${err.message}`);
     return new Map();
   }
@@ -366,7 +366,7 @@ async function writeUrlMapToApi(urlMap) {
     } else {
       print(`failed!\n`);
     }
-  } catch (/** @type {any} */ err) {
+  } catch (err) {
     print(`Failed to save URL map: ${err.message}\n`);
   }
 }
@@ -490,7 +490,7 @@ async function runTemporaryPublicStorageTarget(options) {
       } else {
         print(`failed!\n`);
       }
-    } catch (/** @type {any} */ err) {
+    } catch (err) {
       print(`failed!\n`);
       process.stderr.write(err.stack + '\n');
     }
@@ -590,7 +590,7 @@ async function runCommand(options) {
     case 'lhci':
       try {
         return await runLHCITarget(options);
-      } catch (/** @type {any} */ err) {
+      } catch (err) {
         if (options.ignoreDuplicateBuildFailure && /Build already exists/.test(err.message)) {
           print('Build already exists but ignore requested via options, skipping upload...');
           return;

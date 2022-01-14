@@ -6,7 +6,7 @@
 
 import {h} from 'preact';
 import clsx from 'clsx';
-import {useState} from 'preact/hooks';
+import {useState} from 'preact/compat';
 import './lhr-viewer-link.css';
 
 /** @typedef {LH.Result|(() => Promise<LH.Result>)} LHResolver */

@@ -73,14 +73,10 @@ async function createApp(options) {
  * @return {Promise<ServerInstance>}
  */
 async function createServer(options) {
-  console.log('------------- createServer 1');
   const {app, storageMethod} = await createApp(options);
-  console.log('------------- createServer 2');
 
   return new Promise((resolve, reject) => {
-    console.log('------------- createServer 3');
     const server = createHttpServer(app);
-    console.log('------------- createServer 4');
 
     // Node default socket timeout is 2 minutes.
     // Some LHCI API operations (computing statistics) can take longer than that under heavy load.
@@ -104,12 +100,10 @@ async function createServer(options) {
     };
 
     server.listen(listenOptions, () => {
-      console.log('------------- createServer 5');
       const serverAddress = server.address();
       const listenPort =
         typeof serverAddress === 'string' || !serverAddress ? options.port : serverAddress.port;
 
-      console.log('------------- createServer 6');
       resolve({
         storageMethod,
         port: listenPort,

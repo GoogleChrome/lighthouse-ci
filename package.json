@@ -50,7 +50,6 @@
     "@types/morgan": "^1.7.35",
     "@types/node": "^11.13.2",
     "@types/plotly.js": "^1.44.9",
-    "@types/puppeteer": "^1.19.0",
     "@types/sequelize": "^4.27.34",
     "@types/tmp": "^0.1.0",
     "@types/umzug": "^2.2.2",
@@ -81,7 +80,7 @@
     "preact-render-to-json": "^3.6.6",
     "prettier": "1.16.4",
     "prop-types": "^15.7.2",
-    "puppeteer": "^1.18.1",
+    "puppeteer": "^13.0.1",
     "rimraf": "^3.0.2",
     "sqlite3": "^5.0.0",
     "typescript": "^3.9.3"

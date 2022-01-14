@@ -65,7 +65,7 @@ async function main() {
       '.woff': 'file',
       '.woff2': 'file',
     },
-    publicPath: '/',
+    publicPath: '/app',
     bundle: true,
     outdir,
     // minify: true,

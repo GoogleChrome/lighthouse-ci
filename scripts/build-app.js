@@ -66,7 +66,7 @@ async function main() {
     publicPath: '/app',
     bundle: true,
     outdir,
-    // minify: true,
+    minify: true,
     sourcemap: true,
     jsxFactory: 'h',
     watch: command === 'watch' ? {

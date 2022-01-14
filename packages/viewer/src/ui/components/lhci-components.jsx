@@ -9,8 +9,10 @@ export {LoadingSpinner} from '../../../../server/src/ui/components/loading-spinn
 export {Paper} from '../../../../server/src/ui/components/paper.jsx';
 export {LhrViewerButton} from '../../../../server/src/ui/components/lhr-viewer-button.jsx';
 
+/** @type {string} */
 // @ts-ignore - tsc doesn't get parcel :)
 export const CONFETTI_PATH = require('../../../../server/src/ui/routes/project-list/confetti.svg');
 
+/** @type {string} */
 // @ts-ignore - tsc doesn't get parcel :)
 export const LH_LOGO_PATH = require('../../../../server/src/ui/logo.svg');

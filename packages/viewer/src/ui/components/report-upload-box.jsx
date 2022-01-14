@@ -28,7 +28,7 @@ export function parseStringAsLhr(s) {
       const lhr = JSON.parse(s);
       if (lhr.lighthouseVersion) return lhr;
       return new Error(`JSON did not contain a lighthouseVersion`);
-    } catch (err) {
+    } catch (/** @type {any} */ err) {
       return new Error(`File was not valid JSON (${err.message})`);
     }
   }

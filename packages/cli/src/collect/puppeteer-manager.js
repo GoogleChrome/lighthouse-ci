@@ -84,12 +84,9 @@ class PuppeteerManager {
 
     // Otherwise, check to see if the expected puppeteer download exists.
     const puppeteer = PuppeteerManager._requirePuppeteer();
-    const chromiumPath =
-      (puppeteer &&
-        puppeteer.PuppeteerNode &&
-        puppeteer.PuppeteerNode.prototype.executablePath()) ||
-      // @ts-expect-error - older puppeteer
-      (puppeteer.executablePath && puppeteer.executablePath());
+    const puppeteerUnknown = /** @type {unknown} */ (puppeteer);
+    const pupppeteerNode = /** @type {PuppeteerNode|undefined} */ (puppeteerUnknown);
+    const chromiumPath = pupppeteerNode && pupppeteerNode.executablePath();
     return chromiumPath && fs.existsSync(chromiumPath) ? chromiumPath : undefined;
   }
 

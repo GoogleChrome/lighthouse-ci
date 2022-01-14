@@ -62,7 +62,6 @@
     "babel-eslint": "^10.1.0",
     "babel-jest": "^26.0.1",
     "babel-loader": "^8.1.0",
-    "create-serve": "^1.0.1",
     "esbuild": "^0.14.11",
     "eslint": "^7.1.0",
     "eslint-config-google": "^0.14.0",

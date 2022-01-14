@@ -7170,11 +7170,6 @@ create-react-context@0.3.0, create-react-context@^0.3.0:
     gud "^1.0.0"
     warning "^4.0.3"
 
-create-serve@^1.0.1:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/create-serve/-/create-serve-1.0.1.tgz#a52ec4cbd2d0f776d3e42338fa1f0dae69080c59"
-  integrity sha512-cDAmBGhkwolS7ihq7SnPE8KwjYUZl5FaI9Pq5ZBwNelSKvFR9OoAA4/B5BfB/NC+eYaykBpX9RVMfuU4DHtrPw==
-
 cron@^1.8.2:
   version "1.8.2"
   resolved "https://registry.yarnpkg.com/cron/-/cron-1.8.2.tgz#4ac5e3c55ba8c163d84f3407bde94632da8370ce"

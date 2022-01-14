@@ -47,8 +47,6 @@ function insertCollectedStyles(result) {
 }
 
 async function main() {
-  // @ts-expect-error
-  const {default: serve, error, log} = (await import('create-serve'));
   const htmlPlugin = (await import('@chialab/esbuild-plugin-html')).default;
   
   /** @type {esbuild.BuildOptions} */
@@ -73,23 +71,13 @@ async function main() {
     jsxFactory: 'h',
     watch: command === 'watch' ? {
       onRebuild(err, result) {
-        if (result) insertCollectedStyles(result);
-        serve.update();
-        if (err) {
-          error('× Failed')
-        } else {
-          log('✓ Updated');
-        }
+        if (!err && result) insertCollectedStyles(result);
       },
     } : undefined,
   };
 
   const result = await esbuild.build(buildOptions);
   insertCollectedStyles(result);
-
-  if (command === 'watch') {
-    serve.start({port: 1234, root: outdir});
-  }
 }
 
 main().catch((err) => {

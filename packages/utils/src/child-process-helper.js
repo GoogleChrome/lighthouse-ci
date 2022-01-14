@@ -29,6 +29,7 @@ async function runCommandAndWaitForPattern(command, pattern, opts = {}) {
   /** @type {(e: Error) => void} */
   let reject;
   const timeoutPromise = new Promise(r => setTimeout(r, timeout));
+  /** @type {Promise<void>} */
   const foundStringPromise = new Promise((r1, r2) => {
     resolve = r1;
     reject = r2;

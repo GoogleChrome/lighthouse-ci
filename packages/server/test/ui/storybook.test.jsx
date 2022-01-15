@@ -64,6 +64,9 @@ initStoryshots({
     getMatchOptions: () => ({
       failureThreshold: process.env.CI ? 0.005 : 0.0015,
       failureThresholdType: 'percent',
+      // Slower, but required because images can be larger than the default maxBuffer for child processes
+      // which jest-image-snapshot relies on.
+      runInProcess: true,
     }),
     getScreenshotOptions: () => ({
       encoding: 'base64',

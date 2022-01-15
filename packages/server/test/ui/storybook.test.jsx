@@ -70,7 +70,6 @@ initStoryshots({
       runInProcess: true,
     }),
     getScreenshotOptions: () => ({
-      encoding: 'base64',
       fullPage: false,
     }),
   }),

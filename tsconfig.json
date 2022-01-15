@@ -6,6 +6,7 @@
     "allowJs": true,
     "checkJs": true,
     "strict": true,
+    "useUnknownInCatchVariables": false,
 
     "skipLibCheck": true,
 

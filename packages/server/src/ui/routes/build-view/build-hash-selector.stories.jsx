@@ -33,6 +33,7 @@ const build = id => ({
     'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8DwHwAFBQIAX8jx0gAAAABJRU5ErkJggg==',
   lifecycle: 'sealed',
   hash: hash(id),
+  commitMessage: 'this is a commit message',
   branch: 'master',
   runAt: runAt(id),
 });

@@ -60,7 +60,7 @@ function cleanStdOutput(output) {
     .replace(/(\s+at \S+) .*/g, '$1')
     .replace(/\s+at (async|processTicksAndRejections|process._tickCallback)(?=\n|$)/g, '')
     .replace(
-      /appspot.com\/reports\/[0-9-]+.report.html/g,
+      /appspot.com\/reports\/[0-9-]+.report.html/,
       'appspot.com/reports/XXXX-XXXX.report.html'
     )
     .replace(/\d{4,}(\.\d{1,})?/g, 'XXXX');

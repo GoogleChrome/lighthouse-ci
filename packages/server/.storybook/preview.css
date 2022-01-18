@@ -9,7 +9,3 @@ body,
 #root {
   min-height: 100vh;
 }
-
-@import 'https://fonts.googleapis.com/css?family=Roboto:400,500&display=block';
-@import 'https://fonts.googleapis.com/css?family=Roboto+Mono:400,500&display=block';
-@import 'https://fonts.googleapis.com/icon?family=Material+Icons';

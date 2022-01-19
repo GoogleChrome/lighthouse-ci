@@ -25,3 +25,7 @@ addDecorator(storyFn => (
     {storyFn()}
   </div>
 ));
+
+export const parameters = {
+  layout: 'centered',
+};

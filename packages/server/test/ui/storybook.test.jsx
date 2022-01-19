@@ -26,23 +26,41 @@ initStoryshots({
   test: imageSnapshot({
     storybookUrl: `http://localhost:${process.env.STORYBOOK_PORT}`,
     beforeScreenshot: async (page) => {
-      await page.evaluate(() => new Promise(r => window.requestAnimationFrame(r)));
+      // The browser is reused, so set the viewport back to a good default.
+      await page.setViewport({width: 800, height: 600});
+
       // TODO: replace with "wait for network idle" when puppeteer upgrades
       await page.waitFor(2000);
 
       const dimensions = await page.evaluate(() => {
-        const rootEl = document.querySelector('#root');
+        // Note: #root is made by storybook, #storybook-test-root is made by us in preview.jsx
+        // #root > #storybook-test-root > some_element_being_tested
+        
+        // Some snapshots (like Audit Detail Pane) are position fixed, which doesn't
+        // display properly and so is overriden with absolute (ctrl+f "#storybook-test-root").
+        // That makes the #root element not contain the full size of its children.
+        // In that case, we look at the tested component directly.
+        let element;
+        if (document.querySelector('#storybook-test-root').clientWidth === 0) {
+          element = document.querySelector('#storybook-test-root').children[0];
+        } else {
+          // Simplest case is just to return the size of the #root element.
+          // We could just do the former branch for this case too. This is really
+          // only here to better document what this code is doing.
+          element = document.querySelector('#root');
+        }
+
         return {
-          width: Math.ceil(rootEl.clientWidth),
-          height: Math.ceil(rootEl.clientHeight),
+          width: Math.ceil(element.clientWidth),
+          height: Math.ceil(element.clientHeight),
         };
       });
       await page.setViewport(dimensions);
+      await page.evaluate(() => new Promise(r => window.requestAnimationFrame(r)));
     },
     getMatchOptions: () => ({
       failureThreshold: process.env.CI ? 0.005 : 0.0015,
       failureThresholdType: 'percent',
-      updatePassedSnapshot: true,
     }),
     getScreenshotOptions: () => ({
       encoding: 'base64',

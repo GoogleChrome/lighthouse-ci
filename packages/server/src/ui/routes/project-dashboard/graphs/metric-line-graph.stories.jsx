@@ -12,7 +12,6 @@ import {MetricLineGraph} from './metric-line-graph';
 export default {
   title: 'Project Dashboard/Metric Line Graph',
   component: MetricLineGraph,
-  parameters: {dimensions: 'auto', padding: 10},
 };
 
 const runAt = (deltaInDays = 0) =>

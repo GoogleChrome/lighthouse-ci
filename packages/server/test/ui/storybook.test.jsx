@@ -29,6 +29,9 @@ initStoryshots({
   test: imageSnapshot({
     storybookUrl: `http://localhost:${process.env.STORYBOOK_PORT}`,
     beforeScreenshot: async (page, options) => {
+      // wait for the webfont request to avoid flakiness with webfont display
+      await page.waitForNetworkIdle();
+
       // `parameters` is defined in each story's default export
       const parameters = options.context.parameters;
       let dimensions = parameters.dimensions || {};
@@ -53,9 +56,6 @@ initStoryshots({
           parameters.padding
         );
       }
-
-      // wait for the webfont request to avoid flakiness with webfont display
-      await page.waitForNetworkIdle();
 
       width = Math.ceil(width);
       height = Math.ceil(height);

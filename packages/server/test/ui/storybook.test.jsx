@@ -8,9 +8,6 @@ import * as path from 'path';
 import initStoryshots_ from '@storybook/addon-storyshots';
 import {imageSnapshot} from '@storybook/addon-storyshots-puppeteer';
 
-const DEFAULT_WIDTH = 800;
-const DEFAULT_HEIGHT = 600;
-
 let initStoryshots = initStoryshots_;
 
 if (process.env.CI && require('os').platform() !== 'darwin') {
@@ -28,46 +25,27 @@ initStoryshots({
   suite: 'Image Storyshots',
   test: imageSnapshot({
     storybookUrl: `http://localhost:${process.env.STORYBOOK_PORT}`,
-    beforeScreenshot: async (page, options) => {
-      const parameters = options.context.parameters;
-      let dimensions = parameters.dimensions || {};
-      if (parameters.dimensions === 'auto' || !parameters.dimensions) {
-        await page.setViewport({width: DEFAULT_WIDTH, height: DEFAULT_HEIGHT});
-        await page.evaluate(() => new Promise(r => window.requestAnimationFrame(r)));
-        dimensions = await page.evaluate(() => {
-          const elements = [...document.querySelectorAll('#storybook-test-root *')];
-          return {
-            width: Math.max(...elements.map(el => el.clientWidth)),
-            height: Math.max(...elements.map(el => el.clientHeight)),
-          };
-        });
-      }
+    beforeScreenshot: async (page) => {
+      await page.evaluate(() => new Promise(r => window.requestAnimationFrame(r)));
+      // TODO: replace with "wait for network idle" when puppeteer upgrades
+      await page.waitFor(2000);
 
-      let {width = DEFAULT_WIDTH, height = DEFAULT_HEIGHT} = dimensions;
-      if (parameters.padding) {
-        width += parameters.padding * 2;
-        height += parameters.padding * 2;
-        await page.evaluate(
-          px => (document.getElementById('storybook-test-root').style.padding = `${px}px`),
-          parameters.padding
-        );
-      }
-
-      if (parameters.waitFor) {
-        await page.waitFor(parameters.waitFor);
-      }
-
-      width = Math.ceil(width);
-      height = Math.ceil(height);
-      await page.setViewport({width, height});
+      const dimensions = await page.evaluate(() => {
+        const rootEl = document.querySelector('#root');
+        return {
+          width: Math.ceil(rootEl.clientWidth),
+          height: Math.ceil(rootEl.clientHeight),
+        };
+      });
+      await page.setViewport(dimensions);
     },
     getMatchOptions: () => ({
       failureThreshold: process.env.CI ? 0.005 : 0.0015,
       failureThresholdType: 'percent',
+      updatePassedSnapshot: true,
     }),
     getScreenshotOptions: () => ({
       encoding: 'base64',
-      fullPage: false,
     }),
   }),
 });

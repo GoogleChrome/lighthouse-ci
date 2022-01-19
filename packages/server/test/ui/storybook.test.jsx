@@ -38,6 +38,7 @@ initStoryshots({
       if (parameters.dimensions === 'auto' || !parameters.dimensions) {
         await page.setViewport({width: DEFAULT_WIDTH, height: DEFAULT_HEIGHT});
         await page.evaluate(() => new Promise(r => window.requestAnimationFrame(r)));
+        await page.waitForNetworkIdle();
         dimensions = await page.evaluate(() => {
           const elements = [...document.querySelectorAll('#storybook-test-root *')];
           return {
@@ -60,6 +61,7 @@ initStoryshots({
       width = Math.ceil(width);
       height = Math.ceil(height);
       await page.setViewport({width, height});
+      await page.waitForNetworkIdle();
     },
     getMatchOptions: () => ({
       failureThreshold: process.env.CI ? 0.005 : 0.0015,

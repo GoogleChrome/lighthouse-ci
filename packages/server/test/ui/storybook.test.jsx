@@ -48,10 +48,6 @@ initStoryshots({
     getMatchOptions: () => ({
       failureThreshold: process.env.CI ? 0.005 : 0.0015,
       failureThresholdType: 'percent',
-      // Slower, but required because images can be larger than the default maxBuffer for child processes
-      // which jest-image-snapshot relies on.
-      // https://github.com/americanexpress/jest-image-snapshot/issues/210
-      runInProcess: true,
     }),
     getScreenshotOptions: () => ({
       fullPage: false,

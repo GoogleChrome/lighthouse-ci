@@ -6,4 +6,8 @@ dist/
 node_modules/
 .idea
 storybook-static
+<<<<<<< HEAD
 __diff_output__
+=======
+__diff_output/
+>>>>>>> origin/main

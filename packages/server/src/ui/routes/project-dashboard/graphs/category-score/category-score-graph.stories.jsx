@@ -11,7 +11,6 @@ import {CategoryScoreTimelineGraph} from './category-score-graph';
 export default {
   title: 'Project Dashboard/Category Score Graph',
   component: CategoryScoreTimelineGraph,
-  parameters: {dimensions: 'auto', padding: 10},
 };
 
 /** @type {LH.CategoryResult} */

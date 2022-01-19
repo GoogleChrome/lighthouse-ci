@@ -10,7 +10,6 @@ import {PWAGauge} from './pwa-gauge';
 export default {
   title: 'Components/PWA Gauge',
   component: PWAGauge,
-  parameters: {dimensions: {width: 120, height: 120}},
 };
 
 const allFalse = {optimized: false, installable: false, fastAndReliable: false};

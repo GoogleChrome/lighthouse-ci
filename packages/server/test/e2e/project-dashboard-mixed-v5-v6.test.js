@@ -51,7 +51,7 @@ describe('Project dashboard', () => {
       });
 
       await state.page.mouse.move(left * 1.5, 50 + height * 0.8);
-      await state.page.waitFor(500);
+      await state.page.waitForTimeout(500);
     });
 
     it('should look correct on hover', async () => {

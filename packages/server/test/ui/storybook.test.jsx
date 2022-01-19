@@ -54,9 +54,8 @@ initStoryshots({
         );
       }
 
-      if (parameters.waitForNetworkIdle) {
-        await page.waitForNetworkIdle();
-      }
+      // wait for the webfont request to avoid flakiness with webfont display
+      await page.waitForNetworkIdle();
 
       width = Math.ceil(width);
       height = Math.ceil(height);

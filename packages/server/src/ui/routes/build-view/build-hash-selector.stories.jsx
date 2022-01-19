@@ -12,7 +12,7 @@ import lhr_ from '../../../../test/fixtures/lh-5-6-0-verge-a.json';
 export default {
   title: 'Build View/Build Hash Selector',
   component: BuildHashSelector_,
-  parameters: {dimensions: {width: 800, height: 400}, waitForNetworkIdle: true}, // wait for the webfont request to avoid flakiness with webfont display
+  parameters: {dimensions: {width: 800, height: 400}},
 };
 
 const lhr = /** @type {LH.Result} */ (lhr_);

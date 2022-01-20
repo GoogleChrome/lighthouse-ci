@@ -24,7 +24,6 @@ import lhrPsi800B_ from '../../../../test/fixtures/psi-8-0-0-dkdev-b.json';
 export default {
   title: 'Build View/LHR Comparison',
   component: LhrComparison,
-  parameters: {dimensions: 'auto'},
 };
 
 const lhr5A = /** @type {any} */ (lhr5A_);

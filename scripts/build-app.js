@@ -22,7 +22,6 @@ if (!['build', 'watch'].includes(command)) {
 }
 
 /**
- * 
  * @param {esbuild.BuildResult} result
  */
 function insertCollectedStyles(result) {
@@ -42,7 +41,26 @@ function insertCollectedStyles(result) {
   if (!htmlText.includes(needle)) throw new Error(`expected ${needle} in html`);
 
   const newHtmlText =
-    htmlText.replace(needle, `<link rel="stylesheet" href="${path.relative(outdir, stylesheet)}" />`);
+    htmlText.replace(needle, `<link rel="stylesheet" href="/app/${path.relative(outdir, stylesheet)}" />`);
+  fs.writeFileSync(html, newHtmlText);
+}
+
+/**
+ * @param {esbuild.BuildResult} result
+ */
+ function fixScriptSrc(result) {
+  if (!result.metafile) throw new Error('expected metafile');
+
+  const htmls = Object.keys(result.metafile.outputs).filter(o => o.endsWith('.html'));
+  const html = htmls[0];
+  if (htmls.length !== 1) throw new Error('expected exactly one generated html');
+
+  const needle = '<script src="';
+  const htmlText = fs.readFileSync(html, 'utf-8');
+  if (!htmlText.includes(needle)) throw new Error(`expected ${needle} in html`);
+
+  const newHtmlText =
+    htmlText.replace(needle, `${needle}/app/`);
   fs.writeFileSync(html, newHtmlText);
 }
 
@@ -71,13 +89,17 @@ async function main() {
     jsxFactory: 'h',
     watch: command === 'watch' ? {
       onRebuild(err, result) {
-        if (!err && result) insertCollectedStyles(result);
+        if (!err && result) {
+          insertCollectedStyles(result);
+          fixScriptSrc(result);
+        }
       },
     } : undefined,
   };
 
   const result = await esbuild.build(buildOptions);
   insertCollectedStyles(result);
+  fixScriptSrc(result);
 }
 
 main().catch((err) => {

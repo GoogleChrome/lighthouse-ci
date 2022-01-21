@@ -44,13 +44,13 @@ describe('Project dashboard', () => {
     it('should render graphs for previously unavailable data', async () => {
       await state.page.evaluate(() => {
         const graphs = Array.from(document.querySelectorAll('.metric-line-graph__graph'));
-        if (!graphs.length) throw new Error('Should have found 2 metric graphs');
+        if (graphs.length !== 2) throw new Error('Should have found 2 metric graphs');
 
         window.scrollTo({top: graphs[0].getBoundingClientRect().top - 50});
       });
 
-      // Hover the first graph.
-      await state.page.hover('.metric-line-graph__graph');
+      // Hover the second graph.
+      await state.page.hover('.metric-line-graph__graph:nth-of-type(2)');
     });
 
     it('should look correct on hover', async () => {

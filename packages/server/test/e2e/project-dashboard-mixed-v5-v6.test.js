@@ -47,10 +47,11 @@ describe('Project dashboard', () => {
         if (graphs.length !== 2) throw new Error('Should have found 2 metric graphs');
 
         window.scrollTo({top: graphs[0].getBoundingClientRect().top - 50});
+        return new Promise(resolve => requestAnimationFrame(resolve));
       });
 
-      // Hover the second graph.
-      await state.page.hover('.metric-line-graph__graph:nth-of-type(2)');
+      // Hover the first graph.
+      await state.page.mouse.move(200, 200);
     });
 
     it('should look correct on hover', async () => {

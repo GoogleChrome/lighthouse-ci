@@ -449,6 +449,7 @@ describe('Lighthouse CI CLI', () => {
     });
 
     it('should list the projects', async () => {
+      await page.waitForSelector('.project-list');
       const contents = await page.evaluate('document.body.innerHTML');
       expect(contents).toContain('AwesomeCIProjectName');
       expect(contents).toContain('OtherCIProjectName');
@@ -464,6 +465,7 @@ describe('Lighthouse CI CLI', () => {
     it('should list the projects again', async () => {
       page = await browser.newPage();
       await page.goto(`http://localhost:${server.port}/app`, {waitUntil: 'networkidle0'});
+      await page.waitForSelector('.project-list');
       const contents = await page.evaluate('document.body.innerHTML');
       expect(contents).not.toContain('AwesomeCIProjectName');
       expect(contents).toContain('OtherCIProjectName');

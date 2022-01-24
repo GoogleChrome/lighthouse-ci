@@ -40,6 +40,11 @@ jobs:
         with:
           name: screenshots
           path: packages/server/test/e2e/__image_snapshots__/__diff_output__/*.png
+      - if: ${{ failure() }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: screenshots
+          path: packages/viewer/test/e2e/__image_snapshots__/__diff_output__/*.png
   complete:
     name: Linux
     runs-on: ubuntu-latest

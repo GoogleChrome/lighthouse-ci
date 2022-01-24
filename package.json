@@ -30,12 +30,13 @@
     "@babel/core": "^7.10.2",
     "@babel/plugin-transform-react-jsx": "^7.10.1",
     "@babel/preset-env": "^7.10.1",
-    "@storybook/addon-actions": "^5.3.19",
-    "@storybook/addon-links": "^5.3.19",
-    "@storybook/addon-storyshots": "^5.3.19",
-    "@storybook/addon-storyshots-puppeteer": "^5.3.19",
-    "@storybook/addons": "^5.3.19",
-    "@storybook/preact": "^5.3.19",
+    "@chialab/esbuild-plugin-html": "^0.12.2",
+    "@storybook/addon-actions": "^6.4.13",
+    "@storybook/addon-links": "^6.4.13",
+    "@storybook/addon-storyshots": "^6.4.13",
+    "@storybook/addon-storyshots-puppeteer": "^6.4.13",
+    "@storybook/addons": "^6.4.13",
+    "@storybook/preact": "^6.4.13",
     "@testing-library/dom": "^5.4.0",
     "@types/body-parser": "^1.17.0",
     "@types/compression": "^1.0.1",
@@ -61,6 +62,7 @@
     "babel-eslint": "^10.1.0",
     "babel-jest": "^26.0.1",
     "babel-loader": "^8.1.0",
+    "esbuild": "^0.14.11",
     "eslint": "^7.1.0",
     "eslint-config-google": "^0.14.0",
     "eslint-config-prettier": "^6.11.0",
@@ -75,7 +77,6 @@
     "jest-image-snapshot": "^4.0.2",
     "lerna": "^3.22.0",
     "mysql2": "^2.1.0",
-    "parcel-bundler": "^1.12.4",
     "pg": "^8.2.1",
     "pg-hstore": "^2.3.3",
     "preact-render-to-json": "^3.6.6",
@@ -84,6 +85,6 @@
     "puppeteer": "^1.18.1",
     "rimraf": "^3.0.2",
     "sqlite3": "^5.0.0",
-    "typescript": "^3.9.3"
+    "typescript": "^4.5.4"
   }
 }

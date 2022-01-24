@@ -6,11 +6,13 @@
     "allowJs": true,
     "checkJs": true,
     "strict": true,
+    "useUnknownInCatchVariables": false,
 
     "skipLibCheck": true,
 
-    "jsx": "preserve",
-    "jsxFactory": "preact.h",
+    "jsx": "react",
+    "jsxFactory": "h",
+    "jsxFragmentFactory": "Fragment",
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "diagnostics": true

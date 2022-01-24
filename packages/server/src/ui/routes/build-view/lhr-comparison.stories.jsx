@@ -84,7 +84,7 @@ export const Version800 = () => (
   </Wrapper>
 );
 
-export const Version900 = () => (
+export const Version920 = () => (
   <Wrapper>
     <LhrComparison lhr={lhr920A} baseLhr={lhr920B} hookElements={{}} />
   </Wrapper>

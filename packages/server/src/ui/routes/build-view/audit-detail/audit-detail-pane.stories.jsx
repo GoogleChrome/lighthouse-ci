@@ -57,7 +57,7 @@ const auditPairs62 = createAuditPairs(lhr62A, lhr62B);
 const auditPairs641 = createAuditPairs(lhr641A, lhr641B);
 const auditPairs700 = createAuditPairs(lhr700A, lhr700B);
 const auditPairs800 = createAuditPairs(lhr800A, lhr800B);
-const auditPairs900 = createAuditPairs(lhr920A, lhr920B);
+const auditPairs920 = createAuditPairs(lhr920A, lhr920B);
 const auditPairsPsi800 = createAuditPairs(lhrPsi800A, lhrPsi800B);
 const auditPairsSubitems = createAuditPairs(lhrSubitemsA, lhrSubitemsB, {
   filter: pair =>
@@ -124,11 +124,11 @@ export const Version800 = () => (
   />
 );
 
-export const Version900 = () => (
+export const Version920 = () => (
   <AuditDetailPane
-    selectedAuditId={auditPairs900[1].audit.id || ''}
+    selectedAuditId={auditPairs920[1].audit.id || ''}
     setSelectedAuditId={action('setSelectedAuditId')}
-    pairs={auditPairs900}
+    pairs={auditPairs920}
     baseLhr={lhr920B}
   />
 );

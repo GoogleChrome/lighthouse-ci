@@ -42,7 +42,10 @@ describe('Viewer simple comparison', () => {
 
   describe('render the comparison route', () => {
     it('should wait for the diff to render', async () => {
-      await Promise.all([waitForNetworkIdle0(state.page), state.page.waitFor('.lhr-comparison')]);
+      await Promise.all([
+        waitForNetworkIdle0(state.page),
+        state.page.waitForSelector('.lhr-comparison'),
+      ]);
     });
 
     it('should look correct', async () => {

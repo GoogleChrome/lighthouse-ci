@@ -402,7 +402,9 @@ function resolveAssertionOptionsAndLhrs(baseOptions, unfilteredLhrs) {
       const auditDocumentationLinkMatches = splitMarkdownLink(audit.description || '')
         .map(segment => (segment.isLink ? segment.linkHref : ''))
         .filter(link => link.includes('web.dev') || link.includes('developers.google.com/web'));
-      const [auditDocumentationLink] = auditDocumentationLinkMatches;
+      const auditDocumentationLink =
+        auditDocumentationLinkMatches.find(link => link.includes('web.dev')) ||
+        auditDocumentationLinkMatches[0];
       if (!rest.length) return {assertionKey, auditId, auditTitle, auditDocumentationLink};
       return {assertionKey, auditId, auditTitle, auditDocumentationLink, auditProperty: rest};
     }

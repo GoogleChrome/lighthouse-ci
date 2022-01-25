@@ -94,8 +94,8 @@ function createActualTestDataset() {
       {...baseBuild, id: '9', hash: '1244', commitMessage: 'build 10', runAt: runAt(10)},
       {...baseBuild, id: '10', hash: '1245', commitMessage: 'build 11', runAt: runAt(11)},
       {...baseBuild, id: '11', hash: '1246', commitMessage: 'build 12', runAt: runAt(12)},
-      {...baseBuild, id: '12', hash: '1245', commitMessage: 'build 13', runAt: runAt(13)},
-      {...baseBuild, id: '13', hash: '1246', commitMessage: 'build 14', runAt: runAt(14)},
+      {...baseBuild, id: '12', hash: '1247', commitMessage: 'build 13', runAt: runAt(13)},
+      {...baseBuild, id: '13', hash: '1248', commitMessage: 'build 14', runAt: runAt(14)},
     ],
     runs: [
       {...baseRun, id: '0', buildId: '0', url, lhr: lhr('lh-5-6-0-verge-a.json')},

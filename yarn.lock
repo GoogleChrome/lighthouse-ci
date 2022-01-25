@@ -15319,10 +15319,10 @@ node-fetch@2.6.0, node-fetch@^2.3.0, node-fetch@^2.5.0:
   resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-2.6.0.tgz#e633456386d4aa55863f676a7ab0daa8fdecb0fd"
   integrity sha512-8dG4H5ujfvFiqDmVu9fQ5bOHUC15JMjMY/Zumv26oOvvVJjM67KF8koCWIabKQ1GJIa9r2mMZscBq/TbdOcmNA==
 
-node-fetch@2.6.5:
-  version "2.6.5"
-  resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-2.6.5.tgz#42735537d7f080a7e5f78b6c549b7146be1742fd"
-  integrity sha512-mmlIVHJEu5rnIxgEgez6b9GgWXbkZj5YZ7fx+2r94a2E+Uirsp6HsPTPlomfdHtpt/B0cdKviwkoaM6pyvUOpQ==
+node-fetch@2.6.7:
+  version "2.6.7"
+  resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-2.6.7.tgz#24de9fba827e3b4ae44dc8b20256a379160052ad"
+  integrity sha512-ZjMPFEfVx5j+y2yF35Kzx5sF7kDzxuDj6ziH4FFbOp87zKDZNx8yExJIb05OGF4Nlt9IHFIMBkRl41VdvcNdbQ==
   dependencies:
     whatwg-url "^5.0.0"
 
@@ -17272,16 +17272,16 @@ pupa@^2.0.1:
   dependencies:
     escape-goat "^2.0.0"
 
-puppeteer@^13.1.1:
-  version "13.1.1"
-  resolved "https://registry.yarnpkg.com/puppeteer/-/puppeteer-13.1.1.tgz#63771eb744202aa91918c49123f846e1747da121"
-  integrity sha512-GwdFy1JQ43Hhxj6MraXme+XfCX2CKe18MuwToXTMEAk0txg6vUEgwqBnzErTTqDVZ7sWYrDtDaRCfD2y7ZwgGw==
+puppeteer@^13.1.2:
+  version "13.1.2"
+  resolved "https://registry.yarnpkg.com/puppeteer/-/puppeteer-13.1.2.tgz#d6ef3295d7551200b7e52076a3cc1b731eff4294"
+  integrity sha512-ozVM8Tdg0patMtm/xAr3Uh7rQ28vBpbTHLP+ECmoAxG/s4PKrVLN764H/poLux7Ln77jHThOd8OBJj5mTuA6Iw==
   dependencies:
     debug "4.3.2"
     devtools-protocol "0.0.948846"
     extract-zip "2.0.1"
     https-proxy-agent "5.0.0"
-    node-fetch "2.6.5"
+    node-fetch "2.6.7"
     pkg-dir "4.2.0"
     progress "2.0.3"
     proxy-from-env "1.1.0"

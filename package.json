@@ -73,7 +73,7 @@
     "jest": "^25.0.0",
     "jest-circus": "^25.0.0",
     "jest-fetch-mock": "^3.0.3",
-    "jest-image-snapshot": "^4.0.2",
+    "jest-image-snapshot": "^4.5.1",
     "lerna": "^3.22.0",
     "mysql2": "^2.1.0",
     "pg": "^8.2.1",

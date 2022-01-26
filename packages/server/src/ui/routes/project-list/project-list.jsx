@@ -13,9 +13,9 @@ import {DocumentTitle} from '../../components/document-title';
 import './project-list.css';
 import {Paper} from '../../components/paper';
 
-// @ts-ignore - tsc doesn't get parcel :)
+// @ts-ignore - tsc doesn't get bundlers :)
 const LH_LOGO_PATH = require('../../logo.svg');
-// @ts-ignore - tsc doesn't get parcel :)
+// @ts-ignore - tsc doesn't get bundlers :)
 const CONFETTI_PATH = require('./confetti.svg');
 
 const NoProjects = () => {

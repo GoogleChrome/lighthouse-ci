@@ -6,7 +6,7 @@
 'use strict';
 
 const URL = require('url').URL;
-const fetch = require('isomorphic-fetch');
+const fetch = require('fetch-with-proxy');
 
 const PSI_URL = 'https://www.googleapis.com/pagespeedonline/v5/runPagespeed';
 

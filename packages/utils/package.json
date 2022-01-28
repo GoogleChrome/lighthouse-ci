@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "debug": "^4.3.1",
-    "isomorphic-fetch": "^3.0.0",
+    "fetch-with-proxy": "^3.0.1",
     "js-yaml": "^3.13.1",
     "lighthouse": "8.0.0",
     "tree-kill": "^1.2.1"

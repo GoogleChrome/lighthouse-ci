@@ -20,8 +20,8 @@ import lhr700A_ from '../../../../../test/fixtures/lh-7-0-0-coursehero-a.json';
 import lhr700B_ from '../../../../../test/fixtures/lh-7-0-0-coursehero-b.json';
 import lhr800A_ from '../../../../../test/fixtures/lh-8-0-0-coursehero-a.json';
 import lhr800B_ from '../../../../../test/fixtures/lh-8-0-0-coursehero-b.json';
-import lhr920A_ from '../../../../../test/fixtures/lh-9-2-0-coursehero-a.json';
-import lhr920B_ from '../../../../../test/fixtures/lh-9-2-0-coursehero-b.json';
+import lhr930A_ from '../../../../../test/fixtures/lh-9-3-0-coursehero-a.json';
+import lhr930B_ from '../../../../../test/fixtures/lh-9-3-0-coursehero-b.json';
 import lhrSubitemsA_ from '../../../../../test/fixtures/lh-subitems-a.json';
 import lhrSubitemsB_ from '../../../../../test/fixtures/lh-subitems-b.json';
 import lhrPsi800A_ from '../../../../../test/fixtures/psi-8-0-0-dkdev-a.json';
@@ -44,8 +44,8 @@ const lhr700A = /** @type {any} */ (lhr700A_);
 const lhr700B = /** @type {any} */ (lhr700B_);
 const lhr800A = /** @type {any} */ (lhr800A_);
 const lhr800B = /** @type {any} */ (lhr800B_);
-const lhr920A = /** @type {any} */ (lhr920A_);
-const lhr920B = /** @type {any} */ (lhr920B_);
+const lhr930A = /** @type {any} */ (lhr930A_);
+const lhr930B = /** @type {any} */ (lhr930B_);
 const lhrSubitemsA = /** @type {any} */ (lhrSubitemsA_);
 const lhrSubitemsB = /** @type {any} */ (lhrSubitemsB_);
 const lhrPsi800A = /** @type {any} */ (lhrPsi800A_);
@@ -57,7 +57,7 @@ const auditPairs62 = createAuditPairs(lhr62A, lhr62B);
 const auditPairs641 = createAuditPairs(lhr641A, lhr641B);
 const auditPairs700 = createAuditPairs(lhr700A, lhr700B);
 const auditPairs800 = createAuditPairs(lhr800A, lhr800B);
-const auditPairs920 = createAuditPairs(lhr920A, lhr920B);
+const auditPairs930 = createAuditPairs(lhr930A, lhr930B);
 const auditPairsPsi800 = createAuditPairs(lhrPsi800A, lhrPsi800B);
 const auditPairsSubitems = createAuditPairs(lhrSubitemsA, lhrSubitemsB, {
   filter: pair =>
@@ -124,12 +124,12 @@ export const Version800 = () => (
   />
 );
 
-export const Version920 = () => (
+export const Version930 = () => (
   <AuditDetailPane
-    selectedAuditId={auditPairs920[1].audit.id || ''}
+    selectedAuditId={auditPairs930[1].audit.id || ''}
     setSelectedAuditId={action('setSelectedAuditId')}
-    pairs={auditPairs920}
-    baseLhr={lhr920B}
+    pairs={auditPairs930}
+    baseLhr={lhr930B}
   />
 );
 

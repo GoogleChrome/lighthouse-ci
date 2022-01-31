@@ -17,6 +17,7 @@ module.exports = {
   ],
   // Use the prettier plugin to enforce prettier violations
   plugins: ['prettier', 'import'],
+  ignorePatterns: ['dist/'],
   env: {
     node: true,
     es6: true,

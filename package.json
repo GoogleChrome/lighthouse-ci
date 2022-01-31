@@ -20,6 +20,7 @@
     "test:quick": "npm run test:typecheck && npm run test:lint && npm run test:unit -- --testPathIgnorePatterns=\"cli.test.js\"",
     "test:typecheck": "tsc -p .",
     "test:lint": "npm run test:lint:js && npm run test:lint:jsx && npm run test:lint:tests",
+    "test:lint:fix": "npm run test:lint:js --fix && npm run test:lint:jsx --fix && npm run test:lint:tests --fix",
     "test:lint:js": "eslint ./packages/*/src",
     "test:lint:jsx": "eslint -c ./.eslintrc.ui.js --ext jsx ./packages/server/src/ui ./packages/viewer/src/ui",
     "test:lint:tests": "eslint -c ./.eslintrc.tests.js ./packages/*/test",

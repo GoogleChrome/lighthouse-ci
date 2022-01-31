@@ -47,10 +47,7 @@ function renderPatternMasks(masks, maskId) {
     .attr('patternUnits', 'userSpaceOnUse')
     .attr('patternTransform', `rotate(60 50 50)`);
 
-  passPattern
-    .append('line')
-    .attr('stroke-width', 2)
-    .attr('y2', 10);
+  passPattern.append('line').attr('stroke-width', 2).attr('y2', 10);
 
   masks
     .append('pattern')
@@ -103,10 +100,7 @@ function renderDonutGraph(rootEl, data) {
     .attr(
       'd',
       // @ts-ignore - can't figure out the right type for this
-      d3
-        .arc()
-        .innerRadius(innerRadius)
-        .outerRadius(outerRadius)
+      d3.arc().innerRadius(innerRadius).outerRadius(outerRadius)
     );
 }
 

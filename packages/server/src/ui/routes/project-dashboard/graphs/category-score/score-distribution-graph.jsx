@@ -37,10 +37,7 @@ export function renderScoreDistributionGraph(rootEl, data) {
 
   const {svg, width, graphWidth, graphHeight} = createRootSvg(rootEl, GRAPH_MARGIN);
 
-  const xScale = d3
-    .scaleLinear()
-    .domain([0, 1])
-    .range([0, graphWidth]);
+  const xScale = d3.scaleLinear().domain([0, 1]).range([0, graphWidth]);
   const xScaleForHover = d3
     .scaleLinear()
     .domain([0, binnedStatistics.length])
@@ -49,10 +46,7 @@ export function renderScoreDistributionGraph(rootEl, data) {
     .scaleLinear()
     .domain([0, Math.max(...binnedStatistics.map(bin => bin.length))])
     .range([graphHeight, 10]);
-  const yAxis = d3
-    .axisLeft(yScale)
-    .ticks(3)
-    .tickSize(0);
+  const yAxis = d3.axisLeft(yScale).ticks(3).tickSize(0);
 
   // The numbers on the y-axis to the right-hand side
   svg

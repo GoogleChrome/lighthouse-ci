@@ -92,7 +92,12 @@ describe('combineAsyncData', () => {
   });
 
   it('should return values when 4 set', () => {
-    const values = [['loaded', 1], ['loaded', 2], ['loaded', 3], ['loaded', 4]];
+    const values = [
+      ['loaded', 1],
+      ['loaded', 2],
+      ['loaded', 3],
+      ['loaded', 4],
+    ];
 
     expect(combineAsyncData(...values)).toEqual([1, 2, 3, 4]);
   });

@@ -5,8 +5,6 @@
  */
 'use strict';
 
-/* eslint-env jest */
-
 const path = require('path');
 const rimraf = require('rimraf');
 const fs = require('fs');

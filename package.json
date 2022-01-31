@@ -22,8 +22,8 @@
     "test:lint": "npm run test:lint:js && npm run test:lint:jsx && npm run test:lint:tests",
     "test:lint:fix": "npm run test:lint:js --fix && npm run test:lint:jsx --fix && npm run test:lint:tests --fix",
     "test:lint:js": "eslint ./packages/*/src",
-    "test:lint:jsx": "eslint -c ./.eslintrc.ui.js --ext jsx ./packages/server/src/ui ./packages/viewer/src/ui",
-    "test:lint:tests": "eslint -c ./.eslintrc.tests.js ./packages/*/test",
+    "test:lint:jsx": "eslint ./packages/server/src/ui ./packages/viewer/src/ui",
+    "test:lint:tests": "eslint ./packages/*/test",
     "test:docker": "bash scripts/test-docker.sh",
     "test:unit": "jest --maxWorkers=2"
   },
@@ -59,7 +59,7 @@
     "@types/uuid": "^8.3.0",
     "@types/yargs": "^12.0.8",
     "@types/yargs-parser": "^11.0.0",
-    "babel-eslint": "^10.1.0",
+    "@typescript-eslint/parser": "^5.10.2",
     "babel-jest": "^26.0.1",
     "babel-loader": "^8.1.0",
     "esbuild": "^0.14.11",
@@ -68,11 +68,12 @@
     "eslint-config-prettier": "^8.3.0",
     "eslint-config-react": "^1.1.7",
     "eslint-plugin-import": "^2.25.4",
+    "eslint-plugin-jest": "^26.0.0",
     "eslint-plugin-prettier": "^4.0.0",
     "eslint-plugin-react": "^7.28.0",
     "identity-obj-proxy": "^3.0.0",
-    "jest": "^25.0.0",
-    "jest-circus": "^25.0.0",
+    "jest": "^27.4.7",
+    "jest-circus": "^27.4.6",
     "jest-fetch-mock": "^3.0.3",
     "jest-image-snapshot": "^4.5.1",
     "lerna": "^3.22.0",
@@ -85,6 +86,7 @@
     "puppeteer": "^13.1.2",
     "rimraf": "^3.0.2",
     "sqlite3": "^5.0.0",
+    "ts-jest": "^27.1.3",
     "typescript": "^4.5.4"
   }
 }

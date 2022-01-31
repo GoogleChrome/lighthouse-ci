@@ -5,8 +5,6 @@
  */
 'use strict';
 
-/* eslint-env jest */
-
 const PRandom = require('@lhci/utils/src/seed-data/prandom.js');
 
 describe('PRandom', () => {

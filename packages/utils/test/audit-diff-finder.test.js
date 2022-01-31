@@ -5,8 +5,6 @@
  */
 'use strict';
 
-/* eslint-env jest */
-
 const {
   findAuditDiffs,
   getDiffSeverity,

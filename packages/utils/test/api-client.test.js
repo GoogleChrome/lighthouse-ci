@@ -5,8 +5,6 @@
  */
 'use strict';
 
-/* eslint-env jest */
-
 const ApiClient = require('../src/api-client.js');
 
 describe('Lighthouse CI API Client', () => {

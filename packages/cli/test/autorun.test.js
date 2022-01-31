@@ -5,8 +5,6 @@
  */
 'use strict';
 
-/* eslint-env jest */
-
 const {getOverrideArgsForCommand} = require('../src/autorun/autorun.js');
 
 describe('getOverrideArgsForCommand', () => {

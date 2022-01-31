@@ -7,8 +7,6 @@
 
 jest.retryTimes(3);
 
-/* eslint-env jest */
-
 const fs = require('fs');
 const path = require('path');
 const puppeteer = require('puppeteer');

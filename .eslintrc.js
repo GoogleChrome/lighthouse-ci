@@ -6,6 +6,7 @@
 'use strict';
 
 module.exports = {
+  root: true,
   // Start with google standard style and disable the prettier-controlled rules
   //     https://github.com/google/eslint-config-google/blob/master/index.js
   extends: [
@@ -66,8 +67,9 @@ module.exports = {
     'valid-jsdoc': 0,
     'arrow-parens': 0,
   },
+  parser: '@typescript-eslint/parser',
   parserOptions: {
-    ecmaVersion: 2018,
+    ecmaVersion: 2020,
     ecmaFeatures: {
       globalReturn: true,
       jsx: false,

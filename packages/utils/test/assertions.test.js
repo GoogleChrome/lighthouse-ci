@@ -5,8 +5,6 @@
  */
 'use strict';
 
-/* eslint-env jest */
-
 const lighthouseAllPreset = require('@lhci/utils/src/presets/all.js');
 const {convertBudgetsToAssertions} = require('@lhci/utils/src/budgets-converter.js');
 const {getAllAssertionResults} = require('@lhci/utils/src/assertions.js');

@@ -5,8 +5,6 @@
  */
 'use strict';
 
-/* eslint-env jest */
-
 const path = require('path');
 const {createServer} = require('./fixtures/psi/mock-psi-server.js');
 const {runCLI} = require('./test-utils.js');

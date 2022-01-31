@@ -5,8 +5,6 @@
  */
 'use strict';
 
-/* eslint-env jest */
-
 const path = require('path');
 const fetch = require('isomorphic-fetch');
 const runTests = require('./server-test-suite.js').runTests;

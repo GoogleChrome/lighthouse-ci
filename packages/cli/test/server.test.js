@@ -5,8 +5,6 @@
  */
 'use strict';
 
-/* eslint-env jest */
-
 const {runCLI} = require('./test-utils.js');
 
 describe('Lighthouse CI server CLI', () => {

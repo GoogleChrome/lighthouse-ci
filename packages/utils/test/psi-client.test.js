@@ -5,8 +5,6 @@
  */
 'use strict';
 
-/* eslint-env jest */
-
 const PsiClient = require('../src/psi-client.js');
 
 describe('PSI API Client', () => {

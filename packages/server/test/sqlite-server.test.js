@@ -5,8 +5,6 @@
  */
 'use strict';
 
-/* eslint-env jest */
-
 const path = require('path');
 const runTests = require('./server-test-suite.js').runTests;
 const runServer = require('../src/server.js').createServer;

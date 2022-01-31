@@ -28,9 +28,6 @@
     "test:unit": "jest --maxWorkers=2"
   },
   "devDependencies": {
-    "@babel/core": "^7.10.2",
-    "@babel/plugin-transform-react-jsx": "^7.10.1",
-    "@babel/preset-env": "^7.10.1",
     "@chialab/esbuild-plugin-html": "^0.12.2",
     "@storybook/addon-actions": "^6.4.13",
     "@storybook/addon-links": "^6.4.13",
@@ -60,8 +57,6 @@
     "@types/yargs": "^12.0.8",
     "@types/yargs-parser": "^11.0.0",
     "@typescript-eslint/parser": "^5.10.2",
-    "babel-jest": "^26.0.1",
-    "babel-loader": "^8.1.0",
     "esbuild": "^0.14.11",
     "eslint": "^8.8.0",
     "eslint-config-google": "^0.14.0",

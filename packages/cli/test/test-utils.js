@@ -208,9 +208,7 @@ async function runWizardCLI(args, inputs, overrides = {}) {
     await waitForCondition(
       () => wizardProcess.stdoutMemory.includes(inputWaitCondition),
       () =>
-        `Output never contained "${inputWaitCondition}"\nSTDOUT: ${
-          wizardProcess.stdoutMemory
-        }\nSTDERR:${wizardProcess.stderrMemory}`
+        `Output never contained "${inputWaitCondition}"\nSTDOUT: ${wizardProcess.stdoutMemory}\nSTDERR:${wizardProcess.stderrMemory}`
     );
     await writeAllInputs(wizardProcess, inputs);
     await waitForCondition(() => status >= 0).catch(() => undefined);

@@ -36,10 +36,7 @@ async function tryUntilPasses(fn, timeout = 5000) {
 }
 
 function getListOfRunningCommands() {
-  const psLines = childProcess
-    .spawnSync('ps', ['aux'])
-    .stdout.toString()
-    .split('\n');
+  const psLines = childProcess.spawnSync('ps', ['aux']).stdout.toString().split('\n');
 
   return psLines
     .map(line => {

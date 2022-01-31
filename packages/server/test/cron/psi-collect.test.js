@@ -10,7 +10,7 @@
 /** @type {jest.MockInstance} */
 let cronJob = jest.fn().mockReturnValue({start: () => {}});
 jest.mock('cron', () => ({
-  CronJob: function(...args) {
+  CronJob: function (...args) {
     // use this indirection because we have to invoke it with `new` and it's harder to mock assertions
     return cronJob(...args);
   },

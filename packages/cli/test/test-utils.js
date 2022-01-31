@@ -63,7 +63,10 @@ function cleanStdOutput(output) {
       /appspot.com\/reports\/[0-9-]+.report.html/g,
       'appspot.com/reports/XXXX-XXXX.report.html'
     )
-    .replace(/\d{4,}(\.\d{1,})?/g, 'XXXX');
+    // 1234.1, 1234
+    .replace(/\d{4,}(\.\d{1,})?/g, 'XXXX')
+    // 123.1
+    .replace(/\d{3,}(\.\d{1,})/g, 'XXXX');
 }
 
 async function safeDeleteFile(filePath) {

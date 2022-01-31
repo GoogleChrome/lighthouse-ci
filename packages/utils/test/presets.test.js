@@ -15,7 +15,6 @@ const PRESETS_DIR = path.join(__dirname, '../src/presets');
 
 describe('presets', () => {
   let auditsInLighthouse = [];
-
   beforeAll(() => {
     const audits = defaultConfig.audits
       .map(p => [

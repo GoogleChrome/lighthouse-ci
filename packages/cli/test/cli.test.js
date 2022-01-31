@@ -406,8 +406,8 @@ describe('Lighthouse CI CLI', () => {
                https://web.dev/first-contentful-paint/
 
                 expected: <=[32m1[0m
-                   found: [31m759.25[0m
-              [2mall values: 761.01, 759.25[0m
+                   found: [31m755.586[0m
+              [2mall values: XXXX, 755.586[0m
 
 
           [31mX[0m  [1mperformance-budget[0m.script.size failure for [1mmaxNumericValue[0m assertion

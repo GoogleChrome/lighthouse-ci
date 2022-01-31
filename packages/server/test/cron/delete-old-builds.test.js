@@ -10,7 +10,7 @@
 /** @type {jest.MockInstance} */
 let cronJob = jest.fn().mockReturnValue({start: () => {}});
 jest.mock('cron', () => ({
-  CronJob: function(...args) {
+  CronJob: function (...args) {
     // use this indirection because we have to invoke it with `new` and it's harder to mock assertions
     return cronJob(...args);
   },
@@ -43,7 +43,10 @@ describe('cron/delete-old-builds', () => {
 
     it('should collect', async () => {
       storageMethod.deleteBuild.mockClear();
-      const deleteObjects = [{id: 'id-1', projectId: 'pid-1'}, {id: 'id-2', projectId: 'pid-2'}];
+      const deleteObjects = [
+        {id: 'id-1', projectId: 'pid-1'},
+        {id: 'id-2', projectId: 'pid-2'},
+      ];
       storageMethod.findBuildsBeforeTimestamp.mockResolvedValue(deleteObjects);
       await deleteOldBuilds(storageMethod, 30, null, null);
       expect(storageMethod.deleteBuild).toHaveBeenCalledTimes(deleteObjects.length);

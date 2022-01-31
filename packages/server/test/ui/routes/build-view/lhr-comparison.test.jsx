@@ -42,7 +42,10 @@ describe('LhrComparison', () => {
         },
         a11y: {
           title: 'Accessibility',
-          auditRefs: [{id: 'badimages', group: 'images'}, {id: 'debugdata', group: 'missing'}],
+          auditRefs: [
+            {id: 'badimages', group: 'images'},
+            {id: 'debugdata', group: 'missing'},
+          ],
         },
         seo: {
           title: 'SEO',

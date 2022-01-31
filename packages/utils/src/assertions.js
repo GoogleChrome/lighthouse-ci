@@ -399,12 +399,16 @@ function resolveAssertionOptionsAndLhrs(baseOptions, unfilteredLhrs) {
       const failedAudit = auditInstances.find(audit => audit.score !== 1);
       const audit = failedAudit || auditInstances[0] || {};
       const auditTitle = audit.title;
-      const auditDocumentationLinkMatches = splitMarkdownLink(audit.description || '')
+      const auditLinks = splitMarkdownLink(audit.description || '')
         .map(segment => (segment.isLink ? segment.linkHref : ''))
-        .filter(link => link.includes('web.dev') || link.includes('developers.google.com/web'));
+        .filter(Boolean);
+      const auditDocumentationLinkMatches = auditLinks.filter(
+        link => link.includes('web.dev') || link.includes('developers.google.com/web')
+      );
       const auditDocumentationLink =
         auditDocumentationLinkMatches.find(link => link.includes('web.dev')) ||
-        auditDocumentationLinkMatches[0];
+        auditDocumentationLinkMatches[0] ||
+        auditLinks[auditLinks.length - 1];
       if (!rest.length) return {assertionKey, auditId, auditTitle, auditDocumentationLink};
       return {assertionKey, auditId, auditTitle, auditDocumentationLink, auditProperty: rest};
     }

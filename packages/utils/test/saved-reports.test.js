@@ -56,7 +56,10 @@ describe('#saveLHR', () => {
       const files = fs.readdirSync(dir);
       expect(files.map(name => name.replace(/-\d+/, '-XXX'))).toContain('lhr-XXX.json');
 
-      const jsonFilePath = path.join(dir, files.find(f => f.endsWith('.json')));
+      const jsonFilePath = path.join(
+        dir,
+        files.find(f => f.endsWith('.json'))
+      );
       const contents = fs.readFileSync(jsonFilePath, 'utf8');
       expect(contents).toEqual(`{"lighthouseVersion":"5.6.0"}`);
     });
@@ -68,7 +71,10 @@ describe('#saveLHR', () => {
       const files = fs.readdirSync(dir);
       expect(files.map(name => name.replace(/-\d+/, '-XXX'))).toContain('lhr-XXX.html');
 
-      const jsonFilePath = path.join(dir, files.find(f => f.endsWith('.html')));
+      const jsonFilePath = path.join(
+        dir,
+        files.find(f => f.endsWith('.html'))
+      );
       const contents = fs.readFileSync(jsonFilePath, 'utf8');
       expect(contents).toMatch(/<!DOCTYPE html>/i);
       expect(contents).toMatch(/__LIGHTHOUSE_JSON__ = /);

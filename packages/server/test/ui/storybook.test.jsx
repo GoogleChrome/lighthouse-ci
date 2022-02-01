@@ -1,3 +1,5 @@
+/** @jest-environment jsdom */
+
 /**
  * @license Copyright 2020 Google Inc. All Rights Reserved.
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
@@ -25,7 +27,7 @@ initStoryshots({
   suite: 'Image Storyshots',
   test: imageSnapshot({
     storybookUrl: `http://localhost:${process.env.STORYBOOK_PORT}`,
-    beforeScreenshot: async (page) => {
+    beforeScreenshot: async page => {
       // The browser is reused, so set the viewport back to a good default.
       await page.setViewport({width: 800, height: 600});
 
@@ -40,7 +42,7 @@ initStoryshots({
         const elements = [...document.querySelectorAll('#root, #root *')];
         return {
           width: Math.ceil(Math.max(...elements.map(e => e.clientWidth))),
-          height: Math.ceil(Math.max(...elements.map(e => e.clientHeight)))
+          height: Math.ceil(Math.max(...elements.map(e => e.clientHeight))),
         };
       });
       await page.setViewport(dimensions);

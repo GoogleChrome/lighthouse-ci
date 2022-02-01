@@ -430,14 +430,8 @@ function resolveAssertionOptionsAndLhrs(baseOptions, unfilteredLhrs) {
  * @return {AssertionResult[]}
  */
 function getAllAssertionResultsForUrl(baseOptions, unfilteredLhrs) {
-  const {
-    assertions,
-    auditsToAssert,
-    medianLhrs,
-    lhrs,
-    url,
-    aggregationMethod,
-  } = resolveAssertionOptionsAndLhrs(baseOptions, unfilteredLhrs);
+  const {assertions, auditsToAssert, medianLhrs, lhrs, url, aggregationMethod} =
+    resolveAssertionOptionsAndLhrs(baseOptions, unfilteredLhrs);
 
   // If we don't have any data, just return early.
   if (!lhrs.length) return [];

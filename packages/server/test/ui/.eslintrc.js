@@ -6,5 +6,5 @@
 'use strict';
 
 module.exports = {
-  extends: ['../../../../.eslintrc.ui.js', '../../../../.eslintrc.tests.js'],
+  extends: ['../../../../.eslintrc.tests.js', '../../../../.eslintrc.ui.js'],
 };

@@ -12,6 +12,7 @@ const esbuild = require('esbuild');
 const command = process.argv[2];
 const entryPoint = process.argv[3];
 const outdir = process.argv[4];
+const publicPath = process.argv[5] || '/';
 
 if (!command || !entryPoint || !outdir) {
   throw new Error('missing args');
@@ -32,6 +33,10 @@ function insertCollectedStyles(result) {
   if (stylesheets.length === 0) return;
   if (stylesheets.length > 1) throw new Error('expected at most one generated stylesheet');
 
+  const href = publicPath === '/' ?
+    path.relative(outdir, stylesheet) :
+    `/app/${path.relative(outdir, stylesheet)}`;
+
   const htmls = Object.keys(result.metafile.outputs).filter(o => o.endsWith('.html'));
   const html = htmls[0];
   if (htmls.length !== 1) throw new Error('expected exactly one generated html');
@@ -40,8 +45,7 @@ function insertCollectedStyles(result) {
   const htmlText = fs.readFileSync(html, 'utf-8');
   if (!htmlText.includes(needle)) throw new Error(`expected ${needle} in html`);
 
-  const newHtmlText =
-    htmlText.replace(needle, `<link rel="stylesheet" href="/app/${path.relative(outdir, stylesheet)}" />`);
+  const newHtmlText = htmlText.replace(needle, `<link rel="stylesheet" href="${href}" />`);
   fs.writeFileSync(html, newHtmlText);
 }
 
@@ -49,6 +53,7 @@ function insertCollectedStyles(result) {
  * @param {esbuild.BuildResult} result
  */
  function fixScriptSrc(result) {
+  if (publicPath === '/') return;
   if (!result.metafile) throw new Error('expected metafile');
 
   const htmls = Object.keys(result.metafile.outputs).filter(o => o.endsWith('.html'));
@@ -81,7 +86,10 @@ async function main() {
       '.woff': 'file',
       '.woff2': 'file',
     },
-    publicPath: '/app',
+    define: {
+      'process.env.VIEWER_ORIGIN': JSON.stringify(process.env.VIEWER_ORIGIN || ''),
+    },
+    publicPath,
     bundle: true,
     outdir,
     minify: true,

@@ -5,6 +5,8 @@
  */
 'use strict';
 
+/* eslint-env jest */
+
 const buildContext = require('../src/build-context.js');
 
 describe('build-context.js', () => {

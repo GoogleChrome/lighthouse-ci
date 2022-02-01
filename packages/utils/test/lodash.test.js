@@ -5,6 +5,8 @@
  */
 'use strict';
 
+/* eslint-env jest */
+
 const _ = require('../src/lodash.js');
 
 describe('lodash.js', () => {

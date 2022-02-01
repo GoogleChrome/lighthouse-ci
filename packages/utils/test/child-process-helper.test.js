@@ -5,6 +5,8 @@
  */
 'use strict';
 
+/* eslint-env jest */
+
 const os = require('os');
 const childProcess = require('child_process');
 const childProcessHelper = require('../src/child-process-helper.js');

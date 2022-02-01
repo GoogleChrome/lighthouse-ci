@@ -5,6 +5,8 @@
  */
 'use strict';
 
+/* eslint-env jest */
+
 const {computeRepresentativeRuns} = require('../src/representative-runs.js');
 
 describe('Representative Runs', () => {

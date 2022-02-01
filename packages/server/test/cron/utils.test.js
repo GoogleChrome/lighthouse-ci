@@ -5,6 +5,8 @@
  */
 'use strict';
 
+/* eslint-env jest */
+
 const {normalizeCronSchedule} = require('../../src/cron/utils.js');
 
 describe('cron/utils', () => {

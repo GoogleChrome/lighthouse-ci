@@ -5,6 +5,8 @@
  */
 'use strict';
 
+/* eslint-env jest */
+
 const fs = require('fs');
 const path = require('path');
 const defaultConfig = require('lighthouse/lighthouse-core/config/default-config.js');

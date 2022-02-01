@@ -5,6 +5,8 @@
  */
 'use strict';
 
+/* eslint-env jest */
+
 /** @type {jest.MockInstance} */
 let cronJob = jest.fn().mockReturnValue({start: () => {}});
 jest.mock('cron', () => ({

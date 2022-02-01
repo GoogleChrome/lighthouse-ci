@@ -5,6 +5,8 @@
  */
 'use strict';
 
+/* eslint-env jest */
+
 const {createTestServer, launchBrowser, setupImageSnapshots} = require('../../test-utils.js');
 
 setupImageSnapshots();

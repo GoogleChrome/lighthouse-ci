@@ -52,7 +52,7 @@ function saveLHR(lhr, baseDir = LHCI_DIR) {
  */
 function getHTMLReportForLHR(lhr) {
   // @ts-ignore - lighthouse doesn't publish .d.ts files yet
-  const ReportGenerator = require('lighthouse/lighthouse-core/report/report-generator.js');
+  const ReportGenerator = require('lighthouse/report/generator/report-generator.js');
   return ReportGenerator.generateReportHtml(lhr);
 }
 

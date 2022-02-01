@@ -5,6 +5,8 @@
  */
 'use strict';
 
+/* eslint-env jest */
+
 const _ = require('@lhci/utils/src/lodash.js');
 const ApiClient = require('@lhci/utils/src/api-client.js');
 const fetch = require('isomorphic-fetch');

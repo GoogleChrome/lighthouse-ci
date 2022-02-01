@@ -5,6 +5,8 @@
  */
 'use strict';
 
+/* eslint-env jest */
+
 jest.retryTimes(3);
 
 const fs = require('fs');

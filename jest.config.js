@@ -14,7 +14,7 @@ module.exports = {
       isolatedModules: true,
     },
   },
-  testEnvironment: 'jsdom',
+  testEnvironment: 'node',
   testRunner: require.resolve('jest-circus/runner'),
   globalSetup: require.resolve('./packages/server/test/storybook-setup.js'),
   globalTeardown: require.resolve('./packages/server/test/storybook-teardown.js'),

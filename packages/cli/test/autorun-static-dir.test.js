@@ -7,6 +7,8 @@
 
 jest.retryTimes(3);
 
+/* eslint-env jest */
+
 const path = require('path');
 const {runCLI} = require('./test-utils.js');
 

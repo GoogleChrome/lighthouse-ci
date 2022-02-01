@@ -5,6 +5,8 @@
  */
 'use strict';
 
+/* eslint-env jest */
+
 const os = require('os');
 const fs = require('fs');
 const path = require('path');

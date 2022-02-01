@@ -5,6 +5,8 @@
  */
 'use strict';
 
+/* eslint-env jest */
+
 /** @type {any} */
 const baseLhr5_ = require('../fixtures/lh-5-6-0-verge-a.json');
 /** @type {any} */

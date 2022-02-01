@@ -5,6 +5,8 @@
  */
 'use strict';
 
+/* eslint-env jest */
+
 const {cleanupE2E} = require('../../test-utils.js');
 
 /** @param {LHCI.E2EState} state */

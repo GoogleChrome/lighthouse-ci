@@ -14,7 +14,6 @@ module.exports = {
     'is-on-https': 'off',
     'service-worker': 'off',
     'installable-manifest': 'off',
-    'redirects-http': 'off',
     'splash-screen': 'off',
     'themed-omnibox': 'off',
     'content-width': 'off',

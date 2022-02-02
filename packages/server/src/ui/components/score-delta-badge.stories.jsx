@@ -10,7 +10,6 @@ import {ScoreDeltaBadge} from './score-delta-badge';
 export default {
   title: 'Components/Score Delta Badge',
   component: ScoreDeltaBadge,
-  parameters: {dimensions: {width: 120, height: 60}},
 };
 
 /** @type {LHCI.NumericAuditDiff} */

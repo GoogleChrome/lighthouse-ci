@@ -16,6 +16,7 @@ Breaking changes come from many sources within LHCI and have a much stricter def
 
 | Change                                                    | Impact   | Expected Frequency |
 | --------------------------------------------------------- | -------- | ------------------ |
+| New minimum Node version                                  | Moderate | 1/year             |
 | Lighthouse minor version bump that introduces a new audit | Low      | 3-6/year           |
 | Lighthouse major version bump                             | Moderate | 1-2/year           |
 | LHCI server API format change (removal of data)           | Moderate | 1-2/year           |

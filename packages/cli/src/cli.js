@@ -8,7 +8,6 @@
 
 const yargs = require('yargs');
 const yargsParser = require('yargs-parser');
-const updateNotifier = require('update-notifier');
 const {
   loadAndParseRcFile,
   hasOptedOutOfRcDetection,
@@ -24,8 +23,6 @@ const serverCmd = require('./server/server.js');
 const wizardCmd = require('./wizard/wizard.js');
 const openCmd = require('./open/open.js');
 const pkg = require('../package.json');
-
-updateNotifier({pkg}).notify({defer: false});
 
 /** @return {[string, (path: string) => LHCI.YargsOptions]|[LHCI.YargsOptions]} */
 function createYargsConfigArguments() {

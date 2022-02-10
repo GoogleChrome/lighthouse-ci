@@ -26,6 +26,8 @@ RUN groupadd --system lhci && \
   mkdir --parents /home/lhci/reports && \
   chown --recursive lhci:lhci /home/lhci
 
+RUN cd /home/lhci/reports && npm link puppeteer
+
 USER lhci
 WORKDIR /home/lhci/reports
 

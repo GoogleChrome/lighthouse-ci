@@ -1,4 +1,4 @@
-FROM node:12-buster-slim
+FROM node:14-buster-slim
 
 # Install utilities
 RUN apt-get update --fix-missing && apt-get -y upgrade && apt-get install -y git wget gnupg && apt-get clean

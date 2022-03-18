@@ -1,5 +1,8 @@
 FROM node:14-buster-slim
 
+# Install utilities
+RUN apt-get update --fix-missing && apt-get install -y python build-essential && apt-get clean
+
 WORKDIR /usr/src/lhci
 COPY package.json .
 COPY lighthouserc.json .

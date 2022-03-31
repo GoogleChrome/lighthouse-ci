@@ -58,9 +58,9 @@ The simple configuration file below is all you need to get started collecting Li
 
 ```js
 module.exports = {
-  ci: {
-    upload: {
-      target: 'temporary-public-storage',
+  "ci": {
+    "upload": {
+      "target": 'temporary-public-storage',
     },
   },
 };
@@ -154,12 +154,12 @@ jobs:
 
 ```js
 module.exports = {
-  ci: {
-    collect: {
-      settings: {chromeFlags: '--no-sandbox'},
+  "ci": {
+    "collect": {
+      "settings": {chromeFlags: '--no-sandbox'},
     },
-    upload: {
-      target: 'temporary-public-storage',
+    "upload": {
+      "target": 'temporary-public-storage',
     },
   },
 };
@@ -231,12 +231,12 @@ lhci autorun
 
 ```js
 module.exports = {
-  ci: {
-    collect: {
-      settings: {chromeFlags: '--no-sandbox'},
+  "ci": {
+    "collect": {
+      "settings": {chromeFlags: '--no-sandbox'},
     },
-    upload: {
-      target: 'temporary-public-storage',
+    "upload": {
+      "target": 'temporary-public-storage',
     },
   },
 };
@@ -286,12 +286,12 @@ If your site does not use a `package.json`-based build step, you might receive s
 
 ```js
 module.exports = {
-  ci: {
-    collect: {
-      staticDistDir: './',
+  "ci": {
+    "collect": {
+      "staticDistDir": './',
     },
-    upload: {
-      target: 'temporary-public-storage',
+    "upload": {
+      "target": 'temporary-public-storage',
     },
   },
 };
@@ -309,13 +309,13 @@ Modify `lighthouserc.js` to configure the command used to start your server usin
 
 ```js
 module.exports = {
-  ci: {
-    collect: {
-      url: ['http://localhost:3000/'],
-      startServerCommand: 'rails server -e production',
+  "ci": {
+    "collect": {
+      "url": ['http://localhost:3000/'],
+      "startServerCommand": 'rails server -e production',
     },
-    upload: {
-      target: 'temporary-public-storage',
+    "upload": {
+      "target": 'temporary-public-storage',
     },
   },
 };
@@ -386,10 +386,10 @@ While Lighthouse reports at your fingertips is great, failing the build based on
 
 ```js
 module.exports = {
-  ci: {
+  "ci": {
     // ...
-    assert: {
-      preset: 'lighthouse:recommended',
+    "assert": {
+      "preset": 'lighthouse:recommended',
     },
     // ...
   },
@@ -424,11 +424,11 @@ You would change your configuration to disable those two audits:
 
 ```js
 module.exports = {
-  ci: {
+  "ci": {
     // ...
-    assert: {
-      preset: 'lighthouse:recommended',
-      assertions: {
+    "assert": {
+      "preset": 'lighthouse:recommended',
+      "assertions": {
         'uses-rel-preload': 'off',
         'uses-rel-preconnect': 'off',
       },
@@ -497,11 +497,11 @@ With your server setup and the project created, all that's left to do is update 
 
 ```js
 module.exports = {
-  ci: {
-    upload: {
-      target: 'lhci',
-      serverBaseUrl: 'https://your-lhci-server-url.example.com',
-      token: 'Your *build token* goes here', // could also use LHCI_TOKEN variable instead
+  "ci": {
+    "upload": {
+      "target": 'lhci',
+      "serverBaseUrl": 'https://your-lhci-server-url.example.com',
+      "token": 'Your *build token* goes here', // could also use LHCI_TOKEN variable instead
     },
   },
 };

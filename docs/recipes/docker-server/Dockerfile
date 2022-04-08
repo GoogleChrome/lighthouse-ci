@@ -1,4 +1,4 @@
-FROM node:16-buster-slim
+FROM node:14-buster-slim
 
 # Install utilities
 RUN apt-get update --fix-missing && apt-get install -y python build-essential && apt-get clean

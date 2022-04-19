@@ -58,10 +58,7 @@ const ChangedAuditList = props => {
             onClick={() => props.setSelectedAuditId(audit.id || null)}
           >
             <div className="audit-group__audit-score">
-              <ScoreIcon
-                score={audit.score || 0}
-                diffs={pair.diffs}
-              />
+              <ScoreIcon score={audit.score || 0} />
             </div>
             <div className="audit-group__audit-title">{audit.title}</div>
             <div className="audit-group__audit-diff">
@@ -99,10 +96,7 @@ const UnchangedAuditList = props => {
             }}
           >
             <div className="audit-group__audit-score">
-              <ScoreIcon
-                score={audit.score || 0}
-                diffs={pair.diffs}
-              />
+              <ScoreIcon score={audit.score || 0} />
             </div>
             <div className="audit-group__audit-title">{audit.title}</div>
             <div className="audit-group__audit-diff">Open Report</div>

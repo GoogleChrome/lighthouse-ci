@@ -27,6 +27,7 @@ function getCategoryForAuditId(auditId) {
 
 /** @param {string} auditId */
 function getGroupForAuditId(auditId) {
+  if (auditId === 'cumulative-layout-shift') return 'metrics';
   if (auditId === 'first-contentful-paint') return 'metrics';
   if (auditId === 'first-meaningful-paint') return 'metrics';
   if (auditId === 'speed-index') return 'metrics';
@@ -210,4 +211,4 @@ function createLHR(pageUrl, auditDefs, prandom) {
   };
 }
 
-module.exports = {createLHR, generateNumericValue};
+module.exports = {createLHR, generateNumericValue, getGroupForAuditId};

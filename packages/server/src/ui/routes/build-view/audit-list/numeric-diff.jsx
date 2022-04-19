@@ -93,12 +93,13 @@ const toDisplay = (x, options) => {
   }
 
   if (unit === 'none') {
-    if (Math.abs(value) < 10) {
+    if (Math.abs(x) < 1) {
+      value = x;
+      fractionDigits = 3;
+    } else if (Math.abs(value) < 10) {
       value = x;
       fractionDigits = 1;
-    }
-
-    if (Math.abs(value) >= 50) {
+    } else if (Math.abs(value) >= 50) {
       value /= 1000;
       fractionDigits = 1;
       suffixUnit = 'K';

@@ -33,9 +33,10 @@ function insertCollectedStyles(result) {
   if (stylesheets.length === 0) return;
   if (stylesheets.length > 1) throw new Error('expected at most one generated stylesheet');
 
-  const href = publicPath === '/' ?
-    path.relative(outdir, stylesheet) :
-    `/app/${path.relative(outdir, stylesheet)}`;
+  const href =
+    publicPath === '/'
+      ? path.relative(outdir, stylesheet)
+      : `/app/${path.relative(outdir, stylesheet)}`;
 
   const htmls = Object.keys(result.metafile.outputs).filter(o => o.endsWith('.html'));
   const html = htmls[0];
@@ -52,7 +53,7 @@ function insertCollectedStyles(result) {
 /**
  * @param {esbuild.BuildResult} result
  */
- function fixScriptSrc(result) {
+function fixScriptSrc(result) {
   if (publicPath === '/') return;
   if (!result.metafile) throw new Error('expected metafile');
 
@@ -64,14 +65,13 @@ function insertCollectedStyles(result) {
   const htmlText = fs.readFileSync(html, 'utf-8');
   if (!htmlText.includes(needle)) throw new Error(`expected ${needle} in html`);
 
-  const newHtmlText =
-    htmlText.replace(needle, `${needle}/app/`);
+  const newHtmlText = htmlText.replace(needle, `${needle}/app/`);
   fs.writeFileSync(html, newHtmlText);
 }
 
 async function main() {
   const htmlPlugin = (await import('@chialab/esbuild-plugin-html')).default;
-  
+
   /** @type {esbuild.BuildOptions} */
   const buildOptions = {
     entryPoints: [entryPoint],
@@ -95,14 +95,17 @@ async function main() {
     minify: true,
     sourcemap: true,
     jsxFactory: 'h',
-    watch: command === 'watch' ? {
-      onRebuild(err, result) {
-        if (!err && result) {
-          insertCollectedStyles(result);
-          fixScriptSrc(result);
-        }
-      },
-    } : undefined,
+    watch:
+      command === 'watch'
+        ? {
+            onRebuild(err, result) {
+              if (!err && result) {
+                insertCollectedStyles(result);
+                fixScriptSrc(result);
+              }
+            },
+          }
+        : undefined,
   };
 
   const result = await esbuild.build(buildOptions);
@@ -110,7 +113,7 @@ async function main() {
   fixScriptSrc(result);
 }
 
-main().catch((err) => {
+main().catch(err => {
   console.error(err);
   process.exit(1);
 });

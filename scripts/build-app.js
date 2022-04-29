@@ -12,7 +12,7 @@ const esbuild = require('esbuild');
 const command = process.argv[2];
 const entryPoint = process.argv[3];
 const outdir = process.argv[4];
-const publicPath = process.argv[5] || '/';
+const publicPath = process.argv[5] || './';
 
 if (!command || !entryPoint || !outdir) {
   throw new Error('missing args');
@@ -34,10 +34,10 @@ function insertCollectedStyles(result) {
   if (stylesheets.length > 1) throw new Error('expected at most one generated stylesheet');
 
   const href =
-    publicPath === '/'
+    publicPath === './'
       ? path.relative(outdir, stylesheet)
       : `/app/${path.relative(outdir, stylesheet)}`;
-
+  console.log({href, outdir, stylesheet});
   const htmls = Object.keys(result.metafile.outputs).filter(o => o.endsWith('.html'));
   const html = htmls[0];
   if (htmls.length !== 1) throw new Error('expected exactly one generated html');
@@ -54,7 +54,7 @@ function insertCollectedStyles(result) {
  * @param {esbuild.BuildResult} result
  */
 function fixScriptSrc(result) {
-  if (publicPath === '/') return;
+  if (publicPath === './') return;
   if (!result.metafile) throw new Error('expected metafile');
 
   const htmls = Object.keys(result.metafile.outputs).filter(o => o.endsWith('.html'));
@@ -65,7 +65,7 @@ function fixScriptSrc(result) {
   const htmlText = fs.readFileSync(html, 'utf-8');
   if (!htmlText.includes(needle)) throw new Error(`expected ${needle} in html`);
 
-  const newHtmlText = htmlText.replace(needle, `${needle}/app/`);
+  const newHtmlText = htmlText.replace(needle, `${needle}/${publicPath}`);
   fs.writeFileSync(html, newHtmlText);
 }
 
@@ -92,7 +92,7 @@ async function main() {
     publicPath,
     bundle: true,
     outdir,
-    minify: true,
+    minify: false,
     sourcemap: true,
     jsxFactory: 'h',
     watch:

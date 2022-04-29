@@ -29,7 +29,8 @@ async function main() {
     entryPoints: [entryPoint],
     entryNames: '[name]',
     assetNames: 'assets/[name]-[hash]',
-
+    // Defined chunknames breaks the viewer (probably cuz the -plugin-html, but is great for server routing)
+    chunkNames: publicPath ? `chunks/[name]-[hash]` : undefined,
     plugins: [htmlPlugin()],
     loader: {
       '.svg': 'file',

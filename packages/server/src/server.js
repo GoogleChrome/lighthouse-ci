@@ -58,9 +58,6 @@ async function createApp(options) {
   app.use('/version', (_, res) => res.send(version));
   app.use('/v1/projects', createProjectsRouter(context));
   app.use('/app', express.static(DIST_FOLDER));
-  // Ideally we don't serve these files via http://localhost:9009/app/projects/lighthouse-real-world/compare/chunks/1-AMI5R5VT.css etc
-  // But... it simplifies the build a lot…
-  app.get('/app/*/chunks/*', (req, res) => res.sendFile(path.join(DIST_FOLDER, req.url.match(/app\/.*?\/(chunks\/.*)/)[1])));
   app.get('/app/*', (_, res) => res.sendFile(path.join(DIST_FOLDER, 'index.html')));
   app.use(errorMiddleware);
 

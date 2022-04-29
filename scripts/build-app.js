@@ -5,6 +5,8 @@
  */
 'use strict';
 
+const fs = require('fs');
+
 const esbuild = require('esbuild');
 
 const command = process.argv[2];
@@ -20,16 +22,33 @@ if (!['build', 'watch'].includes(command)) {
   throw new Error('invalid command');
 }
 
+/**
+ * @param {esbuild.BuildResult} result
+ */
+function fixHtmlSubresourceUrls(result) {
+  if (publicPath !== '/app') return;
+  if (!result.metafile) throw new Error('expected metafile');
+
+  const htmls = Object.keys(result.metafile.outputs).filter(o => o.endsWith('.html'));
+  const html = htmls[0];
+  if (htmls.length !== 1) throw new Error('expected exactly one generated html');
+
+  const htmlText = fs.readFileSync(html, 'utf-8');
+  const newHtmlText = htmlText
+    .replace('<script src="chunks/', '<script src="/app/chunks/')
+    .replace('<link rel="stylesheet" href="chunks/', '<link rel="stylesheet" href="/app/chunks/');
+  fs.writeFileSync(html, newHtmlText);
+}
+
 async function main() {
   const htmlPlugin = (await import('@chialab/esbuild-plugin-html')).default;
 
-  console.log({entryPoint});
   /** @type {esbuild.BuildOptions} */
   const buildOptions = {
     entryPoints: [entryPoint],
     entryNames: '[name]',
     assetNames: 'assets/[name]-[hash]',
-    // Defined chunknames breaks the viewer (probably cuz the -plugin-html, but is great for server routing)
+    // Defined chunknames breaks the viewer (probably cuz the -plugin-html), but pairs with fixHtmlSubresourceUrls.
     chunkNames: publicPath ? `chunks/[name]-[hash]` : undefined,
     plugins: [htmlPlugin()],
     loader: {
@@ -46,10 +65,20 @@ async function main() {
     minify: true,
     sourcemap: true,
     jsxFactory: 'h',
+    watch:
+      command === 'watch'
+        ? {
+            onRebuild(err, result) {
+              if (!err && result) {
+                fixHtmlSubresourceUrls(result);
+              }
+            },
+          }
+        : undefined,
   };
 
-  console.log(buildOptions);
   const result = await esbuild.build(buildOptions);
+  fixHtmlSubresourceUrls(result);
 
   console.log('Built.', new Date());
   if (result.errors.length) console.error(result.errors);

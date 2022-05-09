@@ -28,7 +28,7 @@
     "test:unit": "jest --maxWorkers=2"
   },
   "devDependencies": {
-    "@chialab/esbuild-plugin-html": "^0.12.2",
+    "@chialab/esbuild-plugin-html": "^0.15.14",
     "@storybook/addon-actions": "^6.4.13",
     "@storybook/addon-links": "^6.4.13",
     "@storybook/addon-storyshots": "^6.4.13",

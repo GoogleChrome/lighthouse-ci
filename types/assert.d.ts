@@ -1,3 +1,4 @@
+/* eslint-disable */
 /**
  * @license Copyright 2019 Google Inc. All Rights Reserved.
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
@@ -99,6 +100,30 @@ declare global {
           | 'total'
           | 'third-party';
       }
+    }
+
+    namespace AssertResults {
+      export type AssertionType =
+        | keyof StrictOmit<AssertCommand.AssertionOptions, 'aggregationMethod'>
+        | 'auditRan';
+
+      export interface AssertionResult {
+        url: string;
+        name: keyof Omit<AssertCommand.AssertionOptions, 'aggregationMethod'> | 'auditRan';
+        operator: string;
+        expected: number;
+        actual: number;
+        values: number[];
+        passed: boolean;
+        level?: AssertCommand.AssertionFailureLevel;
+        auditId?: string;
+        auditProperty?: string;
+        auditTitle?: string;
+        auditDocumentationLink?: string;
+        message?: string;
+      }
+
+      export type AssertionResultNoURL = StrictOmit<AssertionResult, 'url'>;
     }
   }
 }

@@ -85,8 +85,8 @@ export const App = () => {
   }, []);
 
   useEffect(() => {
-    localStorage.setItem('lastBaseReport', JSON.stringify(baseReport));
-    localStorage.setItem('lastCompareReport', JSON.stringify(compareReport));
+    if (baseReport) localStorage.setItem('lastBaseReport', JSON.stringify(baseReport));
+    if (compareReport) localStorage.setItem('lastCompareReport', JSON.stringify(compareReport));
   }, [baseReport, compareReport]);
 
   return (

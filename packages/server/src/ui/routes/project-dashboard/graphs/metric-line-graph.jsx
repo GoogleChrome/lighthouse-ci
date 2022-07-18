@@ -73,10 +73,7 @@ function renderLineGraph(rootEl, data) {
   const yMaxSeconds = Math.ceil((yMax * 1.1) / 1000);
 
   const xScale = buildXScale(graphWidth, data);
-  const yScale = d3
-    .scaleLinear()
-    .domain([0, yMaxSeconds])
-    .range([graphHeight, 0]);
+  const yScale = d3.scaleLinear().domain([0, yMaxSeconds]).range([graphHeight, 0]);
   const yAxis = d3
     .axisRight(yScale)
     .ticks(Math.min(yMaxSeconds, 6))

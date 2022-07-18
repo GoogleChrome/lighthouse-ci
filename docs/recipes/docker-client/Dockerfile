@@ -1,4 +1,4 @@
-FROM node:12-buster-slim
+FROM node:14-bullseye-slim
 
 # Install utilities
 RUN apt-get update --fix-missing && apt-get -y upgrade && apt-get install -y git wget gnupg && apt-get clean
@@ -11,7 +11,7 @@ RUN apt-get update \
     && apt-get clean
 
 # Install Lighthouse CI
-RUN npm install -g @lhci/cli@0.8.2
+RUN npm install -g @lhci/cli@0.9.0
 RUN npm install -g lighthouse
 
 # Setup a user to avoid doing everything as root

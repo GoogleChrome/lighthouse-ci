@@ -10,7 +10,7 @@
 const fs = require('fs');
 const path = require('path');
 const {withTmpDir} = require('../../cli/test/test-utils.js');
-const {replaceUrlPatterns, saveLHR} = require('@lhci/utils/src/saved-reports.js');
+const {replaceUrlPatterns, saveLHR} = require('../src/saved-reports.js');
 
 describe('#replaceUrlPatterns', () => {
   it('should replace basic patterns', () => {
@@ -56,7 +56,10 @@ describe('#saveLHR', () => {
       const files = fs.readdirSync(dir);
       expect(files.map(name => name.replace(/-\d+/, '-XXX'))).toContain('lhr-XXX.json');
 
-      const jsonFilePath = path.join(dir, files.find(f => f.endsWith('.json')));
+      const jsonFilePath = path.join(
+        dir,
+        files.find(f => f.endsWith('.json'))
+      );
       const contents = fs.readFileSync(jsonFilePath, 'utf8');
       expect(contents).toEqual(`{"lighthouseVersion":"5.6.0"}`);
     });
@@ -68,7 +71,10 @@ describe('#saveLHR', () => {
       const files = fs.readdirSync(dir);
       expect(files.map(name => name.replace(/-\d+/, '-XXX'))).toContain('lhr-XXX.html');
 
-      const jsonFilePath = path.join(dir, files.find(f => f.endsWith('.html')));
+      const jsonFilePath = path.join(
+        dir,
+        files.find(f => f.endsWith('.html'))
+      );
       const contents = fs.readFileSync(jsonFilePath, 'utf8');
       expect(contents).toMatch(/<!DOCTYPE html>/i);
       expect(contents).toMatch(/__LIGHTHOUSE_JSON__ = /);

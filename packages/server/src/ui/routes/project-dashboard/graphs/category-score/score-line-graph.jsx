@@ -66,19 +66,19 @@ export function renderScoreGraph(rootEl, data) {
   const scoreLineMaskId = `scoreLineMask-${statName}`;
 
   /** @type {[number, number][]} */
-  const passingGuideLine = [[0, 90], [n, 90]];
+  const passingGuideLine = [
+    [0, 90],
+    [n, 90],
+  ];
   /** @type {[number, number][]} */
-  const failingGuideLine = [[0, 50], [n, 50]];
+  const failingGuideLine = [
+    [0, 50],
+    [n, 50],
+  ];
 
   const xScale = buildXScale(graphWidth, data);
-  const yScale = d3
-    .scaleLinear()
-    .domain([0, 100])
-    .range([graphHeight, 0]);
-  const yAxis = d3
-    .axisLeft(yScale)
-    .ticks(6)
-    .tickSize(0);
+  const yScale = d3.scaleLinear().domain([0, 100]).range([graphHeight, 0]);
+  const yAxis = d3.axisLeft(yScale).ticks(6).tickSize(0);
 
   /** @type {() => import('d3').Line<StatisticWithBuild>} */
   const statisticLine = d3.line;
@@ -114,25 +114,13 @@ export function renderScoreGraph(rootEl, data) {
     .call(yAxis);
 
   // The grey error bar area behind the score line
-  svg
-    .append('path')
-    .datum(statistics)
-    .attr('class', 'score-error-range')
-    .attr('d', scoreRange);
+  svg.append('path').datum(statistics).attr('class', 'score-error-range').attr('d', scoreRange);
 
   // Passing/Average horizontal score guide
-  svg
-    .append('path')
-    .datum(passingGuideLine)
-    .attr('class', 'score-guide')
-    .attr('d', guideLine);
+  svg.append('path').datum(passingGuideLine).attr('class', 'score-guide').attr('d', guideLine);
 
   // Average/Failing horizontal score guide
-  svg
-    .append('path')
-    .datum(failingGuideLine)
-    .attr('class', 'score-guide')
-    .attr('d', guideLine);
+  svg.append('path').datum(failingGuideLine).attr('class', 'score-guide').attr('d', guideLine);
 
   // The shaded area for the version changes
   for (const {index} of versionChanges) {

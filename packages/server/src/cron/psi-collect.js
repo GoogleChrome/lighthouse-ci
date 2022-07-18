@@ -41,11 +41,7 @@ async function psiCollectForProject(storageMethod, psi, site) {
     commitMessage: `Autocollected at ${new Date().toLocaleString()}`,
     author: `Lighthouse CI Server <no-reply@example.com>`,
     avatarUrl: getGravatarUrlFromEmail('no-reply@example.com'),
-    hash: Date.now()
-      .toString(16)
-      .split('')
-      .reverse()
-      .join(''),
+    hash: Date.now().toString(16).split('').reverse().join(''),
 
     runAt: new Date().toISOString(),
     committedAt: new Date().toISOString(),

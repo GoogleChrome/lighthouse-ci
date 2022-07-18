@@ -49,24 +49,15 @@ function renderHistogram(rootEl, data) {
   const [passThreshold, failThreshold] = data.scoreLevels;
   const {svg, graphWidth, graphHeight} = createRootSvg(rootEl, GRAPH_MARGIN);
 
-  const xScale = d3
-    .scaleLinear()
-    .domain([0, xMax])
-    .range([0, graphWidth]);
+  const xScale = d3.scaleLinear().domain([0, xMax]).range([0, graphWidth]);
   const xScaleForHover = d3
     .scaleLinear()
     .domain([0, binnedStatistics.length])
     .range([0, graphWidth]);
 
   const yMax = Math.max(...binnedStatistics.map(bin => bin.length));
-  const yScale = d3
-    .scaleLinear()
-    .domain([0, yMax])
-    .range([graphHeight, 10]);
-  const yAxis = d3
-    .axisLeft(yScale)
-    .ticks(Math.min(3, yMax))
-    .tickSize(0);
+  const yScale = d3.scaleLinear().domain([0, yMax]).range([graphHeight, 10]);
+  const yAxis = d3.axisLeft(yScale).ticks(Math.min(3, yMax)).tickSize(0);
 
   // The numbers on the y-axis to the right-hand side
   svg

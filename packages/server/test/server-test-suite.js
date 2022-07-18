@@ -946,8 +946,7 @@ function runTests(state) {
       client.setBuildToken(projectA.token);
       await expect(client.createBuild(payload)).rejects.toMatchObject({
         status: 422,
-        body:
-          '{"message":"Build already exists for hash \\"e0acdd50ed0fdcfdceb2508498be50cc55c696ef\\""}',
+        body: '{"message":"Build already exists for hash \\"e0acdd50ed0fdcfdceb2508498be50cc55c696ef\\""}',
       });
     });
 

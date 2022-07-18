@@ -24,7 +24,6 @@
     "lighthouse-logger": "1.2.0",
     "open": "^7.1.0",
     "tmp": "^0.1.0",
-    "update-notifier": "^3.0.1",
     "uuid": "^8.3.1",
     "yargs": "^15.4.1",
     "yargs-parser": "^13.1.2"

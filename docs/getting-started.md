@@ -129,13 +129,16 @@ script:
 
 ```yaml
 version: 2.1
+orbs:
+  browser-tools: circleci/browser-tools@1.2.3
 jobs:
   build:
     docker:
-      - image: circleci/node:15.12-browsers
+      - image: cimg/node:16.13-browsers
     working_directory: ~/your-project
     steps:
       - checkout
+      - browser-tools/install-chrome
       - run: npm install
       - run: npm run build
       - run: sudo npm install -g @lhci/cli@0.8.x

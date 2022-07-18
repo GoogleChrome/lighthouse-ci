@@ -71,14 +71,14 @@ function getSavedReportsDirectory() {
   return LHCI_DIR;
 }
 
-/** @return {Array<import('./assertions').AssertionResult>} */
+/** @return {Array<LHCI.AssertResults.AssertionResult>} */
 function loadAssertionResults() {
   ensureDirectoryExists();
   if (!fs.existsSync(ASSERTION_RESULTS_PATH)) return [];
   return JSON.parse(fs.readFileSync(ASSERTION_RESULTS_PATH, 'utf8'));
 }
 
-/** @param {Array<import('./assertions').AssertionResult>} results */
+/** @param {Array<LHCI.AssertResults.AssertionResult>} results */
 function saveAssertionResults(results) {
   ensureDirectoryExists();
   return fs.writeFileSync(ASSERTION_RESULTS_PATH, JSON.stringify(results, null, 2));

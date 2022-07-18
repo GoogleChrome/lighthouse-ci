@@ -17,7 +17,7 @@ const {
   synthesizeItemKeyDiffs,
   sortZippedBaseAndCompareItems,
   replaceNondeterministicStrings,
-} = require('@lhci/utils/src/audit-diff-finder.js');
+} = require('../src/audit-diff-finder.js');
 
 describe('#findAuditDiffs', () => {
   it('should return empty array for identical audits', () => {

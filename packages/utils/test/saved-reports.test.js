@@ -10,7 +10,7 @@
 const fs = require('fs');
 const path = require('path');
 const {withTmpDir} = require('../../cli/test/test-utils.js');
-const {replaceUrlPatterns, saveLHR} = require('@lhci/utils/src/saved-reports.js');
+const {replaceUrlPatterns, saveLHR} = require('../src/saved-reports.js');
 
 describe('#replaceUrlPatterns', () => {
   it('should replace basic patterns', () => {

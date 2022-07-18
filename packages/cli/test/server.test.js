@@ -38,10 +38,7 @@ describe('Lighthouse CI server CLI', () => {
 
   it('should print debug information when port is invalid from config', async () => {
     const normalizePathsForWindows = stderr =>
-      stderr
-        .replace(__dirname, '.')
-        .replace(__dirname, '.')
-        .replace(/\\/g, '/');
+      stderr.replace(__dirname, '.').replace(__dirname, '.').replace(/\\/g, '/');
 
     const {status, stderr} = await runCLI([
       'server',

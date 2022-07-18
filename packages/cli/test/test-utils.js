@@ -51,19 +51,24 @@ async function writeAllInputs(wizardProcess, inputs) {
 
 /** @param {string} output */
 function cleanStdOutput(output) {
-  return output
-    .replace(/✘/g, 'X')
-    .replace(/×/g, 'X')
-    .replace(/[0-9a-f-]{36}/gi, '<UUID>')
-    .replace(/:\d{4,6}/g, ':XXXX')
-    .replace(/port \d{4,6}/, 'port XXXX')
-    .replace(/(\s+at \S+) .*/g, '$1')
-    .replace(/\s+at (async|processTicksAndRejections|process._tickCallback)(?=\n|$)/g, '')
-    .replace(
-      /appspot.com\/reports\/[0-9-]+.report.html/,
-      'appspot.com/reports/XXXX-XXXX.report.html'
-    )
-    .replace(/\d{4,}(\.\d{1,})?/g, 'XXXX');
+  return (
+    output
+      .replace(/✘/g, 'X')
+      .replace(/×/g, 'X')
+      .replace(/[0-9a-f-]{36}/gi, '<UUID>')
+      .replace(/:\d{4,6}/g, ':XXXX')
+      .replace(/port \d{4,6}/, 'port XXXX')
+      .replace(/(\s+at \S+) .*/g, '$1')
+      .replace(/\s+at (async|processTicksAndRejections|process._tickCallback)(?=\n|$)/g, '')
+      .replace(
+        /appspot.com\/reports\/[0-9-]+.report.html/g,
+        'appspot.com/reports/XXXX-XXXX.report.html'
+      )
+      // 1234.1, 1234
+      .replace(/\d{4,}(\.\d{1,})?/g, 'XXXX')
+      // 123.1
+      .replace(/\d{3,}(\.\d{1,})/g, 'XXXX')
+  );
 }
 
 async function safeDeleteFile(filePath) {
@@ -208,9 +213,7 @@ async function runWizardCLI(args, inputs, overrides = {}) {
     await waitForCondition(
       () => wizardProcess.stdoutMemory.includes(inputWaitCondition),
       () =>
-        `Output never contained "${inputWaitCondition}"\nSTDOUT: ${
-          wizardProcess.stdoutMemory
-        }\nSTDERR:${wizardProcess.stderrMemory}`
+        `Output never contained "${inputWaitCondition}"\nSTDOUT: ${wizardProcess.stdoutMemory}\nSTDERR:${wizardProcess.stderrMemory}`
     );
     await writeAllInputs(wizardProcess, inputs);
     await waitForCondition(() => status >= 0).catch(() => undefined);

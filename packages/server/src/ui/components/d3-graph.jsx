@@ -13,19 +13,13 @@ import * as d3 from 'd3';
  * @param {{top: number, right: number, bottom: number, left: number}} margin
  */
 export function createRootSvg(rootEl, margin) {
-  d3.select(rootEl)
-    .selectAll('*')
-    .remove();
+  d3.select(rootEl).selectAll('*').remove();
 
   const height = rootEl.clientHeight;
   const width = rootEl.clientWidth;
   const graphWidth = width - margin.left - margin.right;
   const graphHeight = height - margin.top - margin.bottom;
-  const svgRoot = d3
-    .select(rootEl)
-    .append('svg')
-    .attr('width', width)
-    .attr('height', height);
+  const svgRoot = d3.select(rootEl).append('svg').attr('width', width).attr('height', height);
 
   return {
     width,

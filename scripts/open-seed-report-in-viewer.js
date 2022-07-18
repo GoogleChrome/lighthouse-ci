@@ -16,7 +16,7 @@ async function run() {
   const page = await browser.newPage();
   await page.goto('https://googlechrome.github.io/lighthouse/viewer/');
   await page.evaluate(() => console.log('Loaded'));
-  await page.waitFor(1000);
+  await page.waitForTimeout(1000);
   await page.evaluate(() => console.log('Evaling'));
   await page.evaluate(lhr => {
     const dataTransfer = new DataTransfer();

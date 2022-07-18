@@ -22,9 +22,7 @@ app.get('/', (_, res) => {
   `);
 });
 
-const {
-  SERVER_START_MESSAGE = 'Server listening on port...',
-  SERVER_START_PORT = 52425,
-} = process.env;
+const {SERVER_START_MESSAGE = 'Server listening on port...', SERVER_START_PORT = 52425} =
+  process.env;
 
 app.listen(SERVER_START_PORT, () => process.stdout.write(SERVER_START_MESSAGE));

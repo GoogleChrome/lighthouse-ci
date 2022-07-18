@@ -28,11 +28,11 @@ describe('Project dashboard', () => {
 
       expect(commits).toMatchInlineSnapshot(`
         Array [
+          "1248build 14call_splitmasterMay 24 6:00 AM",
+          "1247build 13call_splitmasterMay 23 6:00 AM",
           "1246build 12call_splitmasterMay 22 6:00 AM",
           "1245build 11call_splitmasterMay 21 6:00 AM",
           "1244build 10call_splitmasterMay 20 6:00 AM",
-          "1243build 9call_splitmasterMay 19 6:00 AM",
-          "1242build 8call_splitmasterMay 18 6:00 AM",
         ]
       `);
     });
@@ -42,16 +42,16 @@ describe('Project dashboard', () => {
     });
 
     it('should render graphs for previously unavailable data', async () => {
-      const {height, left} = await state.page.evaluate(() => {
+      await state.page.evaluate(() => {
         const graphs = Array.from(document.querySelectorAll('.metric-line-graph__graph'));
-        if (!graphs.length) throw new Error('Should have found 2 metric graphs');
-        const {top, bottom, left} = graphs[1].getBoundingClientRect();
-        window.scrollTo({top: top - 50});
-        return {height: bottom - top, left};
+        if (graphs.length !== 2) throw new Error('Should have found 2 metric graphs');
+
+        window.scrollTo({top: graphs[0].getBoundingClientRect().top - 50});
+        return new Promise(resolve => requestAnimationFrame(resolve));
       });
 
-      await state.page.mouse.move(left * 1.5, 50 + height * 0.8);
-      await state.page.waitFor(500);
+      // Hover the first graph.
+      await state.page.mouse.move(200, 200);
     });
 
     it('should look correct on hover', async () => {

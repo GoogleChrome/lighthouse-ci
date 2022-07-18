@@ -129,13 +129,16 @@ script:
 
 ```yaml
 version: 2.1
+orbs:
+  browser-tools: circleci/browser-tools@1.2.3
 jobs:
   build:
     docker:
-      - image: circleci/node:15.12-browsers
+      - image: cimg/node:16.13-browsers
     working_directory: ~/your-project
     steps:
       - checkout
+      - browser-tools/install-chrome
       - run: npm install
       - run: npm run build
       - run: sudo npm install -g @lhci/cli@0.8.x
@@ -222,7 +225,7 @@ lhci autorun
 </details>
 
 <details>
-<summary>Google Cloudbuild</summary>
+<summary>Google Cloud Build</summary>
 <br />
 
 **NOTE:** Learn more about the [security tradeoffs](./recipes/docker-client/README.md#--no-sandbox-container-tradeoffs) behind use of the `--no-sandbox` Chrome option before proceeding.
@@ -244,8 +247,8 @@ module.exports = {
 
 **Notes**
 
-- `LHCI_BUILD_CONTEXT__CURRENT_BRANCH` doesn't pick up the right variables in cloudbuild so passing through `$BRANCH_NAME` will fix this.
-- `machineType` defines the machine you can pick. The bigger the machine the more stable the performance results will be (see [Lighthouse variability documentation](https://github.com/GoogleChrome/lighthouse/blob/master/docs/variability.md)). WARNING: Look through the [Cloudbuild machine pricing](https://cloud.google.com/cloud-build/pricing) before deciding on a machine type.
+- `LHCI_BUILD_CONTEXT__CURRENT_BRANCH` doesn't pick up the right variables in Cloud Build so passing through `$BRANCH_NAME` will fix this.
+- `machineType` defines the machine you can pick. The bigger the machine the more stable the performance results will be (see [Lighthouse variability documentation](https://github.com/GoogleChrome/lighthouse/blob/master/docs/variability.md)). WARNING: Look through the [Cloud Build machine pricing](https://cloud.google.com/cloud-build/pricing) before deciding on a machine type.
 
 **cloudbuild.yml**
 
@@ -347,7 +350,7 @@ Be sure to keep this token secret. Anyone in possession of this token will be ab
 
 #### Additional configuration for GitHub Actions as CI Provider
 
-Make sure you define the `LHCI_GITHUB_APP_TOKEN` as [enviroment variable](https://docs.github.com/en/free-pro-team@latest/actions/reference/environment-variables#about-environment-variables) on the workflow and ensure that the git history is available too.
+Make sure you define the `LHCI_GITHUB_APP_TOKEN` as [environment variable](https://docs.github.com/en/free-pro-team@latest/actions/reference/environment-variables#about-environment-variables) on the workflow and ensure that the git history is available too.
 
 ```yaml
 name: CI

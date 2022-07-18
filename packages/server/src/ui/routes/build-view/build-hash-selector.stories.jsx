@@ -12,7 +12,6 @@ import lhr_ from '../../../../test/fixtures/lh-5-6-0-verge-a.json';
 export default {
   title: 'Build View/Build Hash Selector',
   component: BuildHashSelector_,
-  parameters: {dimensions: {width: 800, height: 400}},
 };
 
 const lhr = /** @type {LH.Result} */ (lhr_);
@@ -33,6 +32,7 @@ const build = id => ({
     'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8DwHwAFBQIAX8jx0gAAAABJRU5ErkJggg==',
   lifecycle: 'sealed',
   hash: hash(id),
+  commitMessage: 'this is a commit message',
   branch: 'master',
   runAt: runAt(id),
 });

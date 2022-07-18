@@ -5,11 +5,11 @@
     "start": "lhci server --config=./lighthouserc.json"
   },
   "dependencies": {
-    "@lhci/cli": "0.8.2",
-    "@lhci/server": "0.8.2",
+    "@lhci/cli": "0.9.0",
+    "@lhci/server": "0.9.0",
     "mysql2": "^2.1.0",
-    "pg": "^7.12.1",
+    "pg": "^8.2.1",
     "pg-hstore": "^2.3.3",
-    "sqlite3": "^4.0.6"
+    "sqlite3": "^5.0.0"
   }
 }

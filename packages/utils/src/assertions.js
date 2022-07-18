@@ -10,28 +10,7 @@ const preset = require('./presets/all.js');
 const {splitMarkdownLink} = require('./markdown.js');
 const {computeRepresentativeRuns} = require('./representative-runs.js');
 
-/** @typedef {keyof StrictOmit<LHCI.AssertCommand.AssertionOptions, 'aggregationMethod'>|'auditRan'} AssertionType */
-
-/**
- * @typedef AssertionResult
- * @property {string} url
- * @property {AssertionType} name
- * @property {string} operator
- * @property {number} expected
- * @property {number} actual
- * @property {number[]} values
- * @property {boolean} passed
- * @property {LHCI.AssertCommand.AssertionFailureLevel} [level]
- * @property {string} [auditId]
- * @property {string|undefined} [auditProperty]
- * @property {string|undefined} [auditTitle]
- * @property {string|undefined} [auditDocumentationLink]
- * @property {string|undefined} [message]
- */
-
-/** @typedef {StrictOmit<AssertionResult, 'url'>} AssertionResultNoURL */
-
-/** @type {Record<AssertionType, (result: LH.AuditResult) => number | undefined>} */
+/** @type {Record<LHCI.AssertResults.AssertionType, (result: LH.AuditResult) => number | undefined>} */
 const AUDIT_TYPE_VALUE_GETTERS = {
   auditRan: result => (result === undefined ? 0 : 1),
   minScore: result => {
@@ -44,7 +23,7 @@ const AUDIT_TYPE_VALUE_GETTERS = {
   maxNumericValue: result => result.numericValue,
 };
 
-/** @type {Record<AssertionType, {operator: string, passedFn(actual: number, expected: number): boolean}>} */
+/** @type {Record<LHCI.AssertResults.AssertionType, {operator: string, passedFn(actual: number, expected: number): boolean}>} */
 const AUDIT_TYPE_OPERATORS = {
   auditRan: {operator: '==', passedFn: (actual, expected) => actual === expected},
   minScore: {operator: '>=', passedFn: (actual, expected) => actual >= expected},
@@ -71,7 +50,7 @@ function normalizeAssertion(assertion) {
 /**
  * @param {number[]} values
  * @param {LHCI.AssertCommand.AssertionAggregationMethod} aggregationMethod
- * @param {AssertionType} assertionType
+ * @param {LHCI.AssertResults.AssertionType} assertionType
  * @return {number}
  */
 function getValueForAggregationMethod(values, aggregationMethod, assertionType) {
@@ -91,9 +70,9 @@ function getValueForAggregationMethod(values, aggregationMethod, assertionType) 
 /**
  * @param {LH.AuditResult[]} auditResults
  * @param {LHCI.AssertCommand.AssertionAggregationMethod} aggregationMethod
- * @param {AssertionType} assertionType
+ * @param {LHCI.AssertResults.AssertionType} assertionType
  * @param {number} expectedValue
- * @return {AssertionResultNoURL[]}
+ * @return {LHCI.AssertResults.AssertionResultNoURL[]}
  */
 function getAssertionResult(auditResults, aggregationMethod, assertionType, expectedValue) {
   const values = auditResults.map(AUDIT_TYPE_VALUE_GETTERS[assertionType]);
@@ -154,7 +133,7 @@ function getAssertionResult(auditResults, aggregationMethod, assertionType, expe
  * @param {Array<LH.AuditResult|undefined>} possibleAuditResults
  * @param {LHCI.AssertCommand.AssertionOptions} options
  * @param {string} [auditId]
- * @return {AssertionResultNoURL[]}
+ * @return {LHCI.AssertResults.AssertionResultNoURL[]}
  */
 function getStandardAssertionResults(possibleAuditResults, options, auditId) {
   const {minScore, maxLength, maxNumericValue, aggregationMethod = 'optimistic'} = options;
@@ -178,7 +157,7 @@ function getStandardAssertionResults(possibleAuditResults, options, auditId) {
   // We just checked that all of them are defined, so redefine for easier tsc.
   const auditResults = /** @type {Array<LH.AuditResult>} */ (possibleAuditResults);
 
-  /** @type {AssertionResultNoURL[]} */
+  /** @type {LHCI.AssertResults.AssertionResultNoURL[]} */
   const results = [];
 
   // Keep track of if we had a manual assertion so we know whether or not to automatically create a
@@ -209,7 +188,7 @@ function getStandardAssertionResults(possibleAuditResults, options, auditId) {
  * @param {string} key
  * @param {number} actual
  * @param {number} expected
- * @return {AssertionResultNoURL[]}
+ * @return {LHCI.AssertResults.AssertionResultNoURL[]}
  */
 function getAssertionResultsForBudgetRow(key, actual, expected) {
   return getAssertionResult(
@@ -229,10 +208,10 @@ function getAssertionResultsForBudgetRow(key, actual, expected) {
  * (de-duped by "<resource type>.<property>").
  *
  * @param {LH.AuditResult[]} auditResults
- * @return {AssertionResultNoURL[]}
+ * @return {LHCI.AssertResults.AssertionResultNoURL[]}
  */
 function getBudgetAssertionResults(auditResults) {
-  /** @type {AssertionResultNoURL[]} */
+  /** @type {LHCI.AssertResults.AssertionResultNoURL[]} */
   const results = [];
   /** @type {Set<string>} */
   const resultsKeys = new Set();
@@ -274,7 +253,7 @@ function getBudgetAssertionResults(auditResults) {
  * @param {Array<string>} auditProperty
  * @param {LHCI.AssertCommand.AssertionOptions} assertionOptions
  * @param {Array<LH.Result>} lhrs
- * @return {AssertionResultNoURL[]}
+ * @return {LHCI.AssertResults.AssertionResultNoURL[]}
  */
 function getCategoryAssertionResults(auditProperty, assertionOptions, lhrs) {
   if (auditProperty.length !== 1) {
@@ -317,7 +296,7 @@ function doesLHRMatchPattern(pattern, lhr) {
  * @param {Array<LH.AuditResult>} auditResults
  * @param {LHCI.AssertCommand.AssertionOptions} assertionOptions
  * @param {Array<LH.Result>} lhrs
- * @return {AssertionResultNoURL[]}
+ * @return {LHCI.AssertResults.AssertionResultNoURL[]}
  */
 function getAssertionResultsForAudit(auditId, auditProperty, auditResults, assertionOptions, lhrs) {
   if (auditId === 'performance-budget') {
@@ -399,10 +378,16 @@ function resolveAssertionOptionsAndLhrs(baseOptions, unfilteredLhrs) {
       const failedAudit = auditInstances.find(audit => audit.score !== 1);
       const audit = failedAudit || auditInstances[0] || {};
       const auditTitle = audit.title;
-      const auditDocumentationLinkMatches = splitMarkdownLink(audit.description || '')
+      const auditLinks = splitMarkdownLink(audit.description || '')
         .map(segment => (segment.isLink ? segment.linkHref : ''))
-        .filter(link => link.includes('web.dev') || link.includes('developers.google.com/web'));
-      const [auditDocumentationLink] = auditDocumentationLinkMatches;
+        .filter(Boolean);
+      const auditDocumentationLinkMatches = auditLinks.filter(
+        link => link.includes('web.dev') || link.includes('developers.google.com/web')
+      );
+      const auditDocumentationLink =
+        auditDocumentationLinkMatches.find(link => link.includes('web.dev')) ||
+        auditDocumentationLinkMatches[0] ||
+        auditLinks[auditLinks.length - 1];
       if (!rest.length) return {assertionKey, auditId, auditTitle, auditDocumentationLink};
       return {assertionKey, auditId, auditTitle, auditDocumentationLink, auditProperty: rest};
     }
@@ -421,22 +406,16 @@ function resolveAssertionOptionsAndLhrs(baseOptions, unfilteredLhrs) {
 /**
  * @param {LHCI.AssertCommand.BaseOptions} baseOptions
  * @param {LH.Result[]} unfilteredLhrs
- * @return {AssertionResult[]}
+ * @return {LHCI.AssertResults.AssertionResult[]}
  */
 function getAllAssertionResultsForUrl(baseOptions, unfilteredLhrs) {
-  const {
-    assertions,
-    auditsToAssert,
-    medianLhrs,
-    lhrs,
-    url,
-    aggregationMethod,
-  } = resolveAssertionOptionsAndLhrs(baseOptions, unfilteredLhrs);
+  const {assertions, auditsToAssert, medianLhrs, lhrs, url, aggregationMethod} =
+    resolveAssertionOptionsAndLhrs(baseOptions, unfilteredLhrs);
 
   // If we don't have any data, just return early.
   if (!lhrs.length) return [];
 
-  /** @type {AssertionResult[]} */
+  /** @type {LHCI.AssertResults.AssertionResult[]} */
   const results = [];
 
   for (const auditToAssert of auditsToAssert) {
@@ -474,7 +453,7 @@ function getAllAssertionResultsForUrl(baseOptions, unfilteredLhrs) {
  *
  * @param {LHCI.AssertCommand.Options} options
  * @param {LH.Result[]} lhrs
- * @return {AssertionResult[]}
+ * @return {LHCI.AssertResults.AssertionResult[]}
  */
 function getAllAssertionResults(options, lhrs) {
   const groupedByURL = _.groupBy(lhrs, lhr => lhr.finalUrl);
@@ -489,7 +468,7 @@ function getAllAssertionResults(options, lhrs) {
     arrayOfOptions = options.assertMatrix;
   }
 
-  /** @type {AssertionResult[]} */
+  /** @type {LHCI.AssertResults.AssertionResult[]} */
   const results = [];
   for (const lhrSet of groupedByURL) {
     for (const baseOptions of arrayOfOptions) {

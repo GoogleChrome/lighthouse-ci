@@ -11,7 +11,6 @@ module.exports = {
       preset: 'lighthouse:recommended',
       assertions: {
         'dom-size': ['error', {maxNumericValue: 3000}],
-
         'csp-xss': 'off',
         'unsized-images': 'off',
         'uses-rel-preload': 'off',

@@ -64,7 +64,7 @@ docker container run --cap-add=SYS_ADMIN \
   -v "$(pwd)/scripts:/home/lhci/reports/scripts" \
   patrickhulce/lhci-client \
   lhci collect --url="https://example.com" \
-               --puppeteerScript=scripts/puppeteer-test.js \
+               --puppeteerScript=docs/recipes/puppeteer-example.js \
                --puppeteerLaunchOptions.args=--no-sandbox \
                --puppeteerLaunchOptions.args=--disable-setuid-sandbox
 ```
@@ -75,7 +75,7 @@ module.exports = {
   ci: {
     collect: {
       // ...
-      puppeteerScript: 'scripts/puppeteer-test.js',
+      puppeteerScript: 'docs/recipes/puppeteer-example.js',
       puppeteerLaunchOptions: {
         args: ['--no-sandbox', '--disable-setuid-sandbox']
       },

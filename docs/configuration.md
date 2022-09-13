@@ -424,7 +424,7 @@ lhci collect --start-server-command="yarn serve" --url=http://localhost:8080/ --
 
 ### `upload`
 
-Saves the runs in the `.lighthouseci/` folder to desired target and sets a GitHub status check when the GitHub token is available.
+Saves the runs in the `.lighthouseci/` folder to desired target and sets a GitHub status check when the GitHub token is available and target is not `filesystem`.
 
 ```bash
 Options:
@@ -484,6 +484,7 @@ The target location to which Lighthouse CI should upload the reports.
 - You want to process the raw Lighthouse results yourself locally.
 - You want access to the report files on the local filesystem.
 - You don't want to upload the results to a custom location that isn't supported by Lighthouse CI.
+- You don't need detailed status checks in GitHub
 
 #### `token`
 

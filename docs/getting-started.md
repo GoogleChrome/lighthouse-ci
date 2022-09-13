@@ -228,7 +228,7 @@ lhci autorun
 <summary>Google Cloud Build</summary>
 <br />
 
-**NOTE:** Learn more about the [security tradeoffs](./recipes/docker-client/README.md#--no-sandbox-container-tradeoffs) behind use of the `--no-sandbox` Chrome option before proceeding.
+**NOTE:** Learn more about the [security tradeoffs](./recipes/docker-client/README.md#--no-sandbox-issues-explained) behind use of the `--no-sandbox` Chrome option before proceeding.
 
 **.lighthouserc.js**
 

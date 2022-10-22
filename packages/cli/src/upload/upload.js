@@ -543,6 +543,7 @@ async function runFilesystemTarget(options) {
     const context = {
       hostname: url.hostname,
       pathname: url.pathname,
+      hash: url.hash,
       date: fetchTimeDate.toISOString().replace(/T.*/, ''),
       datetime: fetchTimeDate
         .toISOString()

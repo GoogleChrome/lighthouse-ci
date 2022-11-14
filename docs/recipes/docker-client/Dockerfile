@@ -1,5 +1,8 @@
 FROM node:14-bullseye-slim
 
+# Set variable so puppeteer will not try to download chromium
+ENV PUPPETEER_SKIP_DOWNLOAD=true
+
 # Install utilities
 RUN apt-get update --fix-missing && apt-get -y upgrade && apt-get install -y git wget gnupg && apt-get clean
 
@@ -14,11 +17,16 @@ RUN apt-get update \
 RUN npm install -g @lhci/cli@0.9.0
 RUN npm install -g lighthouse
 
+# Install puppeteer
+RUN npm install -g puppeteer
+
 # Setup a user to avoid doing everything as root
 RUN groupadd --system lhci && \
   useradd --system --create-home --gid lhci lhci && \
   mkdir --parents /home/lhci/reports && \
   chown --recursive lhci:lhci /home/lhci
+
+RUN cd /home/lhci/reports && npm link puppeteer
 
 USER lhci
 WORKDIR /home/lhci/reports

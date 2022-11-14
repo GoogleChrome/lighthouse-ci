@@ -38,7 +38,7 @@ exit $EXIT_CODE
 
 To run Lighthouse CI, you'll need...
 
-- Node v10 LTS or later
+- Node v16 LTS or later
 - Chrome Stable or later
 - (if Ubuntu) Xenial or later
 
@@ -77,9 +77,9 @@ script:
 
 # Example if your travis build runs a matrix like...
 # matrix:
-#   - 12
-#   - 10
-if [[ "$TRAVIS_NODE_VERSION" != "10" ]]; then
+#   - 18
+#   - 16
+if [[ "$TRAVIS_NODE_VERSION" != "18" ]]; then
   echo "Only run Lighthouse CI once per build, node version is not the selected version.";
   exit 0;
 fi

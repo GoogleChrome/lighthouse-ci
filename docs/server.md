@@ -14,7 +14,7 @@ alt="Screenshot of the Lighthouse CI server diff UI" width="48%">
 
 The LHCI server can be run in any node environment with persistent disk storage or network access to a postgres/mysql database.
 
-- Node v14 LTS
+- Node v16 LTS
 - Database Storage (sqlite, mysql, or postgresql)
 
 ### General

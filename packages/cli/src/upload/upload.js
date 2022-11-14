@@ -8,7 +8,6 @@
 const fs = require('fs');
 const path = require('path');
 const URL = require('url').URL;
-const fetch = require('isomorphic-fetch');
 const _ = require('@lhci/utils/src/lodash.js');
 const ApiClient = require('@lhci/utils/src/api-client.js');
 const {writeUrlMapToFile} = require('@lhci/utils/src/saved-reports.js');
@@ -31,6 +30,7 @@ const {
   getCurrentBranchSafe,
   getAncestorHash,
 } = require('@lhci/utils/src/build-context.js');
+const fetch = require('../fetch.js');
 
 /** @param {string} message */
 const print = message => {
@@ -393,7 +393,7 @@ function buildTemporaryStorageLink(compareUrl, urlAudited, previousUrlMap) {
 async function runLHCITarget(options) {
   if (!options.token) throw new Error('Must provide token for LHCI target');
 
-  const api = new ApiClient({...options, rootURL: options.serverBaseUrl});
+  const api = new ApiClient({fetch, ...options, rootURL: options.serverBaseUrl});
 
   api.setBuildToken(options.token);
   const project = await api.findProjectByToken(options.token);
@@ -543,6 +543,7 @@ async function runFilesystemTarget(options) {
     const context = {
       hostname: url.hostname,
       pathname: url.pathname,
+      hash: url.hash,
       date: fetchTimeDate.toISOString().replace(/T.*/, ''),
       datetime: fetchTimeDate
         .toISOString()

@@ -26,7 +26,7 @@ A vendor that provides hosted services and version control integrations to facil
 
 ## Setting Up CI
 
-There are many CI providers out there to choose from. Lighthouse CI works with any provider that offers a stable environment with Node 10 LTS or later and stable Chrome. Below are some common providers documentation on how to get started.
+There are many CI providers out there to choose from. Lighthouse CI works with any provider that offers a stable environment with Node 16 LTS or later and stable Chrome. Below are some common providers documentation on how to get started.
 
 - [GitHub Actions](https://help.github.com/en/actions/configuring-and-managing-workflows/configuring-a-workflow)
 - [GitLab CI](https://docs.gitlab.com/ee/ci/quick_start/)

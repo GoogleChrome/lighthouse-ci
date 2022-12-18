@@ -441,6 +441,7 @@ module.exports = {
 };
 ```
 
+
 Read more about what's possible in [configuration](./configuration.md) with [the assertions format](./configuration.md#assert).
 
 ## The Lighthouse CI Server

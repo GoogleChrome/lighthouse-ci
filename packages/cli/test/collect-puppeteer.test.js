@@ -66,7 +66,7 @@ describe('Lighthouse CI collect CLI with puppeteer', () => {
     );
 
     expect(stdout).toMatchInlineSnapshot(`
-      "Started a web server with \\"node ./auth-server.js\\"...
+      "Started a web server with "node ./auth-server.js"...
       Running Lighthouse 1 time(s) on http://localhost:XXXX/public
       Run #1...done.
       Done running Lighthouse!
@@ -78,7 +78,7 @@ describe('Lighthouse CI collect CLI with puppeteer', () => {
     const files = fs.readdirSync(path.join(autorunDir, '.lighthouseci'));
     const report = files.find(file => /lhr.*\.json$/.test(file));
     const lhr = JSON.parse(fs.readFileSync(path.join(autorunDir, '.lighthouseci', report)));
-    expect(lhr.userAgent).toContain('HeadlessChrome/98.0.4758.0'); // make sure the right chrome was used
+    expect(lhr.userAgent).toContain('HeadlessChrome/111.0.5555.0'); // make sure the right chrome was used
   }, 180000);
 
   it('should not fail on providing defaults without Chrome installations', async () => {

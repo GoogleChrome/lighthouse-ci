@@ -39,7 +39,7 @@ describe('Lighthouse CI collect CLI with puppeteer', () => {
     // 4xx and 5xx status codes cause Lighthouse to exit with 1 and collect to fail.
     // Just succeeding here is enough to signal that our login script worked.
     expect(stdout).toMatchInlineSnapshot(`
-      "Started a web server with \\"node ./auth-server.js\\"...
+      "Started a web server with "node ./auth-server.js"...
       Running Lighthouse 1 time(s) on http://localhost:XXXX
       Run #1...done.
       Done running Lighthouse!
@@ -90,7 +90,7 @@ describe('Lighthouse CI collect CLI with puppeteer', () => {
     // Make sure there is no default chromePath found
     const chromePathHelp = stdout.match(/--chromePath.*\n.*\n.*/);
     expect(chromePathHelp).toMatchInlineSnapshot(`
-      Array [
+      [
         "--chromePath                The path to the Chrome or Chromium executable to use for collection.
         --puppeteerScript           The path to a script that manipulates the browser with puppeteer before running Lighthouse, used for auth.
         --puppeteerLaunchOptions    The object of puppeteer launch options",

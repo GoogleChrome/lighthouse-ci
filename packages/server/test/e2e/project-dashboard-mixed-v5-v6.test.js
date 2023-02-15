@@ -6,6 +6,7 @@
 'use strict';
 
 /* eslint-env jest, browser */
+/* eslint-disable no-irregular-whitespace */
 
 const {shouldRunE2E, emptyTest} = require('../test-utils.js');
 

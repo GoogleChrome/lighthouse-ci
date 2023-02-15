@@ -78,6 +78,7 @@
     "prettier": "2.5.1",
     "prop-types": "^15.7.2",
     "puppeteer": "^19.7.0",
+    "puppeteer-core": "^19.7.0",
     "rimraf": "^3.0.2",
     "sqlite3": "^5.1.2",
     "ts-jest": "^27.1.3",

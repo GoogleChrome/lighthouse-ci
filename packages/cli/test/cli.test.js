@@ -171,9 +171,6 @@ describe('Lighthouse CI CLI', () => {
   // FIXME: Tests dependency. Moving these tests breaks others.
   describe('collect', () => {
     it('should collect results with a server command', async () => {
-      // FIXME: for some inexplicable reason this test cannot pass in Travis Windows
-      if (os.platform() === 'win32') return;
-
       const startCommand = `yarn start server -p=14927 --storage.sqlDatabasePath=${tmpSqlFilePath}`;
       const {stdout, stderr, status} = await runCLI([
         'collect',

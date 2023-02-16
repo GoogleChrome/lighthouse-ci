@@ -1843,33 +1843,33 @@
   resolved "https://registry.yarnpkg.com/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz#75a2e8b51cb758a7553d6804a5932d7aace75c39"
   integrity sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==
 
-"@chialab/esbuild-plugin-html@^0.15.14":
-  version "0.15.14"
-  resolved "https://registry.yarnpkg.com/@chialab/esbuild-plugin-html/-/esbuild-plugin-html-0.15.14.tgz#7eb9836f963f1af02e8aa5b4e6f47467c935628f"
-  integrity sha512-EiI5EEv6H18LUD78IRZG/9RN75rk3hP/AqDUeu4N7COlwwEHwDge9cHOr4NvgZbY6is7T9NVYANlE/MUnmXelA==
+"@chialab/esbuild-plugin-html@^0.17.2":
+  version "0.17.2"
+  resolved "https://registry.yarnpkg.com/@chialab/esbuild-plugin-html/-/esbuild-plugin-html-0.17.2.tgz#6d498db1ad90daf343c37de7be4e0337fd6aa7d6"
+  integrity sha512-IoPRjmiLzoOzJBCJ5sFR5fEjYfQ6EMwuWL1VhZrw1IyDCK34zIqOwmkKk49Tw84VHGkPy/+RUsu8nNP1Ax6liQ==
   dependencies:
-    "@chialab/esbuild-rna" "^0.15.14"
-    "@chialab/node-resolve" "^0.15.9"
+    "@chialab/esbuild-rna" "^0.17.3"
+    "@chialab/node-resolve" "^0.17.0"
 
-"@chialab/esbuild-rna@^0.15.14":
-  version "0.15.14"
-  resolved "https://registry.yarnpkg.com/@chialab/esbuild-rna/-/esbuild-rna-0.15.14.tgz#09263419da96f6b96b6fbe8ed301bde30a4b35b2"
-  integrity sha512-9pviDrC7svGy4V1C6AcAji2HRZ0qbNT3IKapzK8E0NZIRzcay9YK77VJIFyedHEgZqLF1K1iDiG2WP6q2jBCuQ==
+"@chialab/esbuild-rna@^0.17.3":
+  version "0.17.3"
+  resolved "https://registry.yarnpkg.com/@chialab/esbuild-rna/-/esbuild-rna-0.17.3.tgz#07d609436ff081af14046f2f3aa28171cd1769d3"
+  integrity sha512-LwPGDBeRnCNSkUfCEXYWKf7iORt6JCbmCLvEaeZnqle2Tm5yNRtZjCnQHdG9D4UpY9YQgrlZQnF785yOnKwL7Q==
   dependencies:
-    "@chialab/estransform" "^0.15.14"
-    "@chialab/node-resolve" "^0.15.9"
+    "@chialab/estransform" "^0.17.2"
+    "@chialab/node-resolve" "^0.17.0"
 
-"@chialab/estransform@^0.15.14":
-  version "0.15.14"
-  resolved "https://registry.yarnpkg.com/@chialab/estransform/-/estransform-0.15.14.tgz#832f6e68df59f5689b4eb14e5c59bc2f65337777"
-  integrity sha512-o416C85M3jGnzHswOK6MxncfPPTOuNUoJWDWV8FRPKkQzI3avVos+v/bEQVqMJX480lSDqfUHkhZ7gMJIzB2oQ==
+"@chialab/estransform@^0.17.2":
+  version "0.17.3"
+  resolved "https://registry.yarnpkg.com/@chialab/estransform/-/estransform-0.17.3.tgz#f0f9302ae230bf9c09213140ad3ed8560fa312e7"
+  integrity sha512-ZFCcDk85ZllhUiAMIzRFsLhrA2z8xwRyXyJBNMP/84+3czLEydSTzzBK9nXNGloOspwp+lL+EgPlFY8Ry693Bg==
   dependencies:
     "@parcel/source-map" "^2.0.0"
 
-"@chialab/node-resolve@^0.15.9":
-  version "0.15.9"
-  resolved "https://registry.yarnpkg.com/@chialab/node-resolve/-/node-resolve-0.15.9.tgz#46985d4f8a468bbb8443bc624ba60bcc4c72b9a8"
-  integrity sha512-4/2GWaGnMV2CLK4QsG4OyJVb6gcz28XPb/bswYWrH9DmYEx6YXVlNEGDswNJxFeYXvXBCIQ5UGzAzjdEMa075A==
+"@chialab/node-resolve@^0.17.0":
+  version "0.17.0"
+  resolved "https://registry.yarnpkg.com/@chialab/node-resolve/-/node-resolve-0.17.0.tgz#95b73b064e83ce78c23dfbb8b370a0d1f36c2bd0"
+  integrity sha512-u9VwO/0djjXsM70aH/Wrx0BrXjtjhfNOxaDks32xa1mZP9T0CXZ0be5Sv3hXI9g5UeJbfvCyFJS2hfJEu7Ifgg==
 
 "@choojs/findup@^0.2.0":
   version "0.2.1"

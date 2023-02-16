@@ -93,8 +93,9 @@ jobs:
       - name: Run yarn test:unit
         run: yarn test:unit || yarn test:unit || yarn test:unit
       - run: yarn test:docker
-      - run: yarn ci:dogfood
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          LHCI_CANARY_SERVER_URL: https://lhci-canary.herokuapp.com/
-          LHCI_CANARY_SERVER_TOKEN: ${{ secrets.LHCI_CANARY_SERVER_TOKEN }}
+      # TODO: re-enable, once we have canary server up again
+      # - run: yarn ci:dogfood
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #     LHCI_CANARY_SERVER_URL: https://lhci-canary.herokuapp.com/
+      #     LHCI_CANARY_SERVER_TOKEN: ${{ secrets.LHCI_CANARY_SERVER_TOKEN }}

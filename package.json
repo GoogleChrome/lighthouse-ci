@@ -10,10 +10,10 @@
     "build:storybook": "lerna run --scope @lhci/server build:storybook",
     "build:watch": "lerna run --scope @lhci/server build:watch --stream",
     "build:source-map-explorer": "lerna run --scope @lhci/server build:source-map-explorer",
-    "start": "./packages/cli/src/cli.js",
+    "start": "node ./packages/cli/src/cli.js",
     "start:seed-data-in-viewer": "node ./scripts/open-seed-report-in-viewer.js",
     "start:seed-database": "node ./scripts/seed-database.js ./packages/cli/test/fixtures/lighthouserc.js",
-    "start:server": "./packages/cli/src/cli.js server --config=./packages/cli/test/fixtures/lighthouserc.js",
+    "start:server": "node ./packages/cli/src/cli.js server --config=./packages/cli/test/fixtures/lighthouserc.js",
     "update:fixture-seed-data": "node ./scripts/update-seed-fixtures.js",
     "test:fixture-seed-data": "jest '--testMatch=**/scripts/diff-seed-fixture.js'",
     "test": "npm run test:typecheck && npm run test:lint && npm run test:unit",
@@ -28,7 +28,7 @@
     "test:unit": "jest --maxWorkers=2"
   },
   "devDependencies": {
-    "@chialab/esbuild-plugin-html": "^0.15.14",
+    "@chialab/esbuild-plugin-html": "^0.17.2",
     "@storybook/addon-actions": "^6.5.13",
     "@storybook/addon-links": "^6.5.13",
     "@storybook/addon-storyshots": "^6.5.13",

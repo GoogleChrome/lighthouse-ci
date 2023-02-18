@@ -14,8 +14,8 @@ describe('Lighthouse CI server CLI', () => {
     const {status, stderr} = await runCLI(['server'], {env: {LHCI_port: 'foo'}});
     expect(status).toEqual(1);
     expect(stderr).toMatchInlineSnapshot(`
-      "Invalid port option \\"NaN\\"
-      environment: LHCI_NO_LIGHTHOUSERC=\\"1\\", LHCI_port=\\"foo\\"
+      "Invalid port option "NaN"
+      environment: LHCI_NO_LIGHTHOUSERC="1", LHCI_port="foo"
       process.argv: server
       simpleArgv: port=foo, p=undefined
       configFile: undefined
@@ -27,8 +27,8 @@ describe('Lighthouse CI server CLI', () => {
     const {status, stderr} = await runCLI(['server', '-p=foo']);
     expect(status).toEqual(1);
     expect(stderr).toMatchInlineSnapshot(`
-      "Invalid port option \\"NaN\\"
-      environment: LHCI_NO_LIGHTHOUSERC=\\"1\\"
+      "Invalid port option "NaN"
+      environment: LHCI_NO_LIGHTHOUSERC="1"
       process.argv: server -p=foo
       simpleArgv: port=undefined, p=foo
       configFile: undefined
@@ -47,8 +47,8 @@ describe('Lighthouse CI server CLI', () => {
     ]);
     expect(status).toEqual(1);
     expect(normalizePathsForWindows(stderr)).toMatchInlineSnapshot(`
-      "Invalid port option \\"NaN\\"
-      environment: LHCI_NO_LIGHTHOUSERC=\\"1\\"
+      "Invalid port option "NaN"
+      environment: LHCI_NO_LIGHTHOUSERC="1"
       process.argv: server --config ./fixtures/lighthouserc-invalid-port.json
       simpleArgv: port=undefined, p=undefined
       configFile: ./fixtures/lighthouserc-invalid-port.json

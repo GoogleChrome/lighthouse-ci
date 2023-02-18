@@ -6,6 +6,7 @@
 'use strict';
 
 /* eslint-env jest, browser */
+/* eslint-disable no-irregular-whitespace */
 
 const {shouldRunE2E, emptyTest} = require('../test-utils.js');
 
@@ -27,7 +28,7 @@ describe('Project dashboard', () => {
       });
 
       expect(commits).toMatchInlineSnapshot(`
-        Array [
+        [
           "1248build 14call_splitmasterMay 24 6:00 AM",
           "1247build 13call_splitmasterMay 23 6:00 AM",
           "1246build 12call_splitmasterMay 22 6:00 AM",

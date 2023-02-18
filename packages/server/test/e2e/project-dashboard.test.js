@@ -6,6 +6,7 @@
 'use strict';
 
 /* eslint-env jest, browser */
+/* eslint-disable no-irregular-whitespace */
 
 const {shouldRunE2E, emptyTest} = require('../test-utils.js');
 
@@ -27,7 +28,7 @@ describe('Project dashboard', () => {
       });
 
       expect(commits).toMatchInlineSnapshot(`
-        Array [
+        [
           "824cbea4test: empty basecall_splitmasterOct 09 8:15 PM",
           "ba5b0ad9test(unmatched-ancestor): a really really really really long messagecall_splitmissing_ancestorAug 09 8:13 PM",
           "5b0ad9f6test(matched-ancestor): a really really really really really long messagecall_splitmasterAug 09 6:55 PM",

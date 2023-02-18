@@ -33,6 +33,7 @@ class PuppeteerManager {
 
     try {
       // @ts-ignore - puppeteer-core is API-compatible with puppeteer
+      // eslint-disable-next-line import/no-extraneous-dependencies
       return require('puppeteer-core');
     } catch (_) {}
 

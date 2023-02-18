@@ -9,6 +9,8 @@
 
 const {shouldRunE2E, emptyTest, getTestLHRPath, waitForNetworkIdle0} = require('../test-utils.js');
 
+jest.setTimeout(60_000);
+
 describe('Viewer simple comparison', () => {
   if (!shouldRunE2E()) return emptyTest();
 

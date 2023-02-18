@@ -38,7 +38,7 @@ describe('AsyncLoader', () => {
       />
     );
 
-    expect(container.innerHTML).toMatchInlineSnapshot(`"<span>{\\"x\\":1}</span>"`);
+    expect(container.innerHTML).toMatchInlineSnapshot(`"<span>{"x":1}</span>"`);
   });
 
   it('should render 404 in the loaded but undefined state', async () => {

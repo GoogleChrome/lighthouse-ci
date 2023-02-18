@@ -13,6 +13,8 @@ const runTests = require('./server-test-suite.js').runTests;
 const runServer = require('../src/server.js').createServer;
 const {safeDeleteFile} = require('../../cli/test/test-utils.js');
 
+jest.setTimeout(60_000);
+
 describe('sqlite server (authenticated)', () => {
   const state = {
     port: undefined,

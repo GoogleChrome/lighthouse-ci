@@ -171,9 +171,6 @@ describe('Lighthouse CI CLI', () => {
   // FIXME: Tests dependency. Moving these tests breaks others.
   describe('collect', () => {
     it('should collect results with a server command', async () => {
-      // FIXME: for some inexplicable reason this test cannot pass in Travis Windows
-      if (os.platform() === 'win32') return;
-
       const startCommand = `yarn start server -p=14927 --storage.sqlDatabasePath=${tmpSqlFilePath}`;
       const {stdout, stderr, status} = await runCLI([
         'collect',
@@ -185,7 +182,7 @@ describe('Lighthouse CI CLI', () => {
 
       const stdoutClean = stdout.replace(/sqlDatabasePath=.*?"/, 'sqlDatabasePath=<file>"');
       expect(stdoutClean).toMatchInlineSnapshot(`
-        "Started a web server with \\"yarn start server -p=XXXX --storage.sqlDatabasePath=<file>\\"...
+        "Started a web server with "yarn start server -p=XXXX --storage.sqlDatabasePath=<file>"...
         Running Lighthouse 1 time(s) on http://localhost:XXXX/app/
         Run #1...done.
         Done running Lighthouse!
@@ -242,7 +239,7 @@ describe('Lighthouse CI CLI', () => {
       const links = fs.readFileSync(linksFile, 'utf8');
       expect(cleanStdOutput(links)).toMatchInlineSnapshot(`
         "{
-          \\"http://localhost:XXXX/app/\\": \\"http://localhost:XXXX/app/projects/awesomeciprojectname/compare/<UUID>?compareUrl=http%3A%2F%2Flocalhost%3APORT%2Fapp%2F\\"
+          "http://localhost:XXXX/app/": "http://localhost:XXXX/app/projects/awesomeciprojectname/compare/<UUID>?compareUrl=http%3A%2F%2Flocalhost%3APORT%2Fapp%2F"
         }"
       `);
     });

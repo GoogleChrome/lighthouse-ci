@@ -12,6 +12,8 @@ jest.retryTimes(3);
 const path = require('path');
 const {runCLI} = require('./test-utils.js');
 
+jest.setTimeout(60_000);
+
 describe('Lighthouse CI collect CLI', () => {
   describe('with URLs', () => {
     const staticDistDir = path.join(__dirname, 'fixtures/collect-static-dir-with-urls');

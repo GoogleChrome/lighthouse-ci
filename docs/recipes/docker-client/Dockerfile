@@ -1,4 +1,4 @@
-FROM node:14-bullseye-slim
+FROM node:16-bullseye-slim
 
 # Set variable so puppeteer will not try to download chromium
 ENV PUPPETEER_SKIP_DOWNLOAD=true
@@ -14,7 +14,7 @@ RUN apt-get update \
     && apt-get clean
 
 # Install Lighthouse CI
-RUN npm install -g @lhci/cli@0.9.0
+RUN npm install -g @lhci/cli@0.10.0
 RUN npm install -g lighthouse
 
 # Install puppeteer

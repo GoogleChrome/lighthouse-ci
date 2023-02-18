@@ -56,7 +56,7 @@ describe('Lighthouse CI autorun CLI with startServerCommand', () => {
       ✅  Chrome installation found
       Healthcheck passed!
 
-      Started a web server with \\"node autorun-server.js\\"...
+      Started a web server with "node autorun-server.js"...
       Running Lighthouse 1 time(s) on http://localhost:XXXX
       Run #1...done.
       Done running Lighthouse!
@@ -70,7 +70,7 @@ describe('Lighthouse CI autorun CLI with startServerCommand', () => {
       1 result(s) for [1mhttp://localhost:XXXX/[0m :
 
         [31mX[0m  [1mviewport[0m failure for [1mminScore[0m assertion
-             Does not have a \`<meta name=\\"viewport\\">\` tag with \`width\` or \`initial-scale\`
+             Does not have a \`<meta name="viewport">\` tag with \`width\` or \`initial-scale\`
              https://web.dev/viewport/
 
               expected: >=[32m0.9[0m
@@ -108,7 +108,7 @@ describe('Lighthouse CI autorun CLI with startServerCommand', () => {
       ✅  LHCI server can accept a build for this commit hash
       Healthcheck passed!
 
-      Started a web server with \\"node autorun-server.js\\"...
+      Started a web server with "node autorun-server.js"...
       Running Lighthouse 1 time(s) on http://localhost:XXXX
       Run #1...done.
       Done running Lighthouse!

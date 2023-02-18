@@ -13,6 +13,8 @@ const path = require('path');
 const rimraf = require('rimraf');
 const {runCLI} = require('./test-utils.js');
 
+jest.setTimeout(60_000);
+
 describe('Lighthouse CI healthcheck CLI', () => {
   const autorunFixtureDir = path.join(__dirname, 'fixtures/autorun-static-dir');
   const rcFile = path.join(autorunFixtureDir, 'lighthouserc.json');

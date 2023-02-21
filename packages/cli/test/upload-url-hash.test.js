@@ -39,19 +39,19 @@ describe('Lighthouse CI upload filesystem reports with url hash', () => {
   // Added unit test for PR#835
   it('url with hash in the reportFilenamePattern', async () => {
     const lhr = JSON.parse(fs.readFileSync(fakeLhrPath, 'utf8'));
-    lhr.finalUrl = `https://www.example.com/#/page1`;
+    lhr.requestedUrl = `https://www.example.com/#/page1`;
     lhr.fetchTime = '2022-10-25T22:34:01.000Z';
     lhr.categories.performance = {score: 0.5};
     lhr.audits['first-contentful-paint'].numericValue = 900;
     fs.writeFileSync(fakeLhrPath.replace(/lhr-\d+/, 'lhr-4'), JSON.stringify(lhr));
 
-    lhr.finalUrl = `https://www.example.com/#/page2`;
+    lhr.requestedUrl = `https://www.example.com/#/page2`;
     lhr.fetchTime = '2022-10-25T22:34:02.000Z';
     lhr.categories.performance = {score: 0.5};
     lhr.audits['first-contentful-paint'].numericValue = 1100;
     fs.writeFileSync(fakeLhrPath.replace(/lhr-\d+/, 'lhr-5'), JSON.stringify(lhr));
 
-    lhr.finalUrl = `https://www.example.com/#/page3`;
+    lhr.requestedUrl = `https://www.example.com/#/page3`;
     lhr.fetchTime = '2022-10-25T22:34:03.000Z';
     lhr.categories.performance = {score: 0.5};
     lhr.audits['first-contentful-paint'].numericValue = 1000;

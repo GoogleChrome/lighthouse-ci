@@ -527,7 +527,9 @@ async function runFilesystemTarget(options) {
   /** @type {Array<LH.Result>} */
   const lhrs = loadSavedLHRs().map(lhr => JSON.parse(lhr));
   /** @type {Array<Array<[LH.Result, LH.Result]>>} */
-  const lhrsByUrl = _.groupBy(lhrs, lhr => lhr.finalUrl).map(lhrs => lhrs.map(lhr => [lhr, lhr]));
+  const lhrsByUrl = _.groupBy(lhrs, lhr => lhr.requestedUrl).map(lhrs =>
+    lhrs.map(lhr => [lhr, lhr])
+  );
   const representativeLhrs = computeRepresentativeRuns(lhrsByUrl);
 
   const targetDir = path.resolve(process.cwd(), options.outputDir || '');
@@ -538,7 +540,7 @@ async function runFilesystemTarget(options) {
   const manifest = [];
   // Process the median LHRs last so duplicate filenames will be overwritten by the median run
   for (const lhr of _.sortBy(lhrs, lhr => (representativeLhrs.includes(lhr) ? 10 : 1))) {
-    const url = new URL(lhr.finalUrl);
+    const url = new URL(lhr.requestedUrl);
     const fetchTimeDate = new Date(new Date(lhr.fetchTime).getTime() || Date.now());
     const context = {
       hostname: url.hostname,
@@ -557,7 +559,7 @@ async function runFilesystemTarget(options) {
 
     /** @type {LHCI.UploadCommand.ManifestEntry} */
     const entry = {
-      url: lhr.finalUrl,
+      url: lhr.requestedUrl,
       isRepresentativeRun: representativeLhrs.includes(lhr),
       htmlPath: path.join(targetDir, htmlPath),
       jsonPath: path.join(targetDir, jsonPath),

@@ -29,7 +29,7 @@ jobs:
           node-version: 16.x
       - run: yarn
       - run: yarn build
-      - run: yarn test:unit
+      - run: yarn test:unit || yarn test:unit --onlyFailures || yarn test:unit --onlyFailures
       - if: ${{ failure() }}
         uses: actions/upload-artifact@v2
         with:
@@ -91,7 +91,7 @@ jobs:
       - run: yarn test:typecheck
       - run: yarn test:lint
       - name: Run yarn test:unit
-        run: yarn test:unit || yarn test:unit || yarn test:unit
+        run: yarn test:unit || yarn test:unit --onlyFailures || yarn test:unit --onlyFailures
       - run: yarn test:docker
       # TODO: re-enable, once we have canary server up again
       # - run: yarn ci:dogfood

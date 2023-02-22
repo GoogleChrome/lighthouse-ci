@@ -5,6 +5,8 @@
  */
 'use strict';
 
+// import {ReportGenerator} from 'lighthouse/report/generator/report-generator.js';
+
 const fs = require('fs');
 const path = require('path');
 const LHCI_DIR = path.join(process.cwd(), '.lighthouseci');
@@ -38,21 +40,22 @@ function loadSavedLHRs() {
 /**
  * @param {string} lhr
  */
-function saveLHR(lhr, baseDir = LHCI_DIR) {
+async function saveLHR(lhr, baseDir = LHCI_DIR) {
   const baseFilename = `lhr-${Date.now()}`;
   const basePath = path.join(baseDir, baseFilename);
   ensureDirectoryExists(baseDir);
   fs.writeFileSync(`${basePath}.json`, lhr);
-  fs.writeFileSync(`${basePath}.html`, getHTMLReportForLHR(JSON.parse(lhr)));
+  fs.writeFileSync(`${basePath}.html`, await getHTMLReportForLHR(JSON.parse(lhr)));
 }
 
 /**
  * @param {LH.Result} lhr
- * @return {string}
+ * @return {Promise<string>}
  */
-function getHTMLReportForLHR(lhr) {
+async function getHTMLReportForLHR(lhr) {
   // @ts-ignore - lighthouse doesn't publish .d.ts files yet
-  const ReportGenerator = require('lighthouse/report/generator/report-generator.js');
+  const {ReportGenerator} = await import('lighthouse/report/generator/report-generator.js');
+  // const {ReportGenerator} = require('lighthouse/report/generator/report-generator.js');
   return ReportGenerator.generateReportHtml(lhr);
 }
 

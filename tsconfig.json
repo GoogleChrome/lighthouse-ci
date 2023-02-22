@@ -25,5 +25,5 @@
     "packages/server/test/api/*.js",
     "packages/server/test/e2e/**/*.js",
     "packages/viewer/test/**/*.js"
-  ]
+, "packages/utils/src/saved-reports.mjs"  ]
 }

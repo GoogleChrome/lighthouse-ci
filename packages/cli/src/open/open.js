@@ -45,7 +45,7 @@ async function runCommand(options) {
 
     process.stdout.write(`Opening median report for ${lhr.finalUrl}...\n`);
     const tmpFile = tmp.fileSync({postfix: '.html'});
-    fs.writeFileSync(tmpFile.name, getHTMLReportForLHR(lhr));
+    fs.writeFileSync(tmpFile.name, await getHTMLReportForLHR(lhr));
     await open(tmpFile.name);
   }
 

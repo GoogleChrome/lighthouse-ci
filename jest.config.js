@@ -6,18 +6,29 @@
 'use strict';
 
 module.exports = {
-  preset: 'ts-jest/presets/js-with-ts-esm',
+  // preset: 'ts-jest/presets/js-with-ts-esm',
+  extensionsToTreatAsEsm: ['.jsx', '.ts', '.tsx', '.mts'],
   transform: {
     '^.+\\.m?[tj]sx?$': [
       'ts-jest',
       {
+        useESM: true,
         // Disable typechecking.
         diagnostics: false,
         isolatedModules: true,
       },
     ],
   },
-  transformIgnorePatterns: ['node_modules/@storybook/.*'],
+  transformIgnorePatterns: [
+    'node_modules/@storybook/.*',
+    'node_modules/preact-router/.*',
+    'packages/utils/src/saved-reports.js',
+    'packages/utils/src/budgets-converter.js',
+    'packages/utils/test/presets.test.js',
+    // 'node_modules/lighthouse/.*',
+  ],
+  // transformIgnorePatterns: ['packages/utils/src/saved-reports.js'],
+  // transformIgnorePatterns: ['node_modules/@storybook/.*', 'node_modules/lighthouse/.*'],
   testEnvironment: 'node',
   testRunner: require.resolve('jest-circus/runner'),
   globalSetup: require.resolve('./packages/server/test/storybook-setup.js'),

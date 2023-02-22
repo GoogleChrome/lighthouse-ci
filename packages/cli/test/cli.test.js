@@ -320,7 +320,7 @@ describe('Lighthouse CI CLI', () => {
 
           [31mX[0m  [1minstallable-manifest[0m failure for [1mminScore[0m assertion
                Web app manifest or service worker do not meet the installability requirements
-               https://web.dev/installable-manifest/
+               https://developer.chrome.com/docs/lighthouse/pwa/installable-manifest/
 
                 expected: >=[32m0.9[0m
                    found: [31m0[0m
@@ -372,7 +372,7 @@ describe('Lighthouse CI CLI', () => {
 
           [31mX[0m  [1minstallable-manifest[0m failure for [1mminScore[0m assertion
                Web app manifest or service worker do not meet the installability requirements
-               https://web.dev/installable-manifest/
+               https://developer.chrome.com/docs/lighthouse/pwa/installable-manifest/
 
                 expected: >=[32m0.9[0m
                    found: [31m0[0m
@@ -400,7 +400,7 @@ describe('Lighthouse CI CLI', () => {
 
           [31mX[0m  [1mfirst-contentful-paint[0m failure for [1mmaxNumericValue[0m assertion
                First Contentful Paint
-               https://web.dev/first-contentful-paint/
+               https://developer.chrome.com/docs/lighthouse/performance/first-contentful-paint/
 
                 expected: <=[32m1[0m
                    found: [31mXXXX[0m

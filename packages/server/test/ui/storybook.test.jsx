@@ -7,6 +7,7 @@
  */
 
 import * as path from 'path';
+import {fileURLToPath} from 'url';
 import initStoryshots_ from '@storybook/addon-storyshots';
 import {imageSnapshot} from '@storybook/addon-storyshots-puppeteer';
 
@@ -23,7 +24,7 @@ if (process.env.CI && require('os').platform() !== 'darwin') {
 }
 
 initStoryshots({
-  configPath: path.join(__dirname, '../../.storybook'),
+  configPath: path.join(path.dirname(fileURLToPath(import.meta.url)), '../../.storybook'),
   suite: 'Image Storyshots',
   test: imageSnapshot({
     storybookUrl: `http://localhost:${process.env.STORYBOOK_PORT}`,

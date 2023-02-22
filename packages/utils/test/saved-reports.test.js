@@ -51,8 +51,8 @@ describe('#replaceUrlPatterns', () => {
 
 describe('#saveLHR', () => {
   it('should save the lhr to json', async () => {
-    await withTmpDir(dir => {
-      saveLHR(JSON.stringify({lighthouseVersion: '5.6.0'}), dir);
+    await withTmpDir(async (dir) => {
+      await saveLHR(JSON.stringify({lighthouseVersion: '5.6.0'}), dir);
       const files = fs.readdirSync(dir);
       expect(files.map(name => name.replace(/-\d+/, '-XXX'))).toContain('lhr-XXX.json');
 
@@ -66,8 +66,8 @@ describe('#saveLHR', () => {
   });
 
   it('should save the lhr to html', async () => {
-    await withTmpDir(dir => {
-      saveLHR(JSON.stringify({lighthouseVersion: '5.6.0'}), dir);
+    await withTmpDir(async (dir) => {
+      await saveLHR(JSON.stringify({lighthouseVersion: '5.6.0'}), dir);
       const files = fs.readdirSync(dir);
       expect(files.map(name => name.replace(/-\d+/, '-XXX'))).toContain('lhr-XXX.html');
 

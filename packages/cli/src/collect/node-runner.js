@@ -12,7 +12,7 @@ const uuid = require('uuid');
 const childProcess = require('child_process');
 const {getSavedReportsDirectory} = require('@lhci/utils/src/saved-reports.js');
 
-const LH_CLI_PATH = path.join(require.resolve('lighthouse'), '../../lighthouse-cli/index.js');
+const LH_CLI_PATH = path.join(require.resolve('lighthouse'), '../../cli/index.js');
 
 class LighthouseRunner {
   /** @param {string} output */

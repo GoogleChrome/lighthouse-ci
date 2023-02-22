@@ -9,6 +9,7 @@
 /* eslint-env jest */
 
 import {h} from 'preact';
+import {jest} from '@jest/globals';
 import {computeAuditGroups} from '../../../../src/ui/routes/build-view/lhr-comparison.jsx';
 import {cleanup} from '../../../test-utils.js';
 

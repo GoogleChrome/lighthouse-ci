@@ -7,6 +7,8 @@
 
 /* eslint-env jest */
 
+import {jest} from '@jest/globals';
+
 /** @type {jest.MockInstance} */
 let cronJob = jest.fn().mockReturnValue({start: () => {}});
 jest.mock('cron', () => ({

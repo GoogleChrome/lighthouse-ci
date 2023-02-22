@@ -7,6 +7,8 @@
  */
 
 import {h} from 'preact';
+import {jest} from '@jest/globals';
+import jestFetchMock from 'jest-fetch-mock';
 import {api} from '../../../../src/ui/hooks/use-api-data.jsx';
 import {ProjectList} from '../../../../src/ui/routes/project-list/project-list.jsx';
 import {render, cleanup, wait} from '../../../test-utils.js';
@@ -20,7 +22,7 @@ describe('ProjectList', () => {
   let fetchMock;
 
   beforeEach(() => {
-    fetchMock = global.fetch = require('jest-fetch-mock');
+    fetchMock = global.fetch = jestFetchMock;
     api._fetch = fetchMock;
   });
 

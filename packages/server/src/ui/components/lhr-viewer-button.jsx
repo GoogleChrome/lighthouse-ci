@@ -7,9 +7,8 @@
 import {h} from 'preact';
 import {LhrViewerLink} from './lhr-viewer-link';
 import './lhr-viewer-button.css';
-
 // @ts-ignore - ts doesn't know how bundlers work :)
-const LH_ICON_PATH = require('../favicon.svg');
+import LH_ICON_PATH from '../favicon.svg';
 
 /** @param {{lhr: import('./lhr-viewer-link').LHResolver, label?: string}} props */
 export const LhrViewerButton = props => {

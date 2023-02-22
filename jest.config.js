@@ -21,7 +21,6 @@ module.exports = {
   },
   transformIgnorePatterns: [
     'node_modules/@storybook/.*',
-    'node_modules/preact-router/.*',
     'packages/utils/src/saved-reports.js',
     'packages/utils/src/budgets-converter.js',
     'packages/utils/test/presets.test.js',

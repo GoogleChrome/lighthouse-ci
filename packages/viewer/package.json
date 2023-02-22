@@ -17,7 +17,7 @@
   },
   "devDependencies": {
     "clsx": "^1.0.4",
-    "preact": "^10.0.1",
+    "preact": "^10.12.1",
     "@fontsource/material-icons": "^4.4.5",
     "@fontsource/roboto": "^4.4.5",
     "@fontsource/roboto-mono": "^4.4.5"

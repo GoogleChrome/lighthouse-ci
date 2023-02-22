@@ -9,11 +9,19 @@
 /* eslint-env jest */
 
 import {h} from 'preact';
+import {jest} from '@jest/globals';
+import jestFetchMock from 'jest-fetch-mock';
 import {api} from '../../../../src/ui/hooks/use-api-data.jsx';
-import {ProjectDashboard} from '../../../../src/ui/routes/project-dashboard/project-dashboard.jsx';
+// import {ProjectDashboard} from '../../../../src/ui/routes/project-dashboard/project-dashboard.jsx';
 import {render, cleanup, wait} from '../../../test-utils.js';
 
-jest.mock('../../../../src/ui/layout/page');
+jest.unstable_mockModule('../../../../src/ui/layout/page.jsx', () => ({Page: null}));
+
+/** @type {import('../../../../src/ui/routes/project-dashboard/project-dashboard.jsx')['ProjectDashboard']} */
+let ProjectDashboard;
+beforeAll(async () => {
+  ({ProjectDashboard} = await import('../../../../src/ui/routes/project-dashboard/project-dashboard.jsx'));
+});
 
 afterEach(cleanup);
 
@@ -22,7 +30,7 @@ describe('ProjectDashboard', () => {
   let fetchMock;
 
   beforeEach(() => {
-    fetchMock = global.fetch = require('jest-fetch-mock');
+    fetchMock = global.fetch = jestFetchMock;
     api._fetch = (...args) => {
       if (process.env.DEBUG) console.log('fetching', args); // eslint-disable-line
       return fetchMock(...args);

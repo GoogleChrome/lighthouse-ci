@@ -12,11 +12,10 @@ import {Page} from '../../layout/page';
 import {DocumentTitle} from '../../components/document-title';
 import './project-list.css';
 import {Paper} from '../../components/paper';
-
 // @ts-ignore - tsc doesn't get bundlers :)
-const LH_LOGO_PATH = require('../../logo.svg');
+import LH_LOGO_PATH from '../../logo.svg';
 // @ts-ignore - tsc doesn't get bundlers :)
-const CONFETTI_PATH = require('./confetti.svg');
+import CONFETTI_PATH from './confetti.svg';
 
 const NoProjects = () => {
   return (

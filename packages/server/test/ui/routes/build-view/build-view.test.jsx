@@ -9,20 +9,28 @@
 /* eslint-env jest */
 
 import {h} from 'preact';
+import {jest} from '@jest/globals';
+import jestFetchMock from 'jest-fetch-mock';
 import {api} from '../../../../src/ui/hooks/use-api-data.jsx';
-import {BuildView} from '../../../../src/ui/routes/build-view/build-view.jsx';
+// import {BuildView} from '../../../../src/ui/routes/build-view/build-view.jsx';
 import {render, cleanup, wait} from '../../../test-utils.js';
 
-jest.mock('../../../../src/ui/layout/page');
+jest.unstable_mockModule('../../../../src/ui/layout/page.jsx', () => ({Page: null}));
 
-afterEach(cleanup);
+/** @type {import('../../../../src/ui/routes/build-view/build-view.jsx')['BuildView']} */
+let BuildView;
+beforeAll(async () => {
+  ({BuildView} = await import('../../../../src/ui/routes/build-view/build-view.jsx'));
+});
+
+afterEach(() => cleanup());
 
 describe('BuildView', () => {
   /** @type {import('jest-fetch-mock/types').GlobalWithFetchMock['fetch']} */
   let fetchMock;
 
   beforeEach(() => {
-    fetchMock = global.fetch = require('jest-fetch-mock');
+    fetchMock = global.fetch = jestFetchMock;
     api._fetch = fetchMock;
   });
 

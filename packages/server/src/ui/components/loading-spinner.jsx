@@ -7,9 +7,10 @@
 import {h} from 'preact';
 import clsx from 'clsx';
 import './loading-spinner.css';
+// @ts-expect-error - tsc doesn't understand bundlers :)
+import SVG_PATH from './loading-spinner.svg';
 
-// @ts-ignore - tsc doesn't understand bundlers :)
-const SVG_PATH = require('./loading-spinner.svg');
+// const SVG_PATH = require('./loading-spinner.svg');
 
 const LoadingSpinner_ = () => {
   return <img src={SVG_PATH} alt="Loading spinner" />;

@@ -43,7 +43,7 @@ class StorageMethod {
   }
 
   /**
-   * @return {Promise<Array<LHCI.ServerCommand.Project>>}
+   * @return {Promise<LHCI.ServerCommand.Project[]>}
    */
   async getProjects() {
     throw new Error('Unimplemented');
@@ -115,7 +115,7 @@ class StorageMethod {
 
   /**
    * @param {string} projectId
-   * @return {Promise<Array<{branch: string}>>}
+   * @return {Promise<{branch: string}[]>}
    */
   // eslint-disable-next-line no-unused-vars
   async getBranches(projectId) {
@@ -194,7 +194,7 @@ class StorageMethod {
   /**
    * @param {string} projectId
    * @param {string} [buildId]
-   * @return {Promise<Array<{url: string}>>}
+   * @return {Promise<{url: string}[]>}
    */
   // eslint-disable-next-line no-unused-vars
   async getUrls(projectId, buildId) {
@@ -213,7 +213,7 @@ class StorageMethod {
   /**
    * @param {string} projectId
    * @param {string} buildId
-   * @return {Promise<Array<LHCI.ServerCommand.Statistic>>}
+   * @return {Promise<LHCI.ServerCommand.Statistic[]>}
    */
   // eslint-disable-next-line no-unused-vars
   async getStatistics(projectId, buildId) {
@@ -260,7 +260,7 @@ class StorageMethod {
   /**
    * @param {string} projectId
    * @param {string} buildId
-   * @return {Promise<Array<LHCI.ServerCommand.Statistic>>}
+   * @return {Promise<LHCI.ServerCommand.Statistic[]>}
    */
   // eslint-disable-next-line no-unused-vars
   async _getStatistics(projectId, buildId) {
@@ -281,12 +281,12 @@ class StorageMethod {
    * @param {StorageMethod} storageMethod
    * @param {string} projectId
    * @param {string} buildId
-   * @return {Promise<Array<LHCI.ServerCommand.Statistic>>}
+   * @return {Promise<LHCI.ServerCommand.Statistic[]>}
    */
   static async getOrCreateStatistics(storageMethod, projectId, buildId) {
     const build = await storageMethod.findBuildById(projectId, buildId);
     if (!build) throw new E404('No build with that ID');
-    // If the build hasn't been sealed yet then we can't compute statistics for it yet.
+    // If the build hasn't been sealed, yet then we can't compute statistics for it yet.
     if (build.lifecycle !== 'sealed') return [];
 
     const urls = await storageMethod.getUrls(projectId, buildId);
@@ -307,7 +307,7 @@ class StorageMethod {
    * @template TTransactionHandle
    * @param {StorageMethod} storageMethod
    * @param {LHCI.ServerCommand.Build} build
-   * @param {{transaction?: TTransactionHandle, existingStatistics?: Array<LHCI.ServerCommand.Statistic>}} context
+   * @param {{transaction?: TTransactionHandle, existingStatistics?: LHCI.ServerCommand.Statistic[]}} context
    * @return {Promise<{statistics: Array<LHCI.ServerCommand.Statistic>, representativeRuns: Array<LHCI.ServerCommand.Run>}>}
    */
   static async createStatistics(storageMethod, build, context) {
@@ -374,6 +374,7 @@ class StorageMethod {
   /**
    * @param {string} base
    * @param {{randomLength?: number, maxLength?: number, prandom?: import('@lhci/utils/src/seed-data/prandom')}} [options]
+   * @return {string}
    */
   static generateSlug(base, options = {}) {
     const {maxLength = 40, randomLength = 0, prandom} = options;

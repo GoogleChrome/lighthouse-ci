@@ -16,8 +16,8 @@ module.exports = {
   E404,
   E422,
   /**
-   * @param {import('express-serve-static-core').RequestHandler} handler
-   * @return {import('express-serve-static-core').RequestHandler}
+   * @param {import('express').RequestHandler} handler
+   * @return {import('express').RequestHandler}
    */
   handleAsyncError(handler) {
     return (req, res, next) => {
@@ -34,7 +34,7 @@ module.exports = {
   },
   /**
    * @param {{storageMethod: LHCI.ServerCommand.StorageMethod}} context
-   * @return {import('express-serve-static-core').RequestHandler}
+   * @return {import('express').RequestHandler}
    */
   validateBuildTokenMiddleware(context) {
     return (req, res, next) => {
@@ -56,7 +56,7 @@ module.exports = {
   },
   /**
    * @param {{storageMethod: LHCI.ServerCommand.StorageMethod}} context
-   * @return {import('express-serve-static-core').RequestHandler}
+   * @return {import('express').RequestHandler}
    */
   validateAdminTokenMiddleware(context) {
     return (req, res, next) => {
@@ -79,7 +79,7 @@ module.exports = {
   },
   /**
    * @param {{options: LHCI.ServerCommand.Options}} context
-   * @return {import('express-serve-static-core').RequestHandler|undefined}
+   * @return {import('express').RequestHandler|undefined}
    */
   createBasicAuthMiddleware(context) {
     if (!context.options.basicAuth) return undefined;
@@ -90,8 +90,8 @@ module.exports = {
   },
   /**
    * @param {Error} err
-   * @param {import('express-serve-static-core').Request} req
-   * @param {import('express-serve-static-core').Response} res
+   * @param {import('express').Request} req
+   * @param {import('express').Response} res
    * @param {*} next
    */
   errorMiddleware(err, req, res, next) {

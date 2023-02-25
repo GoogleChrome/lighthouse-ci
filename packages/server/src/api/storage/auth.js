@@ -8,7 +8,7 @@
 const crypto = require('crypto');
 
 module.exports = {
-  /** Generates a cryptographically psuedorandom alphanumeric string of length 40. @return {string} */
+  /** Generates a cryptographically pseudorandom alphanumeric string of length 40. @return {string} */
   generateAdminToken() {
     return crypto
       .randomBytes(30)

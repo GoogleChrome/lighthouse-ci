@@ -162,13 +162,16 @@ function normalizeStatistic(statistic) {
 /**
  * @typedef SqlState
  * @property {import('sequelize').Sequelize} sequelize
- * @property {import('sequelize').Model<LHCI.ServerCommand.Project, ProjectAttrs>} projectModel
- * @property {import('sequelize').Model<LHCI.ServerCommand.Build, BuildAttrs>} buildModel
- * @property {import('sequelize').Model<LHCI.ServerCommand.Run, RunAttrs>} runModel
- * @property {import('sequelize').Model<LHCI.ServerCommand.Statistic, StatisticAttrs>} statisticModel
+ * @property {import('sequelize').ModelDefined<LHCI.ServerCommand.Project, ProjectAttrs>} projectModel
+ * @property {import('sequelize').ModelDefined<LHCI.ServerCommand.Build, BuildAttrs>} buildModel
+ * @property {import('sequelize').ModelDefined<LHCI.ServerCommand.Run, RunAttrs>} runModel
+ * @property {import('sequelize').ModelDefined<LHCI.ServerCommand.Statistic, StatisticAttrs>} statisticModel
  */
 
-/** Sort all records by most recently created */
+/**
+ * Sort all records by most recently created
+ * @type {import("sequelize").Order}
+ */
 const order = [['createdAt', 'desc']];
 
 class SqlStorageMethod {
@@ -189,18 +192,21 @@ class SqlStorageMethod {
   /**
    * @template T1
    * @template T2
-   * @param {import('sequelize').Model<T1, T2>} model
+   * @param {import('sequelize').ModelDefined<T1, T2>} model
    * @param {string} pk
+   * @return {Promise<T1>}
    */
   async _findByPk(model, pk) {
+    // @ts-ignore
     return model.findByPk(validateUuidOrEmpty(pk));
   }
 
   /**
    * @template T1
    * @template T2
-   * @param {import('sequelize').Model<T1, T2>} model
+   * @param {import('sequelize').ModelDefined<T1, T2>} model
    * @param {import('sequelize').FindOptions<T1 & T2>} options
+   * @return {Promise<T1[]>}
    */
   async _findAll(model, options) {
     if (options.where) {
@@ -213,6 +219,7 @@ class SqlStorageMethod {
       }
     }
 
+    // @ts-ignore
     return model.findAll(options);
   }
 
@@ -266,7 +273,7 @@ class SqlStorageMethod {
   }
 
   /**
-   * @return {Promise<Array<LHCI.ServerCommand.Project>>}
+   * @return {Promise<LHCI.ServerCommand.Project[]>}
    */
   async getProjects() {
     const {projectModel} = this._sql();
@@ -346,6 +353,8 @@ class SqlStorageMethod {
     if (unsavedProject.name.length < 4) throw new E422('Project name too short');
     const projectId = uuid.v4();
     const adminToken = generateAdminToken();
+    /** @type {LHCI.ServerCommand.Project}*/
+    // @ts-ignore
     const project = await projectModel.create({
       ...unsavedProject,
       baseBranch: unsavedProject.baseBranch || 'master',
@@ -424,7 +433,8 @@ class SqlStorageMethod {
     };
     const existingForHash = await buildModel.findOne({where: existingWhere});
     if (existingForHash) throw new E422(`Build already exists for hash "${unsavedBuild.hash}"`);
-
+    /** @type {LHCI.ServerCommand.Build}*/
+    // @ts-ignore
     const build = await buildModel.create({...unsavedBuild, id: uuid.v4()});
     return clone(build);
   }
@@ -478,6 +488,8 @@ class SqlStorageMethod {
    */
   async findBuildsBeforeTimestamp(runAt) {
     const {buildModel} = this._sql();
+    /** @type {LHCI.ServerCommand.Build[]}*/
+    // @ts-ignore
     const oldBuilds = await buildModel.findAll({
       where: {runAt: {[Op.lte]: runAt}},
       order: [['runAt', 'ASC']],
@@ -525,8 +537,8 @@ class SqlStorageMethod {
 
     if (!validatePartialUuidOrUndefined(buildId)) return undefined;
 
-    // Postgres stores UUIDs as numbers so it's impossible to do a pattern match.
-    // Instead we'll do a range check which works whether the UUID is treated as a string or a
+    // Postgres stores UUIDs as numbers, so it's impossible to do a pattern match.
+    // Instead, we'll do a range check which works whether the UUID is treated as a string or a
     // number. For example...
     //
     // Given the prefix `a82fb732` we can look for all UUIDs that are...
@@ -539,6 +551,8 @@ class SqlStorageMethod {
     if (numericValue !== 0) prefix = `${leadingZeros}${prefix}`;
     const lowerUuid = formatAsUuid(prefix, '0');
     const upperUuid = formatAsUuid(prefix, 'f');
+    /** @type {LHCI.ServerCommand.Build[]}*/
+    // @ts-ignore
     const builds = await buildModel.findAll({
       where: {id: {[Op.gte]: lowerUuid, [Op.lte]: upperUuid}, projectId},
       limit: 2,
@@ -573,7 +587,8 @@ class SqlStorageMethod {
       branch: project.baseBranch,
       id: {[Op.ne]: build.id},
     };
-
+    /** @type {LHCI.ServerCommand.Build[]}*/
+    // @ts-ignore
     const nearestBuildBefore = await buildModel.findAll({
       where: {...where, runAt: {[Op.lte]: build.runAt}},
       order: [['runAt', 'DESC']],
@@ -584,6 +599,8 @@ class SqlStorageMethod {
       return nearestBuildBefore[0];
     }
 
+    /** @type {LHCI.ServerCommand.Build[]}*/
+    // @ts-ignore
     const nearestBuildAfter = await buildModel.findAll({
       where: {...where, runAt: {[Op.gte]: build.runAt}},
       order: [['runAt', 'ASC']],
@@ -640,6 +657,8 @@ class SqlStorageMethod {
     if (unsavedRun.representative) throw new E422('Invalid representative value');
     if (unsavedRun.url.length > 256) throw new E422('URL too long');
 
+    /** @type {LHCI.ServerCommand.Run}*/
+    // @ts-ignore
     const run = await runModel.create({...unsavedRun, representative: false, id: uuid.v4()});
     return clone(run);
   }
@@ -647,7 +666,7 @@ class SqlStorageMethod {
   /**
    * @param {string} projectId
    * @param {string} buildId
-   * @return {Promise<Array<LHCI.ServerCommand.Statistic>>}
+   * @return {Promise<LHCI.ServerCommand.Statistic[]>}
    */
   async getStatistics(projectId, buildId) {
     return StorageMethod.getOrCreateStatistics(this, projectId, buildId);
@@ -662,6 +681,8 @@ class SqlStorageMethod {
     const transaction = context && context.transaction;
     const {statisticModel} = this._sql();
     logVerbose('[_createOrUpdateStatistic] looking up existing statistic');
+    /** @type {LHCI.ServerCommand.Statistic}*/
+    // @ts-ignore
     const existing = await statisticModel.findOne({
       where: {
         projectId: unsavedStatistic.projectId,
@@ -682,6 +703,8 @@ class SqlStorageMethod {
       statistic = updated;
     } else {
       logVerbose('[_createOrUpdateStatistic] no existing statistic found, creating one');
+      /** @type {LHCI.ServerCommand.Statistic}*/
+      // @ts-ignore
       statistic = await statisticModel.create({...unsavedStatistic, id: uuid.v4()}, {transaction});
     }
 
@@ -691,7 +714,7 @@ class SqlStorageMethod {
   /**
    * @param {string} projectId
    * @param {string} buildId
-   * @return {Promise<Array<LHCI.ServerCommand.Statistic>>}
+   * @return {Promise<LHCI.ServerCommand.Statistic[]>}
    */
   async _getStatistics(projectId, buildId) {
     const {statisticModel} = this._sql();

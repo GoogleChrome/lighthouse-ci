@@ -7,9 +7,8 @@
 
 const log = require('debug')('lhci:server:sql');
 const logVerbose = require('debug')('lhci:server:sql:verbose');
-const path = require('path');
 const uuid = require('uuid');
-const Umzug = require('umzug');
+const {Umzug, SequelizeStorage} = require('umzug');
 const {Sequelize, Op} = require('sequelize');
 const {omit, padEnd} = require('@lhci/utils/src/lodash.js');
 const {hashAdminToken, generateAdminToken} = require('../auth.js');
@@ -133,15 +132,29 @@ function createSequelize(options) {
  */
 function createUmzug(sequelize, options) {
   return new Umzug({
-    logging: /** @param {*} msg */ msg => logVerbose('[umzug]', msg),
-    storage: 'sequelize',
-    storageOptions: {
-      sequelize: /** @type {*} */ (sequelize),
-      tableName: options.sqlMigrationOptions && options.sqlMigrationOptions.tableName,
+    logger: {
+      debug: msg => logVerbose('[umzug]', msg),
+      warn: msg => logVerbose('[umzug]', msg),
+      error: msg => logVerbose('[umzug]', msg),
+      info: msg => logVerbose('[umzug]', msg)
     },
+    storage: new SequelizeStorage({
+      sequelize,
+      tableName: options.sqlMigrationOptions && options.sqlMigrationOptions.tableName
+    }),
+    context: sequelize.getQueryInterface(),
     migrations: {
-      path: path.join(__dirname, 'migrations'),
-      params: [sequelize.getQueryInterface(), Sequelize, options],
+      glob: ['migrations/*.js', {cwd: __dirname}],
+      resolve: ({name, path, context}) => {
+        // Adjust the migration from the new signature to the v2 signature, making easier to upgrade to v3
+        // @ts-ignore
+        const migration = require(path);
+        return {
+          name,
+          up: async () => migration.up(context, options),
+          down: async () => migration.down(context, options),
+        };
+      }
     },
   });
 }

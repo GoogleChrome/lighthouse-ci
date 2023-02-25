@@ -5,21 +5,21 @@
  */
 'use strict';
 
+const {DataTypes, QueryTypes} = require('sequelize');
+
 /* eslint-disable new-cap */
 
 module.exports = {
   /**
    * @param {import('sequelize').QueryInterface} queryInterface
-   * @param {typeof import('sequelize')} Sequelize
    */
-  up: async (queryInterface, Sequelize) => {
-    const {DataTypes} = Sequelize;
+  up: async (queryInterface) => {
     await queryInterface.addColumn('projects', 'baseBranch', {type: DataTypes.STRING(80)});
     await queryInterface.bulkUpdate(
       'projects',
       {baseBranch: 'master'},
       {baseBranch: null},
-      {type: Sequelize.QueryTypes.BULKUPDATE}
+      {type: QueryTypes.BULKUPDATE}
     );
   },
   /**

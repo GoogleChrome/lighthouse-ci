@@ -5,24 +5,22 @@
  */
 'use strict';
 
+const {DataTypes, col, QueryTypes} = require('sequelize');
 /* eslint-disable new-cap */
 
 module.exports = {
   /**
    * @param {import('sequelize').QueryInterface} queryInterface
-   * @param {typeof import('sequelize')} Sequelize
    */
-  up: async (queryInterface, Sequelize) => {
-    const {DataTypes} = Sequelize;
+  up: async (queryInterface) => {
     await queryInterface.addColumn('projects', 'slug', {type: DataTypes.STRING(40)});
     await queryInterface.bulkUpdate(
       'projects',
-      {slug: Sequelize.col('id')},
+      {slug: col('id')},
       {slug: null},
-      {type: Sequelize.QueryTypes.BULKUPDATE}
+      {type: QueryTypes.BULKUPDATE}
     );
     await queryInterface.addIndex('projects', {
-      // @ts-ignore - Sequelize types are out of date
       name: 'projects_unique_slug',
       unique: true,
       fields: ['slug'],

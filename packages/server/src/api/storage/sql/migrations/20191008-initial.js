@@ -5,16 +5,15 @@
  */
 'use strict';
 
+const {DataTypes} = require('sequelize');
 /* eslint-disable new-cap */
 
 module.exports = {
   /**
    * @param {import('sequelize').QueryInterface} queryInterface
-   * @param {typeof import('sequelize')} Sequelize
    * @param {LHCI.ServerCommand.StorageOptions} options
    */
-  up: async (queryInterface, Sequelize, options) => {
-    const {DataTypes} = Sequelize;
+  up: async (queryInterface, options) => {
     await queryInterface.createTable('projects', {
       id: {type: DataTypes.UUID(), primaryKey: true},
       name: {type: DataTypes.STRING(40)},

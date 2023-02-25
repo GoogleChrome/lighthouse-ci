@@ -51,7 +51,7 @@
     "@types/plotly.js": "^2.12.18",
     "@types/sequelize": "^4.28.14",
     "@types/tmp": "^0.2.3",
-    "@types/umzug": "^2.2.2",
+    "@types/umzug": "^2.3.3",
     "@types/uuid": "^9.0.1",
     "@types/yargs": "^12.0.8",
     "@types/yargs-parser": "^11.0.0",

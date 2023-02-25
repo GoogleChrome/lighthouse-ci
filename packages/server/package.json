@@ -31,7 +31,7 @@
     "express-basic-auth": "^1.2.1",
     "morgan": "^1.10.0",
     "sequelize": "^6.29.0",
-    "umzug": "^2.2.0",
+    "umzug": "^3.2.1",
     "uuid": "^9.0.0"
   },
   "devDependencies": {

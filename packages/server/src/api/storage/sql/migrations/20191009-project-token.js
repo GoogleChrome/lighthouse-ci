@@ -6,20 +6,19 @@
 'use strict';
 
 /* eslint-disable new-cap */
+const {DataTypes, QueryTypes, col} = require('sequelize');
 
 module.exports = {
   /**
    * @param {import('sequelize').QueryInterface} queryInterface
-   * @param {typeof import('sequelize')} Sequelize
    */
-  up: async (queryInterface, Sequelize) => {
-    const {DataTypes} = Sequelize;
+  up: async (queryInterface) => {
     await queryInterface.addColumn('projects', 'token', {type: DataTypes.UUID()});
     await queryInterface.bulkUpdate(
       'projects',
-      {token: Sequelize.col('id')},
+      {token: col('id')},
       {token: null},
-      {type: Sequelize.QueryTypes.BULKUPDATE}
+      {type: QueryTypes.BULKUPDATE}
     );
   },
   /**

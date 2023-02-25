@@ -4,22 +4,21 @@
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
  */
 'use strict';
+const {DataTypes, QueryTypes} = require('sequelize');
 
 /* eslint-disable new-cap */
 
 module.exports = {
   /**
    * @param {import('sequelize').QueryInterface} queryInterface
-   * @param {typeof import('sequelize')} Sequelize
    */
-  up: async (queryInterface, Sequelize) => {
-    const {DataTypes} = Sequelize;
+  up: async (queryInterface) => {
     await queryInterface.addColumn('statistics', 'version', {type: DataTypes.DECIMAL(8, 2)});
     await queryInterface.bulkUpdate(
       'statistics',
       {version: 1},
       {version: null},
-      {type: Sequelize.QueryTypes.BULKUPDATE}
+      {type: QueryTypes.BULKUPDATE}
     );
   },
   /**

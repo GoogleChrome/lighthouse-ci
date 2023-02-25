@@ -6,16 +6,15 @@
 'use strict';
 
 const {hashAdminToken, generateAdminToken} = require('../../auth.js');
+const {DataTypes, QueryTypes} = require('sequelize');
 
 /* eslint-disable new-cap */
 
 module.exports = {
   /**
    * @param {import('sequelize').QueryInterface} queryInterface
-   * @param {typeof import('sequelize')} Sequelize
    */
-  up: async (queryInterface, Sequelize) => {
-    const {DataTypes} = Sequelize;
+  up: async (queryInterface) => {
     await queryInterface.addColumn('projects', 'adminToken', {type: DataTypes.STRING(64)});
     await queryInterface.bulkUpdate(
       'projects',
@@ -23,7 +22,7 @@ module.exports = {
       // via the wizard command, but our goal is exactly to create an initial token no one can guess.
       {adminToken: hashAdminToken(generateAdminToken(), '0')},
       {adminToken: null},
-      {type: Sequelize.QueryTypes.BULKUPDATE}
+      {type: QueryTypes.BULKUPDATE}
     );
   },
   /**

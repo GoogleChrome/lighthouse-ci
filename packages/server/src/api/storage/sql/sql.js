@@ -10,7 +10,7 @@ const logVerbose = require('debug')('lhci:server:sql:verbose');
 const path = require('path');
 const uuid = require('uuid');
 const Umzug = require('umzug');
-const Sequelize = require('sequelize');
+const {Sequelize, Op} = require('sequelize');
 const {omit, padEnd} = require('@lhci/utils/src/lodash.js');
 const {hashAdminToken, generateAdminToken} = require('../auth.js');
 const {E422} = require('../../express-utils.js');
@@ -81,8 +81,7 @@ function createSequelize(options) {
   const dialect = options.sqlDialect;
   const sequelizeOptions = {
     logging: /** @param {*} msg */ msg => logVerbose('[sequelize]', msg),
-    ...options.sequelizeOptions,
-    operatorsAliases: false,
+    ...options.sequelizeOptions
   };
 
   if (dialect === 'sqlite') {
@@ -461,7 +460,7 @@ class SqlStorageMethod {
       log('[sealBuild] updating run representative flag');
       await runModel.update(
         {representative: true},
-        {where: {id: {[Sequelize.Op.in]: runIds}}, transaction}
+        {where: {id: {[Op.in]: runIds}}, transaction}
       );
 
       log('[sealBuild] committing transaction');
@@ -480,7 +479,7 @@ class SqlStorageMethod {
   async findBuildsBeforeTimestamp(runAt) {
     const {buildModel} = this._sql();
     const oldBuilds = await buildModel.findAll({
-      where: {runAt: {[Sequelize.Op.lte]: runAt}},
+      where: {runAt: {[Op.lte]: runAt}},
       order: [['runAt', 'ASC']],
     });
     return oldBuilds;
@@ -541,7 +540,7 @@ class SqlStorageMethod {
     const lowerUuid = formatAsUuid(prefix, '0');
     const upperUuid = formatAsUuid(prefix, 'f');
     const builds = await buildModel.findAll({
-      where: {id: {[Sequelize.Op.gte]: lowerUuid, [Sequelize.Op.lte]: upperUuid}, projectId},
+      where: {id: {[Op.gte]: lowerUuid, [Op.lte]: upperUuid}, projectId},
       limit: 2,
     });
 
@@ -572,11 +571,11 @@ class SqlStorageMethod {
     const where = {
       projectId: build.projectId,
       branch: project.baseBranch,
-      id: {[Sequelize.Op.ne]: build.id},
+      id: {[Op.ne]: build.id},
     };
 
     const nearestBuildBefore = await buildModel.findAll({
-      where: {...where, runAt: {[Sequelize.Op.lte]: build.runAt}},
+      where: {...where, runAt: {[Op.lte]: build.runAt}},
       order: [['runAt', 'DESC']],
       limit: 1,
     });
@@ -586,7 +585,7 @@ class SqlStorageMethod {
     }
 
     const nearestBuildAfter = await buildModel.findAll({
-      where: {...where, runAt: {[Sequelize.Op.gte]: build.runAt}},
+      where: {...where, runAt: {[Op.gte]: build.runAt}},
       order: [['runAt', 'ASC']],
       limit: 1,
     });

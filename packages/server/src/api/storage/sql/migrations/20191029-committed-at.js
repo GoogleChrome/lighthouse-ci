@@ -13,8 +13,9 @@ module.exports = {
    * @param {typeof import('sequelize')} Sequelize
    */
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.addColumn('builds', 'committedAt', {type: Sequelize.DATE(6)});
-    await queryInterface.addColumn('builds', 'ancestorCommittedAt', {type: Sequelize.DATE(6)});
+    const {DataTypes} = Sequelize;
+    await queryInterface.addColumn('builds', 'committedAt', {type: DataTypes.DATE(6)});
+    await queryInterface.addColumn('builds', 'ancestorCommittedAt', {type: DataTypes.DATE(6)});
   },
   /**
    * @param {import('sequelize').QueryInterface} queryInterface

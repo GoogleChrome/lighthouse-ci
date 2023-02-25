@@ -15,7 +15,8 @@ module.exports = {
    * @param {typeof import('sequelize')} Sequelize
    */
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.addColumn('projects', 'adminToken', {type: Sequelize.STRING(64)});
+    const {DataTypes} = Sequelize;
+    await queryInterface.addColumn('projects', 'adminToken', {type: DataTypes.STRING(64)});
     await queryInterface.bulkUpdate(
       'projects',
       // Because of the useless salt, this will be an invalid admin token that requires resetting

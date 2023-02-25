@@ -7,28 +7,28 @@
 
 /* eslint-disable new-cap */
 
-const Sequelize = require('sequelize');
+const {DataTypes} = require('sequelize');
 
 /** @type {import('sequelize').Model<any, any>} */
 const ModelRef = /** @type {any} */ (undefined);
 
 /** @type {LHCI.ServerCommand.TableDefinition<LHCI.ServerCommand.Build>} */
 const attributes = {
-  id: {type: Sequelize.UUID(), primaryKey: true},
-  projectId: {type: Sequelize.UUID(), references: {model: ModelRef, key: 'id'}},
-  lifecycle: {type: Sequelize.STRING(40)},
-  hash: {type: Sequelize.STRING(40)},
-  branch: {type: Sequelize.STRING(40)},
-  commitMessage: {type: Sequelize.STRING(80)},
-  author: {type: Sequelize.STRING(256)},
-  avatarUrl: {type: Sequelize.STRING(256)},
-  ancestorHash: {type: Sequelize.STRING(40)},
-  externalBuildUrl: {type: Sequelize.STRING(256)},
-  runAt: {type: Sequelize.DATE(6)}, // should mostly be equal to createdAt but modifiable by the consumer
-  committedAt: {type: Sequelize.DATE(6)},
-  ancestorCommittedAt: {type: Sequelize.DATE(6)},
-  createdAt: {type: Sequelize.DATE(6)},
-  updatedAt: {type: Sequelize.DATE(6)},
+  id: {type: DataTypes.UUID(), primaryKey: true},
+  projectId: {type: DataTypes.UUID(), references: {model: ModelRef, key: 'id'}},
+  lifecycle: {type: DataTypes.STRING(40)},
+  hash: {type: DataTypes.STRING(40)},
+  branch: {type: DataTypes.STRING(40)},
+  commitMessage: {type: DataTypes.STRING(80)},
+  author: {type: DataTypes.STRING(256)},
+  avatarUrl: {type: DataTypes.STRING(256)},
+  ancestorHash: {type: DataTypes.STRING(40)},
+  externalBuildUrl: {type: DataTypes.STRING(256)},
+  runAt: {type: DataTypes.DATE(6)}, // should mostly be equal to createdAt but modifiable by the consumer
+  committedAt: {type: DataTypes.DATE(6)},
+  ancestorCommittedAt: {type: DataTypes.DATE(6)},
+  createdAt: {type: DataTypes.DATE(6)},
+  updatedAt: {type: DataTypes.DATE(6)},
 };
 
 module.exports = {

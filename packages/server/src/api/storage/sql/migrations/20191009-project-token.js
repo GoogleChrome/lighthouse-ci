@@ -13,7 +13,8 @@ module.exports = {
    * @param {typeof import('sequelize')} Sequelize
    */
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.addColumn('projects', 'token', {type: Sequelize.UUID()});
+    const {DataTypes} = Sequelize;
+    await queryInterface.addColumn('projects', 'token', {type: DataTypes.UUID()});
     await queryInterface.bulkUpdate(
       'projects',
       {token: Sequelize.col('id')},

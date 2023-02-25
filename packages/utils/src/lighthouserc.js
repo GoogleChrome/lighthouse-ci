@@ -81,7 +81,8 @@ function parseFileContentToJSON(pathToRcFile, contents) {
   // Check if file path ends in .yaml or .yml
   if (YAML_FILE_EXTENSION_REGEX.test(pathToRcFile)) {
     // Parse yaml content to JSON
-    return yaml.safeLoad(contents);
+    // @ts-ignore
+    return yaml.load(contents);
   }
 
   // Fallback to JSON parsing
@@ -124,8 +125,7 @@ function findRcFile(startDir, opts = {}) {
  */
 function hasOptedOutOfRcDetection(argv = process.argv, env = process.env) {
   if (env.LHCI_NO_LIGHTHOUSERC) return true;
-  if (argv.some(arg => /no-?lighthouserc/i.test(arg))) return true;
-  return false;
+  return argv.some(arg => /no-?lighthouserc/i.test(arg));
 }
 
 /**

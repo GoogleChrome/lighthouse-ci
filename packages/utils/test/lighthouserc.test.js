@@ -22,7 +22,7 @@ describe('lighthouserc.js', () => {
   });
 
   function writeYAMLFile(path, content) {
-    fs.writeFileSync(path, yaml.safeDump(content));
+    fs.writeFileSync(path, yaml.dump(content));
   }
 
   function writeJSONFile(path, json) {

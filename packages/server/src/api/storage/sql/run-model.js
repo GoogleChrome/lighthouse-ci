@@ -7,21 +7,21 @@
 
 /* eslint-disable new-cap */
 
-const Sequelize = require('sequelize');
+const {DataTypes} = require('sequelize');
 
 /** @type {import('sequelize').Model<any, any>} */
 const ModelRef = /** @type {any} */ (undefined);
 
 /** @type {LHCI.ServerCommand.TableDefinition<LHCI.ServerCommand.Run>} */
 const attributes = {
-  id: {type: Sequelize.UUID(), primaryKey: true},
-  projectId: {type: Sequelize.UUID(), references: {model: ModelRef, key: 'id'}},
-  buildId: {type: Sequelize.UUID(), references: {model: ModelRef, key: 'id'}},
-  representative: {type: Sequelize.BOOLEAN},
-  url: {type: Sequelize.STRING({length: 256})},
-  lhr: {type: Sequelize.TEXT('long')},
-  createdAt: {type: Sequelize.DATE(6)},
-  updatedAt: {type: Sequelize.DATE(6)},
+  id: {type: DataTypes.UUID(), primaryKey: true},
+  projectId: {type: DataTypes.UUID(), references: {model: ModelRef, key: 'id'}},
+  buildId: {type: DataTypes.UUID(), references: {model: ModelRef, key: 'id'}},
+  representative: {type: DataTypes.BOOLEAN},
+  url: {type: DataTypes.STRING({length: 256})},
+  lhr: {type: DataTypes.TEXT('long')},
+  createdAt: {type: DataTypes.DATE(6)},
+  updatedAt: {type: DataTypes.DATE(6)},
 };
 
 module.exports = {

@@ -16,11 +16,11 @@
     "build:watch": "node ../../scripts/build-app.js watch ./src/ui/index.html ./dist"
   },
   "devDependencies": {
-    "clsx": "^1.0.4",
-    "preact": "^10.0.1",
-    "@fontsource/material-icons": "^4.4.5",
-    "@fontsource/roboto": "^4.4.5",
-    "@fontsource/roboto-mono": "^4.4.5"
+    "clsx": "^1.2.1",
+    "preact": "^10.13.0",
+    "@fontsource/material-icons": "^4.5.4",
+    "@fontsource/roboto": "^4.5.8",
+    "@fontsource/roboto-mono": "^4.5.10"
   },
   "alias": {
     "isomorphic-fetch": "clsx"

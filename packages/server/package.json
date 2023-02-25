@@ -22,28 +22,28 @@
   "dependencies": {
     "@lhci/utils": "0.1.0",
     "bluebird": "^3.7.2",
-    "body-parser": "^1.18.3",
+    "body-parser": "^1.20.2",
     "compression": "^1.7.4",
-    "cron": "^1.8.2",
-    "dayjs": "^1.8.28",
-    "debug": "^4.3.1",
-    "express": "^4.16.4",
-    "express-basic-auth": "^1.2.0",
-    "morgan": "^1.9.1",
-    "sequelize": "^4.44.3",
+    "cron": "^2.2.0",
+    "dayjs": "^1.11.7",
+    "debug": "^4.3.4",
+    "express": "^4.18.2",
+    "express-basic-auth": "^1.2.1",
+    "morgan": "^1.10.0",
+    "sequelize": "^6.29.0",
     "umzug": "^2.2.0",
-    "uuid": "^8.3.1"
+    "uuid": "^9.0.0"
   },
   "devDependencies": {
     "clsx": "^1.0.4",
     "d3": "^5.15.0",
-    "plotly.js": "^1.48.3",
-    "preact": "^10.0.1",
+    "plotly.js": "^2.18.2",
+    "preact": "^10.13.0",
     "preact-async-route": "^2.2.1",
-    "preact-router": "^3.1.0",
-    "@fontsource/material-icons": "^4.4.5",
-    "@fontsource/roboto": "^4.4.5",
-    "@fontsource/roboto-mono": "^4.4.5"
+    "preact-router": "^4.1.0",
+    "@fontsource/material-icons": "^4.5.4",
+    "@fontsource/roboto": "^4.5.8",
+    "@fontsource/roboto-mono": "^4.5.10"
   },
   "alias": {
     "isomorphic-fetch": "clsx"

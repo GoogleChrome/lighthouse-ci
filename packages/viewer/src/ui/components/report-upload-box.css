@@ -92,6 +92,12 @@
   background: var(--highlighted-background-color);
 }
 
-.report-upload-box__upload:hover {
+.report-upload-box:hover .report-upload-box__upload {
+  background: hsl(223deg 100% 98%);
+}
+.report-upload-box .report-upload-box__upload:hover {
   background: var(--compare-highlight-color);
 }
+
+
+

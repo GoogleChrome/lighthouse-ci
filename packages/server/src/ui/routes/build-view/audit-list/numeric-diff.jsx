@@ -16,10 +16,11 @@ const BIG_PICTURE_LIMITS = {
   'largest-contentful-paint': [0, 15000],
   'speed-index': [0, 15000],
   'first-cpu-idle': [0, 15000],
-  interactive: [0, 20000],
+  'interactive': [0, 20000],
   'estimated-input-latency': [0, 1500],
   'max-potential-fid': [0, 1500],
   'total-blocking-time': [0, 1500],
+  'experimental-interaction-to-next-paint': [0, 3500],
   'cumulative-layout-shift': [0, 1],
   __default__: [0, 30 * 1000],
 };

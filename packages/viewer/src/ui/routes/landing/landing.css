@@ -24,6 +24,7 @@
 }
 
 .landing__background img {
+  position: absolute;
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -42,17 +43,26 @@
   justify-content: center;
 }
 
+.paper.landing__paper p {
+  margin: 16px 0;
+}
+
 .landing__logo {
   height: 70px;
   width: 70px;
   margin-top: calc(var(--base-spacing) * 2);
   margin-bottom: var(--base-spacing);
 }
-
-.landing__info-icon {
+.landing__logo--diff {
   position: absolute;
-  top: var(--base-spacing);
-  right: var(--base-spacing);
+  top: 0;
+  mix-blend-mode: difference;
+  transform: translate(-35px);
+  transition: transform 500ms;
+}
+.landing__logos:hover .landing__logo--diff {
+  transform: translate(-70px);
+  mix-blend-mode: exclusion;
 }
 
 .landing h1 {
@@ -70,5 +80,22 @@
   flex-direction: row;
 
   margin-top: calc(var(--base-spacing) * 2);
-  border-top: 1px solid var(--base-border-color);
+  border: 1px solid var(--base-border-color);
+  border-width: 1px 0 1px;
 }
+
+.landing__upload .report-upload-box {
+  /* extra tall for larger drop targets */
+  height: 100px;
+}
+
+footer {
+  border-top: 1px solid #e5e5e5;
+  margin: calc(var(--base-spacing) * 4) 0 calc(var(--base-spacing) * 2);
+  font-size: 80%;
+  color: gray;
+  width: 60%;
+  text-align: center;
+  padding-top: calc(var(--base-spacing) * 2);
+}
+

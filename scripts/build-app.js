@@ -37,8 +37,8 @@ function fixHtmlSubresourceUrls(result, buildOptions) {
 
   const htmls = Object.keys(result.metafile.outputs).filter(o => o.endsWith('.html'));
   const csss = Object.keys(result.metafile.outputs).filter(o => o.endsWith('.css'));
-  if (htmls.length !== 1) throw new Error('expected exactly one generated html');
-  if (csss.length !== 1) throw new Error('expected exactly one generated html');
+  if (htmls.length !== 1) throw new Error('expected exactly one generated html ' + htmls);
+  if (csss.length !== 1) throw new Error('expected exactly one generated css ' + csss);
   const htmlDistPath = htmls[0];
   const cssDistPath = csss[0];
 

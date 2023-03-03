@@ -79,7 +79,7 @@ async function main() {
     entryPoints: [entryPoint],
     entryNames: '[name]',
     assetNames: 'assets/[name]-[hash]',
-    // Defined chunknames breaks the viewer (probably cuz the -plugin-html), but pairs with fixHtmlSubresourceUrls.
+    // See the special handling in fixHtmlSubresourceUrls.
     chunkNames: `chunks/[name]-[hash]`,
     plugins: [htmlPlugin()],
     loader: {

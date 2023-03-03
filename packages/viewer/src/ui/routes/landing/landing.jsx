@@ -31,6 +31,7 @@ export const LandingRoute = props => {
         <img className="landing__logo" src={LH_LOGO_PATH} alt="Lighthouse Logo" />
         <h1>Lighthouse CI Report Diff Tool</h1>
         <span>Drag or upload two Lighthouse reports to start comparing!</span>
+        <a href="?baseReport=http://localhost:25450/packages/server/test/fixtures/lh-5-6-0-verge-a.json&compareReport=http://localhost:25450/packages/server/test/fixtures/lh-5-6-0-verge-b.json">View example diff</a>
         <div className="landing__upload">
           <ReportUploadBox
             variant="base"

@@ -29,7 +29,6 @@ git checkout -b gh-pages
 yarn clean
 yarn build
 cp -R packages/viewer/dist ./viewer
-cp -R packages/server/test/fixtures ./viewer/fixtures
 
 # Create and push the deploy commit
 git add ./viewer

@@ -31,7 +31,7 @@ function fixHtmlSubresourceUrls(result) {
 
   const htmls = Object.keys(result.metafile.outputs).filter(o => o.endsWith('.html'));
   const html = htmls[0];
-  if (htmls.length !== 1) throw new Error('expected exactly one generated html');
+  if (htmls.length !== 1) throw new Error('expected exactly one generated html ' + htmls);
 
   const htmlText = fs.readFileSync(html, 'utf-8');
   const newHtmlText = htmlText

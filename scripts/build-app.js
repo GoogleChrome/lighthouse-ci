@@ -33,11 +33,8 @@ if (!['build', 'watch'].includes(command)) {
  * @param {esbuild.BuildOptions} buildOptions
  */
 function fixHtmlSubresourceUrls(result, buildOptions) {
-  // Viewer uses a publicPath of ./, Server uses /app.
-
   if (!result.metafile) throw new Error('expected metafile');
 
-  console.log(buildOptions);
   const htmls = Object.keys(result.metafile.outputs).filter(o => o.endsWith('.html'));
   const csss = Object.keys(result.metafile.outputs).filter(o => o.endsWith('.css'));
   if (htmls.length !== 1) throw new Error('expected exactly one generated html');
@@ -45,44 +42,38 @@ function fixHtmlSubresourceUrls(result, buildOptions) {
   const htmlDistPath = htmls[0];
   const cssDistPath = csss[0];
 
+  // Viewer uses a publicPath of ./, Server uses /app.
+  if (!buildOptions.outdir || !buildOptions.publicPath) {
+    throw new Error('missing args');
+  }
+  const relativeCssPath = path.relative(buildOptions.outdir, cssDistPath);
+
+  // Rewrite the HTML
   const htmlText = fs.readFileSync(htmlDistPath, 'utf-8');
-
-  /** @param {string} filepath */
-  const resolveToWebPath = filepath => {
-    if (!buildOptions.outdir || !buildOptions.publicPath) {
-      throw new Error('missing args');
-    }
-    const relativePath = path.relative(buildOptions.outdir, filepath);
-    // const x =  path.join(buildOptions.publicPath, path.sep, relativePath);
-    const ret = `${buildOptions.publicPath}${relativePath}`;
-    console.log({filepath, pp: buildOptions.publicPath, ret});
-    return ret;
-  };
-
-  const adjustedCssPath = `"${buildOptions.publicPath}${path.relative(buildOptions.outdir, cssDistPath)}`
   const newHtmlText = htmlText
-  // noop @chialab/esbuild-plugin-html's stupid css loading technique
-    .replace('<script type="application/javascript">', '<script type="dumb-dont-run-this">')
+    // Inject publicPath on JS references
     .replace('<script src="chunks/', `<script src="${buildOptions.publicPath}chunks/`)
+    // noop @chialab/esbuild-plugin-html's stupid css loading technique
+    .replace('<script type="application/javascript">', '<script type="dumb-dont-run-this">')
+    // ... and instead use a proper stylesheet link. (with a fixed path)
     .replace(
       '</head>',
       `
-    <link rel="stylesheet" href="${resolveToWebPath(cssDistPath)}">
-    <!--                 orthis ${adjustedCssPath}       -->
+    <link rel="stylesheet" href="${buildOptions.publicPath}${relativeCssPath}">
     </head>
     `
     );
   fs.writeFileSync(htmlDistPath, newHtmlText);
 
-  const cssText = fs.readFileSync(cssDistPath, 'utf-8');
-  // Don't source icons relative to the chunks/css file.
-  const newCssText = cssText.replaceAll(`url(./assets`, `url(../assets`);
+  // Rewrite the CSS, making sure we don't source icons relative to the chunks/css file.
+  const newCssText = fs
+    .readFileSync(cssDistPath, 'utf-8')
+    .replaceAll(`url(./assets`, `url(../assets`);
   fs.writeFileSync(cssDistPath, newCssText);
 }
 
 async function main() {
   const htmlPlugin = (await import('@chialab/esbuild-plugin-html')).default;
-  console.log({entryPoint});
   /** @type {esbuild.BuildOptions} */
   const buildOptions = {
     entryPoints: [entryPoint],

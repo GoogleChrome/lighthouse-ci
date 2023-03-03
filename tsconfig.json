@@ -2,7 +2,8 @@
   "compilerOptions": {
     "noEmit": true,
     "module": "commonjs",
-    "target": "ES2017",
+    "target": "ES2021",
+    "lib": ["ES2021"],
     "allowJs": true,
     "checkJs": true,
     "strict": true,

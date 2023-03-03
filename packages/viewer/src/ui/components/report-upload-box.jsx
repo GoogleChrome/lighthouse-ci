@@ -187,7 +187,7 @@ export const ReportUploadBox = props => {
       </div>
       <div className="report-upload-box__spacer" />
       <label className="report-upload-box__upload">
-        Upload
+        Select file
         <input
           type="file"
           style={{display: 'none'}}

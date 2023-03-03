@@ -29,7 +29,7 @@ export const LandingRoute = props => {
           <i className="material-icons">info</i>
         </a>
         <img className="landing__logo" src={LH_LOGO_PATH} alt="Lighthouse Logo" />
-        <h1>Lighthouse CI Diff</h1>
+        <h1>Lighthouse CI Report Diff Tool</h1>
         <span>Drag or upload two Lighthouse reports to start comparing!</span>
         <div className="landing__upload">
           <ReportUploadBox

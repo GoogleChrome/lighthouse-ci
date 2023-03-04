@@ -23,8 +23,8 @@ export const LandingRoute = props => {
         <div className="landing__logos">
           <img className="landing__logo" src={LH_LOGO_PATH} alt="Lighthouse Logo" />
           <img className="landing__logo landing__logo--diff" src={LH_LOGO_PATH} alt="" />
+          <h1>Lighthouse Report Diff Tool</h1>
         </div>
-        <h1>Lighthouse Report Diff Tool</h1>
         <p>Provide two Lighthouse reports to start comparing!</p>
         <p>
           <a href="./?baseReport=/packages/server/test/fixtures/lh-5-6-0-verge-a.json&compareReport=/packages/server/test/fixtures/lh-5-6-0-verge-b.json">

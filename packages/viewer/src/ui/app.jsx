@@ -30,7 +30,7 @@ const INITIAL_COMPARE_URL = SEARCH_PARAMS.get('compareReport');
  * @param {(r: ReportData) => void} setReport
  */
 async function loadReportFromURL(url, setReport) {
-  const filename = new URL(url).pathname.split('/').slice(-1)[0] || 'Unknown';
+  const filename = new URL(url, location.href).pathname.split('/').slice(-1)[0] || 'Unknown';
   const response = await fetch(url);
   const data = await response.text();
   const lhr = parseStringAsLhr(data);

@@ -13,8 +13,8 @@
   "scripts": {
     "clean": "rm -rf ./dist ./storybook-static",
     "build": "npm run build:esbuild && npm run build:storybook",
-    "build:esbuild": "node ../../scripts/build-app.js build ./src/ui/index.html ./dist /app",
-    "build:watch": "node ../../scripts/build-app.js watch ./src/ui/index.html ./dist /app",
+    "build:esbuild": "node ../../scripts/build-app.js build ./src/ui/index.html ./dist /app/",
+    "build:watch": "node ../../scripts/build-app.js watch ./src/ui/index.html ./dist /app/",
     "build:source-map-explorer": "npm run clean && npm run build && ../../scripts/source-map-explorer.sh",
     "build:storybook": "build-storybook",
     "start:storybook": "start-storybook -p 6006"

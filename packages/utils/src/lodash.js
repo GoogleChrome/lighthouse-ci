@@ -268,6 +268,7 @@ module.exports = {
   pick(object, propertiesToPick) {
     /** @type {Partial<T>} */
     const out = {};
+    // @ts-ignore
     for (const [key_, value] of Object.entries(object)) {
       const key = /** @type {keyof T} */ (key_);
       if (!propertiesToPick.includes(key)) continue;
@@ -286,6 +287,7 @@ module.exports = {
   omit(object, propertiesToDrop, options = {}) {
     /** @type {Partial<T>} */
     const out = {};
+    // @ts-ignore
     for (const [key_, value] of Object.entries(object)) {
       const key = /** @type {keyof T} */ (key_);
       if (propertiesToDrop.includes(key)) continue;

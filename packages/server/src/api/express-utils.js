@@ -16,7 +16,7 @@ module.exports = {
   E404,
   E422,
   /**
-   * @param {import('express').RequestHandler} handler
+   * @param {import('express').RequestHandler<import('express-serve-static-core').ParamsDictionary, any, any, {[key: string]: any}>} handler
    * @return {import('express').RequestHandler}
    */
   handleAsyncError(handler) {

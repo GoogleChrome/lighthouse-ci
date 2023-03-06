@@ -39,7 +39,7 @@ describe('Lighthouse CI collect CLI with puppeteer', () => {
     // 4xx and 5xx status codes cause Lighthouse to exit with 1 and collect to fail.
     // Just succeeding here is enough to signal that our login script worked.
     expect(stdout).toMatchInlineSnapshot(`
-      "Started a web server with \\"node ./auth-server.js\\"...
+      "Started a web server with "node ./auth-server.js"...
       Running Lighthouse 1 time(s) on http://localhost:XXXX
       Run #1...done.
       Done running Lighthouse!
@@ -66,7 +66,7 @@ describe('Lighthouse CI collect CLI with puppeteer', () => {
     );
 
     expect(stdout).toMatchInlineSnapshot(`
-      "Started a web server with \\"node ./auth-server.js\\"...
+      "Started a web server with "node ./auth-server.js"...
       Running Lighthouse 1 time(s) on http://localhost:XXXX/public
       Run #1...done.
       Done running Lighthouse!
@@ -78,7 +78,7 @@ describe('Lighthouse CI collect CLI with puppeteer', () => {
     const files = fs.readdirSync(path.join(autorunDir, '.lighthouseci'));
     const report = files.find(file => /lhr.*\.json$/.test(file));
     const lhr = JSON.parse(fs.readFileSync(path.join(autorunDir, '.lighthouseci', report)));
-    expect(lhr.userAgent).toContain('HeadlessChrome/98.0.4758.0'); // make sure the right chrome was used
+    expect(lhr.userAgent).toContain('HeadlessChrome/111.0.5555.0'); // make sure the right chrome was used
   }, 180000);
 
   it('should not fail on providing defaults without Chrome installations', async () => {
@@ -90,7 +90,7 @@ describe('Lighthouse CI collect CLI with puppeteer', () => {
     // Make sure there is no default chromePath found
     const chromePathHelp = stdout.match(/--chromePath.*\n.*\n.*/);
     expect(chromePathHelp).toMatchInlineSnapshot(`
-      Array [
+      [
         "--chromePath                The path to the Chrome or Chromium executable to use for collection.
         --puppeteerScript           The path to a script that manipulates the browser with puppeteer before running Lighthouse, used for auth.
         --puppeteerLaunchOptions    The object of puppeteer launch options",

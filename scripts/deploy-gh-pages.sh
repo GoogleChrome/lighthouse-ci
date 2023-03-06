@@ -29,9 +29,10 @@ git checkout -b gh-pages
 yarn clean
 yarn build
 cp -R packages/viewer/dist ./viewer
+cp -R packages/viewer/dist ./difftool
 
 # Create and push the deploy commit
-git add ./viewer
+git add ./viewer ./difftool
 git commit -m 'gh pages deploy'
 git push -uf origin gh-pages
 

@@ -6,6 +6,7 @@
 'use strict';
 
 const fs = require('fs');
+const path = require('path');
 
 const esbuild = require('esbuild');
 
@@ -23,33 +24,63 @@ if (!['build', 'watch'].includes(command)) {
 }
 
 /**
+ * All of this is dumb but esbuild-plugin-html is limited and paths are hard.
+ *
+ * FYI If you see a static resource served as HTML, then the express router attempted use
+ * a static file, but didnt see it on disk, and instead served the HTML. The problem will probably
+ * be in here.
  * @param {esbuild.BuildResult} result
+ * @param {esbuild.BuildOptions} buildOptions
  */
-function fixHtmlSubresourceUrls(result) {
-  if (publicPath !== '/app') return;
+function fixHtmlSubresourceUrls(result, buildOptions) {
   if (!result.metafile) throw new Error('expected metafile');
 
   const htmls = Object.keys(result.metafile.outputs).filter(o => o.endsWith('.html'));
-  const html = htmls[0];
-  if (htmls.length !== 1) throw new Error('expected exactly one generated html');
+  const csss = Object.keys(result.metafile.outputs).filter(o => o.endsWith('.css'));
+  if (htmls.length !== 1) throw new Error('expected exactly one generated html ' + htmls);
+  if (csss.length !== 1) throw new Error('expected exactly one generated css ' + csss);
+  const htmlDistPath = htmls[0];
+  const cssDistPath = csss[0];
 
-  const htmlText = fs.readFileSync(html, 'utf-8');
+  // Viewer uses a publicPath of ./, Server uses /app.
+  if (!buildOptions.outdir || !buildOptions.publicPath) {
+    throw new Error('missing args');
+  }
+  const relativeCssPath = path.relative(buildOptions.outdir, cssDistPath);
+
+  // Rewrite the HTML
+  const htmlText = fs.readFileSync(htmlDistPath, 'utf-8');
   const newHtmlText = htmlText
-    .replace('<script src="chunks/', '<script src="/app/chunks/')
-    .replace('<link rel="stylesheet" href="chunks/', '<link rel="stylesheet" href="/app/chunks/');
-  fs.writeFileSync(html, newHtmlText);
+    // Inject publicPath on JS references
+    .replace('<script src="chunks/', `<script src="${buildOptions.publicPath}chunks/`)
+    // noop @chialab/esbuild-plugin-html's stupid css loading technique
+    .replace('<script type="application/javascript">', '<script type="dumb-dont-run-this">')
+    // ... and instead use a proper stylesheet link. (with a fixed path)
+    .replace(
+      '</head>',
+      `
+    <link rel="stylesheet" href="${buildOptions.publicPath}${relativeCssPath}">
+    </head>
+    `
+    );
+  fs.writeFileSync(htmlDistPath, newHtmlText);
+
+  // Rewrite the CSS, making sure we don't source icons relative to the chunks/css file.
+  const newCssText = fs
+    .readFileSync(cssDistPath, 'utf-8')
+    .replaceAll(`url(./assets`, `url(../assets`);
+  fs.writeFileSync(cssDistPath, newCssText);
 }
 
 async function main() {
   const htmlPlugin = (await import('@chialab/esbuild-plugin-html')).default;
-
   /** @type {esbuild.BuildOptions} */
   const buildOptions = {
     entryPoints: [entryPoint],
     entryNames: '[name]',
     assetNames: 'assets/[name]-[hash]',
-    // Defined chunknames breaks the viewer (probably cuz the -plugin-html), but pairs with fixHtmlSubresourceUrls.
-    chunkNames: publicPath ? `chunks/[name]-[hash]` : undefined,
+    // See the special handling in fixHtmlSubresourceUrls.
+    chunkNames: `chunks/[name]-[hash]`,
     plugins: [htmlPlugin()],
     loader: {
       '.svg': 'file',
@@ -70,7 +101,7 @@ async function main() {
         ? {
             onRebuild(err, result) {
               if (!err && result) {
-                fixHtmlSubresourceUrls(result);
+                fixHtmlSubresourceUrls(result, buildOptions);
               }
             },
           }
@@ -78,7 +109,7 @@ async function main() {
   };
 
   const result = await esbuild.build(buildOptions);
-  fixHtmlSubresourceUrls(result);
+  fixHtmlSubresourceUrls(result, buildOptions);
 
   console.log('Built.', new Date());
   if (result.errors.length) console.error(result.errors);

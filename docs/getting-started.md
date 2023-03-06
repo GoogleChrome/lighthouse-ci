@@ -85,10 +85,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Use Node.js 12.x
+      - name: Use Node.js 16.x
         uses: actions/setup-node@v1
         with:
-          node-version: 12.x
+          node-version: 16.x
       - name: npm install, build
         run: |
           npm install
@@ -109,7 +109,7 @@ jobs:
 
 ```yaml
 language: node_js
-node_js: v12
+node_js: v16
 addons:
   chrome: stable
 before_install:
@@ -171,7 +171,7 @@ module.exports = {
 **.gitlab-ci.yml**
 
 ```yaml
-image: cypress/browsers:node14.15.0-chrome86-ff82
+image: cypress/browsers:node16.17.0-chrome106
 lhci:
   script:
     - npm install
@@ -198,7 +198,7 @@ echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" | sud
 wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
 
 # Add Node's apt-key
-curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
+curl -sL https://deb.nodesource.com/setup_16.x | sudo -E bash -
 
 # Install NodeJS and Google Chrome
 sudo apt-get update
@@ -228,7 +228,7 @@ lhci autorun
 <summary>Google Cloud Build</summary>
 <br />
 
-**NOTE:** Learn more about the [security tradeoffs](./recipes/docker-client/README.md#--no-sandbox-container-tradeoffs) behind use of the `--no-sandbox` Chrome option before proceeding.
+**NOTE:** Learn more about the [security tradeoffs](./recipes/docker-client/README.md#--no-sandbox-issues-explained) behind use of the `--no-sandbox` Chrome option before proceeding.
 
 **.lighthouserc.js**
 
@@ -256,16 +256,16 @@ module.exports = {
 steps:
   - id: 'install'
     args: ['npm', 'ci']
-    name: node:14-alpine
+    name: node:16-alpine
 
   - id: 'build'
     waitFor: ['install']
-    name: node:14-alpine
+    name: node:16-alpine
     args: ['npm', 'run', 'build']
 
   - id: 'lighthouse'
     waitFor: ['build']
-    name: cypress/browsers:node14.15.0-chrome86-ff82
+    name: cypress/browsers:node16.17.0-chrome106
     entrypoint: '/bin/sh'
     args: ['-c', 'npm install -g @lhci/cli@0.8.x && lhci autorun --failOnUploadFailure']
     env:
@@ -363,10 +363,10 @@ jobs:
       - uses: actions/checkout@v2
         with:
           ref: ${{ github.event.pull_request.head.sha }}
-      - name: Use Node.js 10.x
+      - name: Use Node.js 16.x
         uses: actions/setup-node@v1
         with:
-          node-version: 10.x
+          node-version: 16.x
       - name: npm install, build
         run: |
           npm install

@@ -23,13 +23,14 @@ jobs:
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
-      - name: Use Node.js 14.x
-        uses: actions/setup-node@v1
+      - name: Use Node.js 16.x
+        uses: actions/setup-node@v3
         with:
-          node-version: 14.x
-      - run: yarn
+          node-version: 16.x
+          cache: yarn
+      - run: yarn install --frozen-lockfile
       - run: yarn build
-      - run: yarn test:unit
+      - run: yarn test:unit || yarn test:unit --onlyFailures || yarn test:unit --onlyFailures
       - if: ${{ failure() }}
         uses: actions/upload-artifact@v2
         with:
@@ -70,10 +71,11 @@ jobs:
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
-      - name: Use Node.js 14.x
-        uses: actions/setup-node@v1
+      - name: Use Node.js 16.x
+        uses: actions/setup-node@v3
         with:
-          node-version: 14.x
+          node-version: 16.x
+          cache: yarn
       - name: Configure Environment
         run: |-
           echo "CHROME_PATH=$(which google-chrome-stable)" >> $GITHUB_ENV
@@ -86,15 +88,16 @@ jobs:
           mysql --host=127.0.0.1 --port=33306 -e 'create database lighthouse_ci_test;' -u root
 
           google-chrome-stable --version
-      - run: yarn
+      - run: yarn install --frozen-lockfile
       - run: yarn build
       - run: yarn test:typecheck
       - run: yarn test:lint
       - name: Run yarn test:unit
-        run: yarn test:unit || yarn test:unit || yarn test:unit
+        run: yarn test:unit || yarn test:unit --onlyFailures || yarn test:unit --onlyFailures
       - run: yarn test:docker
-      - run: yarn ci:dogfood
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          LHCI_CANARY_SERVER_URL: https://lhci-canary.herokuapp.com/
-          LHCI_CANARY_SERVER_TOKEN: ${{ secrets.LHCI_CANARY_SERVER_TOKEN }}
+      # TODO: re-enable, once we have canary server up again
+      # - run: yarn ci:dogfood
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #     LHCI_CANARY_SERVER_URL: https://lhci-canary.herokuapp.com/
+      #     LHCI_CANARY_SERVER_TOKEN: ${{ secrets.LHCI_CANARY_SERVER_TOKEN }}

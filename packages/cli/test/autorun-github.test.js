@@ -92,8 +92,8 @@ describe('Lighthouse CI autorun CLI with GitHub status check', () => {
       Uploading median LHR of http://localhost:XXXX/good.html...success!
       Open the report at https://storage.googleapis.com/lighthouse-infrastructure.appspot.com/reports/XXXX-XXXX.report.html
       GitHub token found, attempting to set status...
-      GitHub accepted \\"failure\\" status for \\"lhci/url/bad.html\\".
-      GitHub accepted \\"success\\" status for \\"lhci/url/good.html\\".
+      GitHub accepted "failure" status for "lhci/url/bad.html".
+      GitHub accepted "success" status for "lhci/url/good.html".
 
       "
     `);
@@ -103,7 +103,7 @@ describe('Lighthouse CI autorun CLI with GitHub status check', () => {
       1 result(s) for [1mhttp://localhost:XXXX/bad.html[0m :
 
         [31mX[0m  [1mviewport[0m failure for [1mminScore[0m assertion
-             Does not have a \`<meta name=\\"viewport\\">\` tag with \`width\` or \`initial-scale\`
+             Does not have a \`<meta name="viewport">\` tag with \`width\` or \`initial-scale\`
              https://web.dev/viewport/
 
               expected: >=[32m0.9[0m
@@ -113,7 +113,7 @@ describe('Lighthouse CI autorun CLI with GitHub status check', () => {
       1 result(s) for [1mhttp://localhost:XXXX/good.html[0m :
 
         ✅  [1mviewport[0m passing for [1mminScore[0m assertion
-             Has a \`<meta name=\\"viewport\\">\` tag with \`width\` or \`initial-scale\`
+             Has a \`<meta name="viewport">\` tag with \`width\` or \`initial-scale\`
              https://web.dev/viewport/
 
               expected: >=[32m0.9[0m
@@ -184,7 +184,7 @@ describe('Lighthouse CI autorun CLI with GitHub status check', () => {
       1 result(s) for [1mhttp://localhost:XXXX/bad.html[0m :
 
         [31mX[0m  [1mviewport[0m failure for [1mminScore[0m assertion
-             Does not have a \`<meta name=\\"viewport\\">\` tag with \`width\` or \`initial-scale\`
+             Does not have a \`<meta name="viewport">\` tag with \`width\` or \`initial-scale\`
              https://web.dev/viewport/
 
               expected: >=[32m0.9[0m
@@ -194,7 +194,7 @@ describe('Lighthouse CI autorun CLI with GitHub status check', () => {
       1 result(s) for [1mhttp://localhost:XXXX/good.html[0m :
 
         ✅  [1mviewport[0m passing for [1mminScore[0m assertion
-             Has a \`<meta name=\\"viewport\\">\` tag with \`width\` or \`initial-scale\`
+             Has a \`<meta name="viewport">\` tag with \`width\` or \`initial-scale\`
              https://web.dev/viewport/
 
               expected: >=[32m0.9[0m

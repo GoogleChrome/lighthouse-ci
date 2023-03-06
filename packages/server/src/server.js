@@ -29,7 +29,7 @@ const DIST_FOLDER = path.join(__dirname, '../dist');
  * @return {Promise<{app: Parameters<typeof createHttpServer>[1], storageMethod: StorageMethod}>}
  */
 async function createApp(options) {
-  const {storage} = options;
+  const {storage, useBodyParser} = options;
 
   log('[createApp] initializing storage method');
   const storageMethod = StorageMethod.from(storage);
@@ -43,9 +43,12 @@ async function createApp(options) {
   // While LHCI should be served behind nginx/apache that handles compression, it won't always be.
   app.use(compression());
 
-  // 1. Support large payloads because LHRs are big.
-  // 2. Support JSON primitives because `PUT /builds/<id>/lifecycle "sealed"`
-  app.use(bodyParser.json({limit: '10mb', strict: false}));
+  if (typeof useBodyParser === 'undefined' || useBodyParser) {
+    // 1. Optional if you want to overwrite by other middleware like koa or fastify
+    // 2. Support large payloads because LHRs are big.
+    // 3. Support JSON primitives because `PUT /builds/<id>/lifecycle "sealed"`
+    app.use(bodyParser.json({limit: '10mb', strict: false}));
+  }
 
   // Add a health check route before auth
   app.use('/healthz', (_, res) => res.send('healthy'));

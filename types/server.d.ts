@@ -184,7 +184,9 @@ declare global {
       export interface Options {
         logLevel: 'silent' | 'verbose';
         port: number;
-        host?: string
+        host?: string;
+
+        useBodyParser?: boolean;
         storage: StorageOptions;
         psiCollectCron?: {
           psiApiKey: string;

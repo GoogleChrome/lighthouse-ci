@@ -12,7 +12,7 @@ module.exports = {
   /**
    * @param {import('sequelize').QueryInterface} queryInterface
    */
-  up: async (queryInterface) => {
+  up: async queryInterface => {
     await queryInterface.addColumn('builds', 'committedAt', {type: DataTypes.DATE(6)});
     await queryInterface.addColumn('builds', 'ancestorCommittedAt', {type: DataTypes.DATE(6)});
   },

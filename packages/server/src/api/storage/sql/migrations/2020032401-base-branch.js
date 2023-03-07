@@ -13,7 +13,7 @@ module.exports = {
   /**
    * @param {import('sequelize').QueryInterface} queryInterface
    */
-  up: async (queryInterface) => {
+  up: async queryInterface => {
     await queryInterface.addColumn('projects', 'baseBranch', {type: DataTypes.STRING(80)});
     await queryInterface.bulkUpdate(
       'projects',

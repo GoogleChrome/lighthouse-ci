@@ -14,7 +14,7 @@ module.exports = {
   /**
    * @param {import('sequelize').QueryInterface} queryInterface
    */
-  up: async (queryInterface) => {
+  up: async queryInterface => {
     await queryInterface.addColumn('projects', 'adminToken', {type: DataTypes.STRING(64)});
     await queryInterface.bulkUpdate(
       'projects',

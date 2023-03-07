@@ -80,7 +80,7 @@ function createSequelize(options) {
   const dialect = options.sqlDialect;
   const sequelizeOptions = {
     logging: /** @param {*} msg */ msg => logVerbose('[sequelize]', msg),
-    ...options.sequelizeOptions
+    ...options.sequelizeOptions,
   };
 
   if (dialect === 'sqlite') {
@@ -136,11 +136,11 @@ function createUmzug(sequelize, options) {
       debug: msg => logVerbose('[umzug]', msg),
       warn: msg => logVerbose('[umzug]', msg),
       error: msg => logVerbose('[umzug]', msg),
-      info: msg => logVerbose('[umzug]', msg)
+      info: msg => logVerbose('[umzug]', msg),
     },
     storage: new SequelizeStorage({
       sequelize,
-      tableName: options.sqlMigrationOptions && options.sqlMigrationOptions.tableName
+      tableName: options.sqlMigrationOptions && options.sqlMigrationOptions.tableName,
     }),
     context: sequelize.getQueryInterface(),
     migrations: {
@@ -154,7 +154,7 @@ function createUmzug(sequelize, options) {
           up: async () => migration.up(context, options),
           down: async () => migration.down(context, options),
         };
-      }
+      },
     },
   });
 }
@@ -481,10 +481,7 @@ class SqlStorageMethod {
       const runIds = representativeRuns.map(run => run.id);
 
       log('[sealBuild] updating run representative flag');
-      await runModel.update(
-        {representative: true},
-        {where: {id: {[Op.in]: runIds}}, transaction}
-      );
+      await runModel.update({representative: true}, {where: {id: {[Op.in]: runIds}}, transaction});
 
       log('[sealBuild] committing transaction');
       await transaction.commit();

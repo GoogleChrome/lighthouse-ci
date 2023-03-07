@@ -42,7 +42,12 @@ module.exports = {
       buildId: {type: DataTypes.UUID()},
       representative: {type: DataTypes.BOOLEAN},
       url: {type: DataTypes.STRING({length: 256})},
-      lhr: {type: options.sqlDialect === 'sqlite' ? DataTypes.TEXT : DataTypes.TEXT('long')},
+      lhr: {
+        type:
+          options.sqlDialect === 'sqlite' || options.sqlDialect === 'postgres'
+            ? DataTypes.TEXT
+            : DataTypes.TEXT('long'),
+      },
       createdAt: {type: DataTypes.DATE(6)},
       updatedAt: {type: DataTypes.DATE(6)},
     });

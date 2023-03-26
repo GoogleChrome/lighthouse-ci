@@ -80,7 +80,7 @@ The team does not have the bandwidth to assist with debugging this problem. Plea
 
 ## Running LHCI in Github Actions I constantly get Ancestor hash not determinable
 
-If you are using `actions/checkout@v2` to checkout your repository and based on the size and traffic on your repo this error might happen due to how the checkout action is configured and is not a LHCI issue.
+If you are using `actions/checkout@v3` to checkout your repository and based on the size and traffic on your repo this error might happen due to how the checkout action is configured and is not a LHCI issue.
 
 Checkout action by default doesn't clone the entire repo and the number of commits to fetch is set to 1 for performance reasons. When LHCI runs the health check the ancestor hash might be missing because the branch / hash is not there in the local history.
 
@@ -93,13 +93,13 @@ jobs:
     name: Lighthouse
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 20
       - name: Fetch base_ref HEAD to use it as Ancestor hash in LHCI
         run: git fetch --depth=1 origin +refs/heads/${{github.base_ref}}:refs/remotes/origin/${{github.base_ref}}
 ```
 
-The additions are `fetch-depth: 20` added to `actions/checkout@v2` and a new step to fetch base_ref HEAD to use it as ancestor hash in LHCI.
+The additions are `fetch-depth: 20` added to `actions/checkout@v3` and a new step to fetch base_ref HEAD to use it as ancestor hash in LHCI.
 
 The fetch depth set to 20 is a good default, but might not work in all cases, you can adjust it based on your needs.

@@ -27,7 +27,7 @@ export const LandingRoute = props => {
         </div>
         <p>Provide two Lighthouse reports to start comparing!</p>
         <p>
-          <a href="./?baseReport=/packages/server/test/fixtures/lh-5-6-0-verge-a.json&compareReport=/packages/server/test/fixtures/lh-5-6-0-verge-b.json">
+          <a href="./?baseReport=https://googlechrome.github.io/lighthouse-ci/packages/server/test/fixtures/lh-5-6-0-verge-a.json&compareReport=https://googlechrome.github.io/lighthouse-ci/packages/server/test/fixtures/lh-5-6-0-verge-b.json">
             View example diff
           </a>
         </p>

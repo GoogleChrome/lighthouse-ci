@@ -12,6 +12,9 @@ const {getGroupForAuditId} = require('./seed-data/lhr-generator.js');
 /** @typedef {'better'|'worse'|'added'|'removed'|'ambiguous'|'no change'} RowLabel */
 /** @typedef {{item: Record<string, any>, kind?: string, index: number}} DetailItemEntry */
 
+// Hardcoded audit ids that arent worth diffing and generally regress the UX when done.
+const auditsToNotDIff = ['main-thread-tasks', 'screenshot-thumbnails', 'metrics'];
+
 /**
  * @param {number} delta
  * @param {'audit'|'score'} deltaType
@@ -383,6 +386,7 @@ function deepPruneItemForKeySerialization(item) {
 function getItemKey(item) {
   // For most opportunities, diagnostics, etc where 1 row === 1 resource
   if (typeof item.url === 'string' && item.url) return item.url;
+  if (typeof item.origin === 'string' && item.origin) return item.origin;
   // For sourcemapped opportunities that identify a source location
   const source = item.source;
   if (typeof source === 'string') return source;
@@ -579,6 +583,8 @@ function findAuditDiffs(baseAudit, compareAudit, options = {}) {
   const {percentAbsoluteDeltaThreshold = 0} = options;
   /** @type {Array<LHCI.AuditDiff>} */
   const diffs = [];
+
+  if (auditsToNotDIff.includes(auditId)) return diffs;
 
   if (typeof baseAudit.score === 'number' || typeof compareAudit.score === 'number') {
     diffs.push(

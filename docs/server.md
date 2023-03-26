@@ -130,6 +130,44 @@ const lhci = require('@lhci/server');
 })();
 ```
 
+#### For Fastify Middleware
+```js
+const fastify = require('fastify');
+const lhci = require('@lhci/server');
+(async () => {
+  const {app} = await createApp({
+    // you need that for use fastify
+    useBodyParser: false,
+    storage: {
+      storageMethod: 'sql',
+      sqlDialect: 'sqlite',
+      // see configuration...
+    },
+  });
+  const fastify = require('fastify')({
+    logger: true
+  })
+  fastify.all(
+    '/*',
+    async (req, reply) => {
+      // you need to clone the body for express or this will be emit error
+      req.raw.body = req.body;
+      await app(req.raw, reply.raw);
+      // don't forget that or fastify will be not respond
+      reply.hijack();
+    }
+  );
+// Run the server!
+  fastify.listen({ port: 3000 }, function (err, address) {
+    if (err) {
+      fastify.log.error(err)
+      process.exit(1)
+    }
+    // Server is now listening on ${address}
+  })
+})();
+```
+
 ### Firewall Rules
 
 You can also protect your server through firewall rules to prevent it from being accessed from outside your internal network. Refer to your infrastructure provider's documentation on how to setup firewall rules to block external IP addresses from accessing the server. Don't forget to allow your CI machines!

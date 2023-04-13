@@ -9,14 +9,27 @@
 
 const fs = require('fs');
 const path = require('path');
+const {promisify} = require('util');
+const {exec} = require('child_process');
+
+const execAsync = promisify(exec);
+
+/**
+ * Jest does a bad job with esm, so we get the default config via cli here.
+ */
+async function getDefaultConfig() {
+  const {stdout} = await execAsync(
+    `node -e "import('lighthouse').then(c => console.log(JSON.stringify(c.defaultConfig)))"`
+  );
+  return JSON.parse(stdout);
+}
 
 const PRESETS_DIR = path.join(__dirname, '../src/presets');
 
-// TODO: Reenable once we figure out ESM in jest
-describe.skip('presets', () => {
+describe('presets', () => {
   let auditsInLighthouse = [];
   beforeAll(async () => {
-    const {defaultConfig} = await import('lighthouse');
+    const defaultConfig = await getDefaultConfig();
     const audits = defaultConfig.audits
       .map(p => [p, fs.readFileSync(require.resolve(`lighthouse/core/audits/${p}`), 'utf8')])
       .map(([p, contents]) => ({

@@ -7,6 +7,11 @@
 
 module.exports = {
   assertions: {
+    // Not applicable in navigation mode (off)
+    // TODO: Enable this to support user flows
+    'experimental-interaction-to-next-paint': ['off', {}],
+    'uses-responsive-images-snapshot': ['off', {}],
+    'work-during-interaction': ['off', {}],
     // Not useful or invisible diagnostic audits (off)
     'critical-request-chains': ['off', {}],
     'final-screenshot': ['off', {}],
@@ -99,7 +104,7 @@ module.exports = {
     'paste-preventing-inputs': ['error', {}],
     'performance-budget': ['error', {}],
     'preload-fonts': ['error', {}],
-    'preload-lcp-image': ['error', {}],
+    'prioritize-lcp-image': ['error', {}],
     'render-blocking-resources': ['error', {}],
     'robots-txt': ['error', {}],
     'server-response-time': ['error', {}],

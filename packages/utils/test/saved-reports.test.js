@@ -11,6 +11,23 @@ const fs = require('fs');
 const path = require('path');
 const {withTmpDir} = require('../../cli/test/test-utils.js');
 const {replaceUrlPatterns, saveLHR} = require('../src/saved-reports.js');
+const {promisify} = require('util');
+const {exec} = require('child_process');
+
+const execAsync = promisify(exec);
+
+/**
+ * Jest does a bad job with esm, so we mock the report generation with a CLI call here.
+ */
+async function generateReport(lhr) {
+  const json = JSON.stringify(lhr);
+  const {stdout} = await execAsync(
+    `node -e 'import("lighthouse").then(m => console.log(m.generateReport(${json})))'`
+  );
+  return stdout;
+}
+
+jest.mock('lighthouse', () => ({generateReport}));
 
 describe('#replaceUrlPatterns', () => {
   it('should replace basic patterns', () => {
@@ -49,8 +66,7 @@ describe('#replaceUrlPatterns', () => {
   });
 });
 
-// TODO: Reenable once we figure out how to deal with ESM and Jest
-describe.skip('#saveLHR', () => {
+describe('#saveLHR', () => {
   it('should save the lhr to json', async () => {
     await withTmpDir(async dir => {
       await saveLHR(JSON.stringify({lighthouseVersion: '5.6.0'}), dir);

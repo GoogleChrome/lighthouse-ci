@@ -478,7 +478,7 @@ async function runTemporaryPublicStorageTarget(options) {
       const response = await fetch(TEMPORARY_PUBLIC_STORAGE_URL, {
         method: 'POST',
         headers: {'content-type': 'text/html'},
-        body: getHTMLReportForLHR(lhr),
+        body: await getHTMLReportForLHR(lhr),
       });
 
       const {success, url} = await response.json();
@@ -569,7 +569,7 @@ async function runFilesystemTarget(options) {
       }, /** @type {Record<string, number>} */ ({})),
     };
 
-    fs.writeFileSync(entry.htmlPath, getHTMLReportForLHR(lhr));
+    fs.writeFileSync(entry.htmlPath, await getHTMLReportForLHR(lhr));
     fs.writeFileSync(entry.jsonPath, JSON.stringify(lhr));
     manifest.push(entry);
   }

@@ -104,7 +104,7 @@ describe('Lighthouse CI autorun CLI with GitHub status check', () => {
 
         [31mX[0m  [1mviewport[0m failure for [1mminScore[0m assertion
              Does not have a \`<meta name="viewport">\` tag with \`width\` or \`initial-scale\`
-             https://web.dev/viewport/
+             https://developer.chrome.com/docs/lighthouse/pwa/viewport/
 
               expected: >=[32m0.9[0m
                  found: [31m0[0m
@@ -114,7 +114,7 @@ describe('Lighthouse CI autorun CLI with GitHub status check', () => {
 
         ✅  [1mviewport[0m passing for [1mminScore[0m assertion
              Has a \`<meta name="viewport">\` tag with \`width\` or \`initial-scale\`
-             https://web.dev/viewport/
+             https://developer.chrome.com/docs/lighthouse/pwa/viewport/
 
               expected: >=[32m0.9[0m
                  found: [32m1[0m
@@ -185,7 +185,7 @@ describe('Lighthouse CI autorun CLI with GitHub status check', () => {
 
         [31mX[0m  [1mviewport[0m failure for [1mminScore[0m assertion
              Does not have a \`<meta name="viewport">\` tag with \`width\` or \`initial-scale\`
-             https://web.dev/viewport/
+             https://developer.chrome.com/docs/lighthouse/pwa/viewport/
 
               expected: >=[32m0.9[0m
                  found: [31m0[0m
@@ -195,7 +195,7 @@ describe('Lighthouse CI autorun CLI with GitHub status check', () => {
 
         ✅  [1mviewport[0m passing for [1mminScore[0m assertion
              Has a \`<meta name="viewport">\` tag with \`width\` or \`initial-scale\`
-             https://web.dev/viewport/
+             https://developer.chrome.com/docs/lighthouse/pwa/viewport/
 
               expected: >=[32m0.9[0m
                  found: [32m1[0m

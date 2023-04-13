@@ -11,6 +11,24 @@ const fs = require('fs');
 const path = require('path');
 const {withTmpDir} = require('../../cli/test/test-utils.js');
 const {replaceUrlPatterns, saveLHR} = require('../src/saved-reports.js');
+const {promisify} = require('util');
+const {exec} = require('child_process');
+
+const execAsync = promisify(exec);
+
+/**
+ * Jest does a bad job with esm, so we mock the report generation with a CLI call here.
+ */
+async function generateReport(lhr) {
+  // This isn't technically JSON anymore but it works for this test.
+  const lhrString = JSON.stringify(lhr).replaceAll(`"`, `'`);
+  const {stdout} = await execAsync(
+    `node -e "import('lighthouse').then(m=>console.log(m.generateReport(${lhrString})))"`
+  );
+  return stdout;
+}
+
+jest.mock('lighthouse', () => ({generateReport}));
 
 describe('#replaceUrlPatterns', () => {
   it('should replace basic patterns', () => {
@@ -51,8 +69,8 @@ describe('#replaceUrlPatterns', () => {
 
 describe('#saveLHR', () => {
   it('should save the lhr to json', async () => {
-    await withTmpDir(dir => {
-      saveLHR(JSON.stringify({lighthouseVersion: '5.6.0'}), dir);
+    await withTmpDir(async dir => {
+      await saveLHR(JSON.stringify({lighthouseVersion: '5.6.0'}), dir);
       const files = fs.readdirSync(dir);
       expect(files.map(name => name.replace(/-\d+/, '-XXX'))).toContain('lhr-XXX.json');
 
@@ -66,8 +84,8 @@ describe('#saveLHR', () => {
   });
 
   it('should save the lhr to html', async () => {
-    await withTmpDir(dir => {
-      saveLHR(JSON.stringify({lighthouseVersion: '5.6.0'}), dir);
+    await withTmpDir(async dir => {
+      await saveLHR(JSON.stringify({lighthouseVersion: '5.6.0'}), dir);
       const files = fs.readdirSync(dir);
       expect(files.map(name => name.replace(/-\d+/, '-XXX'))).toContain('lhr-XXX.html');
 

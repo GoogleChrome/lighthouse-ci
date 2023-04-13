@@ -28,6 +28,9 @@ const BUILD_DIR_PRIORITY = [
   // likely a built version of the site
   // default name for next.js
   'out',
+  // likely a built version of the site
+  // default name for 11ty
+  '_site',
   // riskier, sometimes is a built version of the site but also can be just a dir of static assets
   // default name for gatsby
   'public',

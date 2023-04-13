@@ -46,7 +46,21 @@ yarn install # run in the repo root
 
 When working on the CLI, simply make your changes to `packages/cli` or `packages/utils` files and run `yarn start <LHCI arguments here>`. No build step necessary.
 
-When working on the server, you'll need to start build in watch mode. In one terminal run `yarn build:watch` from the repo root. In another terminal run `yarn start:server`. If you made any changes to the APIs of the server, you will need to restart the `yarn start:server` command, but UI changes should be picked up on refresh without restarting the server process. Once the server is up and running you can fill it with some test data by running `yarn start:seed-database` in another terminal.
+When working on the server, you'll need to build. `yarn build` in root will build the server and viewer. Also, you can use watch mode.
+
+```sh
+yarn build:watch
+yarn start:server
+```
+
+If you made any changes to the APIs of the server, you will need to restart the `yarn start:server` command, but UI changes should be picked up on refresh without restarting the server process. Once the server is up and running you can fill it with some test data with `yarn start:seed-database`.
+
+## Problems?
+
+```sh
+trash node_modules && yarn install
+yarn build
+```
 
 ## Updating the Lighthouse Version
 

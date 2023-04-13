@@ -25,6 +25,8 @@ if (process.env.CI && require('os').platform() !== 'darwin') {
 initStoryshots({
   configPath: path.join(__dirname, '../../.storybook'),
   suite: 'Image Storyshots',
+  // Use a storyKindRegex as an `.only`-like filter on the "Image Storyshots" tests.
+  // storyKindRegex: /Graph/,
   test: imageSnapshot({
     storybookUrl: `http://localhost:${process.env.STORYBOOK_PORT}`,
     beforeScreenshot: async page => {

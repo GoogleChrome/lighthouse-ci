@@ -19,7 +19,7 @@ const execAsync = promisify(exec);
  */
 async function getDefaultConfig() {
   const {stdout} = await execAsync(
-    `node -e "import('lighthouse').then(c => console.log(JSON.stringify(c.defaultConfig)))"`
+    `node -e "import('lighthouse').then(c=>console.log(JSON.stringify(c.defaultConfig)))"`
   );
   return JSON.parse(stdout);
 }

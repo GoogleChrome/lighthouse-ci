@@ -275,6 +275,9 @@ module.exports = {
       // FIXME: we're more forgiving in CI where font rendering creates small changes.,
       // failureThreshold: process.env.CI ? 0.005 : 0.001,
       failureThresholdType: 'percent',
+      // On -u dont update files that are already fine. This should match the default but...
+      // we've seen behavior which seemingly conflicts.
+      updatePassedSnapshot: false,
     });
 
     expect.extend({toMatchImageSnapshot});

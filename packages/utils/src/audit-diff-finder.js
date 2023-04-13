@@ -384,9 +384,8 @@ function deepPruneItemForKeySerialization(item) {
 
 /** @param {Record<string, any>} item @return {string} */
 function getItemKey(item) {
-  // For most opportunities, diagnostics, etc where 1 row === 1 resource
-  if (typeof item.url === 'string' && item.url) return item.url;
-  if (typeof item.origin === 'string' && item.origin) return item.origin;
+  // Do most specific checks at the top. most general at bottom..
+  //
   // For sourcemapped opportunities that identify a source location
   const source = item.source;
   if (typeof source === 'string') return source;
@@ -410,6 +409,9 @@ function getItemKey(item) {
   ) {
     return `${item.tapTarget.path} + ${item.overlappingTarget.path}`;
   }
+  // For most opportunities, diagnostics, etc where 1 row === 1 resource
+  if (typeof item.url === 'string' && item.url) return item.url;
+  if (typeof item.origin === 'string' && item.origin) return item.origin;
 
   // For everything else, use the entire object, actually works OK on most nodes.
   return JSON.stringify(deepPruneItemForKeySerialization(item));

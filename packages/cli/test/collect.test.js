@@ -100,12 +100,12 @@ describe('collect', () => {
         // Check server started and lighthouse ran.
         const cleanStartCommand = cleanStdOutput(startCommand);
         expect(stdout).toMatchInlineSnapshot(`
-          "Started a web server with "SERVER_START_PORT=XXXX SERVER_START_MESSAGE='Running server' node /Users/asraine/src/lighthouse-ci/packages/cli/test/fixtures/autorun-start-server/autorun-server.js"...
-          Running Lighthouse 1 time(s) on http://localhost:XXXX/
-          Run #1...done.
-          Done running Lighthouse!
-          "
-        `);
+        "Started a web server with "${cleanStartCommand}"...
+        Running Lighthouse 1 time(s) on http://localhost:XXXX/
+        Run #1...done.
+        Done running Lighthouse!
+        "
+      `);
         // Checkout no errors were logged.
         expect(stderr.toString()).toMatchInlineSnapshot(`""`);
         // Check script ran without errors.
@@ -141,14 +141,14 @@ describe('collect', () => {
         // Check server started and lighthouse ran.
         const cleanStartCommand = cleanStdOutput(startCommand);
         expect(stdout).toMatchInlineSnapshot(`
-          "Started a web server with "SERVER_START_PORT=XXXX SERVER_START_MESSAGE='Running server' node /Users/asraine/src/lighthouse-ci/packages/cli/test/fixtures/autorun-start-server/autorun-server.js"...
-          WARNING: Timed out waiting for the server to start listening.
-                   Ensure the server prints a pattern that matches /listen|ready/i when it is ready.
-          Running Lighthouse 1 time(s) on http://localhost:XXXX/
-          Run #1...done.
-          Done running Lighthouse!
-          "
-        `);
+        "Started a web server with "${cleanStartCommand}"...
+        WARNING: Timed out waiting for the server to start listening.
+                 Ensure the server prints a pattern that matches /listen|ready/i when it is ready.
+        Running Lighthouse 1 time(s) on http://localhost:XXXX/
+        Run #1...done.
+        Done running Lighthouse!
+        "
+      `);
         // Check script ran without errors.
         expect(status).toEqual(0);
       }),

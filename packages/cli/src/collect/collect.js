@@ -125,7 +125,7 @@ async function runOnUrl(url, options, context) {
         ...options,
         settings,
       });
-      saveLHR(lhr);
+      await saveLHR(lhr);
       process.stdout.write('done.\n');
 
       // PSI caches results for a minute. Ensure each run is unique by waiting 60s between runs.

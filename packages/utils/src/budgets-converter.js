@@ -20,11 +20,10 @@ function convertPathExpressionToRegExp(path) {
 
 /**
  * @param {Array<LHCI.AssertCommand.Budget>} budgets
- * @return {LHCI.AssertCommand.Options}
+ * @return {Promise<LHCI.AssertCommand.Options>}
  */
-function convertBudgetsToAssertions(budgets) {
-  // @ts-ignore - .d.ts files no yet shipped with lighthouse
-  const Budget = require('lighthouse/lighthouse-core/config/budget.js');
+async function convertBudgetsToAssertions(budgets) {
+  const {Budget} = await import('lighthouse/core/config/budget.js');
   // Normalize the definition using built-in Lighthouse validation.
   budgets = Budget.initializeBudget(budgets);
 

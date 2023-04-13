@@ -9,18 +9,29 @@
 
 const fs = require('fs');
 const path = require('path');
-const defaultConfig = require('lighthouse/lighthouse-core/config/default-config.js');
+const {promisify} = require('util');
+const {exec} = require('child_process');
+
+const execAsync = promisify(exec);
+
+/**
+ * Jest does a bad job with esm, so we get the default config via cli here.
+ */
+async function getDefaultConfig() {
+  const {stdout} = await execAsync(
+    `node -e "import('lighthouse').then(c=>console.log(JSON.stringify(c.defaultConfig)))"`
+  );
+  return JSON.parse(stdout);
+}
 
 const PRESETS_DIR = path.join(__dirname, '../src/presets');
 
 describe('presets', () => {
   let auditsInLighthouse = [];
-  beforeAll(() => {
+  beforeAll(async () => {
+    const defaultConfig = await getDefaultConfig();
     const audits = defaultConfig.audits
-      .map(p => [
-        p,
-        fs.readFileSync(require.resolve(`lighthouse/lighthouse-core/audits/${p}`), 'utf8'),
-      ])
+      .map(p => [p, fs.readFileSync(require.resolve(`lighthouse/core/audits/${p}`), 'utf8')])
       .map(([p, contents]) => ({
         path: p,
         id: contents.match(/\s+id: '([^']+)',/)[1],

@@ -20,9 +20,10 @@ const execAsync = promisify(exec);
  * Jest does a bad job with esm, so we mock the report generation with a CLI call here.
  */
 async function generateReport(lhr) {
-  const json = JSON.stringify(lhr);
+  // This isn't technically JSON anymore but it works for this test.
+  const lhrString = JSON.stringify(lhr).replaceAll(`"`, `'`);
   const {stdout} = await execAsync(
-    `node -e 'import("lighthouse").then(m=>console.log(m.generateReport(${json})))'`
+    `node -e "import('lighthouse').then(m=>console.log(m.generateReport(${lhrString})))"`
   );
   return stdout;
 }

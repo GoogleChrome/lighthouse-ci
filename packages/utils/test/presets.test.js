@@ -9,18 +9,15 @@
 
 const fs = require('fs');
 const path = require('path');
-const defaultConfig = require('lighthouse/lighthouse-core/config/default-config.js');
 
 const PRESETS_DIR = path.join(__dirname, '../src/presets');
 
 describe('presets', () => {
   let auditsInLighthouse = [];
-  beforeAll(() => {
+  beforeAll(async () => {
+    const {defaultConfig} = await import('lighthouse');
     const audits = defaultConfig.audits
-      .map(p => [
-        p,
-        fs.readFileSync(require.resolve(`lighthouse/lighthouse-core/audits/${p}`), 'utf8'),
-      ])
+      .map(p => [p, fs.readFileSync(require.resolve(`lighthouse/core/audits/${p}`), 'utf8')])
       .map(([p, contents]) => ({
         path: p,
         id: contents.match(/\s+id: '([^']+)',/)[1],

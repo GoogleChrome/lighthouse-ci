@@ -8,7 +8,6 @@
 module.exports = {
   assertions: {
     // Not useful or invisible diagnostic audits (off)
-    'full-page-screenshot': ['off', {}],
     'critical-request-chains': ['off', {}],
     'final-screenshot': ['off', {}],
     'js-libraries': ['off', {}],
@@ -27,7 +26,6 @@ module.exports = {
     diagnostics: ['off', {}],
     metrics: ['off', {}],
     // All the rest of the audits (error)
-    'apple-touch-icon': ['error', {}],
     'aria-allowed-attr': ['error', {}],
     'aria-command-name': ['error', {}],
     'aria-hidden-body': ['error', {}],
@@ -44,6 +42,7 @@ module.exports = {
     'aria-treeitem-name': ['error', {}],
     'aria-valid-attr': ['error', {}],
     'aria-valid-attr-value': ['error', {}],
+    'bf-cache': ['error', {}],
     'bootup-time': ['error', {}],
     'button-name': ['error', {}],
     'color-contrast': ['error', {}],
@@ -93,12 +92,11 @@ module.exports = {
     'modern-image-formats': ['error', {}],
     'no-document-write': ['error', {}],
     'no-unload-listeners': ['error', {}],
-    'no-vulnerable-libraries': ['error', {}],
     'non-composited-animations': ['error', {}],
     'notification-on-start': ['error', {}],
     'object-alt': ['error', {}],
     'offscreen-images': ['error', {}],
-    'password-inputs-can-be-pasted-into': ['error', {}],
+    'paste-preventing-inputs': ['error', {}],
     'performance-budget': ['error', {}],
     'preload-fonts': ['error', {}],
     'preload-lcp-image': ['error', {}],

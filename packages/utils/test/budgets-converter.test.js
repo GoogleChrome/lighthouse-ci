@@ -70,7 +70,7 @@ describe('convertPathExpressionToRegExp', () => {
 });
 
 describe('convertBudgetsToAssertions', () => {
-  it('should convert budgets to assertions format', () => {
+  it('should convert budgets to assertions format', async () => {
     const budgets = [
       {
         timings: [
@@ -115,7 +115,7 @@ describe('convertBudgetsToAssertions', () => {
       },
     ];
 
-    const results = convertBudgetsToAssertions(budgets);
+    const results = await convertBudgetsToAssertions(budgets);
     expect(results).toEqual({
       assertMatrix: [
         {

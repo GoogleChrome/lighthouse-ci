@@ -22,7 +22,7 @@ const execAsync = promisify(exec);
 async function generateReport(lhr) {
   const json = JSON.stringify(lhr);
   const {stdout} = await execAsync(
-    `node -e 'import("lighthouse").then(m => console.log(m.generateReport(${json})))'`
+    `node -e 'import("lighthouse").then(m=>console.log(m.generateReport(${json})))'`
   );
   return stdout;
 }

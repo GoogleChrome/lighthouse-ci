@@ -735,7 +735,7 @@ describe('getAllAssertionResults', () => {
       ]);
     });
 
-    it('should assert budgets natively', () => {
+    it('should assert budgets natively', async () => {
       const budgets = [
         {
           resourceCounts: [
@@ -747,7 +747,7 @@ describe('getAllAssertionResults', () => {
       ];
 
       const lhrs = [lhrWithResourceSummary, lhrWithResourceSummary];
-      const results = getAllAssertionResults(convertBudgetsToAssertions(budgets), lhrs);
+      const results = getAllAssertionResults(await convertBudgetsToAssertions(budgets), lhrs);
       expect(results).toEqual([
         {
           url: 'http://example.com',

@@ -21,7 +21,7 @@
     "https-proxy-agent": "^5.0.0",
     "inquirer": "^6.3.1",
     "isomorphic-fetch": "^3.0.0",
-    "lighthouse": "9.6.8",
+    "lighthouse": "10.1.0",
     "lighthouse-logger": "1.2.0",
     "open": "^7.1.0",
     "tmp": "^0.1.0",

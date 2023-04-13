@@ -55,7 +55,7 @@ describe('Lighthouse CI assert CLI', () => {
   it('should run the recommended preset', async () => {
     const result = await run([`--preset=lighthouse:recommended`]);
     expect(result.status).toEqual(1);
-    expect(result.failures.length).toMatchInlineSnapshot(`99`);
+    expect(result.failures.length).toMatchInlineSnapshot(`98`);
     expect(result.warnings.length).toMatchInlineSnapshot(`17`);
     expect(result.passes.length).toMatchInlineSnapshot(`0`);
     expect(result.failures).toContain('deprecations failure');
@@ -92,7 +92,7 @@ describe('Lighthouse CI assert CLI', () => {
     const result = await run([`--preset=lighthouse:recommended`, '--include-passed-assertions']);
     expect(result.status).toEqual(1);
     expect(result.warnings.length).toMatchInlineSnapshot(`17`);
-    expect(result.failures.length).toMatchInlineSnapshot(`99`);
+    expect(result.failures.length).toMatchInlineSnapshot(`98`);
     expect(result.passes.length).toMatchInlineSnapshot(`1`);
     expect(result.passes).toContain('first-contentful-paint passing');
     expect(result.failures).toContain('viewport failure');

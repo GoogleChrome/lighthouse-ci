@@ -51,7 +51,7 @@ async function runCommand(options) {
   if (!areAssertionsSet && !budgetsFile) throw new Error('No assertions to use');
   if (budgetsFile && areAssertionsSet) throw new Error('Cannot use both budgets AND assertions');
   // If we have a budgets file, convert it to our assertions format.
-  if (budgetsFile) options = convertBudgetsToAssertions(readBudgets(budgetsFile));
+  if (budgetsFile) options = await convertBudgetsToAssertions(readBudgets(budgetsFile));
 
   const lhrs = loadSavedLHRs().map(json => JSON.parse(json));
   const uniqueUrls = new Set(lhrs.map(lhr => lhr.finalUrl));

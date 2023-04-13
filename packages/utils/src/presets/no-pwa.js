@@ -18,7 +18,6 @@ module.exports = {
     'themed-omnibox': 'off',
     'content-width': 'off',
     viewport: 'off',
-    'apple-touch-icon': 'off',
     'maskable-icon': 'off',
   },
 };

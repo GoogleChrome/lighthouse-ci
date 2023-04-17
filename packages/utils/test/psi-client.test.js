@@ -15,7 +15,7 @@ describe('PSI API Client', () => {
   const apiKey = 'the-key';
 
   it('should request the url', async () => {
-    const lighthouseResult = {finalUrl: 'https://example.com/'};
+    const lighthouseResult = {finalDisplayedUrl: 'https://example.com/'};
     fetchJsonMock = jest.fn().mockResolvedValue({lighthouseResult});
     const fetchMock = jest.fn().mockImplementation(fetchMockImpl);
     const client = new PsiClient({apiKey, fetch: fetchMock});
@@ -39,7 +39,7 @@ describe('PSI API Client', () => {
   });
 
   it('should respect provided options', async () => {
-    const lighthouseResult = {finalUrl: 'https://example.com/'};
+    const lighthouseResult = {finalDisplayedUrl: 'https://example.com/'};
     fetchJsonMock = jest.fn().mockResolvedValue({lighthouseResult});
     const fetchMock = jest.fn().mockImplementation(fetchMockImpl);
     const runOptions = {strategy: 'desktop', categories: ['accessibility', 'pwa', 'seo']};

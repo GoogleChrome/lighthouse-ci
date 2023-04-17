@@ -17,7 +17,7 @@ describe('createLHR', () => {
 
     expect(lhr).toMatchObject({
       requestedUrl: 'http://example.com',
-      finalUrl: 'http://example.com',
+      finalDisplayedUrl: 'http://example.com',
       audits: {
         'seo-audit': {
           title: 'Seo Audit',

@@ -38,8 +38,8 @@ export function parseStringAsLhr(s) {
 
 /** @param {LH.Result} lhrA  @param {LH.Result} lhrB @return {DisplayType} */
 export function computeBestDisplayType(lhrA, lhrB) {
-  const urlA = new URL(lhrA.finalUrl);
-  const urlB = new URL(lhrB.finalUrl);
+  const urlA = new URL(lhrA.finalDisplayedUrl);
+  const urlB = new URL(lhrB.finalDisplayedUrl);
   if (urlA.hostname !== urlB.hostname) return 'hostname';
   if (urlA.pathname !== urlB.pathname) return 'pathname';
   if (urlA.search !== urlB.search) return 'path';
@@ -50,7 +50,7 @@ export function computeBestDisplayType(lhrA, lhrB) {
 /** @param {{report: ReportData, displayType: DisplayType}} props */
 const FilePill = props => {
   const {filename, lhr} = props.report;
-  const url = new URL(lhr.finalUrl);
+  const url = new URL(lhr.finalDisplayedUrl);
   const timestamp = new Date(lhr.fetchTime).toLocaleString();
   const options = {
     filename,

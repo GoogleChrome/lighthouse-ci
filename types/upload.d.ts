@@ -40,7 +40,7 @@ declare global {
       }
 
       export interface ManifestEntry {
-        url: string; // finalUrl of the run
+        url: string; // finalUrlDisplayed of the run
         isRepresentativeRun: boolean; // whether it was the median run for the URL
         jsonPath: string;
         htmlPath: string;

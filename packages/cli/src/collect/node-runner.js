@@ -31,7 +31,7 @@ class LighthouseRunner {
     /** @type {LH.Result} */
     const lhr = JSON.parse(process.env.LHCITEST_MOCK_LHR || '{}');
     lhr.requestedUrl = url;
-    lhr.finalUrl = url;
+    lhr.finalDisplayedUrl = url;
     lhr.configSettings = lhr.configSettings || options.settings || {};
     return Promise.resolve(JSON.stringify(lhr));
   }

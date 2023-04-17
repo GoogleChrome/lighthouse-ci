@@ -17,7 +17,7 @@ describe('getAllAssertionResults', () => {
   beforeEach(() => {
     lhrs = [
       {
-        finalUrl: 'http://page-1.com',
+        finalDisplayedUrl: 'http://page-1.com',
         categories: {pwa: {score: 0.5}, perf: {score: 0.1}},
         audits: {
           'first-contentful-paint': {
@@ -36,7 +36,7 @@ describe('getAllAssertionResults', () => {
         },
       },
       {
-        finalUrl: 'http://page-1.com',
+        finalDisplayedUrl: 'http://page-1.com',
         categories: {pwa: {score: 0.8}, perf: {score: 0.1}},
         audits: {
           'first-contentful-paint': {
@@ -402,7 +402,7 @@ describe('getAllAssertionResults', () => {
       const lhrs = [
         // This is the "median-run" by FCP and interactive.
         {
-          finalUrl: 'http://example.com',
+          finalDisplayedUrl: 'http://example.com',
           audits: {
             'first-contentful-paint': {numericValue: 5000},
             interactive: {numericValue: 10000},
@@ -410,7 +410,7 @@ describe('getAllAssertionResults', () => {
           },
         },
         {
-          finalUrl: 'http://example.com',
+          finalDisplayedUrl: 'http://example.com',
           audits: {
             'first-contentful-paint': {numericValue: 1000},
             interactive: {numericValue: 5000},
@@ -418,7 +418,7 @@ describe('getAllAssertionResults', () => {
           },
         },
         {
-          finalUrl: 'http://example.com',
+          finalDisplayedUrl: 'http://example.com',
           audits: {
             'first-contentful-paint': {numericValue: 10000},
             interactive: {numericValue: 15000},
@@ -567,7 +567,7 @@ describe('getAllAssertionResults', () => {
 
     beforeEach(() => {
       lhrWithBudget = {
-        finalUrl: 'http://page-1.com',
+        finalDisplayedUrl: 'http://page-1.com',
         audits: {
           'performance-budget': {
             id: 'performance-budget',
@@ -598,7 +598,7 @@ describe('getAllAssertionResults', () => {
       };
 
       lhrWithResourceSummary = {
-        finalUrl: 'http://example.com',
+        finalDisplayedUrl: 'http://example.com',
         audits: {
           'resource-summary': {
             details: {
@@ -897,7 +897,7 @@ describe('getAllAssertionResults', () => {
 
     beforeEach(() => {
       lhrWithUserTimings = {
-        finalUrl: 'http://example.com',
+        finalDisplayedUrl: 'http://example.com',
         audits: {
           'user-timings': {
             details: {
@@ -994,7 +994,7 @@ describe('getAllAssertionResults', () => {
   describe('URL-grouping', () => {
     beforeEach(() => {
       for (const lhr of [...lhrs]) {
-        lhrs.push({...lhr, finalUrl: 'http://page-2.com'});
+        lhrs.push({...lhr, finalDisplayedUrl: 'http://page-2.com'});
       }
     });
 
@@ -1059,7 +1059,7 @@ describe('getAllAssertionResults', () => {
   describe('assertMatrix', () => {
     beforeEach(() => {
       for (const lhr of [...lhrs]) {
-        lhrs.push({...lhr, finalUrl: 'http://page-2.com'});
+        lhrs.push({...lhr, finalDisplayedUrl: 'http://page-2.com'});
       }
     });
 

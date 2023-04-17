@@ -69,6 +69,7 @@ declare global {
     export interface Result {
       requestedUrl: string;
       finalUrl: string;
+      finalDisplayedUrl: string;
       fetchTime: string;
       lighthouseVersion: string;
       categories: {[categoryId: string]: CategoryResult};

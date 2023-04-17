@@ -284,7 +284,7 @@ function getCategoryAssertionResults(auditProperty, assertionOptions, lhrs) {
  * @return {boolean}
  */
 function doesLHRMatchPattern(pattern, lhr) {
-  return new RegExp(pattern).test(lhr.finalUrl);
+  return new RegExp(pattern).test(lhr.finalDisplayedUrl);
 }
 
 /**
@@ -364,7 +364,7 @@ function resolveAssertionOptionsAndLhrs(baseOptions, unfilteredLhrs) {
     : unfilteredLhrs;
 
   // Double-check we've only got one URL to look at that should have been pre-grouped in `getAllAssertionResults`.
-  const uniqueURLs = new Set(lhrs.map(lhr => lhr.finalUrl));
+  const uniqueURLs = new Set(lhrs.map(lhr => lhr.finalDisplayedUrl));
   if (uniqueURLs.size > 1) throw new Error('Can only assert one URL at a time!');
 
   const medianLhrs = computeRepresentativeRuns([
@@ -399,7 +399,7 @@ function resolveAssertionOptionsAndLhrs(baseOptions, unfilteredLhrs) {
     medianLhrs,
     aggregationMethod,
     lhrs: lhrs,
-    url: (lhrs[0] && lhrs[0].finalUrl) || '',
+    url: (lhrs[0] && lhrs[0].finalDisplayedUrl) || '',
   };
 }
 
@@ -456,7 +456,7 @@ function getAllAssertionResultsForUrl(baseOptions, unfilteredLhrs) {
  * @return {LHCI.AssertResults.AssertionResult[]}
  */
 function getAllAssertionResults(options, lhrs) {
-  const groupedByURL = _.groupBy(lhrs, lhr => lhr.finalUrl);
+  const groupedByURL = _.groupBy(lhrs, lhr => lhr.finalDisplayedUrl);
 
   /** @type {LHCI.AssertCommand.BaseOptions[]} */
   let arrayOfOptions = [options];

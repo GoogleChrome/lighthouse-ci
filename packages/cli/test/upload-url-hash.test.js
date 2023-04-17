@@ -19,7 +19,7 @@ describe('Lighthouse CI upload filesystem reports with url hash', () => {
   const fakeLhrPath = path.join(lighthouseciDir, 'lhr-12345.json');
 
   const writeLhr = () => {
-    const fakeLhr = {finalUrl: 'foo.com', categories: {}, audits: {}};
+    const fakeLhr = {finalDisplayedUrl: 'foo.com', categories: {}, audits: {}};
     fakeLhr.categories.pwa = {score: 0};
     fakeLhr.categories.performance = {score: 0};
     fakeLhr.audits['performance-budget'] = {score: 0};

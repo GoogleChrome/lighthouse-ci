@@ -20,7 +20,7 @@ describe('Lighthouse CI upload CLI', () => {
   const fakeLhrPath = path.join(lighthouseciDir, 'lhr-12345.json');
 
   const writeLhr = () => {
-    const fakeLhr = {finalUrl: 'foo.com', categories: {}, audits: {}};
+    const fakeLhr = {finalDisplayedUrl: 'foo.com', categories: {}, audits: {}};
     fakeLhr.categories.pwa = {score: 0};
     fakeLhr.categories.performance = {score: 0};
     fakeLhr.audits['performance-budget'] = {score: 0};
@@ -125,7 +125,7 @@ describe('Lighthouse CI upload CLI', () => {
 
   it('should upload for a build with very long URL', async () => {
     const lhr = JSON.parse(fs.readFileSync(fakeLhrPath, 'utf8'));
-    lhr.finalUrl = `http://localhost/reall${'l'.repeat(256)}y-long-url`;
+    lhr.finalDisplayedUrl = `http://localhost/reall${'l'.repeat(256)}y-long-url`;
     fs.writeFileSync(fakeLhrPath, JSON.stringify(lhr));
 
     expect(await apiClient.getBuilds(project.id)).toHaveLength(1);

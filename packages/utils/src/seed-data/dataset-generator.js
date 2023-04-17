@@ -537,7 +537,7 @@ function createLoadTestDataset() {
             /** @type {LH.Result} */
             const lhr = JSON.parse(sourceLhr);
             lhr.requestedUrl = url;
-            lhr.finalUrl = url;
+            lhr.finalDisplayedUrl = url;
             for (const auditId of Object.keys(lhr.audits)) {
               const multiplier = 1 + Math.random() * 0.4 - 0.2;
               const audit = lhr.audits[auditId];

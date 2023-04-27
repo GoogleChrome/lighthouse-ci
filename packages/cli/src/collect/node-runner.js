@@ -45,7 +45,7 @@ class LighthouseRunner {
     const settings = options.settings || {};
     const chromeFlags = options.settings && options.settings.chromeFlags;
     let chromeFlagsAsString = chromeFlags || '';
-    if (!options.headful) chromeFlagsAsString += ' --headless';
+    if (!options.headful) chromeFlagsAsString += ' --headless=new';
     if (chromeFlagsAsString) settings.chromeFlags = chromeFlagsAsString;
 
     // Make sure we're not passing something that will ruin our runner.

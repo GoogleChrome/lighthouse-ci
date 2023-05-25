@@ -14,7 +14,7 @@ RUN apt-get update \
     && apt-get clean
 
 # Install Lighthouse CI
-RUN npm install -g @lhci/cli@0.11.1
+RUN npm install -g @lhci/cli@0.12.0
 RUN npm install -g lighthouse
 
 # Install puppeteer

@@ -2,6 +2,7 @@ FROM node:16-bullseye-slim
 
 # Set variable so puppeteer will not try to download chromium
 ENV PUPPETEER_SKIP_DOWNLOAD=true
+ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/google-chrome-stable
 
 # Install utilities
 RUN apt-get update --fix-missing && apt-get -y upgrade && apt-get install -y git wget gnupg && apt-get clean

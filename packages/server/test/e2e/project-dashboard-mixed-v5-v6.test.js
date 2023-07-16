@@ -29,11 +29,11 @@ describe('Project dashboard', () => {
 
       expect(commits).toMatchInlineSnapshot(`
         [
-          "1250build 16call_splitmasterMay 26 13:00:00",
-          "1249build 15call_splitmasterMay 25 13:00:00",
-          "1248build 14call_splitmasterMay 24 13:00:00",
-          "1247build 13call_splitmasterMay 23 13:00:00",
-          "1246build 12call_splitmasterMay 22 13:00:00",
+          "1249build 15call_splitmasterMay 25 6:00 AM",
+          "1248build 14call_splitmasterMay 24 6:00 AM",
+          "1247build 13call_splitmasterMay 23 6:00 AM",
+          "1246build 12call_splitmasterMay 22 6:00 AM",
+          "1245build 11call_splitmasterMay 21 6:00 AM",
         ]
       `);
     });

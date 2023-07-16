@@ -105,8 +105,8 @@ function renderLineGraph(rootEl, data) {
     const dasharray = STROKE_DASHARRAY_OPTIONS[metricIndex % STROKE_DASHARRAY_OPTIONS.length];
     const metricLine = statisticLine()
       .curve(d3.curveMonotoneX)
-      .x(d => xScale(metric.statistics.indexOf(d)))
-      .y(d => yScale(d.value / 1000));
+      .x(d => parseInt(`${xScale(metric.statistics.indexOf(d))}`, 10))
+      .y(d => parseInt(`${yScale(d.value / 1000)}`, 10));
 
     // The plain gray line of the metric values
     svg
@@ -136,14 +136,14 @@ function renderLineGraph(rootEl, data) {
     ];
 
     for (const scoreSectionMaskFill of scoreSectionMaskFills) {
-      if (scoreSectionMaskFill.start < 0) continue;
+      if (scoreSectionMaskFill.start === undefined || scoreSectionMaskFill.start < 0) continue;
 
       svg
         .append('rect')
         .attr('x', 0)
-        .attr('y', scoreSectionMaskFill.end)
+        .attr('y', parseInt(`${scoreSectionMaskFill.end}`, 10))
         .attr('width', graphWidth)
-        .attr('height', scoreSectionMaskFill.start - scoreSectionMaskFill.end)
+        .attr('height', scoreSectionMaskFill.start - parseInt(`${scoreSectionMaskFill.end}`, 10))
         .attr('mask', `url(#${lineMaskId})`)
         .attr('class', `metric-line-graph__mask-fill--${scoreSectionMaskFill.type}`);
     }

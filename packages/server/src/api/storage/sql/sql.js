@@ -203,8 +203,8 @@ class SqlStorageMethod {
   }
 
   /**
-   * @template T1
-   * @template T2
+   * @template {Object} T1
+   * @template {Object} T2
    * @param {import('sequelize').ModelDefined<T1, T2>} model
    * @param {string} pk
    * @return {Promise<T1>}
@@ -215,8 +215,8 @@ class SqlStorageMethod {
   }
 
   /**
-   * @template T1
-   * @template T2
+   * @template {Object} T1
+   * @template {Object} T2
    * @param {import('sequelize').ModelDefined<T1, T2>} model
    * @param {import('sequelize').FindOptions<T1 & T2>} options
    * @return {Promise<T1[]>}

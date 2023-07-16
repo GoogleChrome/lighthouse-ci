@@ -19,7 +19,12 @@ export function getExactTicks(domain, count) {
   return _.range(domain[0], domain[1], (domain[1] - domain[0]) / count);
 }
 
-/** @param {Pick<StatisticWithBuild, 'value'>} statistic */
+/** @param {Pick<StatisticWithBuild, 'value'>} statistic
+ * @param {string} prefix
+ * @param {number} passThreshold
+ * @param {number} failThreshold
+ * @return {string}
+ */
 export function getClassNameFromStatistic(
   statistic,
   prefix = 'score',
@@ -44,7 +49,7 @@ export function computeStatisticRerenderKey(statistics) {
  * @param {HTMLElement} rootEl
  * @param {{top: number, left: number, right: number, bottom: number}} margin
  * @param {Array<T>} dataItems
- * @param {(n: number) => number} xScale
+ * @param {import("d3").ScaleLinear<number, number>} xScale
  * @param {(item: T | undefined) => void} setSelectedId
  * @param {import('preact/hooks/src').StateUpdater<boolean>} setPinned
  */
@@ -80,7 +85,7 @@ export function appendHoverCardHitboxElements(
     .enter()
     .append('rect')
     .attr('class', 'graph-hitbox')
-    .attr('x', (d, i) => xScale(i) + xShift)
+    .attr('x', (d, i) => parseInt(`${xScale(i)}`, 10) + xShift)
     .attr('y', 0)
     .attr('width', graphWidth / n)
     .attr('height', graphHeight)
@@ -111,7 +116,7 @@ export function appendHoverCardHitboxElements(
  * @param {number} graphWidth
  * @param {number} graphLeftMargin
  * @param {number} graphRightMargin
- * @param {(n: number) => number} xScale
+ * @param {import("d3").ScaleLinear<number, number>} xScale
  * @param {number} selectedIndex
  */
 export function updateGraphHoverElements(
@@ -133,8 +138,10 @@ export function updateGraphHoverElements(
   if (trackingLineEl instanceof SVGElement) {
     // Tracking line should go through the dot of line graphs but through the *center* of bar graphs
     const visualCueLeft = selectedIndex === -1 ? -9999 : xScale(selectedIndex);
-    const hitboxWidth = xScale(1) - xScale(0);
-    const translateX = isDistribution ? visualCueLeft + hitboxWidth / 2 : visualCueLeft;
+    const hitboxWidth = parseInt(`${xScale(1)}`, 10) - parseInt(`${xScale(0)}`, 10);
+    const translateX = isDistribution
+      ? parseInt(`${visualCueLeft}`, 10) + hitboxWidth / 2
+      : visualCueLeft;
     trackingLineEl.setAttribute('style', `transform: translateX(${translateX}px)`);
   }
 
@@ -142,7 +149,9 @@ export function updateGraphHoverElements(
   const hoverCard = graphRootEl.querySelector('.hover-card');
   if (hoverCard instanceof HTMLElement) {
     const leftPx =
-      selectedIndex === -1 ? -9999 : xScale(selectedIndex) + graphLeftMargin + HOVER_CARD_MARGIN;
+      selectedIndex === -1
+        ? -9999
+        : parseInt(`${xScale(selectedIndex)}`, 10) + graphLeftMargin + HOVER_CARD_MARGIN;
     if (leftPx + HOVER_CARD_WIDTH < graphWidth) {
       hoverCard.style.left = leftPx + 'px';
       hoverCard.style.right = '';

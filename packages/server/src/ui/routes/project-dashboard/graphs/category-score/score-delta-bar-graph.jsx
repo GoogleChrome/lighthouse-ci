@@ -37,10 +37,10 @@ export function renderScoreDeltaGraph(rootEl, statistics) {
   svg
     .append('line')
     .attr('class', 'score-guide')
-    .attr('x1', xScale(0))
-    .attr('y1', yScale(0))
-    .attr('x2', xScale(deltas.length - 1))
-    .attr('y2', yScale(0));
+    .attr('x1', parseInt(`${xScale(0)}`, 10))
+    .attr('y1', parseInt(`${yScale(0)}`, 10))
+    .attr('x2', parseInt(`${xScale(deltas.length - 1)}`, 10))
+    .attr('y2', parseInt(`${yScale(0)}`, 10));
   svg
     .selectAll('.score-delta')
     .data(deltas)
@@ -52,8 +52,9 @@ export function renderScoreDeltaGraph(rootEl, statistics) {
         'score-delta--regression': d < 0,
       })
     )
+    // @ts-ignore
     .attr('x', (d, i) => xScale(i) - graphWidth / deltas.length / 8)
-    .attr('y', d => (d > 0 ? yScale(d) : yScale(0)))
+    .attr('y', d => (d > 0 ? parseInt(`${yScale(d)}`, 10) : parseInt(`${yScale(0)}`, 10)))
     .attr('width', graphWidth / deltas.length / 4)
-    .attr('height', d => Math.abs(yScale(d) - yScale(0)));
+    .attr('height', d => Math.abs(parseInt(`${yScale(d)}`, 10) - parseInt(`${yScale(0)}`, 10)));
 }

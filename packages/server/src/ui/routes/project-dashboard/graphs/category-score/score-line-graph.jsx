@@ -85,18 +85,18 @@ export function renderScoreGraph(rootEl, data) {
   /** @type {() => import('d3').Area<StatisticWithBuild>} */
   const statisticArea = d3.area;
   const scoreLine = statisticLine()
-    .x(d => xScale(statistics.indexOf(d)))
-    .y(d => yScale(d.value * 100));
+    .x(d => parseInt(`${xScale(statistics.indexOf(d))}`, 10))
+    .y(d => parseInt(`${yScale(d.value * 100)}`, 10));
   const scoreRange = statisticArea()
     .curve(d3.curveMonotoneX)
-    .x((d, i) => xScale(i))
-    .y0(d => yScale(minMaxByBuild[d.buildId].min * 100))
-    .y1(d => yScale(minMaxByBuild[d.buildId].max * 100));
+    .x((d, i) => parseInt(`${xScale(i)}`, 10))
+    .y0(d => parseInt(`${yScale(minMaxByBuild[d.buildId].min * 100)}`, 10))
+    .y1(d => parseInt(`${yScale(minMaxByBuild[d.buildId].max * 100)}`, 10));
 
   const guideLine = d3
     .line()
-    .x(d => xScale(d[0]))
-    .y(d => yScale(d[1]));
+    .x(d => parseInt(`${xScale(d[0])}`, 10))
+    .y(d => parseInt(`${yScale(d[1])}`, 10));
 
   masks
     .append('mask')
@@ -127,39 +127,39 @@ export function renderScoreGraph(rootEl, data) {
     svg
       .append('rect')
       .attr('class', 'version-change-warning')
-      .attr('x', xScale(index - 1))
+      .attr('x', parseInt(`${xScale(index - 1)}`, 10))
       .attr('y', 0)
-      .attr('width', xScale(index) - xScale(index - 1))
+      .attr('width', parseInt(`${xScale(index)}`, 10) - parseInt(`${xScale(index - 1)}`, 10))
       .attr('height', graphHeight);
   }
 
   // Passing score line mask fill
   svg
     .append('rect')
-    .attr('x', xScale(0))
-    .attr('y', yScale(100))
-    .attr('width', xScale(n) - xScale(0))
-    .attr('height', yScale(90) - yScale(100))
+    .attr('x', parseInt(`${xScale(0)}`, 10))
+    .attr('y', parseInt(`${yScale(100)}`, 10))
+    .attr('width', parseInt(`${xScale(n)}`, 10) - parseInt(`${xScale(0)}`, 10))
+    .attr('height', parseInt(`${yScale(90)}`, 10) - parseInt(`${yScale(100)}`, 10))
     .attr('mask', `url(#${scoreLineMaskId})`)
     .attr('class', clsx('score-line-fill', getClassNameFromStatistic({value: 1})));
 
   // Average score line mask fill
   svg
     .append('rect')
-    .attr('x', xScale(0))
-    .attr('y', yScale(90))
-    .attr('width', xScale(n) - xScale(0))
-    .attr('height', yScale(50) - yScale(90))
+    .attr('x', parseInt(`${xScale(0)}`, 10))
+    .attr('y', parseInt(`${yScale(90)}`, 10))
+    .attr('width', parseInt(`${xScale(n)}`, 10) - parseInt(`${xScale(0)}`, 10))
+    .attr('height', parseInt(`${yScale(50)}`, 10) - parseInt(`${yScale(90)}`, 10))
     .attr('mask', `url(#${scoreLineMaskId})`)
     .attr('class', clsx('score-line-fill', getClassNameFromStatistic({value: 0.75})));
 
   // Failing score line mask fill
   svg
     .append('rect')
-    .attr('x', xScale(0))
-    .attr('y', yScale(50))
-    .attr('width', xScale(n) - xScale(0))
-    .attr('height', yScale(0) - yScale(50))
+    .attr('x', parseInt(`${xScale(0)}`, 10))
+    .attr('y', parseInt(`${yScale(50)}`, 10))
+    .attr('width', parseInt(`${xScale(n)}`, 10) - parseInt(`${xScale(0)}`, 10))
+    .attr('height', parseInt(`${yScale(0)}`, 10) - parseInt(`${yScale(50)}`, 10))
     .attr('mask', `url(#${scoreLineMaskId})`)
     .attr('class', clsx('score-line-fill', getClassNameFromStatistic({value: 0})));
 
@@ -180,8 +180,8 @@ export function renderScoreGraph(rootEl, data) {
     .enter()
     .append('circle')
     .attr('class', d => clsx('score-point', getClassNameFromStatistic(d)))
-    .attr('cx', (d, i) => xScale(i))
-    .attr('cy', d => yScale(d.value * 100))
+    .attr('cx', (d, i) => parseInt(`${xScale(i)}`, 10))
+    .attr('cy', d => parseInt(`${yScale(d.value * 100)}`, 10))
     .attr('r', 3);
 
   appendHoverCardHitboxElements(

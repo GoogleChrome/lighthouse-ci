@@ -74,10 +74,25 @@ export function renderScoreDistributionGraph(rootEl, data) {
     .attr('class', ({x0 = 0}) =>
       clsx('histogram-bar', getClassNameFromStatistic({value: x0}, 'histogram-bar'))
     )
-    .attr('x', ({x0 = 0, x1 = 0}) => xScale(x0) + (xScale(x1) - xScale(x0)) / 4)
-    .attr('y', bin => Math.min(yScale(bin.length), yScale(0) - 2))
-    .attr('width', ({x0 = 0, x1 = 0}) => xScale(x1) - xScale(x0) - (xScale(x1) - xScale(x0)) / 2)
-    .attr('height', bin => Math.max(yScale(0) - yScale(bin.length), 2));
+    .attr(
+      'x',
+      ({x0 = 0, x1 = 0}) =>
+        parseInt(`${xScale(x0)}`, 10) +
+        (parseInt(`${xScale(x1)}`, 10) - parseInt(`${xScale(x0)}`, 10)) / 4
+    )
+    .attr('y', bin =>
+      Math.min(parseInt(`${yScale(bin.length)}`, 10), parseInt(`${yScale(0)}`, 10) - 2)
+    )
+    .attr(
+      'width',
+      ({x0 = 0, x1 = 0}) =>
+        parseInt(`${xScale(x1)}`, 10) -
+        parseInt(`${xScale(x0)}`, 10) -
+        (parseInt(`${xScale(x1)}`, 10) - parseInt(`${xScale(x0)}`, 10)) / 2
+    )
+    .attr('height', bin =>
+      Math.max(parseInt(`${yScale(0)}`, 10) - parseInt(`${yScale(bin.length)}`, 10), 2)
+    );
 
   appendHoverCardHitboxElements(
     rootEl,

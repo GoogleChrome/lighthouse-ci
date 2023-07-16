@@ -289,7 +289,7 @@ module.exports = {
   /** @param {LHCI.E2EState} state */
   launchBrowser: async state => {
     state.browser = await puppeteer.launch({
-      headless: !state.debug,
+      headless: state.debug ? false : 'new',
       slowMo: state.debug ? 250 : undefined,
       devtools: state.debug,
       env: {...process.env, TZ: 'America/Chicago'},

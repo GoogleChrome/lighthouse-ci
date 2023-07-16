@@ -68,7 +68,7 @@ describe('Lighthouse CI collect CLI using PSI', () => {
       "
     `);
     /**
-     * Replace toMatchInlineSnapshot by toContain
+     * Replace toMatchInlineSnapshot by includes and test with boolean
      * cause node 18.X and upper return "at process.processTicksAndRejections"
      * for prevent fail
      */

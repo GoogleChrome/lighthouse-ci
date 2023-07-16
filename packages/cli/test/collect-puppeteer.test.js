@@ -78,7 +78,7 @@ describe('Lighthouse CI collect CLI with puppeteer', () => {
     const files = fs.readdirSync(path.join(autorunDir, '.lighthouseci'));
     const report = files.find(file => /lhr.*\.json$/.test(file));
     const lhr = JSON.parse(fs.readFileSync(path.join(autorunDir, '.lighthouseci', report)));
-    expect(lhr.userAgent).toContain('Chrome/111.0.0.0'); // make sure the right chrome was used
+    expect(lhr.userAgent).toContain('Chrome/114.0.0.0'); // make sure the right chrome was used
   }, 180000);
 
   it('should not fail on providing defaults without Chrome installations', async () => {

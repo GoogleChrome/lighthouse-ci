@@ -7,8 +7,8 @@
 
 /* eslint-env jest */
 
-const fs = require('fs');
-const path = require('path');
+const {readFileSync} = require('fs');
+const {join} = require('path');
 const {
   createActualTestDataset,
   createTestServer,
@@ -18,7 +18,7 @@ const {
 const ApiClient = require('@lhci/utils/src/api-client.js');
 const {writeSeedDataToApi} = require('@lhci/utils/src/seed-data/seed-data.js');
 
-const SEED_DATA_PATH = path.join(__dirname, '../../fixtures/seed-data.json');
+const SEED_DATA_PATH = join(__dirname, '../../fixtures/seed-data.json');
 
 setupImageSnapshots();
 
@@ -35,7 +35,7 @@ module.exports = state => {
     });
 
     it('should write seed data to the server', async () => {
-      const generated = JSON.parse(fs.readFileSync(SEED_DATA_PATH, 'utf8'));
+      const generated = JSON.parse(readFileSync(SEED_DATA_PATH, 'utf8'));
       await writeSeedDataToApi(
         state.client,
         state.dataset === 'generated' ? generated : createActualTestDataset()

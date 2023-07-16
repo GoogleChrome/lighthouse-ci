@@ -29,6 +29,8 @@ initStoryshots({
   // storyKindRegex: /Graph/,
   test: imageSnapshot({
     browserLaunchOptions: {
+      // force headless here for prevent the warning
+      headless: 'new',
       // Prevent problem with headless message and remove WS error too
       args: ['--remote-debugging-pipe', '--headless=new'],
     },

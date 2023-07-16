@@ -6,6 +6,11 @@
 'use strict';
 
 module.exports = {
+  /**
+   * Upgrade the timeout to 1min for prevent timeout in screen time and
+   * prevent timeout too when running default test
+   */
+  testTimeout: 60000,
   preset: 'ts-jest/presets/js-with-ts-esm',
   transform: {
     '^.+\\.m?[tj]sx?$': [

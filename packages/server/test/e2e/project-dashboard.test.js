@@ -29,11 +29,11 @@ describe('Project dashboard', () => {
 
       expect(commits).toMatchInlineSnapshot(`
         [
-          "824cbea4test: empty basecall_splitmasterOct 09 8:15 PM",
-          "ba5b0ad9test(unmatched-ancestor): a really really really really long messagecall_splitmissing_ancestorAug 09 8:13 PM",
-          "5b0ad9f6test(matched-ancestor): a really really really really really long messagecall_splitmasterAug 09 6:55 PM",
-          "c1ea447bfeat: improves TTIcall_splittest_1Aug 09 6:15 PM",
-          "aaa5b0a3feat: regresses TTIcall_splittest_0Aug 09 3:15 PM",
+          "824cbea4test: empty basecall_splitmasterOct 10 03:15:28",
+          "ba5b0ad9test(unmatched-ancestor): a really really really really long messagecall_splitmissing_ancestorAug 10 03:13:28",
+          "5b0ad9f6test(matched-ancestor): a really really really really really long messagecall_splitmasterAug 10 01:55:18",
+          "c1ea447bfeat: improves TTIcall_splittest_1Aug 10 01:15:28",
+          "aaa5b0a3feat: regresses TTIcall_splittest_0Aug 09 22:15:28",
         ]
       `);
     });

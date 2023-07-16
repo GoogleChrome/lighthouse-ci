@@ -38,7 +38,7 @@ export const Dropdown = props => {
         </select>
       </label>
       <div className="dropdown__chevron">
-        <i className="material-icons-outlined">arrow_drop_down</i>
+        <i className="material-icons">arrow_drop_down</i>
       </div>
     </div>
   );

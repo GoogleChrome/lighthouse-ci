@@ -16,34 +16,37 @@
     "build:esbuild": "node ../../scripts/build-app.js build ./src/ui/index.html ./dist /app/",
     "build:watch": "node ../../scripts/build-app.js watch ./src/ui/index.html ./dist /app/",
     "build:source-map-explorer": "npm run clean && npm run build && ../../scripts/source-map-explorer.sh",
-    "build:storybook": "build-storybook",
-    "start:storybook": "start-storybook -p 6006"
+    "build:storybook": "storybook build",
+    "start:storybook": "storybook dev -p 6006"
   },
   "dependencies": {
     "@lhci/utils": "0.1.0",
     "bluebird": "^3.7.2",
     "body-parser": "^1.20.2",
     "compression": "^1.7.4",
-    "cron": "^2.2.0",
-    "dayjs": "^1.11.7",
+    "cron": "^2.3.1",
+    "dayjs": "^1.11.9",
     "debug": "^4.3.4",
     "express": "^4.18.2",
     "express-basic-auth": "^1.2.1",
     "morgan": "^1.10.0",
-    "sequelize": "^6.29.0",
+    "sequelize": "^6.32.1",
     "umzug": "^3.2.1",
     "uuid": "^9.0.0"
   },
   "devDependencies": {
     "clsx": "^1.0.4",
     "d3": "^5.15.0",
-    "plotly.js": "^2.18.2",
-    "preact": "^10.13.0",
+    "plotly.js": "^2.24.3",
+    "preact": "^10.16.0",
     "preact-async-route": "^2.2.1",
-    "preact-router": "^4.1.0",
-    "@fontsource/material-icons": "^4.5.4",
-    "@fontsource/roboto": "^4.5.8",
-    "@fontsource/roboto-mono": "^4.5.10"
+    "preact-router": "^4.1.1",
+    "@fontsource/material-icons": "^5.0.5",
+    "@fontsource/roboto": "^5.0.5",
+    "@fontsource/roboto-mono": "^5.0.5"
+  },
+  "resolutions": {
+    "webpack": "5"
   },
   "alias": {
     "isomorphic-fetch": "clsx"

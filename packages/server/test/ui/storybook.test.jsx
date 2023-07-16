@@ -28,6 +28,10 @@ initStoryshots({
   // Use a storyKindRegex as an `.only`-like filter on the "Image Storyshots" tests.
   // storyKindRegex: /Graph/,
   test: imageSnapshot({
+    browserLaunchOptions: {
+      // Prevent problem with headless message and remove WS error too
+      args: ['--remote-debugging-pipe', '--headless=new'],
+    },
     storybookUrl: `http://localhost:${process.env.STORYBOOK_PORT}`,
     beforeScreenshot: async page => {
       // The browser is reused, so set the viewport back to a good default.
@@ -36,12 +40,12 @@ initStoryshots({
       // wait for the webfont request to avoid flakiness with webfont display
       await page.waitForNetworkIdle();
       // wait more for good measure.
-      await page.waitForTimeout(2000);
+      await new Promise(r => setTimeout(r, 2000));
 
       const dimensions = await page.evaluate(() => {
         // Note: #root is made by storybook, #storybook-test-root is made by us in preview.jsx
-        // #root > #storybook-test-root > some_element_being_tested
-        const elements = [...document.querySelectorAll('#root, #root *')];
+        // #storybook-root > #storybook-test-root > some_element_being_tested
+        const elements = [...document.querySelectorAll('#storybook-root, #storybook-root *')];
         return {
           width: Math.ceil(Math.max(...elements.map(e => e.clientWidth))),
           height: Math.ceil(Math.max(...elements.map(e => e.clientHeight))),

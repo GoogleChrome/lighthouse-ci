@@ -17,10 +17,10 @@
   },
   "devDependencies": {
     "clsx": "^1.2.1",
-    "preact": "^10.13.0",
-    "@fontsource/material-icons": "^4.5.4",
-    "@fontsource/roboto": "^4.5.8",
-    "@fontsource/roboto-mono": "^4.5.10"
+    "preact": "^10.16.0",
+    "@fontsource/material-icons": "^5.0.5",
+    "@fontsource/roboto": "^5.0.5",
+    "@fontsource/roboto-mono": "^5.0.5"
   },
   "alias": {
     "isomorphic-fetch": "clsx"

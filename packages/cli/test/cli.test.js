@@ -452,7 +452,9 @@ describe('Lighthouse CI CLI', () => {
     let page;
 
     beforeAll(async () => {
-      browser = await puppeteer.launch();
+      browser = await puppeteer.launch({
+        headless: 'new',
+      });
     });
 
     afterAll(async () => {

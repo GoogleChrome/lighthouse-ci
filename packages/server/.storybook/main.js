@@ -4,8 +4,28 @@
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
  */
 'use strict';
-
-module.exports = {
+/** @type { import('@storybook/preact-webpack5').StorybookConfig } */
+const config = {
+  // stories: ['../src/**/*.mdx', '../src/**/*.stories.@(js|jsx|ts|tsx)'],
   stories: ['../src/**/*.stories.jsx'],
-  addons: ['@storybook/addon-actions', '@storybook/addon-links'],
+  addons: [
+    '@storybook/addon-actions',
+    '@storybook/addon-links',
+    // "@storybook/addon-essentials",
+    // "@storybook/addon-interactions"
+  ],
+  framework: {
+    name: '@storybook/preact-webpack5',
+    options: {},
+  },
+  docs: {
+    autodocs: 'tag',
+  },
+  webpack: config => {
+    config.resolve.fallback = {
+      url: false,
+    };
+    return config;
+  },
 };
+export default config;

@@ -5,18 +5,22 @@
  */
 'use strict';
 
-const {h} = require('preact');
+// const {h} = require('preact');
 
 require('./preview.css');
 require('../src/ui/app.css');
-
-const {addDecorator} = require('@storybook/preact');
-addDecorator(storyFn => (
-  <div id="storybook-test-root">
-    {storyFn()}
-  </div>
-));
-
 export const parameters = {
+  actions: {argTypesRegex: '^on[A-Z].*'},
   layout: 'centered',
+  controls: {
+    matchers: {
+      color: /(background|color)$/i,
+      date: /Date$/,
+    },
+  },
 };
+export const decorators = [
+  Story => <div id='storybook-test-root'>
+    <Story />
+  </div>,
+];

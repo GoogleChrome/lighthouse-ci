@@ -21,7 +21,7 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 16
-      - run: npm install && npm install -g @lhci/cli@0.11.x
+      - run: npm install && npm install -g @lhci/cli@0.12.x
       - run: npm run build
       - run: lhci autorun
 ```

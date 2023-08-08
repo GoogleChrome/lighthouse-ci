@@ -95,7 +95,7 @@ jobs:
           npm run build
       - name: run Lighthouse CI
         run: |
-          npm install -g @lhci/cli@0.11.x
+          npm install -g @lhci/cli@0.12.x
           lhci autorun
 ```
 
@@ -113,7 +113,7 @@ node_js: v16
 addons:
   chrome: stable
 before_install:
-  - npm install -g @lhci/cli@0.11.x
+  - npm install -g @lhci/cli@0.12.x
 script:
   - npm run build
   - lhci autorun
@@ -141,7 +141,7 @@ jobs:
       - browser-tools/install-chrome
       - run: npm install
       - run: npm run build
-      - run: sudo npm install -g @lhci/cli@0.11.x
+      - run: sudo npm install -g @lhci/cli@0.12.x
       - run: lhci autorun
 ```
 
@@ -176,7 +176,7 @@ lhci:
   script:
     - npm install
     - npm run build
-    - npm install -g @lhci/cli@0.11.x
+    - npm install -g @lhci/cli@0.12.x
     - lhci autorun --upload.target=temporary-public-storage --collect.settings.chromeFlags="--no-sandbox" || echo "LHCI failed!"
 ```
 
@@ -218,7 +218,7 @@ npm run build
 export CHROME_PATH=$(which google-chrome-stable)
 export LHCI_BUILD_CONTEXT__EXTERNAL_BUILD_URL="$BUILD_URL"
 
-npm install -g @lhci/cli@0.11.x
+npm install -g @lhci/cli@0.12.x
 lhci autorun
 ```
 
@@ -267,7 +267,7 @@ steps:
     waitFor: ['build']
     name: cypress/browsers:node16.17.0-chrome106
     entrypoint: '/bin/sh'
-    args: ['-c', 'npm install -g @lhci/cli@0.11.x && lhci autorun --failOnUploadFailure']
+    args: ['-c', 'npm install -g @lhci/cli@0.12.x && lhci autorun --failOnUploadFailure']
     env:
       - 'LHCI_BUILD_CONTEXT__CURRENT_BRANCH=$BRANCH_NAME'
 
@@ -373,7 +373,7 @@ jobs:
           npm run build
       - name: run Lighthouse CI
         run: |
-          npm install -g @lhci/cli@0.11.x
+          npm install -g @lhci/cli@0.12.x
           lhci autorun
         env:
           LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
@@ -471,7 +471,7 @@ Once the server is set up, _on your local laptop or desktop_, make sure you can 
 ```bash
 $ curl https://your-lhci-server.example.com/version # Make sure you can connect to your server.
 0.x.x
-$ npm install -g @lhci/cli@0.11.x # Install the Lighthouse CI CLI.
+$ npm install -g @lhci/cli@0.12.x # Install the Lighthouse CI CLI.
 Installing...
 $ lhci wizard # Use the wizard to create a project.
 ? Which wizard do you want to run? new-project

@@ -85,10 +85,10 @@ export const App = () => {
   }, []);
 
   useEffect(() => {
-    try{
+    try {
       if (baseReport) localStorage.setItem('lastBaseReport', JSON.stringify(baseReport));
       if (compareReport) localStorage.setItem('lastCompareReport', JSON.stringify(compareReport));
-    }catch(err){
+    } catch (err) {
       console.error(`Error saving to localStorage: ${err}`); // eslint-disable-line no-console
     }
   }, [baseReport, compareReport]);

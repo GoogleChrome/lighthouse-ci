@@ -72,9 +72,20 @@ class FallbackServer {
     );
   }
 
-  /** @return {string[]} */
-  getAvailableUrls() {
-    const htmlFiles = FallbackServer.readHtmlFilesInDirectory(this._pathToBuildDir, 2);
+  /**
+   * @param {number} maxDepth
+   * @return  {string[]}
+   */
+  getAvailableUrls(maxDepth) {
+    if (maxDepth >= 0) {
+      maxDepth = Math.floor(maxDepth);
+    } else {
+      process.stderr.write(
+        `WARNING: staticDirFileDiscoveryDepth must be greater than 0. Defaulting to a discovery depth of 2\n`
+      );
+      maxDepth = 2;
+    }
+    const htmlFiles = FallbackServer.readHtmlFilesInDirectory(this._pathToBuildDir, maxDepth);
     return htmlFiles.map(({file}) => `http://localhost:${this._port}/${file}`);
   }
 

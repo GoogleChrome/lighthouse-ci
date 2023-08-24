@@ -94,6 +94,12 @@ function buildCommand(yargs) {
       default: 5,
       type: 'number',
     },
+    staticDirFileDiscoveryDepth: {
+      description:
+          'The maximum depth level of nested folders that Lighthouse will look into to discover URLs. If not set, this will default to 2.',
+      default: 2,
+      type: 'number',
+    },
   });
 }
 
@@ -187,7 +193,8 @@ async function startServerAndDetermineUrls(options) {
       : options.autodiscoverUrlBlocklist
       ? [options.autodiscoverUrlBlocklist]
       : [];
-    const availableUrls = server.getAvailableUrls();
+    const maxStaticDirFileDiscoveryDepth = options.staticDirFileDiscoveryDepth || 2;
+    const availableUrls = server.getAvailableUrls(maxStaticDirFileDiscoveryDepth);
     const normalizedBlocklist = autodiscoverUrlBlocklistAsArray.map(rawUrl => {
       const url = new URL(rawUrl, 'http://localhost');
       url.port = server.port.toString();

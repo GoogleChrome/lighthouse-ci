@@ -63,6 +63,7 @@ declare global {
         additive: boolean;
         settings?: LighthouseSettings;
         maxAutodiscoverUrls?: number;
+        staticDirFileDiscoveryDepth?: number;
       }
     }
   }

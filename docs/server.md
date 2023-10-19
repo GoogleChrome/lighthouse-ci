@@ -52,7 +52,7 @@ npx lhci server --storage.storageMethod=sql --storage.sqlDialect=sqlite --storag
 
 ### Heroku
 
-LHCI server can be deployed to Heroku on their free tier in just a few minutes. See the [Heroku recipe](./recipes/heroku-server/README.md) for details.
+LHCI server can be deployed to Heroku in just a few minutes. See the [Heroku recipe](./recipes/heroku-server/README.md) for details.
 
 ### Docker
 

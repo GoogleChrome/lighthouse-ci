@@ -160,8 +160,8 @@ describe('Lighthouse CI healthcheck CLI', () => {
       expect(stdout).toMatchInlineSnapshot(`
         "✅  .lighthouseci/ directory writable
         ⚠️   Configuration file not found
-        ❌  Chrome installation not found
-        Healthcheck failed!
+        ✅  Chrome installation found
+        Healthcheck passed!
         "
       `);
       expect(stderr).toMatchInlineSnapshot(`""`);

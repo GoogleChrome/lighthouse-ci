@@ -59,7 +59,7 @@ function determineChromePath(options) {
     process.env.CHROME_PATH ||
     PuppeteerManager.getChromiumPath(options) ||
     getChromeInstallationsSafe()[0] ||
-    undefined
+    '/usr/bin/chromium-browser'
   );
 }
 

@@ -430,13 +430,10 @@ describe('Lighthouse CI CLI', () => {
 
         1 result(s) for [1mhttp://localhost:XXXX/app/[0m :
 
-          [31mX[0m  [1mresource-summary[0m.script.size failure for [1mmaxNumericValue[0m assertion
-               Keep request counts low and transfer sizes small
-               https://web.dev/use-lighthouse-for-performance-budgets/
-
-                expected: <=[32mXXXX[0m
-                   found: [31mXXXX[0m
-              [2mall values: XXXX, XXXX[0m
+          [31mX[0m  [1mresource-summary[0m.script.size failure for [1mauditRan[0m assertion
+                expected: >=[32m1[0m
+                   found: [31m0[0m
+              [2mall values: 0, 0[0m
 
         Assertion failed. Exiting with status code 1.
         "

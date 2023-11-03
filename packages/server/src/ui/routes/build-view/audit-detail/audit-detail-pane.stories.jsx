@@ -4,10 +4,12 @@
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
  */
 
-import {h} from 'preact';
 import {action} from '@storybook/addon-actions';
-import {computeAuditGroups} from '../lhr-comparison';
-import {AuditDetailPane} from './audit-detail-pane';
+import {h} from 'preact';
+import lhr1010A_ from '../../../../../test/fixtures/lh-10-1-0-coursehero-a.json';
+import lhr1010B_ from '../../../../../test/fixtures/lh-10-1-0-coursehero-b.json';
+import lhr1130A_ from '../../../../../test/fixtures/lh-11-3-0-coursehero-a.json';
+import lhr1130B_ from '../../../../../test/fixtures/lh-11-3-0-coursehero-b.json';
 import lhr5A_ from '../../../../../test/fixtures/lh-5-6-0-verge-a.json';
 import lhr5B_ from '../../../../../test/fixtures/lh-5-6-0-verge-b.json';
 import lhr6A_ from '../../../../../test/fixtures/lh-6-0-0-coursehero-a.json';
@@ -22,12 +24,12 @@ import lhr800A_ from '../../../../../test/fixtures/lh-8-0-0-coursehero-a.json';
 import lhr800B_ from '../../../../../test/fixtures/lh-8-0-0-coursehero-b.json';
 import lhr930A_ from '../../../../../test/fixtures/lh-9-3-0-coursehero-a.json';
 import lhr930B_ from '../../../../../test/fixtures/lh-9-3-0-coursehero-b.json';
-import lhr1010A_ from '../../../../../test/fixtures/lh-10-1-0-coursehero-a.json';
-import lhr1010B_ from '../../../../../test/fixtures/lh-10-1-0-coursehero-b.json';
 import lhrSubitemsA_ from '../../../../../test/fixtures/lh-subitems-a.json';
 import lhrSubitemsB_ from '../../../../../test/fixtures/lh-subitems-b.json';
 import lhrPsi800A_ from '../../../../../test/fixtures/psi-8-0-0-dkdev-a.json';
 import lhrPsi800B_ from '../../../../../test/fixtures/psi-8-0-0-dkdev-b.json';
+import {computeAuditGroups} from '../lhr-comparison';
+import {AuditDetailPane} from './audit-detail-pane';
 
 export default {
   title: 'Build View/Audit Detail Pane',
@@ -50,6 +52,8 @@ const lhr930A = /** @type {any} */ (lhr930A_);
 const lhr930B = /** @type {any} */ (lhr930B_);
 const lhr1010A = /** @type {any} */ (lhr1010A_);
 const lhr1010B = /** @type {any} */ (lhr1010B_);
+const lhr1130A = /** @type {any} */ (lhr1130A_);
+const lhr1130B = /** @type {any} */ (lhr1130B_);
 const lhrSubitemsA = /** @type {any} */ (lhrSubitemsA_);
 const lhrSubitemsB = /** @type {any} */ (lhrSubitemsB_);
 const lhrPsi800A = /** @type {any} */ (lhrPsi800A_);
@@ -63,6 +67,7 @@ const auditPairs700 = createAuditPairs(lhr700A, lhr700B);
 const auditPairs800 = createAuditPairs(lhr800A, lhr800B);
 const auditPairs930 = createAuditPairs(lhr930A, lhr930B);
 const auditPairs1010 = createAuditPairs(lhr1010A, lhr1010B);
+const auditPairs1130 = createAuditPairs(lhr1130A, lhr1130B);
 const auditPairsPsi800 = createAuditPairs(lhrPsi800A, lhrPsi800B);
 const auditPairsSubitems = createAuditPairs(lhrSubitemsA, lhrSubitemsB, {
   filter: pair =>
@@ -144,6 +149,15 @@ export const Version1010 = () => (
     setSelectedAuditId={action('setSelectedAuditId')}
     pairs={auditPairs1010}
     baseLhr={lhr1010B}
+  />
+);
+
+export const Version1130 = () => (
+  <AuditDetailPane
+    selectedAuditId={auditPairs1130[1].audit.id || ''}
+    setSelectedAuditId={action('setSelectedAuditId')}
+    pairs={auditPairs1130}
+    baseLhr={lhr1130B}
   />
 );
 

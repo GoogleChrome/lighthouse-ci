@@ -66,10 +66,13 @@ function fixHtmlSubresourceUrls(result, buildOptions) {
   fs.writeFileSync(htmlDistPath, newHtmlText);
 
   // Rewrite the CSS, making sure we don't source icons relative to the chunks/css file.
-  const newCssText = fs
-    .readFileSync(cssDistPath, 'utf-8')
-    .replaceAll(`url(./assets`, `url(../assets`);
-  fs.writeFileSync(cssDistPath, newCssText);
+  const newCssText = fs.readFileSync(cssDistPath, 'utf-8');
+  console.log('newCssText', newCssText);
+  console.log('typeof newCssText', typeof newCssText);
+  console.log('typeof newCssText.replaceAll', typeof newCssText.replaceAll);
+  const regex = /url\(.\assets/g;
+  const next = newCssText.replace(regex, `url(../assets`);
+  fs.writeFileSync(cssDistPath, next);
 }
 
 async function main() {

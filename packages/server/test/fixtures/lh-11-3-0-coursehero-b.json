@@ -1,0 +1,62 @@
+{
+  "lighthouseVersion": "11.3.0",
+  "requestedUrl": "https://www.coursehero.com/",
+  "mainDocumentUrl": "https://www.coursehero.com/",
+  "finalDisplayedUrl": "https://www.coursehero.com/",
+  "finalUrl": "https://www.coursehero.com/",
+  "fetchTime": "2023-11-03T09:51:46.521Z",
+  "gatherMode": "navigation",
+  "runtimeError": {
+    "code": "NO_FCP",
+    "message": "The page did not paint any content. Please ensure you keep the browser window in the foreground during the load and try again. (NO_FCP)"
+  },
+  "runWarnings": [],
+  "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/119.0.6045.105 Safari/537.36",
+  "environment": {
+    "networkUserAgent": "Mozilla/5.0 (Linux; Android 11; moto g power (2022)) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Mobile Safari/537.36",
+    "hostUserAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/119.0.6045.105 Safari/537.36",
+    "benchmarkIndex": 1993.5,
+    "credits": {
+      "axe-core": "4.8.2"
+    }
+  },
+  "audits": {
+    "is-on-https": {
+      "id": "is-on-https",
+      "title": "Uses HTTPS",
+      "description": "All sites should be protected with HTTPS, even ones that don't handle sensitive data. This includes avoiding [mixed content](https://developers.google.com/web/fundamentals/security/prevent-mixed-content/what-is-mixed-content), where some resources are loaded over HTTP despite the initial request being served over HTTPS. HTTPS prevents intruders from tampering with or passively listening in on the communications between your app and your users, and is a prerequisite for HTTP/2 and many new web platform APIs. [Learn more about HTTPS](https://developer.chrome.com/docs/lighthouse/pwa/is-on-https/).",
+      "score": 1,
+      "scoreDisplayMode": "binary",
+      "details": {
+        "type": "table",
+        "headings": [],
+        "items": []
+      }
+    },
+    "viewport": {
+      "id": "viewport",
+      "title": "Has a `<meta name=\"viewport\">` tag with `width` or `initial-scale`",
+      "description": "A `<meta name=\"viewport\">` not only optimizes your app for mobile screen sizes, but also prevents [a 300 millisecond delay to user input](https://developer.chrome.com/blog/300ms-tap-delay-gone-away/). [Learn more about using the viewport meta tag](https://developer.chrome.com/docs/lighthouse/pwa/viewport/).",
+      "score": 1,
+      "scoreDisplayMode": "metricSavings",
+      "warnings": [],
+      "metricSavings": {
+        "INP": 0
+      },
+      "guidanceLevel": 3
+    },
+    "first-contentful-paint": {
+      "id": "first-contentful-paint",
+      "title": "First Contentful Paint",
+      "description": "First Contentful Paint marks the time at which the first text or image is painted. [Learn more about the First Contentful Paint metric](https://developer.chrome.com/docs/lighthouse/performance/first-contentful-paint/).",
+      "score": null,
+      "scoreDisplayMode": "error",
+      "errorMessage": "The page did not paint any content. Please ensure you keep the browser window in the foreground during the load and try again. (NO_FCP)",
+      "errorStack": "LighthouseError: NO_FCP\n    at LHTraceProcessor.createNoFirstContentfulPaintError (file:///home/hamir/lighthouse-ci/node_modules/lighthouse/core/lib/lh-trace-processor.js:41:12)\n    at LHTraceProcessor.computeNavigationTimingsForFrame (file:///home/hamir/lighthouse-ci/node_modules/lighthouse/core/lib/tracehouse/trace-processor.js:957:18)\n    at LHTraceProcessor.processNavigation (file:///home/hamir/lighthouse-ci/node_modules/lighthouse/core/lib/tracehouse/trace-processor.js:800:31)\n    at ProcessedNavigation.compute_ (file:///home/hamir/lighthouse-ci/node_modules/lighthouse/core/computed/processed-navigation.js:32:29)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)"
+    },
+    "largest-contentful-paint": {
+      "id": "largest-contentful-paint",
+      "title": "Largest Contentful Paint"
+    }
+  }
+}

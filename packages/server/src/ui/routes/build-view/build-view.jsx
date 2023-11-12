@@ -170,9 +170,7 @@ const BuildView_ = props => {
         hookElements={{
           warnings: computeWarnings(warningProps).hasWarning ? (
             <BuildViewWarnings {...warningProps} />
-          ) : (
-            undefined
-          ),
+          ) : undefined,
           dropdowns: (
             <Fragment>
               <Dropdown

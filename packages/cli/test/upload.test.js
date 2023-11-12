@@ -159,7 +159,7 @@ describe('Lighthouse CI upload CLI', () => {
 
   it('should support target=filesystem', async () => {
     const lhr = JSON.parse(fs.readFileSync(fakeLhrPath, 'utf8'));
-    lhr.finalUrl = `https://www.example.com/page`;
+    lhr.requestedUrl = `https://www.example.com/page`;
     lhr.fetchTime = '2020-05-22T22:12:01.000Z';
     lhr.audits['first-contentful-paint'].numericValue = 900;
     fs.writeFileSync(fakeLhrPath.replace(/lhr-\d+/, 'lhr-1'), JSON.stringify(lhr));

@@ -30,9 +30,9 @@ module.exports = (state, projectName, opts) => {
 
     it('should wait for the dashboard to load', async () => {
       if (opts && opts.waitFor === 'empty') {
-        await state.page.waitFor('.getting-started');
+        await state.page.waitForSelector('.getting-started');
       } else {
-        await state.page.waitFor('.category-score-graph');
+        await state.page.waitForSelector('.category-score-graph');
       }
     });
 

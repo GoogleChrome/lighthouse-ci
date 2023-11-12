@@ -6,10 +6,14 @@
 'use strict';
 
 const _ = require('./lodash.js');
+const {getGroupForAuditId} = require('./seed-data/lhr-generator.js');
 
 /** @typedef {'improvement'|'neutral'|'regression'} DiffLabel */
 /** @typedef {'better'|'worse'|'added'|'removed'|'ambiguous'|'no change'} RowLabel */
 /** @typedef {{item: Record<string, any>, kind?: string, index: number}} DetailItemEntry */
+
+// Hardcoded audit ids that arent worth diffing and generally regress the UX when done.
+const auditsToNotDIff = ['main-thread-tasks', 'screenshot-thumbnails', 'metrics'];
 
 /**
  * @param {number} delta
@@ -380,8 +384,8 @@ function deepPruneItemForKeySerialization(item) {
 
 /** @param {Record<string, any>} item @return {string} */
 function getItemKey(item) {
-  // For most opportunities, diagnostics, etc where 1 row === 1 resource
-  if (typeof item.url === 'string' && item.url) return item.url;
+  // Do most specific checks at the top. most general at bottom..
+  //
   // For sourcemapped opportunities that identify a source location
   const source = item.source;
   if (typeof source === 'string') return source;
@@ -396,6 +400,18 @@ function getItemKey(item) {
   if (typeof item.statistic === 'string') return item.statistic;
   // For third-party-summary
   if (item.entity && typeof item.entity.text === 'string') return item.entity.text;
+  // For node
+  if (typeof item.node?.path === 'string') return item.node.path;
+  // Tap-targets
+  if (
+    typeof item.tapTarget?.path === 'string' &&
+    typeof item.overlappingTarget?.path === 'string'
+  ) {
+    return `${item.tapTarget.path} + ${item.overlappingTarget.path}`;
+  }
+  // For most opportunities, diagnostics, etc where 1 row === 1 resource
+  if (typeof item.url === 'string' && item.url) return item.url;
+  if (typeof item.origin === 'string' && item.origin) return item.origin;
 
   // For everything else, use the entire object, actually works OK on most nodes.
   return JSON.stringify(deepPruneItemForKeySerialization(item));
@@ -579,6 +595,8 @@ function findAuditDiffs(baseAudit, compareAudit, options = {}) {
   /** @type {Array<LHCI.AuditDiff>} */
   const diffs = [];
 
+  if (auditsToNotDIff.includes(auditId)) return diffs;
+
   if (typeof baseAudit.score === 'number' || typeof compareAudit.score === 'number') {
     diffs.push(
       createAuditDiff({
@@ -668,7 +686,9 @@ function findAuditDiffs(baseAudit, compareAudit, options = {}) {
   // If the only diff found was a numericValue/displayValue diff *AND* it seems like the result was flaky, skip it.
   // The result is likely flaky if the audit passed *OR* it was supposed to have details but no details items changed.
   const isAllPassing = compareAudit.score === 1 && baseAudit.score === 1;
+  const group = getGroupForAuditId(auditId);
   if (
+    group !== 'metrics' && // if metrics group audit is found, don't skip it
     filteredDiffs.every(diff => diff.type === 'displayValue' || diff.type === 'numericValue') &&
     (isAllPassing || hasItemDetails)
   ) {

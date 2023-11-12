@@ -10,7 +10,7 @@
 /** @type {jest.MockInstance} */
 let cronJob = jest.fn().mockReturnValue({start: () => {}});
 jest.mock('cron', () => ({
-  CronJob: function(...args) {
+  CronJob: function (...args) {
     // use this indirection because we have to invoke it with `new` and it's harder to mock assertions
     return cronJob(...args);
   },
@@ -120,7 +120,7 @@ describe('cron/psi-collect', () => {
       buildArgument.runAt = buildArgument.runAt.replace(/.*/, '<DATE>');
       buildArgument.committedAt = buildArgument.committedAt.replace(/.*/, '<DATE>');
       expect(buildArgument).toMatchInlineSnapshot(`
-        Object {
+        {
           "author": "Lighthouse CI Server <no-reply@example.com>",
           "avatarUrl": "https://www.gravatar.com/avatar/f52a99e6bec57a971cbe232b7c5cc49f.jpg?d=identicon",
           "branch": "main",

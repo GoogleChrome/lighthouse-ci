@@ -14,12 +14,10 @@ module.exports = {
     'is-on-https': 'off',
     'service-worker': 'off',
     'installable-manifest': 'off',
-    'redirects-http': 'off',
     'splash-screen': 'off',
     'themed-omnibox': 'off',
     'content-width': 'off',
     viewport: 'off',
-    'apple-touch-icon': 'off',
     'maskable-icon': 'off',
   },
 };

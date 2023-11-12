@@ -33,6 +33,7 @@ class PuppeteerManager {
 
     try {
       // @ts-ignore - puppeteer-core is API-compatible with puppeteer
+      // eslint-disable-next-line import/no-extraneous-dependencies
       return require('puppeteer-core');
     } catch (_) {}
 
@@ -84,7 +85,11 @@ class PuppeteerManager {
 
     // Otherwise, check to see if the expected puppeteer download exists.
     const puppeteer = PuppeteerManager._requirePuppeteer();
-    const chromiumPath = puppeteer && puppeteer.executablePath();
+    const puppeteerUnknown = /** @type {unknown} */ (puppeteer);
+    const pupppeteerNode = /** @type {import('puppeteer').PuppeteerNode | undefined} */ (
+      puppeteerUnknown
+    );
+    const chromiumPath = pupppeteerNode && pupppeteerNode.executablePath();
     return chromiumPath && fs.existsSync(chromiumPath) ? chromiumPath : undefined;
   }
 

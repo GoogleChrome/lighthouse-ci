@@ -10,7 +10,7 @@
 const {
   convertPathExpressionToRegExp,
   convertBudgetsToAssertions,
-} = require('@lhci/utils/src/budgets-converter.js');
+} = require('../src/budgets-converter.js');
 
 describe('convertPathExpressionToRegExp', () => {
   const pathMatch = (path, pattern) => {
@@ -70,7 +70,7 @@ describe('convertPathExpressionToRegExp', () => {
 });
 
 describe('convertBudgetsToAssertions', () => {
-  it('should convert budgets to assertions format', () => {
+  it('should convert budgets to assertions format', async () => {
     const budgets = [
       {
         timings: [
@@ -115,7 +115,7 @@ describe('convertBudgetsToAssertions', () => {
       },
     ];
 
-    const results = convertBudgetsToAssertions(budgets);
+    const results = await convertBudgetsToAssertions(budgets);
     expect(results).toEqual({
       assertMatrix: [
         {

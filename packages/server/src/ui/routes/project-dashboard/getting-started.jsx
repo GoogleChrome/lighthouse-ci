@@ -8,7 +8,7 @@ import {h} from 'preact';
 import {Paper} from '../../components/paper';
 import './getting-started.css';
 
-// @ts-ignore - tsc doesn't get parcel :)
+// @ts-ignore - tsc doesn't get bundlers :)
 const LH_LOGO_PATH = require('../../logo.svg');
 
 /**

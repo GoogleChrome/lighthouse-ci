@@ -54,6 +54,38 @@ docker container run --cpus=".9" --shm-size=2g --cap-add=SYS_ADMIN \
 ```
 The above command will provide 0.9 CPU from the available CPUs. In a 2 core processor, docker will have access to 45% of the CPU cycles. You can tune it as per your need. Keep a check on CPU/Memory Power at the bottom of your lighthouse report for consistent results.
 
+## Using puppeteer
+Puppeteer is present as a dependency in the docker container. If you specify a `puppeteerScript` when running, you should also provide 2 `puppeteerLaunchOptions` for it to work properly in the container, `--no-sandbox` and `--disable-setuid-sandbox`.
+
+As CLI arguments:
+```bash
+docker container run --cap-add=SYS_ADMIN \
+  -v "$(pwd)/lhci-data:/home/lhci/reports/.lighthouseci" \
+  -v "$(pwd)/scripts:/home/lhci/reports/scripts" \
+  patrickhulce/lhci-client \
+  lhci collect --url="https://example.com" \
+               --puppeteerScript=docs/recipes/puppeteer-example.js \
+               --puppeteerLaunchOptions.args=--no-sandbox \
+               --puppeteerLaunchOptions.args=--disable-setuid-sandbox
+```
+
+When using `lighthouserc.js`:
+```javascript
+module.exports = {
+  ci: {
+    collect: {
+      // ...
+      puppeteerScript: 'docs/recipes/puppeteer-example.js',
+      puppeteerLaunchOptions: {
+        args: ['--no-sandbox', '--disable-setuid-sandbox']
+      },
+      // ...
+    },
+    // ...
+  },
+};
+```
+
 ## `--no-sandbox` Issues Explained
 
 Chrome uses sandboxing to isolate renderer processes and restrict their capabilities. If a rogue website is able to discover a browser vulnerability and break out of JavaScript engine for example, they would find themselves in a very limited process that can't write to the filesystem, make network requests, mess with devices, etc.

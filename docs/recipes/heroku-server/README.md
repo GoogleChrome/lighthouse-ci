@@ -4,7 +4,7 @@
 
 ## Overview
 
-The LHCI server can be run in any node environment with persistent disk storage or network access to a postgres database. Heroku offers a [free tier of hosting](https://www.heroku.com/pricing) that provides exactly this!
+The LHCI server can be run in any node environment with persistent disk storage or network access to a postgres database. <del>Heroku offers a [free tier of hosting](https://www.heroku.com/pricing) that provides exactly this!</del>
 
 ## Setting Up Your Repo
 

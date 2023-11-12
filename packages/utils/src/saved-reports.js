@@ -38,22 +38,22 @@ function loadSavedLHRs() {
 /**
  * @param {string} lhr
  */
-function saveLHR(lhr, baseDir = LHCI_DIR) {
+async function saveLHR(lhr, baseDir = LHCI_DIR) {
   const baseFilename = `lhr-${Date.now()}`;
   const basePath = path.join(baseDir, baseFilename);
   ensureDirectoryExists(baseDir);
   fs.writeFileSync(`${basePath}.json`, lhr);
-  fs.writeFileSync(`${basePath}.html`, getHTMLReportForLHR(JSON.parse(lhr)));
+  fs.writeFileSync(`${basePath}.html`, await getHTMLReportForLHR(JSON.parse(lhr)));
 }
 
 /**
  * @param {LH.Result} lhr
- * @return {string}
+ * @return {Promise<string>}
  */
-function getHTMLReportForLHR(lhr) {
-  // @ts-ignore - lighthouse doesn't publish .d.ts files yet
-  const ReportGenerator = require('lighthouse/lighthouse-core/report/report-generator.js');
-  return ReportGenerator.generateReportHtml(lhr);
+async function getHTMLReportForLHR(lhr) {
+  const {generateReport} = await import('lighthouse');
+  // @ts-expect-error TODO: Import exact types from Lighthouse.
+  return generateReport(lhr);
 }
 
 function clearSavedReportsAndLHRs() {
@@ -71,14 +71,14 @@ function getSavedReportsDirectory() {
   return LHCI_DIR;
 }
 
-/** @return {Array<import('./assertions').AssertionResult>} */
+/** @return {Array<LHCI.AssertResults.AssertionResult>} */
 function loadAssertionResults() {
   ensureDirectoryExists();
   if (!fs.existsSync(ASSERTION_RESULTS_PATH)) return [];
   return JSON.parse(fs.readFileSync(ASSERTION_RESULTS_PATH, 'utf8'));
 }
 
-/** @param {Array<import('./assertions').AssertionResult>} results */
+/** @param {Array<LHCI.AssertResults.AssertionResult>} results */
 function saveAssertionResults(results) {
   ensureDirectoryExists();
   return fs.writeFileSync(ASSERTION_RESULTS_PATH, JSON.stringify(results, null, 2));

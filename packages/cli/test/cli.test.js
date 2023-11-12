@@ -171,9 +171,6 @@ describe('Lighthouse CI CLI', () => {
   // FIXME: Tests dependency. Moving these tests breaks others.
   describe('collect', () => {
     it('should collect results with a server command', async () => {
-      // FIXME: for some inexplicable reason this test cannot pass in Travis Windows
-      if (os.platform() === 'win32') return;
-
       const startCommand = `yarn start server -p=14927 --storage.sqlDatabasePath=${tmpSqlFilePath}`;
       const {stdout, stderr, status} = await runCLI([
         'collect',
@@ -185,7 +182,7 @@ describe('Lighthouse CI CLI', () => {
 
       const stdoutClean = stdout.replace(/sqlDatabasePath=.*?"/, 'sqlDatabasePath=<file>"');
       expect(stdoutClean).toMatchInlineSnapshot(`
-        "Started a web server with \\"yarn start server -p=XXXX --storage.sqlDatabasePath=<file>\\"...
+        "Started a web server with "yarn start server -p=XXXX --storage.sqlDatabasePath=<file>"...
         Running Lighthouse 1 time(s) on http://localhost:XXXX/app/
         Run #1...done.
         Done running Lighthouse!
@@ -242,7 +239,7 @@ describe('Lighthouse CI CLI', () => {
       const links = fs.readFileSync(linksFile, 'utf8');
       expect(cleanStdOutput(links)).toMatchInlineSnapshot(`
         "{
-          \\"http://localhost:XXXX/app/\\": \\"http://localhost:XXXX/app/projects/awesomeciprojectname/compare/<UUID>?compareUrl=http%3A%2F%2Flocalhost%3APORT%2Fapp%2F\\"
+          "http://localhost:XXXX/app/": "http://localhost:XXXX/app/projects/awesomeciprojectname/compare/<UUID>?compareUrl=http%3A%2F%2Flocalhost%3APORT%2Fapp%2F"
         }"
       `);
     });
@@ -323,7 +320,7 @@ describe('Lighthouse CI CLI', () => {
 
           [31mX[0m  [1minstallable-manifest[0m failure for [1mminScore[0m assertion
                Web app manifest or service worker do not meet the installability requirements
-               https://web.dev/installable-manifest/
+               https://developer.chrome.com/docs/lighthouse/pwa/installable-manifest/
 
                 expected: >=[32m0.9[0m
                    found: [31m0[0m
@@ -375,7 +372,7 @@ describe('Lighthouse CI CLI', () => {
 
           [31mX[0m  [1minstallable-manifest[0m failure for [1mminScore[0m assertion
                Web app manifest or service worker do not meet the installability requirements
-               https://web.dev/installable-manifest/
+               https://developer.chrome.com/docs/lighthouse/pwa/installable-manifest/
 
                 expected: >=[32m0.9[0m
                    found: [31m0[0m
@@ -403,7 +400,7 @@ describe('Lighthouse CI CLI', () => {
 
           [31mX[0m  [1mfirst-contentful-paint[0m failure for [1mmaxNumericValue[0m assertion
                First Contentful Paint
-               https://web.dev/first-contentful-paint/
+               https://developer.chrome.com/docs/lighthouse/performance/first-contentful-paint/
 
                 expected: <=[32m1[0m
                    found: [31mXXXX[0m
@@ -468,6 +465,7 @@ describe('Lighthouse CI CLI', () => {
     });
 
     it('should list the projects', async () => {
+      await page.waitForSelector('.project-list');
       const contents = await page.evaluate('document.body.innerHTML');
       expect(contents).toContain('AwesomeCIProjectName');
       expect(contents).toContain('OtherCIProjectName');
@@ -483,6 +481,7 @@ describe('Lighthouse CI CLI', () => {
     it('should list the projects again', async () => {
       page = await browser.newPage();
       await page.goto(`http://localhost:${server.port}/app`, {waitUntil: 'networkidle0'});
+      await page.waitForSelector('.project-list');
       const contents = await page.evaluate('document.body.innerHTML');
       expect(contents).not.toContain('AwesomeCIProjectName');
       expect(contents).toContain('OtherCIProjectName');

@@ -20,17 +20,17 @@ export const LandingRoute = props => {
         <img src={CONFETTI_PATH} alt="Lighthouse CI Background Image" />
       </div>
       <Paper className="landing__paper">
-        <a
-          className="landing__info-icon"
-          href="https://github.com/GoogleChrome/lighthouse-ci"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <i className="material-icons">info</i>
-        </a>
-        <img className="landing__logo" src={LH_LOGO_PATH} alt="Lighthouse Logo" />
-        <h1>Lighthouse CI Diff</h1>
-        <span>Drag or upload two Lighthouse reports to start comparing!</span>
+        <div className="landing__logos">
+          <img className="landing__logo" src={LH_LOGO_PATH} alt="Lighthouse Logo" />
+          <img className="landing__logo landing__logo--diff" src={LH_LOGO_PATH} alt="" />
+          <h1>Lighthouse Report Diff Tool</h1>
+        </div>
+        <p>Provide two Lighthouse reports to start comparing!</p>
+        <p>
+          <a href="./?baseReport=https://googlechrome.github.io/lighthouse-ci/packages/server/test/fixtures/lh-5-6-0-verge-a.json&compareReport=https://googlechrome.github.io/lighthouse-ci/packages/server/test/fixtures/lh-5-6-0-verge-b.json">
+            View example diff
+          </a>
+        </p>
         <div className="landing__upload">
           <ReportUploadBox
             variant="base"
@@ -49,6 +49,11 @@ export const LandingRoute = props => {
             dragTarget={props.baseReport ? 'document' : 'self'}
           />
         </div>
+        <p>Above, drag &apos;n drop your JSON/HTML, or select the files from disk.</p>
+
+        <footer>
+          Powered by <a href="https://github.com/GoogleChrome/lighthouse-ci">lighthouse-ci</a>
+        </footer>
       </Paper>
     </div>
   );

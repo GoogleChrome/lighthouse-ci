@@ -17,7 +17,7 @@ const {
   synthesizeItemKeyDiffs,
   sortZippedBaseAndCompareItems,
   replaceNondeterministicStrings,
-} = require('@lhci/utils/src/audit-diff-finder.js');
+} = require('../src/audit-diff-finder.js');
 
 describe('#findAuditDiffs', () => {
   it('should return empty array for identical audits', () => {
@@ -461,7 +461,10 @@ describe('#getDiffSeverity', () => {
       numericValue: 1000,
       details: {
         headings: [{key: 'wastedMs'}, {key: 'wastedKb'}],
-        items: [{url: 'urlA', wastedMs: 2000}, {url: 'urlB', wastedKb: 2000e3}],
+        items: [
+          {url: 'urlA', wastedMs: 2000},
+          {url: 'urlB', wastedKb: 2000e3},
+        ],
       },
     };
 
@@ -471,7 +474,10 @@ describe('#getDiffSeverity', () => {
       numericValue: 1100,
       details: {
         headings: [{key: 'wastedMs'}, {key: 'wastedKb'}],
-        items: [{url: 'urlA', wastedMs: 2500}, {url: 'urlD', wastedKb: 70e3}],
+        items: [
+          {url: 'urlA', wastedMs: 2500},
+          {url: 'urlD', wastedKb: 70e3},
+        ],
       },
     };
 
@@ -481,7 +487,10 @@ describe('#getDiffSeverity', () => {
       numericValue: 400,
       details: {
         headings: [{key: 'wastedMs'}, {key: 'wastedKb'}],
-        items: [{url: 'urlA', wastedMs: 1200}, {url: 'urlB', wastedKb: 1800e3}],
+        items: [
+          {url: 'urlA', wastedMs: 1200},
+          {url: 'urlB', wastedKb: 1800e3},
+        ],
       },
     };
 

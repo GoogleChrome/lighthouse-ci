@@ -10,7 +10,6 @@ import {Gauge} from './gauge';
 export default {
   title: 'Components/Gauge',
   component: Gauge,
-  parameters: {dimensions: {width: 120, height: 120}},
 };
 
 /** @type {LHCI.NumericAuditDiff} */

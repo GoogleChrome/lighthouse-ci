@@ -14,7 +14,7 @@ alt="Screenshot of the Lighthouse CI server diff UI" width="48%">
 
 The LHCI server can be run in any node environment with persistent disk storage or network access to a postgres/mysql database.
 
-- Node v12 LTS
+- Node v16 LTS
 - Database Storage (sqlite, mysql, or postgresql)
 
 ### General
@@ -52,7 +52,7 @@ npx lhci server --storage.storageMethod=sql --storage.sqlDialect=sqlite --storag
 
 ### Heroku
 
-LHCI server can be deployed to Heroku on their free tier in just a few minutes. See the [Heroku recipe](./recipes/heroku-server/README.md) for details.
+LHCI server can be deployed to Heroku in just a few minutes. See the [Heroku recipe](./recipes/heroku-server/README.md) for details.
 
 ### Docker
 
@@ -127,6 +127,44 @@ const lhci = require('@lhci/server');
   app.use((req, res, next) => handleCustomAuthentication(req, res, next));
   app.use(lhciApp);
   app.listen();
+})();
+```
+
+#### For Fastify Middleware
+```js
+const fastify = require('fastify');
+const lhci = require('@lhci/server');
+(async () => {
+  const {app} = await createApp({
+    // you need that for use fastify
+    useBodyParser: false,
+    storage: {
+      storageMethod: 'sql',
+      sqlDialect: 'sqlite',
+      // see configuration...
+    },
+  });
+  const fastify = require('fastify')({
+    logger: true
+  })
+  fastify.all(
+    '/*',
+    async (req, reply) => {
+      // you need to clone the body for express or this will be emit error
+      req.raw.body = req.body;
+      await app(req.raw, reply.raw);
+      // don't forget that or fastify will be not respond
+      reply.hijack();
+    }
+  );
+// Run the server!
+  fastify.listen({ port: 3000 }, function (err, address) {
+    if (err) {
+      fastify.log.error(err)
+      process.exit(1)
+    }
+    // Server is now listening on ${address}
+  })
 })();
 ```
 

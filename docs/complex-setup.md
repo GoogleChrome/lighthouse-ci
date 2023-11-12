@@ -24,7 +24,7 @@ fi
 
 npm run deploy
 
-npm install -g @lhci/cli@0.8.x
+npm install -g @lhci/cli@0.12.x
 lhci healthcheck --fatal
 lhci collect --url=http://localhost:9000/index.html
 lhci assert --preset="lighthouse:recommended"
@@ -38,7 +38,7 @@ exit $EXIT_CODE
 
 To run Lighthouse CI, you'll need...
 
-- Node v10 LTS or later
+- Node v16 LTS or later
 - Chrome Stable or later
 - (if Ubuntu) Xenial or later
 
@@ -77,9 +77,9 @@ script:
 
 # Example if your travis build runs a matrix like...
 # matrix:
-#   - 12
-#   - 10
-if [[ "$TRAVIS_NODE_VERSION" != "10" ]]; then
+#   - 18
+#   - 16
+if [[ "$TRAVIS_NODE_VERSION" != "18" ]]; then
   echo "Only run Lighthouse CI once per build, node version is not the selected version.";
   exit 0;
 fi
@@ -121,7 +121,7 @@ Now that we have our environment ready, time to run Lighthouse CI. The `collect`
 
 # Install Lighthouse CI
 # If you're already using node to manage your project, add it to your package.json `devDependencies` instead to skip this step.
-npm install -g @lhci/cli@0.8.x
+npm install -g @lhci/cli@0.12.x
 
 # Run a healthcheck to make sure everything looks good before we run collection.
 lhci healthcheck --fatal

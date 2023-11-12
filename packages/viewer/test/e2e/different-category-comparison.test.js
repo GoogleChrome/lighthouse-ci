@@ -9,6 +9,8 @@
 
 const {shouldRunE2E, emptyTest, getTestLHRPath, waitForNetworkIdle0} = require('../test-utils.js');
 
+jest.setTimeout(60_000);
+
 describe('Viewer simple comparison', () => {
   if (!shouldRunE2E()) return emptyTest();
 
@@ -38,7 +40,10 @@ describe('Viewer simple comparison', () => {
 
   describe('render the comparison route', () => {
     it('should wait for the diff to render', async () => {
-      await Promise.all([waitForNetworkIdle0(state.page), state.page.waitFor('.lhr-comparison')]);
+      await Promise.all([
+        waitForNetworkIdle0(state.page),
+        state.page.waitForSelector('.lhr-comparison'),
+      ]);
     });
 
     it('should look correct', async () => {

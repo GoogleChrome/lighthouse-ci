@@ -6,12 +6,22 @@
 'use strict';
 
 module.exports = {
+  preset: 'ts-jest/presets/js-with-ts-esm',
+  transform: {
+    '^.+\\.m?[tj]sx?$': [
+      'ts-jest',
+      {
+        // Disable typechecking.
+        diagnostics: false,
+        isolatedModules: true,
+      },
+    ],
+  },
+  transformIgnorePatterns: ['node_modules/@storybook/.*'],
+  testEnvironment: 'node',
   testRunner: require.resolve('jest-circus/runner'),
   globalSetup: require.resolve('./packages/server/test/storybook-setup.js'),
   globalTeardown: require.resolve('./packages/server/test/storybook-teardown.js'),
-  transform: {
-    '.*jsx$': 'babel-jest',
-  },
   moduleNameMapper: {
     '\\.css$': 'identity-obj-proxy',
     '\\.(svg|png|jpg|jpeg)$': '<rootDir>/packages/server/test/__mocks__/file-mock.js',

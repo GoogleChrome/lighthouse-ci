@@ -45,7 +45,7 @@ const BuildList = props => {
             </td>
             <td className="build-list__date">
               {new Date(build.runAt).toDateString().replace(/\w+ (.*) \d{4}/, '$1')}{' '}
-              {new Date(build.runAt).toLocaleTimeString().replace(/:\d{2} /, ' ')}
+              {new Date(build.runAt).toLocaleTimeString().replace(/:\d{2}\s+/, ' ')}
             </td>
           </tr>
         );

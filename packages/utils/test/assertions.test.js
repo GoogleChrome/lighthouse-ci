@@ -7,9 +7,9 @@
 
 /* eslint-env jest */
 
-const lighthouseAllPreset = require('@lhci/utils/src/presets/all.js');
-const {convertBudgetsToAssertions} = require('@lhci/utils/src/budgets-converter.js');
-const {getAllAssertionResults} = require('@lhci/utils/src/assertions.js');
+const lighthouseAllPreset = require('../src/presets/all.js');
+const {convertBudgetsToAssertions} = require('../src/budgets-converter.js');
+const {getAllAssertionResults} = require('../src/assertions.js');
 
 describe('getAllAssertionResults', () => {
   let lhrs;
@@ -321,7 +321,7 @@ describe('getAllAssertionResults', () => {
       ]);
     });
 
-    it('should not set auditDocumentationLink when no match', () => {
+    it('should set auditDocumentationLink to last link as fallback', () => {
       const assertions = {
         'first-contentful-paint': ['warn', {aggregationMethod: 'optimistic'}],
       };
@@ -329,7 +329,24 @@ describe('getAllAssertionResults', () => {
       lhrs[0].audits['first-contentful-paint'].description = [
         'First contentful paint is a really cool [metric](https://example.com/)',
         '[Learn More](https://non-documentation-link.com/first-contentful-paint).',
-        'There are other cool [metrics](https://example.com/) too.',
+        'There are other cool [metrics](https://example2.com/) too.',
+      ].join(' ');
+
+      const results = getAllAssertionResults({assertions}, lhrs);
+      expect(results).toHaveLength(1);
+      expect(results[0]).not.toHaveProperty('auditTitle');
+      expect(results[0].auditDocumentationLink).toEqual('https://example2.com/');
+    });
+
+    it('should not set auditDocumentationLink when no match', () => {
+      const assertions = {
+        'first-contentful-paint': ['warn', {aggregationMethod: 'optimistic'}],
+      };
+
+      lhrs[0].audits['first-contentful-paint'].description = [
+        'First contentful paint is a really cool',
+        'Learn More.',
+        'There are other cool metrics too.',
       ].join(' ');
 
       const results = getAllAssertionResults({assertions}, lhrs);
@@ -718,7 +735,7 @@ describe('getAllAssertionResults', () => {
       ]);
     });
 
-    it('should assert budgets natively', () => {
+    it('should assert budgets natively', async () => {
       const budgets = [
         {
           resourceCounts: [
@@ -730,7 +747,7 @@ describe('getAllAssertionResults', () => {
       ];
 
       const lhrs = [lhrWithResourceSummary, lhrWithResourceSummary];
-      const results = getAllAssertionResults(convertBudgetsToAssertions(budgets), lhrs);
+      const results = getAllAssertionResults(await convertBudgetsToAssertions(budgets), lhrs);
       expect(results).toEqual([
         {
           url: 'http://example.com',

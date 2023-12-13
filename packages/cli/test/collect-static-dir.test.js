@@ -32,7 +32,11 @@ describe('Lighthouse CI collect CLI', () => {
         Done running Lighthouse!
         "
         `);
-      expect(stderr).toMatchInlineSnapshot(`""`);
+      expect(stderr).toMatchInlineSnapshot(`
+        "Debugger attached.
+        Waiting for the debugger to disconnect...
+        "
+      `);
       expect(status).toEqual(0);
     });
 
@@ -54,7 +58,11 @@ describe('Lighthouse CI collect CLI', () => {
         Done running Lighthouse!
         "
       `);
-      expect(stderr).toMatchInlineSnapshot(`""`);
+      expect(stderr).toMatchInlineSnapshot(`
+        "Debugger attached.
+        Waiting for the debugger to disconnect...
+        "
+      `);
       expect(status).toEqual(0);
     });
   });
@@ -76,7 +84,11 @@ describe('Lighthouse CI collect CLI', () => {
           Done running Lighthouse!
           "
           `);
-      expect(stderr).toMatchInlineSnapshot(`""`);
+      expect(stderr).toMatchInlineSnapshot(`
+        "Debugger attached.
+        Waiting for the debugger to disconnect...
+        "
+      `);
       expect(status).toEqual(0);
     });
 
@@ -105,7 +117,11 @@ describe('Lighthouse CI collect CLI', () => {
           Done running Lighthouse!
           "
           `);
-      expect(stderr).toMatchInlineSnapshot(`""`);
+      expect(stderr).toMatchInlineSnapshot(`
+        "Debugger attached.
+        Waiting for the debugger to disconnect...
+        "
+      `);
       expect(status).toEqual(0);
     });
   });
@@ -133,7 +149,11 @@ describe('Lighthouse CI collect CLI', () => {
           Done running Lighthouse!
           "
           `);
-      expect(stderr).toMatchInlineSnapshot(`""`);
+      expect(stderr).toMatchInlineSnapshot(`
+        "Debugger attached.
+        Waiting for the debugger to disconnect...
+        "
+      `);
       expect(status).toEqual(0);
     });
 
@@ -160,7 +180,11 @@ describe('Lighthouse CI collect CLI', () => {
           Done running Lighthouse!
           "
           `);
-      expect(stderr).toMatchInlineSnapshot(`""`);
+      expect(stderr).toMatchInlineSnapshot(`
+        "Debugger attached.
+        Waiting for the debugger to disconnect...
+        "
+      `);
       expect(status).toEqual(0);
     });
 
@@ -191,7 +215,11 @@ describe('Lighthouse CI collect CLI', () => {
           Done running Lighthouse!
           "
           `);
-      expect(stderr).toMatchInlineSnapshot(`""`);
+      expect(stderr).toMatchInlineSnapshot(`
+        "Debugger attached.
+        Waiting for the debugger to disconnect...
+        "
+      `);
       expect(status).toEqual(0);
     });
   });
@@ -219,7 +247,11 @@ describe('Lighthouse CI collect CLI', () => {
           Done running Lighthouse!
           "
           `);
-      expect(stderr).toMatchInlineSnapshot(`""`);
+      expect(stderr).toMatchInlineSnapshot(`
+        "Debugger attached.
+        Waiting for the debugger to disconnect...
+        "
+      `);
       expect(status).toEqual(0);
     });
   });

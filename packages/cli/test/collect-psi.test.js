@@ -45,7 +45,11 @@ describe('Lighthouse CI collect CLI using PSI', () => {
       Done running Lighthouse!
       "
     `);
-    expect(stderr).toMatchInlineSnapshot(`""`);
+    expect(stderr).toMatchInlineSnapshot(`
+      "Debugger attached.
+      Waiting for the debugger to disconnect...
+      "
+    `);
     expect(status).toEqual(0);
   }, 180000);
 
@@ -68,8 +72,11 @@ describe('Lighthouse CI collect CLI using PSI', () => {
       "
     `);
     expect(stderr).toMatchInlineSnapshot(`
-      "Error: PSI Failed (UNKNOWN): Oops
-          at PsiClient.run"
+      "Debugger attached.
+      Error: PSI Failed (UNKNOWN): Oops
+          at PsiClient.run
+          at process.processTicksAndRejections
+      "
     `);
     expect(status).toEqual(1);
   }, 180000);

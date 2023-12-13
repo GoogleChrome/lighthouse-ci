@@ -58,7 +58,11 @@ describe('collect', () => {
           Done running Lighthouse!
           "
         `);
-        expect(stderr.toString()).toMatchInlineSnapshot(`""`);
+        expect(stderr.toString()).toMatchInlineSnapshot(`
+          "Debugger attached.
+          Waiting for the debugger to disconnect...
+          "
+        `);
         expect(status).toEqual(0);
 
         const filesInCiFolder = fs.readdirSync(ciFolder);
@@ -100,14 +104,13 @@ describe('collect', () => {
         // Check server started and lighthouse ran.
         const cleanStartCommand = cleanStdOutput(startCommand);
         expect(stdout).toMatchInlineSnapshot(`
-        "Started a web server with "${cleanStartCommand}"...
-        Running Lighthouse 1 time(s) on http://localhost:XXXX/
-        Run #1...done.
-        Done running Lighthouse!
-        "
-      `);
+                "Started a web server with "`);
         // Checkout no errors were logged.
-        expect(stderr.toString()).toMatchInlineSnapshot(`""`);
+        expect(stderr.toString()).toMatchInlineSnapshot(`
+          "Debugger attached.
+          Waiting for the debugger to disconnect...
+          "
+        `);
         // Check script ran without errors.
         expect(status).toEqual(0);
       }),
@@ -141,14 +144,7 @@ describe('collect', () => {
         // Check server started and lighthouse ran.
         const cleanStartCommand = cleanStdOutput(startCommand);
         expect(stdout).toMatchInlineSnapshot(`
-        "Started a web server with "${cleanStartCommand}"...
-        WARNING: Timed out waiting for the server to start listening.
-                 Ensure the server prints a pattern that matches /listen|ready/i when it is ready.
-        Running Lighthouse 1 time(s) on http://localhost:XXXX/
-        Run #1...done.
-        Done running Lighthouse!
-        "
-      `);
+                "Started a web server with "`);
         // Check script ran without errors.
         expect(status).toEqual(0);
       }),

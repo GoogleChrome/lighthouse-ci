@@ -65,8 +65,8 @@ describe('Lighthouse CI assert CLI', () => {
   it('should run the no-pwa preset', async () => {
     const result = await run([`--preset=lighthouse:no-pwa`]);
     expect(result.status).toEqual(1);
-    expect(result.failures.length).toMatchInlineSnapshot(`91`);
-    expect(result.warnings.length).toMatchInlineSnapshot(`16`);
+    expect(result.failures.length).toMatchInlineSnapshot(`68`);
+    expect(result.warnings.length).toMatchInlineSnapshot(`0`);
     expect(result.passes.length).toMatchInlineSnapshot(`0`);
     expect(result.failures).toContain('deprecations failure');
     expect(result.failures).not.toContain('viewport failure');

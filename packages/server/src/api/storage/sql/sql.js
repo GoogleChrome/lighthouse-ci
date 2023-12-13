@@ -638,7 +638,10 @@ class SqlStorageMethod {
    */
   async getRuns(projectId, buildId, options) {
     const {runModel} = this._sql();
-    const runs = await this._findAll(runModel, {where: {...options, projectId, buildId}, order: orderByCreated});
+    const runs = await this._findAll(runModel, {
+      where: {...options, projectId, buildId},
+      order: orderByCreated,
+    });
     return clone(runs);
   }
 
@@ -730,7 +733,10 @@ class SqlStorageMethod {
    */
   async _getStatistics(projectId, buildId) {
     const {statisticModel} = this._sql();
-    const statistics = await this._findAll(statisticModel, {where: {projectId, buildId}, order: orderByCreated});
+    const statistics = await this._findAll(statisticModel, {
+      where: {projectId, buildId},
+      order: orderByCreated,
+    });
     return clone(statistics).map(normalizeStatistic);
   }
 

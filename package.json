@@ -81,7 +81,7 @@
     "puppeteer-core": "^19.7.1",
     "rimraf": "^3.0.2",
     "sqlite3": "^5.1.2",
-    "ts-jest": "^29.0.5",
-    "typescript": "^4.5.4"
+    "ts-jest": "^29.1.1",
+    "typescript": "^5.3.3"
   }
 }

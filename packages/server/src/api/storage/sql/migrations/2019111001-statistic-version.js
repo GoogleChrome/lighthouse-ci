@@ -13,7 +13,7 @@ module.exports = {
    * @param {typeof import('sequelize')} Sequelize
    */
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.addColumn('statistics', 'version', {type: Sequelize.NUMERIC(8, 2)});
+    await queryInterface.addColumn('statistics', 'version', {type: Sequelize.DECIMAL(8, 2)});
     await queryInterface.bulkUpdate(
       'statistics',
       {version: 1},

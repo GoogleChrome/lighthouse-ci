@@ -328,7 +328,7 @@ For more information on how to use puppeteer, read up on [their API docs](https:
 
 #### `puppeteerLaunchOptions`
 
-An object of options to pass to puppeteer's [`launch` method](https://github.com/puppeteer/puppeteer/blob/v2.0.0/docs/api.md#puppeteerlaunchoptions). Only used when `puppeterScript` is set.
+An object of options to pass to puppeteer's [`launch` method](https://github.com/puppeteer/puppeteer/blob/v2.0.0/docs/api.md#puppeteerlaunchoptions). Only used when `puppeteerScript` is set.
 
 #### `psiApiKey`
 

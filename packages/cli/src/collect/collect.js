@@ -96,7 +96,7 @@ function buildCommand(yargs) {
     },
     staticDirFileDiscoveryDepth: {
       description:
-          'The maximum depth level of nested folders that Lighthouse will look into to discover URLs. If not set, this will default to 2.',
+        'The maximum depth level of nested folders that Lighthouse will look into to discover URLs. If not set, this will default to 2.',
       default: 2,
       type: 'number',
     },

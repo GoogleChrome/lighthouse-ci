@@ -33,9 +33,6 @@ function createRouter(context) {
     '/',
     handleAsyncError(async (req, res) => {
       const unsavedProject = req.body;
-      if (!unsavedProject.name) {
-        throw new Error(`missing name field in ${JSON.stringify(req.body, null, 2)}`);
-      }
       const project = await context.storageMethod.createProject(unsavedProject);
       res.json(project);
     })

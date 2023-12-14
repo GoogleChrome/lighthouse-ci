@@ -390,6 +390,7 @@ class SqlStorageMethod {
    */
   async _createProject(unsavedProject) {
     const {projectModel} = this._sql();
+    if (typeof unsavedProject.name !== 'string') throw new E422('Project name missing');
     if (unsavedProject.name.length < 4) throw new E422('Project name too short');
     const projectId = uuid.v4();
     const adminToken = generateAdminToken();

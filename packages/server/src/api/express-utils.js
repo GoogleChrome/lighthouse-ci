@@ -26,6 +26,8 @@ module.exports = {
         .catch(err => {
           if (err.name === 'SequelizeDatabaseError' && err.message.includes('value too long')) {
             next(new E422(err.message));
+          } else if (err.name === 'SequelizeDatabaseError') {
+            next(new Error(err.message + '\n' + err.stack));
           } else {
             next(err);
           }

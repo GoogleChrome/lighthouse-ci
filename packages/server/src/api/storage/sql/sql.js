@@ -5,6 +5,7 @@
  */
 'use strict';
 
+const path = require('path');
 const log = require('debug')('lhci:server:sql');
 const logVerbose = require('debug')('lhci:server:sql:verbose');
 const uuid = require('uuid');
@@ -144,7 +145,7 @@ function createUmzug(sequelize, options) {
     }),
     context: {queryInterface: sequelize.getQueryInterface(), options},
     migrations: {
-      glob: `${__dirname}/migrations/*.js`,
+      glob: path.posix.join(__dirname.replaceAll('\\', '/'), 'migrations/*.js'),
       resolve: ({name, path, context}) => {
         if (!path) throw new Error('unexpected missing path');
 

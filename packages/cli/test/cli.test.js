@@ -7,6 +7,7 @@
 
 /* eslint-env jest */
 
+const assert = require('assert');
 const path = require('path');
 const os = require('os');
 const fs = require('fs');
@@ -24,6 +25,17 @@ const {
 } = require('./test-utils.js');
 
 jest.setTimeout(120e3);
+
+async function fetchJson(url) {
+  const response = await fetch(url);
+  const text = await response.text();
+  if (text[0] === '<') {
+    // Yes, print it also. Because Jest loves to trim error messages.
+    console.error(`Got a bad response, expected JSON but saw:\n\n${text}`);
+    assert.fail(`Got a bad response, expected JSON but saw:\n\n${text}`);
+  }
+  return JSON.parse(text);
+}
 
 describe('Lighthouse CI CLI', () => {
   const rcFile = path.join(__dirname, 'fixtures/lighthouserc.json');
@@ -53,8 +65,7 @@ describe('Lighthouse CI CLI', () => {
 
   describe('server', () => {
     it('should accept requests', async () => {
-      const response = await fetch(`http://localhost:${server.port}/v1/projects`);
-      const projects = await response.json();
+      const projects = await fetchJson(`http://localhost:${server.port}/v1/projects`);
       expect(projects).toEqual([]);
     });
   });
@@ -246,11 +257,10 @@ describe('Lighthouse CI CLI', () => {
 
     it('should have saved lhrs to the API', async () => {
       const [projectId, buildId, runAId, runBId] = uuids;
-      const response = await fetch(
+
+      const runs = await fetchJson(
         `http://localhost:${server.port}/v1/projects/${projectId}/builds/${buildId}/runs`
       );
-
-      const runs = await response.json();
       expect(runs.map(run => run.id)).toEqual([runBId, runAId]);
       expect(runs.map(run => run.url)).toEqual([
         'http://localhost:PORT/app/', // make sure we replaced the port
@@ -264,11 +274,10 @@ describe('Lighthouse CI CLI', () => {
 
     it('should have sealed the build', async () => {
       const [projectId, buildId] = uuids;
-      const response = await fetch(
+
+      const build = await fetchJson(
         `http://localhost:${server.port}/v1/projects/${projectId}/builds/${buildId}`
       );
-
-      const build = await response.json();
       expect(build).toMatchObject({lifecycle: 'sealed'});
     });
 

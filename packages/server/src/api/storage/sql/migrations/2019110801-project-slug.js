@@ -5,14 +5,15 @@
  */
 'use strict';
 
+const Sequelize = require('sequelize');
+
 /* eslint-disable new-cap */
 
 module.exports = {
   /**
-   * @param {import('sequelize').QueryInterface} queryInterface
-   * @param {typeof import('sequelize')} Sequelize
+   * @param {{queryInterface: import('sequelize').QueryInterface, options: LHCI.ServerCommand.StorageOptions}} _
    */
-  up: async (queryInterface, Sequelize) => {
+  up: async ({queryInterface}) => {
     await queryInterface.addColumn('projects', 'slug', {type: Sequelize.STRING(40)});
     await queryInterface.bulkUpdate(
       'projects',
@@ -28,9 +29,9 @@ module.exports = {
     });
   },
   /**
-   * @param {import('sequelize').QueryInterface} queryInterface
+   * @param {{queryInterface: import('sequelize').QueryInterface, options: LHCI.ServerCommand.StorageOptions}} _
    */
-  down: async queryInterface => {
+  down: async ({queryInterface}) => {
     await queryInterface.removeIndex('projects', 'projects_unique_slug');
     await queryInterface.removeColumn('projects', 'slug');
   },

@@ -25,7 +25,8 @@
     "test:lint:jsx": "eslint ./packages/server/src/ui ./packages/viewer/src/ui",
     "test:lint:tests": "eslint ./packages/*/test",
     "test:docker": "bash scripts/test-docker.sh",
-    "test:unit": "jest --maxWorkers=1"
+    "test:unit": "jest --maxWorkers=2",
+    "test:unit:ci": "jest"
   },
   "devDependencies": {
     "@chialab/esbuild-plugin-html": "^0.17.2",
@@ -77,8 +78,8 @@
     "preact-render-to-json": "^3.6.6",
     "prettier": "2.5.1",
     "prop-types": "^15.7.2",
-    "puppeteer": "^19.7.1",
-    "puppeteer-core": "^19.7.1",
+    "puppeteer": "^21.6.1",
+    "puppeteer-core": "^21.6.1",
     "rimraf": "^3.0.2",
     "sqlite3": "^5.1.2",
     "ts-jest": "^29.1.1",

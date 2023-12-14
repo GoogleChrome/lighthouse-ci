@@ -9,6 +9,7 @@
 import * as path from 'path';
 import initStoryshots_ from '@storybook/addon-storyshots';
 import {imageSnapshot} from '@storybook/addon-storyshots-puppeteer';
+import puppeteer from 'puppeteer';
 
 let initStoryshots = initStoryshots_;
 
@@ -28,6 +29,13 @@ initStoryshots({
   // Use a storyKindRegex as an `.only`-like filter on the "Image Storyshots" tests.
   // storyKindRegex: /Graph/,
   test: imageSnapshot({
+    getCustomBrowser: () => {
+      return puppeteer.launch({
+        headless: 'new',
+        // Avoids "ws does not work in the browser. Browser clients must use the native WebSocket object".
+        args: ['--remote-debugging-pipe'],
+      });
+    },
     storybookUrl: `http://localhost:${process.env.STORYBOOK_PORT}`,
     beforeScreenshot: async page => {
       // The browser is reused, so set the viewport back to a good default.

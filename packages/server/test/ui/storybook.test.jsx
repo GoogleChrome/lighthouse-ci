@@ -23,6 +23,9 @@ if (process.env.CI && require('os').platform() !== 'darwin') {
   };
 }
 
+// TODO: We need to migrate away from this.
+// https://storybook.js.org/docs/writing-tests/storyshots-migration-guide
+
 initStoryshots({
   configPath: path.join(__dirname, '../../.storybook'),
   suite: 'Image Storyshots',

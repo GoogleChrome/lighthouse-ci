@@ -5,21 +5,22 @@
  */
 'use strict';
 
+const Sequelize = require('sequelize');
+
 /* eslint-disable new-cap */
 
 module.exports = {
   /**
-   * @param {import('sequelize').QueryInterface} queryInterface
-   * @param {typeof import('sequelize')} Sequelize
+   * @param {{queryInterface: import('sequelize').QueryInterface, options: LHCI.ServerCommand.StorageOptions}} _
    */
-  up: async (queryInterface, Sequelize) => {
+  up: async ({queryInterface}) => {
     await queryInterface.addColumn('builds', 'committedAt', {type: Sequelize.DATE(6)});
     await queryInterface.addColumn('builds', 'ancestorCommittedAt', {type: Sequelize.DATE(6)});
   },
   /**
-   * @param {import('sequelize').QueryInterface} queryInterface
+   * @param {{queryInterface: import('sequelize').QueryInterface, options: LHCI.ServerCommand.StorageOptions}} _
    */
-  down: async queryInterface => {
+  down: async ({queryInterface}) => {
     await queryInterface.removeColumn('builds', 'committedAt');
     await queryInterface.removeColumn('builds', 'ancestorCommittedAt');
   },

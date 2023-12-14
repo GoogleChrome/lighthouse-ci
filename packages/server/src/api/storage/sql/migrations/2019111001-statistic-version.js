@@ -5,14 +5,15 @@
  */
 'use strict';
 
+const Sequelize = require('sequelize');
+
 /* eslint-disable new-cap */
 
 module.exports = {
   /**
-   * @param {import('sequelize').QueryInterface} queryInterface
-   * @param {typeof import('sequelize')} Sequelize
+   * @param {{queryInterface: import('sequelize').QueryInterface, options: LHCI.ServerCommand.StorageOptions}} _
    */
-  up: async (queryInterface, Sequelize) => {
+  up: async ({queryInterface}) => {
     await queryInterface.addColumn('statistics', 'version', {type: Sequelize.DECIMAL(8, 2)});
     await queryInterface.bulkUpdate(
       'statistics',
@@ -22,9 +23,9 @@ module.exports = {
     );
   },
   /**
-   * @param {import('sequelize').QueryInterface} queryInterface
+   * @param {{queryInterface: import('sequelize').QueryInterface, options: LHCI.ServerCommand.StorageOptions}} _
    */
-  down: async queryInterface => {
+  down: async ({queryInterface}) => {
     await queryInterface.removeColumn('statistics', 'version');
   },
 };

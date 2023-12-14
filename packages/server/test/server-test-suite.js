@@ -51,13 +51,13 @@ function runTests(state) {
 
   describe('/v1/projects', () => {
     it('should create a project', async () => {
-      const payload = {name: 'Lighthouse', externalUrl: 'https://github.com/lighthouse'};
+      const payload = {name: 'Lighthouse A', externalUrl: 'https://github.com/lighthouse'};
       projectA = await client.createProject(payload);
       expect(projectA).toHaveProperty('id');
       expect(projectA).toHaveProperty('token');
       expect(projectA).toHaveProperty('adminToken');
       expect(projectA).toHaveProperty('baseBranch', 'master');
-      expect(projectA).toHaveProperty('slug', 'lighthouse');
+      expect(projectA).toHaveProperty('slug', 'lighthouse-a');
       expect(projectA).toMatchObject(payload);
       expect(projectA.token).toMatch(/^\w{8}-\w{4}/);
       expect(projectA.adminToken).toMatch(/^\w{40}$/);
@@ -65,36 +65,36 @@ function runTests(state) {
 
     it('should create a 2nd project', async () => {
       const payload = {
-        name: 'Lighthouse 2',
+        name: 'Lighthouse C',
         externalUrl: 'https://gitlab.com/lighthouse',
         baseBranch: '',
-      };
-      projectB = await client.createProject(payload);
-      expect(projectB.id).not.toEqual(projectA.id);
-      expect(projectB).toHaveProperty('id');
-      expect(projectB).toHaveProperty('slug', 'lighthouse-2');
-      expect(projectB).toMatchObject({...payload, baseBranch: 'master'});
-    });
-
-    it('should create a 3rd project', async () => {
-      const payload = {
-        name: 'Lighthouse 3',
-        externalUrl: 'https://gitlab.com/lighthouse',
-        baseBranch: 'dev',
       };
       projectC = await client.createProject(payload);
       expect(projectC.id).not.toEqual(projectA.id);
       expect(projectC).toHaveProperty('id');
-      expect(projectC).toHaveProperty('slug', 'lighthouse-3');
-      expect(projectC).toMatchObject(payload);
+      expect(projectC).toHaveProperty('slug', 'lighthouse-c');
+      expect(projectC).toMatchObject({...payload, baseBranch: 'master'});
+    });
+
+    it('should create a 3rd project', async () => {
+      const payload = {
+        name: 'Lighthouse B',
+        externalUrl: 'https://gitlab.com/lighthouse',
+        baseBranch: 'dev',
+      };
+      projectB = await client.createProject(payload);
+      expect(projectB.id).not.toEqual(projectA.id);
+      expect(projectB).toHaveProperty('id');
+      expect(projectB).toHaveProperty('slug', 'lighthouse-b');
+      expect(projectB).toMatchObject(payload);
     });
 
     it('should list projects', async () => {
       const projects = await client.getProjects();
       expect(projects).toEqual([
-        {...projectC, adminToken: '', token: ''},
-        {...projectB, adminToken: '', token: ''},
         {...projectA, adminToken: '', token: ''},
+        {...projectB, adminToken: '', token: ''},
+        {...projectC, adminToken: '', token: ''},
       ]);
     });
 
@@ -109,7 +109,7 @@ function runTests(state) {
     });
 
     it('should fetch a project by slug', async () => {
-      const project = await client.findProjectBySlug('lighthouse');
+      const project = await client.findProjectBySlug('lighthouse-a');
       expect(project).toEqual({...projectA, adminToken: '', token: ''});
     });
 

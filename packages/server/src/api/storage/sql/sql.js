@@ -172,7 +172,13 @@ function normalizeStatistic(statistic) {
  * Sort all records by most recently created
  * @type {import("sequelize").Order}
  */
-const order = [['createdAt', 'desc']];
+const orderByCreated = [['createdAt', 'DESC']];
+
+/**
+ * Sort all records by name
+ * @type {import("sequelize").Order}
+ */
+const orderByName = [['name', 'ASC']];
 
 class SqlStorageMethod {
   constructor() {
@@ -298,7 +304,7 @@ class SqlStorageMethod {
    */
   async getProjects() {
     const {projectModel} = this._sql();
-    const projects = await this._findAll(projectModel, {order});
+    const projects = await this._findAll(projectModel, {order: orderByName});
     return projects.map(clone);
   }
 
@@ -414,7 +420,7 @@ class SqlStorageMethod {
     const {buildModel} = this._sql();
     const builds = await this._findAll(buildModel, {
       where: {projectId, ...omit(options, ['limit'], {dropUndefined: true})},
-      order,
+      order: orderByCreated,
       limit: options.limit || 10,
     });
     return clone(builds);
@@ -632,7 +638,10 @@ class SqlStorageMethod {
    */
   async getRuns(projectId, buildId, options) {
     const {runModel} = this._sql();
-    const runs = await this._findAll(runModel, {where: {...options, projectId, buildId}, order});
+    const runs = await this._findAll(runModel, {
+      where: {...options, projectId, buildId},
+      order: orderByCreated,
+    });
     return clone(runs);
   }
 
@@ -724,7 +733,10 @@ class SqlStorageMethod {
    */
   async _getStatistics(projectId, buildId) {
     const {statisticModel} = this._sql();
-    const statistics = await this._findAll(statisticModel, {where: {projectId, buildId}, order});
+    const statistics = await this._findAll(statisticModel, {
+      where: {projectId, buildId},
+      order: orderByCreated,
+    });
     return clone(statistics).map(normalizeStatistic);
   }
 

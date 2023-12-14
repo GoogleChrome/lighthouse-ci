@@ -30,6 +30,8 @@ async function fetchJson(url) {
   const response = await fetch(url);
   const text = await response.text();
   if (text[0] === '<') {
+    // Yes, print it also. Because Jest loves to trim error messages.
+    console.error(`Got a bad response, expected JSON but saw:\n\n${text}`);
     assert.fail(`Got a bad response, expected JSON but saw:\n\n${text}`);
   }
   return JSON.parse(text);

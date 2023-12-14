@@ -17,7 +17,7 @@
     "build:watch": "node ../../scripts/build-app.js watch ./src/ui/index.html ./dist /app/",
     "build:source-map-explorer": "npm run clean && npm run build && ../../scripts/source-map-explorer.sh",
     "build:storybook": "storybook build",
-    "start:storybook": "start-storybook -p 6006"
+    "start:storybook": "storybook dev -p 6006"
   },
   "dependencies": {
     "@lhci/utils": "0.1.0",

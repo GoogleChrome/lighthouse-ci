@@ -50,9 +50,9 @@ initStoryshots({
       await page.waitForTimeout(2000);
 
       const dimensions = await page.evaluate(() => {
-        // Note: #root is made by storybook, #storybook-test-root is made by us in preview.jsx
-        // #root > #storybook-test-root > some_element_being_tested
-        const elements = [...document.querySelectorAll('#root, #root *')];
+        // Note: #storybook-root is made by storybook, #storybook-test-root is made by us in preview.jsx
+        // #storybook-root > #storybook-test-root > some_element_being_tested
+        const elements = [...document.querySelectorAll('#storybook-root, #storybook-root *')];
         return {
           width: Math.ceil(Math.max(...elements.map(e => e.clientWidth))),
           height: Math.ceil(Math.max(...elements.map(e => e.clientHeight))),

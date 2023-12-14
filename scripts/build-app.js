@@ -124,8 +124,6 @@ async function main() {
   await context.rebuild();
   if (command === 'watch') {
     await context.watch();
-    await context.serve({port: 9009});
-    console.log('http://localhost:9009');
   } else {
     await context.dispose();
   }

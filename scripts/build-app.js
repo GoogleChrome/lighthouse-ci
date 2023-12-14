@@ -37,6 +37,7 @@ function fixHtmlSubresourceUrls(result, buildOptions) {
 
   const htmls = Object.keys(result.metafile.outputs).filter(o => o.endsWith('.html'));
   const csss = Object.keys(result.metafile.outputs).filter(o => o.endsWith('.css'));
+  const jss = Object.keys(result.metafile.outputs).filter(o => o.endsWith('.js'));
   if (htmls.length !== 1) throw new Error('expected exactly one generated html ' + htmls);
   if (csss.length !== 1) throw new Error('expected exactly one generated css ' + csss);
   const htmlDistPath = htmls[0];
@@ -70,6 +71,13 @@ function fixHtmlSubresourceUrls(result, buildOptions) {
     .readFileSync(cssDistPath, 'utf-8')
     .replaceAll(`url(./assets`, `url(../assets`);
   fs.writeFileSync(cssDistPath, newCssText);
+
+  for (const jsPath of jss) {
+    const newJsText = fs
+      .readFileSync(jsPath, 'utf-8')
+      .replaceAll('sourceMappingURL=chunks/', 'sourceMappingURL=');
+    fs.writeFileSync(jsPath, newJsText);
+  }
 }
 
 async function main() {

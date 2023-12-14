@@ -91,7 +91,7 @@ function handleFileInput(props, fileList) {
   });
 }
 
-/** @param {ReportUploadBoxProps} props @param {import('preact/hooks').Ref<DragData>} dragTargetRef @param {(b: boolean) => void} setIsDragging @param {Event} e */
+/** @param {ReportUploadBoxProps} props @param {import('preact/hooks').MutableRef<DragData>} dragTargetRef @param {(b: boolean) => void} setIsDragging @param {Event} e */
 function handleDragEnter(props, dragTargetRef, setIsDragging, e) {
   if (!(e.target instanceof HTMLElement)) return;
   e.stopPropagation();
@@ -100,7 +100,7 @@ function handleDragEnter(props, dragTargetRef, setIsDragging, e) {
   dragTargetRef.current = e.target;
 }
 
-/** @param {ReportUploadBoxProps} props @param {import('preact/hooks').Ref<DragData>} dragTargetRef @param {(b: boolean) => void} setIsDragging @param {Event} e */
+/** @param {ReportUploadBoxProps} props @param {import('preact/hooks').MutableRef<DragData>} dragTargetRef @param {(b: boolean) => void} setIsDragging @param {Event} e */
 function handleDragLeave(props, dragTargetRef, setIsDragging, e) {
   if (e.target !== dragTargetRef.current) return;
   e.stopPropagation();
@@ -116,7 +116,7 @@ function handleDragOver(props, dragTargetRef, setIsDragging, e) {
   e.preventDefault();
 }
 
-/** @param {Pick<ReportUploadBoxProps, 'addToast'|'setReport'>} props @param {import('preact/hooks').Ref<DragData>} dragTargetRef @param {(b: boolean) => void} setIsDragging @param {Event} e */
+/** @param {Pick<ReportUploadBoxProps, 'addToast'|'setReport'>} props @param {import('preact/hooks').MutableRef<DragData>} dragTargetRef @param {(b: boolean) => void} setIsDragging @param {Event} e */
 function handleDrop(props, dragTargetRef, setIsDragging, e) {
   if (!dragTargetRef.current) return;
   if (!(e instanceof DragEvent)) return;

@@ -232,6 +232,9 @@ Options:
   --maxAutodiscoverUrls      The maximum number of pages to collect when using the staticDistDir
                              option with no specified URL. Disable this limit by setting to 0.
                                                                                [number] [default: 5]
+  --staticDirFileDiscoveryDepth The maximum depth of nested folders Lighthouse will look into to discover 
+                                URLs on a static file folder.
+                                                                               [number] [default: 2]
 ```
 
 #### `method`
@@ -420,6 +423,25 @@ lhci collect --staticDistDir=./public --url=http://localhost/products/pricing/
 lhci collect --url=https://example-1.com --url=https://example-2.com
 # Have LHCI start a server and login with puppeteer before running
 lhci collect --start-server-command="yarn serve" --url=http://localhost:8080/ --puppeteer-script=./path/to/login-with-puppeteer.js
+```
+
+### `staticDirFileDiscoveryDepth`
+
+The maximum depth level of nested folders that Lighthouse will look into to discover URLs. If not set, this will default to 2.
+
+### Example
+```text
+
+public/
+├── index.html               #level 0                      
+├── contact/
+│   └── index.html           #level 1
+├── projects/
+│   ├──index.html            #level 1
+│   └── crisis/
+│       ├──index.html        #level 2
+│       └── earthquake/
+│           └── index.html   #level 3
 ```
 
 ---

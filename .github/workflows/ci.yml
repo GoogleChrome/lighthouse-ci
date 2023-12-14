@@ -30,7 +30,7 @@ jobs:
           cache: yarn
       - run: yarn install --frozen-lockfile
       - run: yarn build
-      - run: yarn test:unit || yarn test:unit --onlyFailures || yarn test:unit --onlyFailures
+      - run: yarn test:unit:ci || yarn test:unit:ci --onlyFailures --maxWorkers=1 || yarn test:unit:ci --onlyFailures --maxWorkers=1
       - if: ${{ failure() }}
         uses: actions/upload-artifact@v2
         with:
@@ -93,7 +93,7 @@ jobs:
       - run: yarn test:typecheck
       - run: yarn test:lint
       - name: Run yarn test:unit
-        run: yarn test:unit || yarn test:unit --onlyFailures || yarn test:unit --onlyFailures
+        run: yarn test:unit:ci || yarn test:unit:ci --onlyFailures --maxWorkers=1 || yarn test:unit:ci --onlyFailures --maxWorkers=1
       - run: yarn test:docker
       # TODO: re-enable, once we have canary server up again
       # - run: yarn ci:dogfood

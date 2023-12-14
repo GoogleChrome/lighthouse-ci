@@ -58,11 +58,7 @@ describe('collect', () => {
           Done running Lighthouse!
           "
         `);
-        expect(stderr.toString()).toMatchInlineSnapshot(`
-          "Debugger attached.
-          Waiting for the debugger to disconnect...
-          "
-        `);
+        expect(stderr.toString()).toMatchInlineSnapshot(`""`);
         expect(status).toEqual(0);
 
         const filesInCiFolder = fs.readdirSync(ciFolder);
@@ -104,13 +100,14 @@ describe('collect', () => {
         // Check server started and lighthouse ran.
         const cleanStartCommand = cleanStdOutput(startCommand);
         expect(stdout).toMatchInlineSnapshot(`
-                "Started a web server with "`);
-        // Checkout no errors were logged.
-        expect(stderr.toString()).toMatchInlineSnapshot(`
-          "Debugger attached.
-          Waiting for the debugger to disconnect...
+          "Started a web server with "SERVER_START_PORT=XXXX SERVER_START_MESSAGE='Running server' node /Users/cjamcl/src/lighthouse-ci/packages/cli/test/fixtures/autorun-start-server/autorun-server.js"...
+          Running Lighthouse 1 time(s) on http://localhost:XXXX/
+          Run #1...done.
+          Done running Lighthouse!
           "
         `);
+        // Checkout no errors were logged.
+        expect(stderr.toString()).toMatchInlineSnapshot(`""`);
         // Check script ran without errors.
         expect(status).toEqual(0);
       }),
@@ -144,7 +141,14 @@ describe('collect', () => {
         // Check server started and lighthouse ran.
         const cleanStartCommand = cleanStdOutput(startCommand);
         expect(stdout).toMatchInlineSnapshot(`
-                "Started a web server with "`);
+          "Started a web server with "SERVER_START_PORT=XXXX SERVER_START_MESSAGE='Running server' node /Users/cjamcl/src/lighthouse-ci/packages/cli/test/fixtures/autorun-start-server/autorun-server.js"...
+          WARNING: Timed out waiting for the server to start listening.
+                   Ensure the server prints a pattern that matches /listen|ready/i when it is ready.
+          Running Lighthouse 1 time(s) on http://localhost:XXXX/
+          Run #1...done.
+          Done running Lighthouse!
+          "
+        `);
         // Check script ran without errors.
         expect(status).toEqual(0);
       }),

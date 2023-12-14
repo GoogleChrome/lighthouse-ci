@@ -72,11 +72,7 @@ describe('Lighthouse CI collect CLI with puppeteer', () => {
       Done running Lighthouse!
       "
     `);
-    expect(stderr).toMatchInlineSnapshot(`
-      "Debugger attached.
-      Waiting for the debugger to disconnect...
-      "
-    `);
+    expect(stderr).toMatchInlineSnapshot(`""`);
     expect(status).toEqual(0);
 
     const files = fs.readdirSync(path.join(autorunDir, '.lighthouseci'));

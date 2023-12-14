@@ -7,6 +7,7 @@
 
 /* eslint-env jest */
 
+const assert = require('assert');
 const path = require('path');
 const os = require('os');
 const fs = require('fs');
@@ -29,7 +30,7 @@ async function fetchJson(url) {
   const response = await fetch(url);
   const text = await response.text();
   if (text[0] === '<') {
-    fail(`Got a bad response, expected JSON but saw:\n\n${text}`);
+    assert.fail(`Got a bad response, expected JSON but saw:\n\n${text}`);
   }
   return JSON.parse(text);
 }

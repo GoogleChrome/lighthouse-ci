@@ -8,10 +8,13 @@ declare global {
   namespace LHCI {
     namespace WizardCommand {
       export interface Options {
-        wizard?: 'new-project' | 'reset-admin-token';
+        wizard?: 'new-project' | 'reset-admin-token' | 'reset-build-token';
         extraHeaders?: Record<string, string>;
         basicAuth?: ServerCommand.Options['basicAuth'];
         serverBaseUrl?: string;
+        projectName?: string;
+        projectExternalUrl?: string;
+        projectBaseBranch?: string;
         storage?: ServerCommand.StorageOptions;
       }
     }

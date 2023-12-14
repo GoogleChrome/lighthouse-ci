@@ -74,6 +74,64 @@ describe('wizard CLI', () => {
       });
     }, 30000);
 
+    it('should create a new project with arguments', async () => {
+      server.process.kill();
+      server = await startServer(server.sqlFile, [
+        '--basicAuth.username=user',
+        '--basicAuth.password=lighthouse',
+      ]);
+
+      const {stdout, stderr, status} = await runWizardCLI(
+          [
+            '--wizard=new-project',
+            '--basicAuth.username=user',
+            '--basicAuth.password=lighthouse',
+            `--serverBaseUrl="http://localhost:${server.port}"`,
+            '--projectName="some-new-project"',
+            '--projectExternalUrl="https://somewhere.else"',
+            '--projectBaseBranch="master"',
+          ],
+          [],
+          {
+            inputWaitCondition: 'Created project',
+          }
+      );
+
+      expect(stderr).toEqual('');
+      expect(status).toEqual(0);
+
+      // Extract the regular token
+      expect(stdout).toContain('Use build token');
+      const tokenSentence = stdout
+          .match(/Use build token [\s\S]+/im)[0]
+          .replace(log.bold, '')
+          .replace(log.reset, '');
+      projectToken = tokenSentence.match(/Use build token ([\w-]+)/)[1];
+
+      // Extract the admin token
+      expect(stdout).toContain('Use admin token');
+      const adminSentence = stdout
+          .match(/Use admin token [\s\S]+/im)[0]
+          .replace(log.bold, '')
+          .replace(log.reset, '');
+      projectAdminToken = adminSentence.match(/Use admin token (\w+)/)[1];
+
+      expect(stdout).toContain(`Created project some-new-project`);
+
+      const client = new ApiClient({
+        rootURL: `http://localhost:${server.port}`,
+        basicAuth: {username: 'user', password: 'lighthouse'},
+      });
+      const project = await client.findProjectByToken(projectToken);
+      expect(project).toMatchObject({
+        name: 'some-new-project',
+        externalUrl: 'https://somewhere.else',
+        baseBranch: 'master',
+      });
+      client.setAdminToken(projectAdminToken);
+      await client.deleteProject(project.id);
+    }, 30000);
+
     it('should create a new project with config file', async () => {
       server.process.kill();
       server = await startServer(server.sqlFile, ['--basicAuth.password=lighthouse']);

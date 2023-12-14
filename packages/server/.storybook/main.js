@@ -3,9 +3,23 @@
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
  */
-'use strict';
+'use strict';;
+import { dirname, join } from "path";
 
 module.exports = {
-  stories: ['../src/**/*.stories.jsx'],
-  addons: ['@storybook/addon-actions', '@storybook/addon-links'],
+ stories: ['../src/**/*.stories.jsx'],
+ addons: [getAbsolutePath("@storybook/addon-actions"), getAbsolutePath("@storybook/addon-links")],
+
+ framework: {
+  name: getAbsolutePath("@storybook/preact-webpack5"),
+  options: {}
+ },
+
+ docs: {
+  autodocs: true
+ }
 };
+
+function getAbsolutePath(value) {
+ return dirname(require.resolve(join(value, "package.json")));
+}

@@ -9,13 +9,7 @@ module.exports = {
   root: true,
   // Start with google standard style and disable the prettier-controlled rules
   //     https://github.com/google/eslint-config-google/blob/master/index.js
-  extends: [
-    'eslint:recommended',
-    'plugin:import/errors',
-    'plugin:import/warnings',
-    'google',
-    'prettier',
-  ],
+  extends: ['eslint:recommended', 'plugin:import/errors', 'plugin:import/warnings', 'google', 'prettier', 'plugin:storybook/recommended'],
   // Use the prettier plugin to enforce prettier violations
   plugins: ['prettier', 'import'],
   ignorePatterns: ['dist/'],

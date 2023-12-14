@@ -81,7 +81,29 @@ async function main() {
     assetNames: 'assets/[name]-[hash]',
     // See the special handling in fixHtmlSubresourceUrls.
     chunkNames: `chunks/[name]-[hash]`,
-    plugins: [htmlPlugin()],
+    target: 'ES2021',
+    plugins: [
+      htmlPlugin(),
+      {
+        name: 'onEndPlugin',
+        setup(b) {
+          b.onEnd((result) => {
+            // For some reason onEnd fires twice, but only the second one has
+            // the html output. Maybe issue with html plugin?
+            if (!result.metafile?.outputs['dist/index.html']) {
+              return;
+            }
+
+            if (result) {
+              fixHtmlSubresourceUrls(result, buildOptions);
+              console.log('Built.', new Date());
+            }
+            if (result.errors.length) console.error(result.errors);
+            if (result.warnings.length) console.warn(result.warnings);
+          });
+        },
+      }
+    ],
     loader: {
       '.svg': 'file',
       '.woff': 'file',
@@ -96,24 +118,17 @@ async function main() {
     minify: true,
     sourcemap: true,
     jsxFactory: 'h',
-    watch:
-      command === 'watch'
-        ? {
-            onRebuild(err, result) {
-              if (!err && result) {
-                fixHtmlSubresourceUrls(result, buildOptions);
-              }
-            },
-          }
-        : undefined,
   };
 
-  const result = await esbuild.build(buildOptions);
-  fixHtmlSubresourceUrls(result, buildOptions);
-
-  console.log('Built.', new Date());
-  if (result.errors.length) console.error(result.errors);
-  if (result.warnings.length) console.warn(result.warnings);
+  const context = await esbuild.context(buildOptions);
+  await context.rebuild();
+  if (command === 'watch') {
+    await context.watch();
+    await context.serve({port: 9009});
+    console.log('http://localhost:9009');
+  } else {
+    await context.dispose();
+  }
 }
 
 main().catch(err => {

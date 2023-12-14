@@ -100,7 +100,7 @@ describe('collect', () => {
         // Check server started and lighthouse ran.
         const cleanStartCommand = cleanStdOutput(startCommand);
         expect(stdout).toMatchInlineSnapshot(`
-          "Started a web server with "SERVER_START_PORT=XXXX SERVER_START_MESSAGE='Running server' node /Users/cjamcl/src/lighthouse-ci/packages/cli/test/fixtures/autorun-start-server/autorun-server.js"...
+          "Started a web server with "${cleanStartCommand}"...
           Running Lighthouse 1 time(s) on http://localhost:XXXX/
           Run #1...done.
           Done running Lighthouse!

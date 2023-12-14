@@ -1,4 +1,4 @@
-FROM node:16-bullseye-slim
+FROM node:18-bullseye-slim
 
 # Set variable so puppeteer will not try to download chromium
 ENV PUPPETEER_SKIP_DOWNLOAD=true

@@ -37,6 +37,7 @@ function fixHtmlSubresourceUrls(result, buildOptions) {
 
   const htmls = Object.keys(result.metafile.outputs).filter(o => o.endsWith('.html'));
   const csss = Object.keys(result.metafile.outputs).filter(o => o.endsWith('.css'));
+  const jss = Object.keys(result.metafile.outputs).filter(o => o.endsWith('.js'));
   if (htmls.length !== 1) throw new Error('expected exactly one generated html ' + htmls);
   if (csss.length !== 1) throw new Error('expected exactly one generated css ' + csss);
   const htmlDistPath = htmls[0];
@@ -68,8 +69,15 @@ function fixHtmlSubresourceUrls(result, buildOptions) {
   // Rewrite the CSS, making sure we don't source icons relative to the chunks/css file.
   const newCssText = fs
     .readFileSync(cssDistPath, 'utf-8')
-    .replaceAll(`url(./assets`, `url(../assets`);
+    .replaceAll(`url("./assets`, `url("../assets`);
   fs.writeFileSync(cssDistPath, newCssText);
+
+  for (const jsPath of jss) {
+    const newJsText = fs
+      .readFileSync(jsPath, 'utf-8')
+      .replaceAll('sourceMappingURL=chunks/', 'sourceMappingURL=');
+    fs.writeFileSync(jsPath, newJsText);
+  }
 }
 
 async function main() {
@@ -81,7 +89,29 @@ async function main() {
     assetNames: 'assets/[name]-[hash]',
     // See the special handling in fixHtmlSubresourceUrls.
     chunkNames: `chunks/[name]-[hash]`,
-    plugins: [htmlPlugin()],
+    target: 'ES2021',
+    plugins: [
+      htmlPlugin(),
+      {
+        name: 'onEndPlugin',
+        setup(b) {
+          b.onEnd((result) => {
+            // For some reason onEnd fires twice, but only the second one has
+            // the html output. Maybe issue with html plugin?
+            if (!result.metafile?.outputs['dist/index.html']) {
+              return;
+            }
+
+            if (result) {
+              fixHtmlSubresourceUrls(result, buildOptions);
+              console.log('Built.', new Date());
+            }
+            if (result.errors.length) console.error(result.errors);
+            if (result.warnings.length) console.warn(result.warnings);
+          });
+        },
+      }
+    ],
     loader: {
       '.svg': 'file',
       '.woff': 'file',
@@ -96,24 +126,15 @@ async function main() {
     minify: true,
     sourcemap: true,
     jsxFactory: 'h',
-    watch:
-      command === 'watch'
-        ? {
-            onRebuild(err, result) {
-              if (!err && result) {
-                fixHtmlSubresourceUrls(result, buildOptions);
-              }
-            },
-          }
-        : undefined,
   };
 
-  const result = await esbuild.build(buildOptions);
-  fixHtmlSubresourceUrls(result, buildOptions);
-
-  console.log('Built.', new Date());
-  if (result.errors.length) console.error(result.errors);
-  if (result.warnings.length) console.warn(result.warnings);
+  const context = await esbuild.context(buildOptions);
+  await context.rebuild();
+  if (command === 'watch') {
+    await context.watch();
+  } else {
+    await context.dispose();
+  }
 }
 
 main().catch(err => {

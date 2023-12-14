@@ -10,13 +10,14 @@ const {h} = require('preact');
 require('./preview.css');
 require('../src/ui/app.css');
 
-const {addDecorator} = require('@storybook/preact');
-addDecorator(storyFn => (
-  <div id="storybook-test-root">
-    {storyFn()}
-  </div>
-));
-
 export const parameters = {
   layout: 'centered',
 };
+
+export const decorators = [
+  storyFn => (
+    <div id="storybook-test-root">
+      {storyFn()}
+    </div>
+  ),
+];

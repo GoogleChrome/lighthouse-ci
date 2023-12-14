@@ -59,7 +59,7 @@ export function findRootSvg(rootEl, margin) {
  * @param {{className?: string, data: T, render: (el: HTMLElement, data: T) => void, computeRerenderKey: (data: T) => string, update?: (el: HTMLElement, data: T) => void, computeUpdateKey?: (data: T) => string}} props
  */
 export const D3Graph = props => {
-  const graphElRef = useRef(/** @type {HTMLElement|undefined} */ (undefined));
+  const graphElRef = useRef(/** @type {HTMLDivElement|null} */ (null));
   const updateKey = props.computeUpdateKey ? props.computeUpdateKey(props.data) : '';
   const rerender = () => {
     if (!graphElRef.current) return;

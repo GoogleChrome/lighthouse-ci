@@ -30,7 +30,7 @@ const MOCK_LHR = JSON.stringify({
 });
 
 function getSqlFilePath() {
-  return `cli-test-${Math.round(Math.random() * 1e9)}.tmp.sql`;
+  return `cli-test-${Date.now()}-${Math.round(Math.random() * 1e9)}.tmp.sql`;
 }
 
 /** @param {import('child_process').ChildProcess & {stdoutMemory: string}} wizardProcess @param {string[]} inputs */

@@ -29,11 +29,11 @@ describe('Project dashboard', () => {
 
       expect(commits).toMatchInlineSnapshot(`
         [
+          "1252build 18call_splitmasterMay 28 6:00 AM",
+          "1251build 17call_splitmasterMay 27 6:00 AM",
           "1250build 16call_splitmasterMay 26 6:00 AM",
           "1249build 15call_splitmasterMay 25 6:00 AM",
           "1248build 14call_splitmasterMay 24 6:00 AM",
-          "1247build 13call_splitmasterMay 23 6:00 AM",
-          "1246build 12call_splitmasterMay 22 6:00 AM",
         ]
       `);
     });
@@ -45,7 +45,9 @@ describe('Project dashboard', () => {
     it('should render graphs for previously unavailable data', async () => {
       await state.page.evaluate(() => {
         const graphs = Array.from(document.querySelectorAll('.metric-line-graph__graph'));
-        if (graphs.length !== 2) throw new Error('Should have found 2 metric graphs');
+        if (graphs.length !== 2) {
+          throw new Error(`Should have found 2 metric graphs, but got ${graphs.length}`);
+        }
 
         window.scrollTo({top: graphs[0].getBoundingClientRect().top - 50});
         return new Promise(resolve => requestAnimationFrame(resolve));

@@ -440,8 +440,7 @@ describe('Lighthouse CI CLI', () => {
         1 result(s) for [1mhttp://localhost:XXXX/app/[0m :
 
           [31mX[0m  [1mresource-summary[0m.script.size failure for [1mmaxNumericValue[0m assertion
-               Keep request counts low and transfer sizes small
-               https://web.dev/use-lighthouse-for-performance-budgets/
+               Resources Summary
 
                 expected: <=[32mXXXX[0m
                    found: [31mXXXX[0m

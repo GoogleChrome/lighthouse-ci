@@ -596,7 +596,7 @@ function runTests(state) {
   describe('/:projectId/builds/:buildId/runs', () => {
     const lhr = {
       lighthouseVersion: '4.1.0',
-      finalUrl: 'https://example.com/',
+      finalDisplayedUrl: 'https://example.com/',
       audits: {
         interactive: {numericValue: 5000},
         'speed-index': {numericValue: 5000},
@@ -697,7 +697,7 @@ function runTests(state) {
         buildId: buildA.id,
         url: 'https://example.com:PORT/blog',
         lhr: JSON.stringify({
-          finalUrl: 'https://example.com/blog',
+          finalDisplayedUrl: 'https://example.com/blog',
           lighthouseVersion: '4.2.0',
           audits: {
             interactive: {numericValue: 1000},

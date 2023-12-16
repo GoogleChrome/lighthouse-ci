@@ -186,6 +186,7 @@ function createLHR(pageUrl, auditDefs, prandom) {
   return {
     requestedUrl: pageUrl,
     finalUrl: pageUrl,
+    finalDisplayedUrl: pageUrl,
     categories,
     audits,
 

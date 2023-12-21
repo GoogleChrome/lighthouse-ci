@@ -34,9 +34,9 @@ async function deleteOldBuilds(storageMethod, maxAgeInDays, skipBranches, onlyBr
     }
   );
 
-  for (const {projectId, id} of oldBuilds) {
-    await storageMethod.deleteBuild(projectId, id);
-  }
+  await Promise.all(oldBuilds.map(({projectId, id}) => {
+    return storageMethod.deleteBuild(projectId, id);
+  }));
 }
 
 /**

@@ -34,8 +34,10 @@ async function run() {
   const ancestorBuild = await remoteApi.findAncestorBuildById(projectId, buildId);
   if (!ancestorBuild) throw new Error(`No ancestor build for ${buildId}`);
 
-  const baseRuns = await remoteApi.getRuns(projectId, baseBuild.id, {representative: true});
-  const ancestorRuns = await remoteApi.getRuns(projectId, ancestorBuild.id, {representative: true});
+  const [baseRuns, ancestorRuns] = await Promise.all([
+    remoteApi.getRuns(projectId, baseBuild.id, {representative: true}),
+    remoteApi.getRuns(projectId, ancestorBuild.id, {representative: true}),
+  ]);
 
   /** @type {LHCI.ServerCommand.Project} */
   const project = {

@@ -244,7 +244,7 @@ async function runGithubStatusCheck(options, targetUrlMap) {
   );
 
   if (groupedResults.length) {
-    for (const group of groupedResults) {
+    await Promise.all(groupedResults.map((group => {
       const rawUrl = group[0].url;
       const urlLabel = getUrlLabelForGithub(rawUrl, options);
       const failedResults = group.filter(result => result.level === 'error' && !result.passed);
@@ -257,7 +257,7 @@ async function runGithubStatusCheck(options, targetUrlMap) {
         : `Passed${warningsLabel}`;
       const targetUrl = targetUrlMap.get(rawUrl) || rawUrl;
 
-      await postStatusToGitHub({
+      return postStatusToGitHub({
         slug,
         hash,
         state,
@@ -269,7 +269,7 @@ async function runGithubStatusCheck(options, targetUrlMap) {
         githubApiHost,
         githubAppUrl,
       });
-    }
+    })));
   } else {
     /** @type {Array<LH.Result>} */
     const lhrs = loadSavedLHRs().map(lhr => JSON.parse(lhr));
@@ -279,7 +279,7 @@ async function runGithubStatusCheck(options, targetUrlMap) {
 
     if (!representativeLhrs.length) return print('No LHRs for status check, skipping.\n');
 
-    for (const lhr of representativeLhrs) {
+    await Promise.all(representativeLhrs.map((lhr) => {
       const rawUrl = lhr.finalUrl;
       const urlLabel = getUrlLabelForGithub(rawUrl, options);
       const state = 'success';
@@ -290,7 +290,7 @@ async function runGithubStatusCheck(options, targetUrlMap) {
       const description = `${categoriesDescription}`;
       const targetUrl = targetUrlMap.get(rawUrl) || rawUrl;
 
-      await postStatusToGitHub({
+      return postStatusToGitHub({
         slug,
         hash,
         state,
@@ -302,7 +302,7 @@ async function runGithubStatusCheck(options, targetUrlMap) {
         githubApiHost,
         githubAppUrl,
       });
-    }
+    }));
   }
 }
 

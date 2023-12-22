@@ -19,11 +19,12 @@ jest.mock('cron', () => ({
 const {startDeleteOldBuildsCron, deleteOldBuilds} = require('../../src/cron/delete-old-builds.js');
 
 describe('cron/delete-old-builds', () => {
-  /** @type {{ findBuildsBeforeTimestamp: jest.MockInstance, deleteBuild: jest.MockInstance}} */
+  /** @type {{ findBuildsBeforeTimestamp: jest.MockInstance, findRemainingBuilds: jest.MockInstance, deleteBuild: jest.MockInstance}} */
   let storageMethod;
   beforeEach(() => {
     storageMethod = {
       findBuildsBeforeTimestamp: jest.fn().mockResolvedValue([]),
+      findRemainingBuilds: jest.fn().mockResolvedValue([]),
       deleteBuild: jest.fn().mockResolvedValue({}),
     };
 
@@ -32,11 +33,23 @@ describe('cron/delete-old-builds', () => {
     });
   });
   describe('.deleteOldBuilds', () => {
-    it.each([undefined, null, -1, new Date()])(
+    it.each([-1,  new Date()])(
       'should throw for invalid range (%s)',
       async range => {
         await expect(deleteOldBuilds(storageMethod, range)).rejects.toMatchObject({
-          message: 'Invalid range',
+          message: 'Invalid range for maxAgeInDays',
+        });
+        await expect(deleteOldBuilds(storageMethod, null, range)).rejects.toMatchObject({
+          message: 'Invalid range for totalBuildsToKeep',
+        });
+      }
+    );
+
+    it.each([null, undefined])(
+      'should throw for At least maxAgeInDays or totalBuildsToKeep should be set (%s)',
+      async range => {
+        await expect(deleteOldBuilds(storageMethod, range)).rejects.toMatchObject({
+          message: 'At least maxAgeInDays or totalBuildsToKeep should be set',
         });
       }
     );
@@ -48,7 +61,24 @@ describe('cron/delete-old-builds', () => {
         {id: 'id-2', projectId: 'pid-2'},
       ];
       storageMethod.findBuildsBeforeTimestamp.mockResolvedValue(deleteObjects);
-      await deleteOldBuilds(storageMethod, 30, null, null);
+      await deleteOldBuilds(storageMethod, 30, null, null, null);
+      expect(storageMethod.deleteBuild).toHaveBeenCalledTimes(deleteObjects.length);
+
+      expect(storageMethod.deleteBuild.mock.calls).toMatchObject([
+        ['pid-1', 'id-1'],
+        ['pid-2', 'id-2'],
+      ]);
+    });
+
+    it('should return builds', async () => {
+      storageMethod.deleteBuild.mockClear();
+      const deleteObjects = [
+        {id: 'id-1', projectId: 'pid-1'},
+        {id: 'id-2', projectId: 'pid-2'},
+      ];
+      storageMethod.findBuildsBeforeTimestamp.mockResolvedValue(deleteObjects);
+      storageMethod.findRemainingBuilds.mockResolvedValue(deleteObjects);
+      await deleteOldBuilds(storageMethod, null, 20, null, null);
       expect(storageMethod.deleteBuild).toHaveBeenCalledTimes(deleteObjects.length);
 
       expect(storageMethod.deleteBuild.mock.calls).toMatchObject([
@@ -64,7 +94,7 @@ describe('cron/delete-old-builds', () => {
         {id: 'id-2', branch: '123', projectId: 'pid-2'},
       ];
       storageMethod.findBuildsBeforeTimestamp.mockResolvedValue(deleteObjects);
-      await deleteOldBuilds(storageMethod, 30, null, ['master']);
+      await deleteOldBuilds(storageMethod, 30, null, null, ['master']);
       expect(storageMethod.deleteBuild).toHaveBeenCalledTimes(1);
 
       expect(storageMethod.deleteBuild.mock.calls).toMatchObject([['pid-1', 'id-1']]);
@@ -77,7 +107,7 @@ describe('cron/delete-old-builds', () => {
         {id: 'id-2', branch: '123', projectId: 'pid-2'},
       ];
       storageMethod.findBuildsBeforeTimestamp.mockResolvedValue(deleteObjects);
-      await deleteOldBuilds(storageMethod, 30, ['master'], null);
+      await deleteOldBuilds(storageMethod, 30, null, ['master'], null);
       expect(storageMethod.deleteBuild).toHaveBeenCalledTimes(1);
 
       expect(storageMethod.deleteBuild.mock.calls).toMatchObject([['pid-2', 'id-2']]);

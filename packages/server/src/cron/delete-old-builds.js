@@ -11,28 +11,49 @@ const {normalizeCronSchedule} = require('./utils');
 
 /**
  * @param {LHCI.ServerCommand.StorageMethod} storageMethod
- * @param {number} maxAgeInDays
+ * @param {number | null} maxAgeInDays
+ * @param {number | null} totalBuildsToKeep
  * @param {string[] | null} skipBranches
  * @param {string[] | null} onlyBranches
  * @return {Promise<void>}
  */
-async function deleteOldBuilds(storageMethod, maxAgeInDays, skipBranches, onlyBranches) {
-  if (!maxAgeInDays || !Number.isInteger(maxAgeInDays) || maxAgeInDays <= 0) {
-    throw new Error('Invalid range');
+async function deleteOldBuilds(
+  storageMethod,
+  maxAgeInDays,
+  totalBuildsToKeep,
+  skipBranches,
+  onlyBranches
+) {
+  if (!maxAgeInDays && !totalBuildsToKeep) {
+    throw new Error('At least maxAgeInDays or totalBuildsToKeep should be set');
+  } else if (!totalBuildsToKeep && maxAgeInDays && maxAgeInDays <= 0 || !totalBuildsToKeep && !Number.isInteger(maxAgeInDays)) {
+    throw new Error('Invalid range for maxAgeInDays');
+  } else if (!maxAgeInDays && totalBuildsToKeep && totalBuildsToKeep <= 0 || !maxAgeInDays && !Number.isInteger(totalBuildsToKeep)) {
+    throw new Error('Invalid range for totalBuildsToKeep');
+  }
+  /** @type {LHCI.ServerCommand.Build[]} */
+  let builds = [];
+  if (maxAgeInDays !== null) {
+    const DAY_IN_MS = 24 * 60 * 60 * 1000;
+    const cutoffTime = new Date(Date.now() - maxAgeInDays * DAY_IN_MS);
+    builds = await storageMethod.findBuildsBeforeTimestamp(cutoffTime);
+  }
+  // Try maxAgeInDays but if totalBuildsToKeep is exceeded we delete these instead.
+  if (totalBuildsToKeep !== null) {
+    const remainingBuilds = await storageMethod.findRemainingBuilds(totalBuildsToKeep);
+    if (builds.length === 0 || builds.length > remainingBuilds.length) {
+      builds = remainingBuilds;
+    }
   }
 
-  const DAY_IN_MS = 24 * 60 * 60 * 1000;
-  const cutoffTime = new Date(Date.now() - maxAgeInDays * DAY_IN_MS);
-  const oldBuilds = (await storageMethod.findBuildsBeforeTimestamp(cutoffTime)).filter(
-    ({branch}) => {
-      if (Array.isArray(skipBranches) && skipBranches.includes(branch)) {
-        return false;
-      }
-      if (Array.isArray(onlyBranches) && !onlyBranches.includes(branch)) return false;
-
-      return true;
+  const oldBuilds = builds.filter(({branch}) => {
+    if (Array.isArray(skipBranches) && skipBranches.includes(branch)) {
+      return false;
     }
-  );
+    if (Array.isArray(onlyBranches) && !onlyBranches.includes(branch)) return false;
+
+    return true;
+  });
 
   for (const {projectId, id} of oldBuilds) {
     await storageMethod.deleteBuild(projectId, id);
@@ -83,7 +104,13 @@ function startDeleteOldBuildsCron(storageMethod, options) {
 function runCronJob(storageMethod, log, cronConfig) {
   let inProgress = false;
 
-  const {schedule, maxAgeInDays, skipBranches = null, onlyBranches = null} = cronConfig;
+  const {
+    schedule,
+    maxAgeInDays = null,
+    totalBuildsToKeep = null,
+    skipBranches = null,
+    onlyBranches = null,
+  } = cronConfig;
 
   const cron = new CronJob(normalizeCronSchedule(schedule), () => {
     if (inProgress) {
@@ -92,7 +119,7 @@ function runCronJob(storageMethod, log, cronConfig) {
     }
     inProgress = true;
     log(`Starting delete old builds`);
-    deleteOldBuilds(storageMethod, maxAgeInDays, skipBranches, onlyBranches)
+    deleteOldBuilds(storageMethod, maxAgeInDays, totalBuildsToKeep, skipBranches, onlyBranches)
       .then(() => {
         log(`Successfully delete old builds`);
       })

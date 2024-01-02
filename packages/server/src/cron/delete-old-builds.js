@@ -27,13 +27,13 @@ async function deleteOldBuilds(
   if (!maxAgeInDays && !totalBuildsToKeep) {
     throw new Error('At least maxAgeInDays or totalBuildsToKeep should be set');
   } else if (
-    !totalBuildsToKeep && maxAgeInDays && maxAgeInDays <= 0 ||
-    !totalBuildsToKeep && !Number.isInteger(maxAgeInDays)
+    (!totalBuildsToKeep && maxAgeInDays && maxAgeInDays <= 0) ||
+    (!totalBuildsToKeep && !Number.isInteger(maxAgeInDays))
   ) {
     throw new Error('Invalid range for maxAgeInDays');
   } else if (
-    !maxAgeInDays && totalBuildsToKeep && totalBuildsToKeep <= 0 ||
-    !maxAgeInDays && !Number.isInteger(totalBuildsToKeep)
+    (!maxAgeInDays && totalBuildsToKeep && totalBuildsToKeep <= 0) ||
+    (!maxAgeInDays && !Number.isInteger(totalBuildsToKeep))
   ) {
     throw new Error('Invalid range for totalBuildsToKeep');
   }

@@ -33,17 +33,14 @@ describe('cron/delete-old-builds', () => {
     });
   });
   describe('.deleteOldBuilds', () => {
-    it.each([-1,  new Date()])(
-      'should throw for invalid range (%s)',
-      async range => {
-        await expect(deleteOldBuilds(storageMethod, range)).rejects.toMatchObject({
-          message: 'Invalid range for maxAgeInDays',
-        });
-        await expect(deleteOldBuilds(storageMethod, null, range)).rejects.toMatchObject({
-          message: 'Invalid range for totalBuildsToKeep',
-        });
-      }
-    );
+    it.each([-1, new Date()])('should throw for invalid range (%s)', async range => {
+      await expect(deleteOldBuilds(storageMethod, range)).rejects.toMatchObject({
+        message: 'Invalid range for maxAgeInDays',
+      });
+      await expect(deleteOldBuilds(storageMethod, null, range)).rejects.toMatchObject({
+        message: 'Invalid range for totalBuildsToKeep',
+      });
+    });
 
     it.each([null, undefined])(
       'should throw for At least maxAgeInDays or totalBuildsToKeep should be set (%s)',

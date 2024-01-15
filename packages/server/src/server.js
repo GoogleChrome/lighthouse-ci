@@ -16,6 +16,7 @@ const compression = require('compression');
 const bodyParser = require('body-parser');
 const ApiClient = require('@lhci/utils/src/api-client.js');
 const createProjectsRouter = require('./api/routes/projects.js');
+const createViewerRouter = require('./api/routes/viewer.js');
 const StorageMethod = require('./api/storage/storage-method.js');
 const {errorMiddleware, createBasicAuthMiddleware} = require('./api/express-utils.js');
 const {startPsiCollectCron} = require('./cron/psi-collect.js');
@@ -60,6 +61,7 @@ async function createApp(options) {
   app.get('/', (_, res) => res.redirect('/app'));
   app.use('/version', (_, res) => res.send(version));
   app.use('/v1/projects', createProjectsRouter(context));
+  app.use('/v1/viewer', createViewerRouter(options));
   app.use('/app', express.static(DIST_FOLDER));
   app.get('/app/*', (_, res) => res.sendFile(path.join(DIST_FOLDER, 'index.html')));
   app.use(errorMiddleware);

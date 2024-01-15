@@ -198,6 +198,9 @@ declare global {
           username?: string;
           password?: string;
         };
+        viewer?: {
+          origin?: string;
+        };
       }
 
       export interface DeleteOldBuildsCron {

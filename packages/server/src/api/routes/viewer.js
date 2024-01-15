@@ -6,7 +6,7 @@
 'use strict';
 
 const express = require('express');
-const { handleAsyncError } = require('../express-utils.js');
+const {handleAsyncError} = require('../express-utils.js');
 
 /**
  * @param {LHCI.ServerCommand.Options} options

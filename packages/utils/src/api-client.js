@@ -344,6 +344,13 @@ class ApiClient {
   }
 
   /**
+   * @return {Promise<string>}
+   */
+  async getViewerOrigin() {
+    return this._get('/v1/viewer/origin');
+  }
+
+  /**
    * @param {StrictOmit<LHCI.ServerCommand.Project, 'id'|'token'|'adminToken'>} unsavedProject
    * @return {Promise<LHCI.ServerCommand.Project>}
    */

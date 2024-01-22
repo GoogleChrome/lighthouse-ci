@@ -5,25 +5,25 @@
  */
 'use strict';
 
-/* eslint-disable new-cap */
-
 const Sequelize = require('sequelize');
 
-/** @type {LHCI.ServerCommand.TableDefinition<LHCI.ServerCommand.Project>} */
-const attributes = {
-  id: {type: Sequelize.UUID(), primaryKey: true},
-  name: {type: Sequelize.STRING(256)},
-  slug: {type: Sequelize.STRING(40)},
-  externalUrl: {type: Sequelize.STRING(256)},
-  token: {type: Sequelize.UUID()},
-  baseBranch: {type: Sequelize.STRING(80)},
-  adminToken: {type: Sequelize.STRING(64)},
-  createdAt: {type: Sequelize.DATE(6)},
-  updatedAt: {type: Sequelize.DATE(6)},
-};
+/* eslint-disable new-cap */
 
 module.exports = {
-  tableName: 'projects',
-  attributes,
-  indexes: [],
+  /**
+   * @param {{queryInterface: import('sequelize').QueryInterface, options: LHCI.ServerCommand.StorageOptions}} _
+   */
+  up: async ({queryInterface}) => {
+    await queryInterface.changeColumn('projects', 'name', {
+      type: Sequelize.STRING(256),
+    });
+  },
+  /**
+   * @param {{queryInterface: import('sequelize').QueryInterface, options: LHCI.ServerCommand.StorageOptions}} _
+   */
+  down: async ({queryInterface}) => {
+    await queryInterface.changeColumn('projects', 'name', {
+      type: Sequelize.STRING(40),
+    });
+  },
 };

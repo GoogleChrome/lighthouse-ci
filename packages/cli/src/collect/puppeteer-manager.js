@@ -62,7 +62,7 @@ class PuppeteerManager {
       ...(this._options.puppeteerLaunchOptions || {}),
       pipe: false,
       devtools: false,
-      headless: !this._options.headful,
+      headless: this._options.headful ? false : 'new',
       // The default value for `chromePath` is determined by yargs using the `getChromiumPath` method.
       executablePath: this._options.chromePath,
     });

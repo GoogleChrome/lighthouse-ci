@@ -12,7 +12,6 @@ module.exports = {
     ...recommended.assertions,
     // Every PWA audit is disabled
     'is-on-https': 'off',
-    'service-worker': 'off',
     'installable-manifest': 'off',
     'splash-screen': 'off',
     'themed-omnibox': 'off',

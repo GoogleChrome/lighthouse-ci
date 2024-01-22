@@ -399,6 +399,8 @@ class StorageMethod {
    * @param {StrictOmit<LHCI.ServerCommand.Project, 'id'|'token'|'adminToken'>} unsavedProject
    */
   static async createProjectWithUniqueSlug(storageMethod, unsavedProject) {
+    if (typeof unsavedProject.name !== 'string') throw new Error('Project name missing');
+
     const maxLength = 40;
     let randomLength = 0;
     let slug = StorageMethod.generateSlug(unsavedProject.name, {maxLength, randomLength});

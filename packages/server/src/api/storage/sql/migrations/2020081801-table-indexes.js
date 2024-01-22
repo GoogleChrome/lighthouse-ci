@@ -7,9 +7,9 @@
 
 module.exports = {
   /**
-   * @param {import('sequelize').QueryInterface} queryInterface
+   * @param {{queryInterface: import('sequelize').QueryInterface, options: LHCI.ServerCommand.StorageOptions}} _
    */
-  up: async queryInterface => {
+  up: async ({queryInterface}) => {
     await queryInterface.addIndex('builds', ['projectId', 'lifecycle', 'createdAt']);
     await queryInterface.addIndex('builds', ['projectId', 'hash', 'createdAt']);
     await queryInterface.addIndex('builds', ['projectId', 'branch', 'hash', 'createdAt']);
@@ -18,9 +18,9 @@ module.exports = {
     await queryInterface.addIndex('statistics', ['projectId', 'buildId', 'url', 'name']);
   },
   /**
-   * @param {import('sequelize').QueryInterface} queryInterface
+   * @param {{queryInterface: import('sequelize').QueryInterface, options: LHCI.ServerCommand.StorageOptions}} _
    */
-  down: async queryInterface => {
+  down: async ({queryInterface}) => {
     await queryInterface.removeIndex('builds', ['projectId', 'lifecycle']);
     await queryInterface.removeIndex('builds', ['projectId', 'hash']);
     await queryInterface.removeIndex('builds', ['projectId', 'branch', 'hash']);

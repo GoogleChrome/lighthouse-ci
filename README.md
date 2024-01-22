@@ -20,8 +20,8 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version: 16
-      - run: npm install && npm install -g @lhci/cli@0.12.x
+          node-version: 18
+      - run: npm install && npm install -g @lhci/cli@0.13.x
       - run: npm run build
       - run: lhci autorun
 ```

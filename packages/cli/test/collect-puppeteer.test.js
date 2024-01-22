@@ -78,7 +78,7 @@ describe('Lighthouse CI collect CLI with puppeteer', () => {
     const files = fs.readdirSync(path.join(autorunDir, '.lighthouseci'));
     const report = files.find(file => /lhr.*\.json$/.test(file));
     const lhr = JSON.parse(fs.readFileSync(path.join(autorunDir, '.lighthouseci', report)));
-    expect(lhr.userAgent).toContain('HeadlessChrome/111.0.5555.0'); // make sure the right chrome was used
+    expect(lhr.userAgent).toContain('Chrome/119.0.0.0'); // make sure the right chrome was used
   }, 180000);
 
   it('should not fail on providing defaults without Chrome installations', async () => {
@@ -91,9 +91,9 @@ describe('Lighthouse CI collect CLI with puppeteer', () => {
     const chromePathHelp = stdout.match(/--chromePath.*\n.*\n.*/);
     expect(chromePathHelp).toMatchInlineSnapshot(`
       [
-        "--chromePath                The path to the Chrome or Chromium executable to use for collection.
-        --puppeteerScript           The path to a script that manipulates the browser with puppeteer before running Lighthouse, used for auth.
-        --puppeteerLaunchOptions    The object of puppeteer launch options",
+        "--chromePath                   The path to the Chrome or Chromium executable to use for collection.
+        --puppeteerScript              The path to a script that manipulates the browser with puppeteer before running Lighthouse, used for auth.
+        --puppeteerLaunchOptions       The object of puppeteer launch options",
       ]
     `);
     expect(stderr).toMatchInlineSnapshot(`""`);

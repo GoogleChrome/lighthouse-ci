@@ -5,11 +5,11 @@
  */
 'use strict';
 
+const path = require('path');
 const log = require('debug')('lhci:server:sql');
 const logVerbose = require('debug')('lhci:server:sql:verbose');
-const path = require('path');
 const uuid = require('uuid');
-const Umzug = require('umzug');
+const {Umzug, SequelizeStorage} = require('umzug');
 const {Sequelize, Op} = require('sequelize');
 const {omit, padEnd} = require('@lhci/utils/src/lodash.js');
 const {hashAdminToken, generateAdminToken} = require('../auth.js');
@@ -133,15 +133,29 @@ function createSequelize(options) {
  */
 function createUmzug(sequelize, options) {
   return new Umzug({
-    logging: /** @param {*} msg */ msg => logVerbose('[umzug]', msg),
-    storage: 'sequelize',
-    storageOptions: {
-      sequelize: /** @type {*} */ (sequelize),
-      tableName: options.sqlMigrationOptions && options.sqlMigrationOptions.tableName,
+    logger: {
+      debug: msg => logVerbose('[umzug]', msg),
+      warn: msg => logVerbose('[umzug]', msg),
+      error: msg => logVerbose('[umzug]', msg),
+      info: msg => logVerbose('[umzug]', msg),
     },
+    storage: new SequelizeStorage({
+      sequelize,
+      tableName: options.sqlMigrationOptions && options.sqlMigrationOptions.tableName,
+    }),
+    context: {queryInterface: sequelize.getQueryInterface(), options},
     migrations: {
-      path: path.join(__dirname, 'migrations'),
-      params: [sequelize.getQueryInterface(), Sequelize, options],
+      glob: path.posix.join(__dirname.replaceAll('\\', '/'), 'migrations/*.js'),
+      resolve: ({name, path, context}) => {
+        if (!path) throw new Error('unexpected missing path');
+
+        const migration = require(path);
+        return {
+          name,
+          up: async () => migration.up(context),
+          down: async () => migration.down(context),
+        };
+      },
     },
   });
 }
@@ -377,6 +391,7 @@ class SqlStorageMethod {
    */
   async _createProject(unsavedProject) {
     const {projectModel} = this._sql();
+    if (typeof unsavedProject.name !== 'string') throw new E422('Project name missing');
     if (unsavedProject.name.length < 4) throw new E422('Project name too short');
     const projectId = uuid.v4();
     const adminToken = generateAdminToken();

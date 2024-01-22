@@ -260,7 +260,7 @@ module.exports = {
     return items.slice().sort((a, b) => keyFn(a) - keyFn(b));
   },
   /**
-   * @template T
+   * @template {Object} T
    * @param {T} object
    * @param {Array<keyof T>} propertiesToPick
    * @return {Partial<T>}
@@ -277,7 +277,7 @@ module.exports = {
     return out;
   },
   /**
-   * @template T
+   * @template {Object} T
    * @param {T} object
    * @param {Array<keyof T>} propertiesToDrop
    * @param {{dropUndefined?: boolean}} [options]

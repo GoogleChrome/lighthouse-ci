@@ -22,6 +22,8 @@ import lhr930A_ from '../../../../test/fixtures/lh-9-3-0-coursehero-a.json';
 import lhr930B_ from '../../../../test/fixtures/lh-9-3-0-coursehero-b.json';
 import lhr1010A_ from '../../../../test/fixtures/lh-10-1-0-coursehero-a.json';
 import lhr1010B_ from '../../../../test/fixtures/lh-10-1-0-coursehero-b.json';
+import lhr1140A_ from '../../../../test/fixtures/lh-11-4-0-coursehero-a.json';
+import lhr1140B_ from '../../../../test/fixtures/lh-11-4-0-coursehero-b.json';
 import lhrPsi800A_ from '../../../../test/fixtures/psi-8-0-0-dkdev-a.json';
 import lhrPsi800B_ from '../../../../test/fixtures/psi-8-0-0-dkdev-b.json';
 
@@ -46,6 +48,8 @@ const lhr930A = /** @type {any} */ (lhr930A_);
 const lhr930B = /** @type {any} */ (lhr930B_);
 const lhr1010A = /** @type {any} */ (lhr1010A_);
 const lhr1010B = /** @type {any} */ (lhr1010B_);
+const lhr1140A = /** @type {any} */ (lhr1140A_);
+const lhr1140B = /** @type {any} */ (lhr1140B_);
 const lhrPsi800A = /** @type {any} */ (lhrPsi800A_);
 const lhrPsi800B = /** @type {any} */ (lhrPsi800B_);
 
@@ -97,6 +101,12 @@ export const Version930 = () => (
 export const Version1010 = () => (
   <Wrapper>
     <LhrComparison lhr={lhr1010A} baseLhr={lhr1010B} hookElements={{}} />
+  </Wrapper>
+);
+
+export const Version1140 = () => (
+  <Wrapper>
+    <LhrComparison lhr={lhr1140A} baseLhr={lhr1140B} hookElements={{}} />
   </Wrapper>
 );
 

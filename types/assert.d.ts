@@ -38,6 +38,7 @@ declare global {
         includePassedAssertions?: boolean;
         budgetsFile?: string;
         assertMatrix?: BaseOptions[];
+        lhr?: string;
       }
 
       /**

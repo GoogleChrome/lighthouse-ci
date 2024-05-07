@@ -37,7 +37,7 @@
   "devDependencies": {
     "clsx": "^1.0.4",
     "d3": "^5.15.0",
-    "plotly.js": "^1.48.3",
+    "plotly.js": "^2.32.0",
     "preact": "^10.19.3",
     "preact-jsx-runtime": "^1.2.0",
     "preact-async-route": "^2.2.1",

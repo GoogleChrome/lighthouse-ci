@@ -21,7 +21,7 @@ describe('PSI API Client', () => {
     const client = new PsiClient({apiKey, fetch: fetchMock});
     expect(await client.run('https://example.com')).toEqual(lighthouseResult);
     expect(fetchMock).toHaveBeenCalledWith(
-      'https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=https%3A%2F%2Fexample.com&locale=en_US&strategy=mobile&key=the-key&category=performance&category=accessibility&category=best-practices&category=pwa&category=seo'
+      'https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=https%3A%2F%2Fexample.com&locale=en_US&strategy=mobile&key=the-key&category=performance&category=accessibility&category=best-practices&category=seo'
     );
   });
 

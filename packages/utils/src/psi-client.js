@@ -23,14 +23,14 @@ class PsiClient {
 
   /**
    * @param {string} urlToTest
-   * @param {{strategy?: 'mobile'|'desktop', locale?: string, categories?: Array<'performance' | 'accessibility' | 'best-practices' | 'pwa' | 'seo'>}} [options]
+   * @param {{strategy?: 'mobile'|'desktop', locale?: string, categories?: Array<'performance' | 'accessibility' | 'best-practices' | 'seo'>}} [options]
    * @return {Promise<LH.Result>}
    */
   async run(urlToTest, options = {}) {
     const {
       strategy = 'mobile',
       locale = 'en_US',
-      categories = ['performance', 'accessibility', 'best-practices', 'pwa', 'seo'],
+      categories = ['performance', 'accessibility', 'best-practices', 'seo'],
     } = options;
     const url = new this._URL(this._endpointURL);
     url.searchParams.set('url', urlToTest);

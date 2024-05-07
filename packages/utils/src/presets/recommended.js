@@ -19,7 +19,6 @@ module.exports = {
     'mainthread-work-breakdown': ['warn', {}],
     'max-potential-fid': ['warn', {}],
     'speed-index': ['warn', {}],
-    'uses-rel-preload': ['warn', {}],
     interactive: ['warn', {}],
     // Flaky score but non-flaky details (error, maxLength)
     'duplicated-javascript': ['warn', {maxLength: 0}], // warn until https://github.com/GoogleChrome/lighthouse/issues/11285 is fixed

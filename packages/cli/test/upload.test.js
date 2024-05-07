@@ -21,7 +21,6 @@ describe('Lighthouse CI upload CLI', () => {
 
   const writeLhr = () => {
     const fakeLhr = {finalUrl: 'foo.com', categories: {}, audits: {}};
-    fakeLhr.categories.pwa = {score: 0};
     fakeLhr.categories.performance = {score: 0};
     fakeLhr.audits['performance-budget'] = {score: 0};
     for (const key of Object.keys(fullPreset.assertions)) {
@@ -205,21 +204,21 @@ describe('Lighthouse CI upload CLI', () => {
         isRepresentativeRun: false,
         htmlPath: path.join(outputDir, 'www_example_com-_page-2020_05_22_22_12_01.report.html'),
         jsonPath: path.join(outputDir, 'www_example_com-_page-2020_05_22_22_12_01.report.json'),
-        summary: {performance: 0, pwa: 0},
+        summary: {performance: 0},
       },
       {
         url: 'https://www.example.com/page',
         isRepresentativeRun: false,
         htmlPath: path.join(outputDir, 'www_example_com-_page-2020_05_22_22_12_02.report.html'),
         jsonPath: path.join(outputDir, 'www_example_com-_page-2020_05_22_22_12_02.report.json'),
-        summary: {performance: 0, pwa: 0},
+        summary: {performance: 0},
       },
       {
         url: 'https://www.example.com/page',
         isRepresentativeRun: true,
         htmlPath: path.join(outputDir, 'www_example_com-_page-2020_05_22_22_12_03.report.html'),
         jsonPath: path.join(outputDir, 'www_example_com-_page-2020_05_22_22_12_03.report.json'),
-        summary: {performance: 0.5, pwa: 0},
+        summary: {performance: 0.5},
       },
     ]);
   }, 15000);

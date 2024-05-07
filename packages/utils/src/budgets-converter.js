@@ -5,6 +5,8 @@
  */
 'use strict';
 
+const {Budget} = require('./budget.js');
+
 /**
  * @param {string|undefined} path
  * @return {RegExp}
@@ -18,12 +20,12 @@ function convertPathExpressionToRegExp(path) {
   return new RegExp(`https?://[^/]+${escapedPath}`);
 }
 
+// TODO: make this not async, and propagate that change to callers as possible.
 /**
  * @param {Array<LHCI.AssertCommand.Budget>} budgets
  * @return {Promise<LHCI.AssertCommand.Options>}
  */
 async function convertBudgetsToAssertions(budgets) {
-  const {Budget} = await import('lighthouse/core/config/budget.js');
   // Normalize the definition using built-in Lighthouse validation.
   budgets = Budget.initializeBudget(budgets);
 

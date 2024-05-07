@@ -9,7 +9,6 @@ module.exports = {
   ci: {
     assert: {
       assertions: {
-        'categories.pwa': 'off',
         'speed-index': ['error', {minScore: 0.8}],
         interactive: ['error', {minScore: 0.8}],
         'performance-budget': ['error', {minScore: 1}],

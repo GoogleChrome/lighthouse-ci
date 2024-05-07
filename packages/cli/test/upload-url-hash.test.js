@@ -20,7 +20,6 @@ describe('Lighthouse CI upload filesystem reports with url hash', () => {
 
   const writeLhr = () => {
     const fakeLhr = {finalUrl: 'foo.com', categories: {}, audits: {}};
-    fakeLhr.categories.pwa = {score: 0};
     fakeLhr.categories.performance = {score: 0};
     fakeLhr.audits['performance-budget'] = {score: 0};
     for (const key of Object.keys(fullPreset.assertions)) {
@@ -95,21 +94,21 @@ describe('Lighthouse CI upload filesystem reports with url hash', () => {
         isRepresentativeRun: true,
         htmlPath: path.join(outputDir, 'www_example_com-_-_page1-2022_10_25_22_34_01.report.html'),
         jsonPath: path.join(outputDir, 'www_example_com-_-_page1-2022_10_25_22_34_01.report.json'),
-        summary: {performance: 0.5, pwa: 0},
+        summary: {performance: 0.5},
       },
       {
         url: 'https://www.example.com/#/page2',
         isRepresentativeRun: true,
         htmlPath: path.join(outputDir, 'www_example_com-_-_page2-2022_10_25_22_34_02.report.html'),
         jsonPath: path.join(outputDir, 'www_example_com-_-_page2-2022_10_25_22_34_02.report.json'),
-        summary: {performance: 0.5, pwa: 0},
+        summary: {performance: 0.5},
       },
       {
         url: 'https://www.example.com/#/page3',
         isRepresentativeRun: true,
         htmlPath: path.join(outputDir, 'www_example_com-_-_page3-2022_10_25_22_34_03.report.html'),
         jsonPath: path.join(outputDir, 'www_example_com-_-_page3-2022_10_25_22_34_03.report.json'),
-        summary: {performance: 0.5, pwa: 0},
+        summary: {performance: 0.5},
       },
     ]);
   }, 15000);

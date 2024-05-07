@@ -318,7 +318,7 @@ describe('Lighthouse CI CLI', () => {
     it('should assert failures', async () => {
       const {stdout, stderr, status} = await runCLI([
         'assert',
-        `--assertions.installable-manifest=error`,
+        `--assertions.prioritize-lcp-image=error`,
       ]);
 
       expect(stdout).toMatchInlineSnapshot(`""`);
@@ -327,9 +327,9 @@ describe('Lighthouse CI CLI', () => {
 
         1 result(s) for [1mhttp://localhost:XXXX/app/[0m :
 
-          [31mX[0m  [1minstallable-manifest[0m failure for [1mminScore[0m assertion
-               Web app manifest or service worker do not meet the installability requirements
-               https://developer.chrome.com/docs/lighthouse/pwa/installable-manifest/
+          [31mX[0m  [1mprioritize-lcp-image[0m failure for [1mminScore[0m assertion
+               Preload Largest Contentful Paint image
+               https://web.dev/articles/optimize-lcp#optimize_when_the_resource_is_discovered
 
                 expected: >=[32m0.9[0m
                    found: [31m0[0m
@@ -356,13 +356,13 @@ describe('Lighthouse CI CLI', () => {
 
         1 result(s) for [1mhttp://localhost:XXXX/app/[0m :
 
-          [31mX[0m  [1mperformance-budget[0m.script.size failure for [1mmaxNumericValue[0m assertion
-               Performance budget
-               https://developers.google.com/web/tools/lighthouse/audits/budgets
+          [31mX[0m  [1mprioritize-lcp-image[0m failure for [1mminScore[0m assertion
+               Preload Largest Contentful Paint image
+               https://web.dev/articles/optimize-lcp#optimize_when_the_resource_is_discovered
 
-                expected: <=[32mXXXX[0m
-                   found: [31mXXXX[0m
-              [2mall values: XXXX[0m
+                expected: >=[32m1[0m
+                   found: [31m0[0m
+              [2mall values: 0, 0[0m
 
         Assertion failed. Exiting with status code 1.
         "
@@ -379,9 +379,9 @@ describe('Lighthouse CI CLI', () => {
 
         1 result(s) for [1mhttp://localhost:XXXX/app/[0m :
 
-          [31mX[0m  [1minstallable-manifest[0m failure for [1mminScore[0m assertion
-               Web app manifest or service worker do not meet the installability requirements
-               https://developer.chrome.com/docs/lighthouse/pwa/installable-manifest/
+          [31mX[0m  [1mprioritize-lcp-image[0m failure for [1mminScore[0m assertion
+               Preload Largest Contentful Paint image
+               https://web.dev/articles/optimize-lcp#optimize_when_the_resource_is_discovered
 
                 expected: >=[32m0.9[0m
                    found: [31m0[0m
@@ -416,13 +416,13 @@ describe('Lighthouse CI CLI', () => {
               [2mall values: XXXX, XXXX[0m
 
 
-          [31mX[0m  [1mperformance-budget[0m.script.size failure for [1mmaxNumericValue[0m assertion
-               Performance budget
-               https://developers.google.com/web/tools/lighthouse/audits/budgets
+          [31mX[0m  [1mprioritize-lcp-image[0m failure for [1mminScore[0m assertion
+               Preload Largest Contentful Paint image
+               https://web.dev/articles/optimize-lcp#optimize_when_the_resource_is_discovered
 
-                expected: <=[32mXXXX[0m
-                   found: [31mXXXX[0m
-              [2mall values: XXXX[0m
+                expected: >=[32m1[0m
+                   found: [31m0[0m
+              [2mall values: 0, 0[0m
 
         Assertion failed. Exiting with status code 1.
         "

@@ -102,7 +102,9 @@ class FallbackServer {
       .filter(fileOrDir => fileOrDir.isDirectory())
       .map(dir => dir.name);
 
-    const htmlFiles = files.filter(file => file.endsWith('.html')).map(file => ({file, depth: 0}));
+    const htmlFiles = files
+      .filter(file => file.endsWith('.html') || file.endsWith('.htm'))
+      .map(file => ({file, depth: 0}));
 
     if (depth === 0) return htmlFiles;
 

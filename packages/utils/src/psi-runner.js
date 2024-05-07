@@ -19,7 +19,7 @@ class PsiRunner {
 
   /**
    * @param {string} url
-   * @param {{psiApiKey?: string, psiApiEndpoint?: string, psiStrategy?: 'mobile'|'desktop', psiCategories?: Array<'performance' | 'accessibility' | 'best-practices' | 'pwa' | 'seo'>}} [options]
+   * @param {{psiApiKey?: string, psiApiEndpoint?: string, psiStrategy?: 'mobile'|'desktop', psiCategories?: Array<'performance' | 'accessibility' | 'best-practices' | 'seo'>}} [options]
    * @return {Promise<string>}
    */
   async run(url, options) {
@@ -34,7 +34,7 @@ class PsiRunner {
 
   /**
    * @param {string} url
-   * @param {{psiApiKey?: string, psiApiEndpoint?: string, psiStrategy?: 'mobile'|'desktop', psiCategories?: Array<'performance' | 'accessibility' | 'best-practices' | 'pwa' | 'seo'>}} [options]
+   * @param {{psiApiKey?: string, psiApiEndpoint?: string, psiStrategy?: 'mobile'|'desktop', psiCategories?: Array<'performance' | 'accessibility' | 'best-practices' | 'seo'>}} [options]
    * @return {Promise<string>}
    */
   async runUntilSuccess(url, options = {}) {

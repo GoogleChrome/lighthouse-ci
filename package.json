@@ -74,7 +74,7 @@
     "jest-fetch-mock": "^3.0.3",
     "jest-image-snapshot": "^4.5.1",
     "lerna": "^3.22.0",
-    "mysql2": "^2.1.0",
+    "mysql2": "^3.9.8",
     "pg": "^8.2.1",
     "pg-hstore": "^2.3.3",
     "preact-render-to-json": "^3.6.6",

@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: lhci-server
-          image: docker.io/patrickhulce/lhci-server:0.13.0
+          image: docker.io/patrickhulce/lhci-server:0.14.0
           volumeMounts:
             - mountPath: '/data'
               name: lhci-data-volume

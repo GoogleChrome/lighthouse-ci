@@ -15,7 +15,10 @@ module.exports = (url, options) => {
     ...options,
   };
 
-  if (!instanceOptions.agent && (process.env.HTTP_PROXY || process.env.HTTPS_PROXY || process.env.NO_PROXY)) {
+  if (
+    !instanceOptions.agent &&
+    (process.env.HTTP_PROXY || process.env.HTTPS_PROXY || process.env.NO_PROXY)
+  ) {
     instanceOptions.agent = new ProxyAgent();
   }
 

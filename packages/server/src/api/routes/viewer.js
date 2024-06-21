@@ -19,7 +19,7 @@ function createRouter(options) {
   router.get(
     '/origin',
     handleAsyncError(async (_, res) => {
-      res.json({ viewerOrigin: options.viewer?.origin });
+      res.json({viewerOrigin: options.viewer?.origin});
     })
   );
 

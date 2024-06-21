@@ -18,14 +18,23 @@ function ensureDirectoryExists(baseDir = LHCI_DIR) {
 }
 
 /**
+ * @param {string} [directoryOrPath]
  * @return {string[]}
  */
-function loadSavedLHRs() {
-  ensureDirectoryExists();
+function loadSavedLHRs(directoryOrPath) {
+  directoryOrPath = directoryOrPath || LHCI_DIR;
+
+  if (directoryOrPath === LHCI_DIR) {
+    ensureDirectoryExists();
+  }
+
+  if (fs.lstatSync(directoryOrPath).isFile()) {
+    return [fs.readFileSync(directoryOrPath, 'utf8')];
+  }
 
   /** @type {string[]} */
   const lhrs = [];
-  for (const file of fs.readdirSync(LHCI_DIR)) {
+  for (const file of fs.readdirSync(directoryOrPath)) {
     if (!LHR_REGEX.test(file)) continue;
 
     const filePath = path.join(LHCI_DIR, file);

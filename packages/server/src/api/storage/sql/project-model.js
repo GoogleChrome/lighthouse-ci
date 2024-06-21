@@ -12,7 +12,7 @@ const Sequelize = require('sequelize');
 /** @type {LHCI.ServerCommand.TableDefinition<LHCI.ServerCommand.Project>} */
 const attributes = {
   id: {type: Sequelize.UUID(), primaryKey: true},
-  name: {type: Sequelize.STRING(40)},
+  name: {type: Sequelize.STRING(256)},
   slug: {type: Sequelize.STRING(40)},
   externalUrl: {type: Sequelize.STRING(256)},
   token: {type: Sequelize.UUID()},

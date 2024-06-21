@@ -1031,7 +1031,7 @@ _Optional_ The maximum number of requests to send to the PageSpeed Insights API 
 
 ##### `psiCollectCron.sites[i].categories`
 
-_Optional_ An array containing the categories to test for each url in this site. Defaults to `['performance', 'accessibility', 'best-practices', 'pwa', 'seo']` (all categories).
+_Optional_ An array containing the categories to test for each url in this site. Defaults to `['performance', 'accessibility', 'best-practices', 'seo']` (all categories).
 
 ##### `psiCollectCron.sites[i].strategy`
 

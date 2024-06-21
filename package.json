@@ -30,6 +30,7 @@
   },
   "devDependencies": {
     "@chialab/esbuild-plugin-html": "^0.17.3",
+    "@patrickhulce/scripts": "^0.4.0",
     "@storybook/addon-actions": "^7.6.4",
     "@storybook/addon-links": "^7.6.4",
     "@storybook/addon-storyshots": "^7.6.4",
@@ -57,6 +58,7 @@
     "@types/yargs": "^12.0.8",
     "@types/yargs-parser": "^11.0.0",
     "@typescript-eslint/parser": "^6.14.0",
+    "conventional-commits-parser": "^3.0.0",
     "esbuild": "^0.19.9",
     "eslint": "^8.8.0",
     "eslint-config-google": "^0.14.0",
@@ -83,6 +85,7 @@
     "puppeteer": "^21.6.1",
     "puppeteer-core": "^21.6.1",
     "rimraf": "^3.0.2",
+    "shelljs": "^0.8.5",
     "sqlite3": "^5.1.2",
     "storybook": "^7.6.4",
     "ts-jest": "^29.1.1",

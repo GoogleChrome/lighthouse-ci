@@ -22,7 +22,6 @@ module.exports = {
         'unused-javascript': 'off',
 
         label: 'off',
-        'content-width': 'off',
         'color-contrast': 'off',
         bypass: 'off',
         'tap-targets': 'off',

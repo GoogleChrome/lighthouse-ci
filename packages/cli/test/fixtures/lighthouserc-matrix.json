@@ -5,7 +5,7 @@
         {
           "matchingUrlPattern": "app",
           "assertions": {
-            "installable-manifest": "error"
+            "prioritize-lcp-image": "error"
           }
         },
         {

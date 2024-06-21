@@ -156,7 +156,7 @@ declare global {
         label?: string;
         branch?: string;
         maxNumberOfParallelUrls?: number;
-        categories?: Array<'performance' | 'accessibility' | 'best-practices' | 'pwa' | 'seo'>;
+        categories?: Array<'performance' | 'accessibility' | 'best-practices' | 'seo'>;
         strategy?: 'desktop' | 'mobile';
       }
 

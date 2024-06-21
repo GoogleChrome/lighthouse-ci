@@ -6,17 +6,20 @@
 'use strict';
 
 const fetch = require('isomorphic-fetch');
-const {HttpsProxyAgent} = require('https-proxy-agent');
+const {ProxyAgent} = require('proxy-agent');
 
 /** @type import('isomorphic-fetch') */
 module.exports = (url, options) => {
-  /** @type {Parameters<import('isomorphic-fetch')>[1] & { agent?: import('https-proxy-agent').HttpsProxyAgent }} */
+  /** @type {Parameters<import('isomorphic-fetch')>[1] & { agent?: import('proxy-agent').ProxyAgent }} */
   const instanceOptions = {
     ...options,
   };
 
-  if (!instanceOptions.agent && process.env.HTTP_PROXY) {
-    instanceOptions.agent = new HttpsProxyAgent(process.env.HTTP_PROXY);
+  if (
+    !instanceOptions.agent &&
+    (process.env.HTTP_PROXY || process.env.HTTPS_PROXY || process.env.NO_PROXY)
+  ) {
+    instanceOptions.agent = new ProxyAgent();
   }
 
   return fetch(url, instanceOptions);

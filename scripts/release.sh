@@ -38,7 +38,7 @@ yarn build
 # Release
 # hulk npm-publish --lerna
 
-yarn lerna publish '--force-publish=*' --exact --skip-git --repo-version=$NEXT_VERSION --npm-tag=$NEXT_TAG --yes
+yarn lerna publish '--force-publish=*' --exact --skip-git --repo-version=$NEXT_VERSION --npm-tag=latest --yes
 git checkout lerna.json # lerna prettifies the JSON and isn't useful
 git tag "$NEXT_TAG"
 node ./scripts/print-changelog.js "$CURRENT_TAG" "$NEXT_TAG"

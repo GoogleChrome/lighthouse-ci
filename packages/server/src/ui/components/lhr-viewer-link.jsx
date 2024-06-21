@@ -7,14 +7,16 @@
 import {h} from 'preact';
 import clsx from 'clsx';
 import {useState} from 'preact/hooks';
+import {api} from '../hooks/use-api-data';
 import './lhr-viewer-link.css';
 
 /** @typedef {LH.Result|(() => Promise<LH.Result>)} LHResolver */
 
 /** @param {LH.Result} lhr */
-export function openLhrInClassicViewer(lhr) {
+export async function openLhrInClassicViewer(lhr) {
   // Allows for self-hosted viewer uri instead of linking externally
-  const VIEWER_ORIGIN = process.env.VIEWER_ORIGIN || 'https://googlechrome.github.io';
+  const cliViewerOrigin = await api.getViewerOrigin();
+  const VIEWER_ORIGIN = process.env.VIEWER_ORIGIN || cliViewerOrigin;
   // Chrome doesn't allow us to immediately postMessage to a popup right
   // after it's created. Normally, we could also listen for the popup window's
   // load event, however it is cross-domain and won't fire. Instead, listen

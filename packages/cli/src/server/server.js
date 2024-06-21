@@ -65,6 +65,11 @@ function buildCommand(yargs) {
       type: 'string',
       description: 'The password to protect the server with HTTP Basic Authentication.',
     },
+    'viewer.origin': {
+      type: 'string',
+      description: 'The url origin for self-hosted lighthouse report viewer.',
+      default: 'https://googlechrome.github.io',
+    },
   });
 }
 

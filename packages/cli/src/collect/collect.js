@@ -33,7 +33,10 @@ function buildCommand(yargs) {
       choices: ['node', 'psi'],
       default: 'node',
     },
-    headful: {type: 'boolean', description: 'Run with a headful Chrome'},
+    headful: {
+      description:
+        'Run with a headful Chrome (pass `headless: false` to puppeteer). Overrides value of `puppeteerLaunchOptions.headless`',
+    },
     additive: {type: 'boolean', description: 'Skips clearing of previous collect data'},
     url: {
       description:

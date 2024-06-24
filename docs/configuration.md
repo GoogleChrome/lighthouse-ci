@@ -885,10 +885,10 @@ lhci assert --preset=lighthouse:recommended --includePassedAssertions
 
 ### `open`
 
-Open a local lighthouse report that has been created using `collect`. There is no configuration for this command.
+Open a local lighthouse report that has been created using `collect`. You need to provide URL same as used to run Lighthouse on.
 
 ```bash
-lhci open
+lhci open URL
 ```
 
 ---

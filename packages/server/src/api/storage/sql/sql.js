@@ -532,6 +532,21 @@ class SqlStorageMethod {
   }
 
   /**
+   * @param {number} totalBuildsToKeep
+   * @return {Promise<LHCI.ServerCommand.Build[]>}
+   */
+  async findRemainingBuilds(totalBuildsToKeep) {
+    const {buildModel} = this._sql();
+    const totalBuilds = await buildModel.count();
+    const remaining = totalBuilds - totalBuildsToKeep;
+    const oldBuilds = await buildModel.findAll({
+      order: [['runAt', 'ASC']],
+      limit: remaining,
+    });
+    return oldBuilds.map(this._value);
+  }
+
+  /**
    * @param {string} projectId
    * @param {string} buildId
    * @return {Promise<void>}

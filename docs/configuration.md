@@ -1050,6 +1050,10 @@ The [cron-style](https://crontab.guru/) schedule on which to collect results.
 
 A number of days to keep a records.
 
+##### `deleteOldBuildsCron[i].totalBuildsToKeep`
+
+A number of total builds to be kept, any builds found there after given will be deleted.
+
 ##### `deleteOldBuildsCron[i].onlyBranches`
 
 Array of branch names, which should be deleted

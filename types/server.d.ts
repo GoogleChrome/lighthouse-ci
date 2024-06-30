@@ -205,7 +205,8 @@ declare global {
 
       export interface DeleteOldBuildsCron {
         schedule: string;
-        maxAgeInDays: number;
+        maxAgeInDays?: number;
+        totalBuildsToKeep?: number;
         onlyBranches?: string[];
         skipBranches?: string[];
       }

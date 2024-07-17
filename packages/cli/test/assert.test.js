@@ -16,7 +16,9 @@ const fullPreset = require('@lhci/utils/src/presets/all.js');
 const {runCLI} = require('./test-utils.js');
 
 describe('Lighthouse CI assert CLI', () => {
+  const rootFixturesDir = path.join(__dirname, 'fixtures');
   const fixtureDir = path.join(__dirname, 'fixtures/assertions');
+  const lighthouseciDir = path.join(fixtureDir, '.lighthouseci');
   // eslint-disable-next-line no-control-regex
   const replaceTerminalChars = s => s.replace(/\u001b/g, '').replace(/\[\d+m/g, '');
   const run = async (args, options = {}) => {
@@ -34,7 +36,6 @@ describe('Lighthouse CI assert CLI', () => {
   };
 
   const writeLhr = (passingAuditIds = []) => {
-    const lighthouseciDir = path.join(fixtureDir, '.lighthouseci');
     if (fs.existsSync(lighthouseciDir)) rimraf.sync(lighthouseciDir);
     if (!fs.existsSync(lighthouseciDir)) fs.mkdirSync(lighthouseciDir, {recursive: true});
     const fakeLhrPath = path.join(lighthouseciDir, 'lhr-12345.json');
@@ -122,5 +123,27 @@ describe('Lighthouse CI assert CLI', () => {
     expect(result.failures.length).toMatchInlineSnapshot(`0`);
     expect(result.warnings.length).toMatchInlineSnapshot(`0`);
     expect(result.passes.length).toMatchInlineSnapshot(`1`);
+  });
+
+  it('shoud load LHRs from a file', async () => {
+    const result = await run([
+      `--no-lighthouserc`,
+      `--budgetsFile=${path.join(rootFixturesDir, 'budgets.json')}`,
+      `--lhr ${path.join(lighthouseciDir, 'lhr-12345.json')}`,
+    ]);
+    expect(result.status).toEqual(1);
+    expect(result.failures.length).toMatchInlineSnapshot(`1`);
+    expect(result.stderr).toContain('Checking assertions against 1 URL(s), 1 total run(s)');
+  });
+
+  it('should load LHRs from a directory', async () => {
+    const result = await run([
+      `--no-lighthouserc`,
+      `--budgetsFile=${path.join(rootFixturesDir, 'budgets.json')}`,
+      `--lhr ${lighthouseciDir}`,
+    ]);
+    expect(result.status).toEqual(1);
+    expect(result.failures.length).toMatchInlineSnapshot(`1`);
+    expect(result.stderr).toContain('Checking assertions against 1 URL(s), 1 total run(s)');
   });
 });

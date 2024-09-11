@@ -398,6 +398,15 @@ class ApiClient {
   }
 
   /**
+   * @param {number} totalBuildsToKeep
+   * @return {Promise<LHCI.ServerCommand.Build[]>}
+   */
+  // eslint-disable-next-line no-unused-vars
+  async findRemainingBuilds(totalBuildsToKeep) {
+    throw new Error('Unimplemented');
+  }
+
+  /**
    * @param {string} projectId
    * @return {Promise<string>}
    */

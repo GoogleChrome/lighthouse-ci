@@ -64,6 +64,8 @@ A collection of projects using Lighthouse CI written by the community. If you're
 
 - [Lighthouse CI Starter Example](https://github.com/hchiam/learning-lighthouse-ci) - A minimal example repo that you can use as a template when starting from scratch, offers a beginner-friendly quickstart guide using create-react-app.
 
+- [Lighthouse CI Compare Action](https://github.com/adevinta/actions-lighthouseci-compare) - A Lighthouse CI Github Action that compares the current commit run against the ancestor commit and creates an object with the differences and a Markdown table that you can use for different purposes.
+
 ## Community Guides
 
 A collection of unofficial blog posts, tutorials, and guides written by the community on using Lighthouse CI. If you've written up a guide to using Lighthouse CI in your project, open a PR to add it here!

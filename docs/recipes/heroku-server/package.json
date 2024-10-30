@@ -3,11 +3,11 @@
   "version": "1.0.0",
   "main": "server.js",
   "dependencies": {
-    "@lhci/server": "0.9.x",
+    "@lhci/server": "0.14.x",
     "pg": "^8.2.1",
     "pg-hstore": "^2.3.3"
   },
   "engines": {
-    "node": "14.x"
+    "node": "16.x"
   }
 }

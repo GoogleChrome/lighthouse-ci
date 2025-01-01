@@ -32,17 +32,17 @@ jobs:
       - run: yarn build
       - run: yarn test:unit:ci || yarn test:unit:ci --onlyFailures --maxWorkers=1 || yarn test:unit:ci --onlyFailures --maxWorkers=1
       - if: ${{ failure() }}
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: screenshots
           path: packages/server/test/ui/__image_snapshots__/__diff_output__/*.png
       - if: ${{ failure() }}
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: screenshots
           path: packages/server/test/e2e/__image_snapshots__/__diff_output__/*.png
       - if: ${{ failure() }}
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: screenshots
           path: packages/viewer/test/e2e/__image_snapshots__/__diff_output__/*.png

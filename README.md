@@ -1,3 +1,59 @@
+# Ground News Lighthouse CI
+
+This is a fork of GoogleChrome/lighthouse, mainly for use as a placeholder repo link in Flightcontrol (FC),
+and as a knowledge dump of how we got this running in Flightcontrol. The original README content will follow.
+
+## Deployment
+
+The `patrickhulce/lhci-server` image from Dockerhub is deployed in the
+[Lighthouse CI project on Flightcontrol](https://app.flightcontrol.dev/org/clxvxf2r50006w1rx4irpv41g/environments/cm91h7j21000fkhpsjqpeumze)
+project. Persistent storage is provided by a Postgres RDS database, also provisioned through Flightcontrol.
+
+### Postgres SSL Gotcha
+
+Flightcontrol automatically creates a Postgres user on RDS databases and exposes the connection string
+through the dashboard. However, the user is only permitted to connect using SSL, and the database's
+certificate is self-signed, so `?sslmode=no-verify` must be added to the connection string in order for
+the server to connect successfully. Linking the connection string from the FC database service directly
+to the LHCI FC service will not work.
+
+The LHCI server uses Sequelize v4 under the hood, and `yargs` to translate environment variables into
+the Sequelize connection object.
+
+More information here: 
+- [Lighthouse CI connection configuration docs](https://github.com/GoogleChrome/lighthouse-ci/blob/main/docs/configuration.md#environment-variables)
+- https://node-postgres.com/features/ssl#usage-with-connectionstring
+- [Illustrative Github issue I commented on](https://github.com/GoogleChrome/lighthouse-ci/issues/955)
+
+### The required environment variables set on the FC project
+
+```env
+LHCI_STORAGE__SQL_DIALECT=postgres
+LHCI_STORAGE__SQL_CONNECTION_URL=postgres://<connection-string>?sslmode=no-verify
+```
+
+### Other FC details
+
+#### Cloudfront
+
+The LHCI FC service is designated as a "Web server," so it has a Cloudfront distribution.
+The distribution is set to the NA/EU price class for a bit of savings, and caching is disabled.
+
+### Bootstrapping
+
+The original setup docs have you globally install `@lhci/cli` in order to create the first project.
+If you want to avoid that, you can just run `npm ci` in this directory and it will be installed locally.
+This only needs to be done again if a new project is needed.
+
+The ground-web project has been created and its build and admin tokens added as environment variables on the
+LHCI FC project itself, for reference.
+
+Original setup docs here:
+https://github.com/GoogleChrome/lighthouse-ci/blob/main/docs/getting-started.md#project-creation
+
+
+#### The original README content follows.
+
 # Lighthouse CI
 
 ## Overview

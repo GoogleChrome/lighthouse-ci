@@ -406,7 +406,7 @@ Note that the following options cannot be used because LHCI uses them internally
 
 #### `numberOfRuns`
 
-The number of times to collect Lighthouse results on each `url`. This option helps mitigate fluctations due to natural page [variability](https://github.com/GoogleChrome/lighthouse/blob/v6.0.0-beta.0/docs/variability.md).
+The number of times to collect Lighthouse results on each `url`. This option helps mitigate fluctuations due to natural page [variability](https://github.com/GoogleChrome/lighthouse/blob/v6.0.0-beta.0/docs/variability.md).
 
 #### Examples
 

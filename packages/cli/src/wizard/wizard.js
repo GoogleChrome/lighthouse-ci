@@ -54,7 +54,7 @@ async function runNewProjectWizard(options) {
       type: 'input',
       name: 'projectBaseBranch',
       message: "What branch is considered the repo's trunk or main branch?",
-      default: 'master',
+      default: 'main',
     },
   ]);
 

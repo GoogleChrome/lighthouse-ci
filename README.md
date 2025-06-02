@@ -17,8 +17,8 @@ jobs:
   lighthouseci:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 18
       - run: npm install && npm install -g @lhci/cli@0.14.x
@@ -63,6 +63,8 @@ A collection of projects using Lighthouse CI written by the community. If you're
 - [Lighthouse CI GitHub Action](https://github.com/treosh/lighthouse-ci-action) - Automatically run Lighthouse CI on every PR with GitHub Actions, no infrastructure required.
 
 - [Lighthouse CI Starter Example](https://github.com/hchiam/learning-lighthouse-ci) - A minimal example repo that you can use as a template when starting from scratch, offers a beginner-friendly quickstart guide using create-react-app.
+
+- [Lighthouse CI Compare Action](https://github.com/adevinta/actions-lighthouseci-compare) - A Lighthouse CI Github Action that compares the current commit run against the ancestor commit and creates an object with the differences and a Markdown table that you can use for different purposes.
 
 ## Community Guides
 

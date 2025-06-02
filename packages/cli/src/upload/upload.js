@@ -512,7 +512,7 @@ function getFileOutputPath(pattern, context) {
   for (const match of matches) {
     const name = match.slice(2, -2).toLowerCase();
     const value = context[name] || 'unknown';
-    const sanitizedValue = value.replace(/[^a-z0-9]+/gi, '_');
+    const sanitizedValue = value.replace(/[^a-z0-9]+/gi, '_').replace(/^_/, '');
     filename = filename.replace(match, sanitizedValue);
   }
 

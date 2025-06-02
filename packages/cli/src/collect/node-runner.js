@@ -42,7 +42,7 @@ class LighthouseRunner {
    * @return {{args: string[], cleanupFn: () => void}}
    */
   static computeArgumentsAndCleanup(url, options) {
-    const settings = options.settings || {};
+    const settings = {...options.settings};
     const chromeFlags = options.settings && options.settings.chromeFlags;
     let chromeFlagsAsString = chromeFlags || '';
     if (!options.headful) chromeFlagsAsString += ' --headless=new';

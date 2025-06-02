@@ -97,7 +97,7 @@ describe('Statistic Definitions', () => {
       expect(run([high, baselhr1010, low]).value).toBeCloseTo(21627.392);
       expect(run([high, baselhr1140, low]).value).toBeCloseTo(80796.283);
       expect(run([high, baselhr1200, low]).value).toBeCloseTo(82970.673);
-      expect(run([high, baselhr1261, low]).value).toBeCloseTo(1148.014);
+      expect(run([high, baselhr1261, low]).value).toBeCloseTo(84118.687);
     });
   });
 

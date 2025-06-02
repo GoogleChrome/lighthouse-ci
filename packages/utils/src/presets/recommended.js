@@ -37,9 +37,12 @@ module.exports = {
     'uses-http2': ['off', {}], // not useful for the dev server
     'long-tasks': ['off', {}], // too strict
 
+    'cache-insight': ['warn', {maxLength: 0}],
+    'dom-size-insight': ['warn', {}],
     'dom-size': ['warn', {}],
     'is-on-https': ['warn', {}], // passes on localhost, so OK to leave on
     'modern-image-formats': ['warn', {maxLength: 0}],
+    'render-blocking-insight': ['warn', {maxLength: 0}],
     'render-blocking-resources': ['warn', {maxLength: 0}],
     'server-response-time': ['warn', {}],
     'uses-long-cache-ttl': ['warn', {maxLength: 0}],

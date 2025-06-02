@@ -71,10 +71,10 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
-      - name: Use Node.js 18.16
+      - name: Use Node.js 18
         uses: actions/setup-node@v3
         with:
-          node-version: 18.16
+          node-version: 18
           cache: yarn
       - name: Configure Environment
         run: |-

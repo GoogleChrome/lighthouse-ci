@@ -28,6 +28,8 @@ import lhr1140A_ from '../../../../../test/fixtures/lh-11-4-0-coursehero-a.json'
 import lhr1140B_ from '../../../../../test/fixtures/lh-11-4-0-coursehero-b.json';
 import lhr1200A_ from '../../../../../test/fixtures/lh-12-0-0-coursehero-a.json';
 import lhr1200B_ from '../../../../../test/fixtures/lh-12-0-0-coursehero-b.json';
+import lhr1261A_ from '../../../../../test/fixtures/lh-12-6-1-coursehero-a.json';
+import lhr1261B_ from '../../../../../test/fixtures/lh-12-6-1-coursehero-b.json';
 import lhrSubitemsA_ from '../../../../../test/fixtures/lh-subitems-a.json';
 import lhrSubitemsB_ from '../../../../../test/fixtures/lh-subitems-b.json';
 import lhrPsi800A_ from '../../../../../test/fixtures/psi-8-0-0-dkdev-a.json';
@@ -58,6 +60,8 @@ const lhr1140A = /** @type {any} */ (lhr1140A_);
 const lhr1140B = /** @type {any} */ (lhr1140B_);
 const lhr1200A = /** @type {any} */ (lhr1200A_);
 const lhr1200B = /** @type {any} */ (lhr1200B_);
+const lhr1261A = /** @type {any} */ (lhr1261A_);
+const lhr1261B = /** @type {any} */ (lhr1261B_);
 const lhrSubitemsA = /** @type {any} */ (lhrSubitemsA_);
 const lhrSubitemsB = /** @type {any} */ (lhrSubitemsB_);
 const lhrPsi800A = /** @type {any} */ (lhrPsi800A_);
@@ -73,6 +77,7 @@ const auditPairs930 = createAuditPairs(lhr930A, lhr930B);
 const auditPairs1010 = createAuditPairs(lhr1010A, lhr1010B);
 const auditPairs1140 = createAuditPairs(lhr1140A, lhr1140B);
 const auditPairs1200 = createAuditPairs(lhr1200A, lhr1200B);
+const auditPairs1261 = createAuditPairs(lhr1261A, lhr1261B);
 const auditPairsPsi800 = createAuditPairs(lhrPsi800A, lhrPsi800B);
 const auditPairsSubitems = createAuditPairs(lhrSubitemsA, lhrSubitemsB, {
   filter: pair =>
@@ -172,6 +177,15 @@ export const Version1200 = () => (
     setSelectedAuditId={action('setSelectedAuditId')}
     pairs={auditPairs1200}
     baseLhr={lhr1200B}
+  />
+);
+
+export const Version1261 = () => (
+  <AuditDetailPane
+    selectedAuditId={auditPairs1261[1].audit.id || ''}
+    setSelectedAuditId={action('setSelectedAuditId')}
+    pairs={auditPairs1261}
+    baseLhr={lhr1261B}
   />
 );
 

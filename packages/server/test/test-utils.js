@@ -124,6 +124,8 @@ function createActualTestDataset() {
       {...baseRun, id: '17', buildId: '17', url, lhr: lhr('lh-11-4-0-coursehero-b.json')},
       {...baseRun, id: '18', buildId: '18', url, lhr: lhr('lh-12-0-0-coursehero-a.json')},
       {...baseRun, id: '19', buildId: '19', url, lhr: lhr('lh-12-0-0-coursehero-b.json')},
+      {...baseRun, id: '20', buildId: '20', url, lhr: lhr('lh-12-6-1-coursehero-a.json')},
+      {...baseRun, id: '21', buildId: '21', url, lhr: lhr('lh-12-6-1-coursehero-b.json')},
     ],
   };
 }

@@ -492,7 +492,7 @@ function createLoadTestDataset() {
   const runs = [];
   for (let i = 0; i < 500; i++) {
     const runAt = new Date(
-      new Date((builds[i - 1] || {runAt: new Date('2019-07-01')}).runAt).getTime() +
+      new Date((builds[i - 1] || {runAt: new Date('2025-01-01')}).runAt).getTime() +
         Math.round(Math.random() * 24 * 60 * 60 * 1000)
     ).toISOString();
     const hash = _.padStart(`${i}`, 40, '0');

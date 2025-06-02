@@ -64,7 +64,7 @@ function createActualTestDataset() {
   /** @param {number} delta */
   const runAt = delta =>
     new Date(
-      new Date('2020-05-10T11:00:00.000Z').getTime() + delta * 24 * 60 * 60 * 1000
+      new Date('2025-01-01T11:00:00.000Z').getTime() + delta * 24 * 60 * 60 * 1000
     ).toISOString();
   const url = 'http://lhci.example.com/';
   const baseProject = {externalUrl: '', baseBranch: '', token: '', adminToken: '', slug: ''};
@@ -100,8 +100,10 @@ function createActualTestDataset() {
       {...baseBuild, id: '15', hash: '1250', commitMessage: 'build 16', runAt: runAt(16)},
       {...baseBuild, id: '16', hash: '1251', commitMessage: 'build 17', runAt: runAt(17)},
       {...baseBuild, id: '17', hash: '1252', commitMessage: 'build 18', runAt: runAt(18)},
-      {...baseBuild, id: '18', hash: '1253', commitMessage: 'build 18', runAt: runAt(18)},
-      {...baseBuild, id: '19', hash: '1254', commitMessage: 'build 19', runAt: runAt(19)},
+      {...baseBuild, id: '18', hash: '1253', commitMessage: 'build 19', runAt: runAt(19)},
+      {...baseBuild, id: '19', hash: '1254', commitMessage: 'build 20', runAt: runAt(20)},
+      {...baseBuild, id: '20', hash: '1255', commitMessage: 'build 21', runAt: runAt(21)},
+      {...baseBuild, id: '21', hash: '1256', commitMessage: 'build 22', runAt: runAt(22)},
     ],
     runs: [
       {...baseRun, id: '0', buildId: '0', url, lhr: lhr('lh-5-6-0-verge-a.json')},

@@ -76,6 +76,9 @@ jobs:
         with:
           node-version: 18
           cache: yarn
+      # Since Ubuntu 23, dev builds of Chromium need this.
+      # https://chromium.googlesource.com/chromium/src/+/main/docs/security/apparmor-userns-restrictions.md
+      - run: sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
       - name: Configure Environment
         run: |-
           echo "CHROME_PATH=$(which google-chrome-stable)" >> $GITHUB_ENV

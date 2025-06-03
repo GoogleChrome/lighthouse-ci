@@ -189,12 +189,12 @@ describe('Lighthouse CI upload CLI', () => {
     const files = fs.readdirSync(outputDir).sort();
     expect(files).toEqual([
       'manifest.json',
-      'www_example_com-_page-2020_05_22_22_12_01.report.html',
-      'www_example_com-_page-2020_05_22_22_12_01.report.json',
-      'www_example_com-_page-2020_05_22_22_12_02.report.html',
-      'www_example_com-_page-2020_05_22_22_12_02.report.json',
-      'www_example_com-_page-2020_05_22_22_12_03.report.html',
-      'www_example_com-_page-2020_05_22_22_12_03.report.json',
+      'www_example_com-page-2020_05_22_22_12_01.report.html',
+      'www_example_com-page-2020_05_22_22_12_01.report.json',
+      'www_example_com-page-2020_05_22_22_12_02.report.html',
+      'www_example_com-page-2020_05_22_22_12_02.report.json',
+      'www_example_com-page-2020_05_22_22_12_03.report.html',
+      'www_example_com-page-2020_05_22_22_12_03.report.json',
     ]);
 
     const manifest = JSON.parse(fs.readFileSync(path.join(outputDir, 'manifest.json'), 'utf8'));
@@ -202,22 +202,22 @@ describe('Lighthouse CI upload CLI', () => {
       {
         url: 'https://www.example.com/page',
         isRepresentativeRun: false,
-        htmlPath: path.join(outputDir, 'www_example_com-_page-2020_05_22_22_12_01.report.html'),
-        jsonPath: path.join(outputDir, 'www_example_com-_page-2020_05_22_22_12_01.report.json'),
+        htmlPath: path.join(outputDir, 'www_example_com-page-2020_05_22_22_12_01.report.html'),
+        jsonPath: path.join(outputDir, 'www_example_com-page-2020_05_22_22_12_01.report.json'),
         summary: {performance: 0},
       },
       {
         url: 'https://www.example.com/page',
         isRepresentativeRun: false,
-        htmlPath: path.join(outputDir, 'www_example_com-_page-2020_05_22_22_12_02.report.html'),
-        jsonPath: path.join(outputDir, 'www_example_com-_page-2020_05_22_22_12_02.report.json'),
+        htmlPath: path.join(outputDir, 'www_example_com-page-2020_05_22_22_12_02.report.html'),
+        jsonPath: path.join(outputDir, 'www_example_com-page-2020_05_22_22_12_02.report.json'),
         summary: {performance: 0},
       },
       {
         url: 'https://www.example.com/page',
         isRepresentativeRun: true,
-        htmlPath: path.join(outputDir, 'www_example_com-_page-2020_05_22_22_12_03.report.html'),
-        jsonPath: path.join(outputDir, 'www_example_com-_page-2020_05_22_22_12_03.report.json'),
+        htmlPath: path.join(outputDir, 'www_example_com-page-2020_05_22_22_12_03.report.html'),
+        jsonPath: path.join(outputDir, 'www_example_com-page-2020_05_22_22_12_03.report.json'),
         summary: {performance: 0.5},
       },
     ]);

@@ -344,7 +344,7 @@ class ApiClient {
   }
 
   /**
-   * @return {Promise<string>}
+   * ⁠@return {Promise<{viewerOrigin: string}>}
    */
   async getViewerOrigin() {
     return this._get('/v1/viewer/origin');

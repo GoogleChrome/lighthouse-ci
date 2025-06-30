@@ -37,6 +37,7 @@ function buildCommand(yargs) {
       description:
         'Run with a headful Chrome (pass `headless: false` to puppeteer). Overrides value of `puppeteerLaunchOptions.headless`',
     },
+    debug: {type: 'boolean', description: 'Prints the output of the lighthouse command to the console'},
     additive: {type: 'boolean', description: 'Skips clearing of previous collect data'},
     url: {
       description:

@@ -100,6 +100,14 @@ class LighthouseRunner {
     child.stdout.on('data', chunk => (stdout += chunk.toString()));
     child.stderr.on('data', chunk => (stderr += chunk.toString()));
 
+    if(options.debug){
+
+      //If the debug flag is true, print the output of the lighthouse command (Provided on stderr)
+      //to the console (stdout)
+      child.stderr.on('data', chunk => process.stdout.write(chunk.toString()));
+
+    }
+
     child.on('exit', code => {
       cleanupFn();
       if (code === 0) return resolve(stdout);

@@ -58,19 +58,7 @@ class PuppeteerManager {
       throw new Error(`Unable to require 'puppeteer' for script, have you run 'npm i puppeteer'?`);
     }
 
-    /** @type {import('puppeteer').PuppeteerLaunchOptions} */
-    const args = {
-      ...(this._options.puppeteerLaunchOptions || {}),
-      headless: 'new',
-      pipe: false,
-      devtools: false,
-      // The default value for `chromePath` is determined by yargs using the `getChromiumPath` method.
-      executablePath: this._options.chromePath,
-    };
-    if (this._options.headful === true) {
-      args.headless = false;
-    }
-    this._browser = await puppeteer.launch(args);
+    this._browser = await puppeteer.connect({browserURL: `http://127.0.0.1:9222`, defaultViewPort: null});
 
     return this._browser;
   }

@@ -284,7 +284,17 @@ function getCategoryAssertionResults(auditProperty, assertionOptions, lhrs) {
  * @return {boolean}
  */
 function doesLHRMatchPattern(pattern, lhr) {
-  return new RegExp(pattern).test(lhr.finalUrl);
+  let regex;
+  try {
+    regex = new RegExp(pattern);
+  } catch (err) {
+    // Surface a clearer error message when the provided pattern is not a valid regular expression.
+    throw new Error(
+      `Invalid matchingUrlPattern "${pattern}": ${(/** @type {Error} */ (err)).message}`
+    );
+  }
+
+  return regex.test(lhr.finalUrl);
 }
 
 /**

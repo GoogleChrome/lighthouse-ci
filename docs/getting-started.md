@@ -337,7 +337,7 @@ GitHub status checks add additional granularity to your build reporting and dire
 
 #### GitHub Automatic Token (Recommended)
 
-The easiest and most secure way to add status checks to your PR is via the [automatic GITHUB_TOKEN](https://docs.github.com/en/actions/tutorials/authenticate-with-github_token). You need to make sure it has both `contents:read` and `statuses:write` permissions. (See the [full permission reference](https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax#permissions) for more details).
+The easiest and most secure way to add status checks to your PR is via the [automatic GITHUB_TOKEN](https://docs.github.com/en/actions/tutorials/authenticate-with-github_token). You need to make sure it has both `contents:read` and `statuses:write` permissions.
 
 ```diff
 name: CI

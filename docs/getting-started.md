@@ -10,7 +10,8 @@
   - [Modifications for Sites without a Build Step](#modifications-for-sites-without-a-build-step)
   - [Modifications for Sites with a Custom Server](#modifications-for-sites-with-a-custom-server)
 - [GitHub Status Checks](#github-status-checks)
-  - [GitHub App Method (Recommended)](#github-app-method-recommended)
+  - [GitHub Automatic Token (Recommended)](#github-automatic-token-recommended)
+  - [Alternative: GitHub App Method](#alternative-github-app-method)
   - [Alternative: Personal Access Token Method](#alternative-personal-access-token-method)
   - [Additional configuration for GitHub Actions as CI Provider](#additional-configuration-for-github-actions-as-ci-provider)
 - [Add Assertions](#add-assertions)
@@ -334,7 +335,39 @@ GitHub status checks add additional granularity to your build reporting and dire
 
 ![screenshot of GitHub status checks for Lighthouse CI](https://user-images.githubusercontent.com/2301202/68001177-0b9dd180-fc31-11e9-8091-ada8c6e50a9b.png)
 
-#### GitHub App Method (Recommended)
+#### GitHub Automatic Token (Recommended)
+
+The easiest and most secure way to add status checks to your PR is via the [automatic GITHUB_TOKEN](https://docs.github.com/en/actions/tutorials/authenticate-with-github_token). You need to make sure it has both `contents:read` and `statuses:write` permissions. (See the [full permission reference](https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax#permissions) for more details).
+
+```diff
+name: CI
+on: [push]
+jobs:
+  lhci:
+    name: Lighthouse
+    runs-on: ubuntu-latest
++   permissions:
++     contents: read
++     statuses: write
+    steps:
+      - uses: actions/checkout@v3
+      - name: Use Node.js 16.x
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
+      - name: npm install, build
+        run: |
+          npm install
+          npm run build
+      - name: run Lighthouse CI
+        run: |
+          npm install -g @lhci/cli@0.15.x
+          lhci autorun
++       env:
++         LHCI_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+```
+
+#### Alternative: GitHub App Method
 
 **NOTE: Before installing the GitHub App, refer to the [terms of service](./services-disclaimer.md#github-app).**
 

@@ -38,7 +38,7 @@ exit $EXIT_CODE
 
 To run Lighthouse CI, you'll need...
 
-- Node v16 LTS or later
+- Node v18 LTS or later
 - Chrome Stable or later
 - (if Ubuntu) Xenial or later
 

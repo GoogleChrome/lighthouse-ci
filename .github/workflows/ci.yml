@@ -20,13 +20,13 @@ jobs:
       YARN_GPG: 'no'
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
-      - name: Use Node.js 18
-        uses: actions/setup-node@v3
+      - name: Use Node.js 24
+        uses: actions/setup-node@v6
         with:
-          node-version: 18
+          node-version: 24
           cache: yarn
       - run: yarn install --frozen-lockfile
       - run: yarn build
@@ -68,13 +68,13 @@ jobs:
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
-      - name: Use Node.js 18
-        uses: actions/setup-node@v3
+      - name: Use Node.js 24
+        uses: actions/setup-node@v6
         with:
-          node-version: 18
+          node-version: 24
           cache: yarn
       # Since Ubuntu 23, dev builds of Chromium need this.
       # https://chromium.googlesource.com/chromium/src/+/main/docs/security/apparmor-userns-restrictions.md

@@ -10,7 +10,8 @@
   - [Modifications for Sites without a Build Step](#modifications-for-sites-without-a-build-step)
   - [Modifications for Sites with a Custom Server](#modifications-for-sites-with-a-custom-server)
 - [GitHub Status Checks](#github-status-checks)
-  - [GitHub App Method (Recommended)](#github-app-method-recommended)
+  - [GitHub Automatic Token (Recommended)](#github-automatic-token-recommended)
+  - [Alternative: GitHub App Method](#alternative-github-app-method)
   - [Alternative: Personal Access Token Method](#alternative-personal-access-token-method)
   - [Additional configuration for GitHub Actions as CI Provider](#additional-configuration-for-github-actions-as-ci-provider)
 - [Add Assertions](#add-assertions)
@@ -84,11 +85,11 @@ jobs:
     name: Lighthouse
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - name: Use Node.js 16.x
-        uses: actions/setup-node@v3
+      - uses: actions/checkout@v6
+      - name: Use Node.js 24.x
+        uses: actions/setup-node@v6
         with:
-          node-version: 16.x
+          node-version: 24.x
       - name: npm install, build
         run: |
           npm install
@@ -109,7 +110,7 @@ jobs:
 
 ```yaml
 language: node_js
-node_js: v16
+node_js: v24
 addons:
   chrome: stable
 before_install:
@@ -134,7 +135,7 @@ orbs:
 jobs:
   build:
     docker:
-      - image: cimg/node:16.13-browsers
+      - image: cimg/node:24.13-browsers
     working_directory: ~/your-project
     steps:
       - checkout
@@ -171,7 +172,7 @@ module.exports = {
 **.gitlab-ci.yml**
 
 ```yaml
-image: cypress/browsers:node16.17.0-chrome106
+image: cypress/browsers:24.13.0
 lhci:
   script:
     - npm install
@@ -198,7 +199,7 @@ echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" | sud
 wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
 
 # Add Node's apt-key
-curl -sL https://deb.nodesource.com/setup_16.x | sudo -E bash -
+curl -sL https://deb.nodesource.com/setup_24.x | sudo -E bash -
 
 # Install NodeJS and Google Chrome
 sudo apt-get update
@@ -256,16 +257,16 @@ module.exports = {
 steps:
   - id: 'install'
     args: ['npm', 'ci']
-    name: node:16-alpine
+    name: node:24-alpine
 
   - id: 'build'
     waitFor: ['install']
-    name: node:16-alpine
+    name: node:24-alpine
     args: ['npm', 'run', 'build']
 
   - id: 'lighthouse'
     waitFor: ['build']
-    name: cypress/browsers:node16.17.0-chrome106
+    name: cypress/browsers:cypress/browsers:24.13.0
     entrypoint: '/bin/sh'
     args: ['-c', 'npm install -g @lhci/cli@0.15.x && lhci autorun --failOnUploadFailure']
     env:
@@ -334,7 +335,39 @@ GitHub status checks add additional granularity to your build reporting and dire
 
 ![screenshot of GitHub status checks for Lighthouse CI](https://user-images.githubusercontent.com/2301202/68001177-0b9dd180-fc31-11e9-8091-ada8c6e50a9b.png)
 
-#### GitHub App Method (Recommended)
+#### GitHub Automatic Token (Recommended)
+
+The easiest and most secure way to add status checks to your PR is via the [automatic GITHUB_TOKEN](https://docs.github.com/en/actions/tutorials/authenticate-with-github_token). You need to make sure it has both `contents:read` and `statuses:write` permissions.
+
+```diff
+name: CI
+on: [push]
+jobs:
+  lhci:
+    name: Lighthouse
+    runs-on: ubuntu-latest
++   permissions:
++     contents: read
++     statuses: write
+    steps:
+      - uses: actions/checkout@v6
+      - name: Use Node.js 24.x
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24.x
+      - name: npm install, build
+        run: |
+          npm install
+          npm run build
+      - name: run Lighthouse CI
+        run: |
+          npm install -g @lhci/cli@0.15.x
+          lhci autorun
++       env:
++         LHCI_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+```
+
+#### Alternative: GitHub App Method
 
 **NOTE: Before installing the GitHub App, refer to the [terms of service](./services-disclaimer.md#github-app).**
 
@@ -360,13 +393,13 @@ jobs:
     name: Lighthouse
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v6
         with:
           ref: ${{ github.event.pull_request.head.sha }}
-      - name: Use Node.js 16.x
-        uses: actions/setup-node@v3
+      - name: Use Node.js 24.x
+        uses: actions/setup-node@v6
         with:
-          node-version: 16.x
+          node-version: 24.x
       - name: npm install, build
         run: |
           npm install

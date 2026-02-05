@@ -17,10 +17,10 @@ jobs:
   lighthouseci:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
-          node-version: 18
+          node-version: 24
       - run: npm install && npm install -g @lhci/cli@0.15.x
       - run: npm run build
       - run: lhci autorun

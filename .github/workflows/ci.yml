@@ -23,10 +23,10 @@ jobs:
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
-      - name: Use Node.js 18
+      - name: Use Node.js 24
         uses: actions/setup-node@v6
         with:
-          node-version: 18
+          node-version: 24
           cache: yarn
       - run: yarn install --frozen-lockfile
       - run: yarn build
@@ -71,10 +71,10 @@ jobs:
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
-      - name: Use Node.js 18
+      - name: Use Node.js 24
         uses: actions/setup-node@v6
         with:
-          node-version: 18
+          node-version: 24
           cache: yarn
       # Since Ubuntu 23, dev builds of Chromium need this.
       # https://chromium.googlesource.com/chromium/src/+/main/docs/security/apparmor-userns-restrictions.md

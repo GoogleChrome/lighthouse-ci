@@ -86,10 +86,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
-      - name: Use Node.js 18.x
+      - name: Use Node.js 24.x
         uses: actions/setup-node@v6
         with:
-          node-version: 18.x
+          node-version: 24.x
       - name: npm install, build
         run: |
           npm install
@@ -199,7 +199,7 @@ echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" | sud
 wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
 
 # Add Node's apt-key
-curl -sL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+curl -sL https://deb.nodesource.com/setup_24.x | sudo -E bash -
 
 # Install NodeJS and Google Chrome
 sudo apt-get update
@@ -351,10 +351,10 @@ jobs:
 +     statuses: write
     steps:
       - uses: actions/checkout@v6
-      - name: Use Node.js 18.x
+      - name: Use Node.js 24.x
         uses: actions/setup-node@v6
         with:
-          node-version: 18.x
+          node-version: 24.x
       - name: npm install, build
         run: |
           npm install
@@ -396,10 +396,10 @@ jobs:
       - uses: actions/checkout@v6
         with:
           ref: ${{ github.event.pull_request.head.sha }}
-      - name: Use Node.js 18.x
+      - name: Use Node.js 24.x
         uses: actions/setup-node@v6
         with:
-          node-version: 18.x
+          node-version: 24.x
       - name: npm install, build
         run: |
           npm install

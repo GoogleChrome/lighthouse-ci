@@ -25,6 +25,8 @@ This assumes you've already signed up, created a heroku account, and installed t
 ```bash
 # Create a new project on heroku
 heroku create
+# Setup the Heroku git remote
+heroku git:remote -a <project-name-from-above>
 # Add a database to your project
 heroku addons:create heroku-postgresql:essential-0
 # Deploy your code to heroku

@@ -110,7 +110,7 @@ jobs:
 
 ```yaml
 language: node_js
-node_js: v16
+node_js: v24
 addons:
   chrome: stable
 before_install:
@@ -135,7 +135,7 @@ orbs:
 jobs:
   build:
     docker:
-      - image: cimg/node:16.13-browsers
+      - image: cimg/node:24.13-browsers
     working_directory: ~/your-project
     steps:
       - checkout
@@ -172,7 +172,7 @@ module.exports = {
 **.gitlab-ci.yml**
 
 ```yaml
-image: cypress/browsers:node16.17.0-chrome106
+image: cypress/browsers:24.13.0
 lhci:
   script:
     - npm install
@@ -257,16 +257,16 @@ module.exports = {
 steps:
   - id: 'install'
     args: ['npm', 'ci']
-    name: node:16-alpine
+    name: node:24-alpine
 
   - id: 'build'
     waitFor: ['install']
-    name: node:16-alpine
+    name: node:24-alpine
     args: ['npm', 'run', 'build']
 
   - id: 'lighthouse'
     waitFor: ['build']
-    name: cypress/browsers:node16.17.0-chrome106
+    name: cypress/browsers:cypress/browsers:24.13.0
     entrypoint: '/bin/sh'
     args: ['-c', 'npm install -g @lhci/cli@0.15.x && lhci autorun --failOnUploadFailure']
     env:

@@ -20,3 +20,127 @@
   padding-left: calc(var(--base-spacing) / 4);
   margin-right: calc(var(--base-spacing) / 4);
 }
+
+/* Compare mode toggle */
+.build-view__compare-mode-toggle {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  border: 1px solid var(--base-border-color);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-right: var(--base-spacing);
+}
+
+.build-view__compare-mode-option {
+  padding: 4px 12px;
+  cursor: pointer;
+  font-size: var(--base-font-size);
+  color: var(--secondary-text-color);
+  user-select: none;
+  white-space: nowrap;
+}
+
+.build-view__compare-mode-option--active {
+  color: var(--base-text-color);
+  background-color: var(--highlighted-background-color);
+  border-bottom: 2px solid var(--strong-border-color);
+}
+
+/* Group mode layout */
+.build-view__group-mode {
+  padding: var(--base-spacing);
+}
+
+.build-view__group-controls {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--base-spacing);
+  margin-bottom: calc(var(--base-spacing) * 2);
+}
+
+/* GroupComparisonView */
+.group-comparison {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.group-comparison__title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: calc(var(--base-spacing) * 2);
+  color: var(--base-text-color);
+}
+
+.group-comparison__empty {
+  color: var(--secondary-text-color);
+  font-style: italic;
+}
+
+.group-comparison__section {
+  margin-bottom: calc(var(--base-spacing) * 2);
+}
+
+.group-comparison__section-title {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: var(--base-spacing);
+  color: var(--secondary-text-color);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.group-comparison__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--base-font-size);
+}
+
+.group-comparison__table th {
+  text-align: left;
+  padding: calc(var(--base-spacing) / 2) var(--base-spacing);
+  border-bottom: 2px solid var(--base-border-color);
+  color: var(--secondary-text-color);
+  font-weight: 600;
+  font-size: 0.85em;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.group-comparison__table td {
+  padding: calc(var(--base-spacing) / 2) var(--base-spacing);
+  border-bottom: 1px solid var(--base-border-color);
+}
+
+.group-comparison__table tbody tr:hover {
+  background-color: var(--highlighted-background-color);
+}
+
+.group-comparison__metric-name {
+  font-weight: 500;
+  color: var(--base-text-color);
+}
+
+.group-comparison__value {
+  font-variant-numeric: tabular-nums;
+  color: var(--secondary-text-color);
+}
+
+.group-comparison__delta {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.group-comparison__delta--improved {
+  color: var(--pass-color, #0cce6b);
+}
+
+.group-comparison__delta--regressed {
+  color: var(--fail-color, #ff4e42);
+}
+
+.group-comparison__delta--neutral {
+  color: var(--secondary-text-color);
+}

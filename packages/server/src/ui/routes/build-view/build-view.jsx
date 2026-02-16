@@ -18,6 +18,7 @@ import {
   useOptionalBuildRepresentativeRuns,
   useAncestorBuild,
   useProjectBySlug,
+  useBuildStatistics,
 } from '../../hooks/use-api-data';
 import {BuildHashSelector} from './build-hash-selector';
 import {BuildSelectorHeaderSection} from './build-selector-header-section';
@@ -28,6 +29,13 @@ import {DocumentTitle} from '../../components/document-title';
 import {LoadingSpinner} from '../../components/loading-spinner';
 import {LhrComparison} from './lhr-comparison.jsx';
 import {Dropdown} from '../../components/dropdown';
+import {
+  groupUrlsByPageType,
+  createGroupedDropdownOptions,
+  getUrlsForGroup,
+  getGroupName,
+  aggregateStatistics,
+} from '../../utils/url-grouping.js';
 
 /**
  * @param {{compareUrl?: string, runs: Array<LHCI.ServerCommand.Run>}} props
@@ -47,24 +55,259 @@ function computeSelectedUrl(props, compareRuns) {
   return urlsInBothRuns[0] || fallbackUrl;
 }
 
+/**
+ * Compute a default URL for a build's runs, picking the shortest available.
+ * @param {Array<LHCI.ServerCommand.Run>} runs
+ * @return {string}
+ */
+function computeShortestUrl(runs) {
+  if (!runs.length) return '';
+  const urls = [...new Set(runs.map(r => r.url))];
+  urls.sort((a, b) => a.length - b.length);
+  return urls[0];
+}
+
+/**
+ * Compute independent default URLs for base and compare builds.
+ * Tries to pick the same URL if it exists in both builds; otherwise picks the shortest in each.
+ * @param {Array<LHCI.ServerCommand.Run>} compareRuns
+ * @param {Array<LHCI.ServerCommand.Run>} baseRuns
+ * @return {{defaultBaseUrl: string, defaultCompareUrl: string}}
+ */
+function computeIndependentDefaults(compareRuns, baseRuns) {
+  const compareUrls = new Set(compareRuns.map(r => r.url));
+  const baseUrls = new Set(baseRuns.map(r => r.url));
+
+  // Find URLs present in both builds, sorted by length (shortest first)
+  const sharedUrls = [...compareUrls].filter(u => baseUrls.has(u)).sort((a, b) => a.length - b.length);
+
+  if (sharedUrls.length > 0) {
+    return {defaultBaseUrl: sharedUrls[0], defaultCompareUrl: sharedUrls[0]};
+  }
+
+  return {
+    defaultBaseUrl: computeShortestUrl(baseRuns),
+    defaultCompareUrl: computeShortestUrl(compareRuns),
+  };
+}
+
+/** @param {{baseStats: Array, compareStats: Array, groupName: string}} props */
+const GroupComparisonView = props => {
+  const {baseStats, compareStats, groupName} = props;
+
+  const METRICS = [
+    {name: 'category_performance_median', label: 'Performance Score', format: /** @param {number} v */ v => Math.round(v * 100), unit: '', higherIsBetter: true},
+    {name: 'category_accessibility_median', label: 'Accessibility Score', format: /** @param {number} v */ v => Math.round(v * 100), unit: '', higherIsBetter: true},
+    {name: 'category_best-practices_median', label: 'Best Practices Score', format: /** @param {number} v */ v => Math.round(v * 100), unit: '', higherIsBetter: true},
+    {name: 'category_seo_median', label: 'SEO Score', format: /** @param {number} v */ v => Math.round(v * 100), unit: '', higherIsBetter: true},
+    {name: 'audit_first-contentful-paint_median', label: 'FCP', format: /** @param {number} v */ v => (v / 1000).toFixed(1), unit: 's', higherIsBetter: false},
+    {name: 'audit_largest-contentful-paint_median', label: 'LCP', format: /** @param {number} v */ v => (v / 1000).toFixed(1), unit: 's', higherIsBetter: false},
+    {name: 'audit_interactive_median', label: 'TTI', format: /** @param {number} v */ v => (v / 1000).toFixed(1), unit: 's', higherIsBetter: false},
+    {name: 'audit_speed-index_median', label: 'SI', format: /** @param {number} v */ v => (v / 1000).toFixed(1), unit: 's', higherIsBetter: false},
+    {name: 'audit_total-blocking-time_median', label: 'TBT', format: /** @param {number} v */ v => Math.round(v), unit: 'ms', higherIsBetter: false},
+    {name: 'audit_max-potential-fid_median', label: 'FID', format: /** @param {number} v */ v => Math.round(v), unit: 'ms', higherIsBetter: false},
+    {name: 'audit_cumulative-layout-shift_median', label: 'CLS', format: /** @param {number} v */ v => v.toFixed(3), unit: '', higherIsBetter: false},
+  ];
+
+  /** @param {Array} stats @param {string} name */
+  const findStat = (stats, name) => {
+    const stat = stats.find(s => s.name === name);
+    return stat ? stat.value : undefined;
+  };
+
+  /** @param {number} delta @param {boolean} higherIsBetter */
+  const getDeltaClass = (delta, higherIsBetter) => {
+    if (Math.abs(delta) < 0.001) return 'group-comparison__delta--neutral';
+    const isImproved = higherIsBetter ? delta > 0 : delta < 0;
+    return isImproved ? 'group-comparison__delta--improved' : 'group-comparison__delta--regressed';
+  };
+
+  /** @param {number} delta @param {string} unit @param {boolean} higherIsBetter @param {function} format */
+  const formatDelta = (delta, unit, higherIsBetter, format) => {
+    if (Math.abs(delta) < 0.001) return '--';
+    const sign = delta > 0 ? '+' : '';
+    return `${sign}${format(delta)}${unit}`;
+  };
+
+  const hasData = baseStats.length > 0 || compareStats.length > 0;
+
+  if (!hasData) {
+    return (
+      <div className="group-comparison">
+        <h2 className="group-comparison__title">{groupName} - Group Comparison</h2>
+        <p className="group-comparison__empty">No statistics available for this group.</p>
+      </div>
+    );
+  }
+
+  // Separate into category scores and audit metrics
+  const categoryMetrics = METRICS.filter(m => m.name.startsWith('category_'));
+  const auditMetrics = METRICS.filter(m => m.name.startsWith('audit_'));
+
+  return (
+    <div className="group-comparison">
+      <h2 className="group-comparison__title">{groupName} - Group Comparison</h2>
+
+      <div className="group-comparison__section">
+        <h3 className="group-comparison__section-title">Category Scores</h3>
+        <table className="group-comparison__table">
+          <thead>
+            <tr>
+              <th>Metric</th>
+              <th>Base</th>
+              <th>Compare</th>
+              <th>Delta</th>
+            </tr>
+          </thead>
+          <tbody>
+            {categoryMetrics.map(metric => {
+              const baseVal = findStat(baseStats, metric.name);
+              const compareVal = findStat(compareStats, metric.name);
+              const hasBoth = baseVal !== undefined && compareVal !== undefined;
+              const delta = hasBoth ? compareVal - baseVal : 0;
+
+              return (
+                <tr key={metric.name}>
+                  <td className="group-comparison__metric-name">{metric.label}</td>
+                  <td className="group-comparison__value">
+                    {baseVal !== undefined ? `${metric.format(baseVal)}${metric.unit}` : '--'}
+                  </td>
+                  <td className="group-comparison__value">
+                    {compareVal !== undefined ? `${metric.format(compareVal)}${metric.unit}` : '--'}
+                  </td>
+                  <td className={clsx('group-comparison__delta', hasBoth && getDeltaClass(delta, metric.higherIsBetter))}>
+                    {hasBoth ? formatDelta(delta, metric.unit, metric.higherIsBetter, metric.format) : '--'}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+
+      <div className="group-comparison__section">
+        <h3 className="group-comparison__section-title">Key Metrics</h3>
+        <table className="group-comparison__table">
+          <thead>
+            <tr>
+              <th>Metric</th>
+              <th>Base</th>
+              <th>Compare</th>
+              <th>Delta</th>
+            </tr>
+          </thead>
+          <tbody>
+            {auditMetrics.map(metric => {
+              const baseVal = findStat(baseStats, metric.name);
+              const compareVal = findStat(compareStats, metric.name);
+              const hasBoth = baseVal !== undefined && compareVal !== undefined;
+              const delta = hasBoth ? compareVal - baseVal : 0;
+
+              return (
+                <tr key={metric.name}>
+                  <td className="group-comparison__metric-name">{metric.label}</td>
+                  <td className="group-comparison__value">
+                    {baseVal !== undefined ? `${metric.format(baseVal)}${metric.unit}` : '--'}
+                  </td>
+                  <td className="group-comparison__value">
+                    {compareVal !== undefined ? `${metric.format(compareVal)}${metric.unit}` : '--'}
+                  </td>
+                  <td className={clsx('group-comparison__delta', hasBoth && getDeltaClass(delta, metric.higherIsBetter))}>
+                    {hasBoth ? formatDelta(delta, metric.unit, metric.higherIsBetter, metric.format) : '--'}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+};
+
 /** @param {{project: LHCI.ServerCommand.Project, build: LHCI.ServerCommand.Build, ancestorBuild: LHCI.ServerCommand.Build | null, runs: Array<LHCI.ServerCommand.Run>, baseUrl?: string, compareUrl?: string, hasBaseOverride: boolean}} props */
 const BuildView_ = props => {
   const [openBuildHash, setOpenBuild] = useState(/** @type {null|'base'|'compare'} */ (null));
   const [isOpenLhrBaseLinkHovered, setLhrBaseLinkHover] = useState(false);
   const [isOpenLhrCompareLinkHovered, setLhrCompareLinkHover] = useState(false);
+  const [compareMode, setCompareMode] = useState(/** @type {'individual'|'group'} */ ('individual'));
+  const [selectedGroup, setSelectedGroup] = useState(/** @type {string|undefined} */ (undefined));
   const buildHashSelectorCloseFn = useCallback(() => setOpenBuild(null), [setOpenBuild]);
 
   const compareRuns = props.runs.filter(run => run.buildId === props.build.id);
-  const compareUrl = props.compareUrl || computeSelectedUrl(props, compareRuns);
-  const baseUrl = props.baseUrl || compareUrl;
-  const availableUrls = [...new Set(compareRuns.map(run => run.url))];
-  const run = compareRuns.find(run => run.url === compareUrl);
-
   const ancestorBuildId = props.ancestorBuild && props.ancestorBuild.id;
   const baseRuns = props.runs.filter(run => run.buildId === ancestorBuildId);
+
+  // Independent URL defaults for individual mode
+  const {defaultBaseUrl, defaultCompareUrl} = useMemo(
+    () => computeIndependentDefaults(compareRuns, baseRuns),
+    [compareRuns.length, baseRuns.length]
+  );
+
+  const compareUrl = props.compareUrl || defaultCompareUrl;
+  const baseUrl = props.baseUrl || defaultBaseUrl;
+
+  const availableCompareUrls = [...new Set(compareRuns.map(run => run.url))];
+  const availableBaseUrls = [...new Set(baseRuns.map(run => run.url))];
+
+  const run = compareRuns.find(run => run.url === compareUrl);
   const baseRun = baseRuns.find(run => run.url === baseUrl);
 
-  const availableUrlOptions = availableUrls.map(url => ({value: url, label: decodeURI(url)}));
+  const compareUrlOptions = availableCompareUrls.map(url => ({value: url, label: decodeURI(url)}));
+  const baseUrlOptions = availableBaseUrls.map(url => ({value: url, label: decodeURI(url)}));
+
+  // Group mode data
+  const compareUrlObjects = useMemo(
+    () => availableCompareUrls.map(url => ({url})),
+    [availableCompareUrls.join(',')]
+  );
+  const groups = useMemo(() => groupUrlsByPageType(compareUrlObjects), [compareUrlObjects]);
+  const groupOptions = useMemo(() => createGroupedDropdownOptions(groups), [groups]);
+  const activeGroup = selectedGroup || (groupOptions.length > 0 ? groupOptions[0].value : '');
+
+  // Statistics for group mode - only fetch when in group mode
+  const projectId = props.project.id;
+  const buildId = props.build.id;
+  const compareBuildIds = useMemo(
+    () => (compareMode === 'group' ? [buildId] : undefined),
+    [compareMode, buildId]
+  );
+  const baseBuildIds = useMemo(
+    () => (compareMode === 'group' && ancestorBuildId ? [ancestorBuildId] : undefined),
+    [compareMode, ancestorBuildId]
+  );
+
+  const [compareStatsLoading, compareStatsData] = useBuildStatistics(projectId, compareBuildIds);
+  const [baseStatsLoading, baseStatsData] = useBuildStatistics(projectId, baseBuildIds);
+
+  // Aggregate stats for selected group
+  const groupUrls = useMemo(() => {
+    if (compareMode !== 'group' || !activeGroup) return [];
+    return getUrlsForGroup(activeGroup, compareUrlObjects);
+  }, [compareMode, activeGroup, compareUrlObjects]);
+
+  // For base build, construct URL objects from base runs
+  const baseUrlObjects = useMemo(
+    () => availableBaseUrls.map(url => ({url})),
+    [availableBaseUrls.join(',')]
+  );
+  const baseGroupUrls = useMemo(() => {
+    if (compareMode !== 'group' || !activeGroup) return [];
+    return getUrlsForGroup(activeGroup, baseUrlObjects);
+  }, [compareMode, activeGroup, baseUrlObjects]);
+
+  const aggregatedCompareStats = useMemo(() => {
+    if (compareMode !== 'group' || !compareStatsData || groupUrls.length === 0) return [];
+    return aggregateStatistics(compareStatsData, getGroupName(activeGroup));
+  }, [compareMode, compareStatsData, groupUrls]);
+
+  const aggregatedBaseStats = useMemo(() => {
+    if (compareMode !== 'group' || !baseStatsData || baseGroupUrls.length === 0) return [];
+    return aggregateStatistics(baseStatsData, getGroupName(activeGroup));
+  }, [compareMode, baseStatsData, baseGroupUrls]);
+
+  const groupName = activeGroup ? getGroupName(activeGroup) : '';
+  const displayGroupName = groups.find(g => g.value === activeGroup);
 
   /** @type {LH.Result|undefined} */
   let lhr;
@@ -85,7 +328,8 @@ const BuildView_ = props => {
     lhrError = err;
   }
 
-  if (!run || !lhr) {
+  // In group mode, we don't need a specific run/lhr, so skip the "no runs" check
+  if (compareMode === 'individual' && (!run || !lhr)) {
     return (
       <Fragment>
         <h1>No runs for build</h1>
@@ -98,13 +342,36 @@ const BuildView_ = props => {
   }
 
   const definedLhr = lhr;
-  const warningProps = {
-    lhr: definedLhr,
-    build: props.build,
-    baseBuild: props.ancestorBuild,
-    baseLhr: baseLhr,
-    hasBaseOverride: props.hasBaseOverride,
-  };
+  const warningProps = definedLhr
+    ? {
+        lhr: definedLhr,
+        build: props.build,
+        baseBuild: props.ancestorBuild,
+        baseLhr: baseLhr,
+        hasBaseOverride: props.hasBaseOverride,
+      }
+    : null;
+
+  const compareModeToggle = (
+    <div className="build-view__compare-mode-toggle">
+      <div
+        className={clsx('build-view__compare-mode-option', {
+          'build-view__compare-mode-option--active': compareMode === 'individual',
+        })}
+        onClick={() => setCompareMode('individual')}
+      >
+        Individual
+      </div>
+      <div
+        className={clsx('build-view__compare-mode-option', {
+          'build-view__compare-mode-option--active': compareMode === 'group',
+        })}
+        onClick={() => setCompareMode('group')}
+      >
+        Grouped
+      </div>
+    </div>
+  );
 
   return (
     <Page
@@ -160,47 +427,74 @@ const BuildView_ = props => {
         <Fragment />
       )}
       {(lhrError && <h1>Error parsing LHR ({lhrError.stack})</h1>) || <Fragment />}
-      <LhrComparison
-        lhr={lhr}
-        baseLhr={baseLhr}
-        className={clsx({
-          'build-view--with-lhr-base-link-hover': isOpenLhrBaseLinkHovered,
-          'build-view--with-lhr-compare-link-hover': isOpenLhrCompareLinkHovered,
-        })}
-        hookElements={{
-          warnings: computeWarnings(warningProps).hasWarning ? (
-            <BuildViewWarnings {...warningProps} />
-          ) : undefined,
-          dropdowns: (
-            <Fragment>
-              <Dropdown
-                label="Base URL"
-                className="dropdown--url dropdown--base-url"
-                value={baseUrl}
-                setValue={url => {
-                  const to = new URL(window.location.href);
-                  to.searchParams.set('baseUrl', url);
-                  to.searchParams.set('compareUrl', compareUrl);
-                  route(`${to.pathname}${to.search}`);
-                }}
-                options={availableUrlOptions}
-              />
-              <Dropdown
-                label="Compare URL"
-                className="dropdown--url dropdown--compare-url"
-                value={compareUrl}
-                setValue={url => {
-                  const to = new URL(window.location.href);
-                  to.searchParams.set('baseUrl', baseUrl);
-                  to.searchParams.set('compareUrl', url);
-                  route(`${to.pathname}${to.search}`);
-                }}
-                options={availableUrlOptions}
-              />
-            </Fragment>
-          ),
-        }}
-      />
+      {compareMode === 'individual' && lhr ? (
+        <LhrComparison
+          lhr={lhr}
+          baseLhr={baseLhr}
+          className={clsx({
+            'build-view--with-lhr-base-link-hover': isOpenLhrBaseLinkHovered,
+            'build-view--with-lhr-compare-link-hover': isOpenLhrCompareLinkHovered,
+          })}
+          hookElements={{
+            warnings: warningProps && computeWarnings(warningProps).hasWarning ? (
+              <BuildViewWarnings {...warningProps} />
+            ) : undefined,
+            dropdowns: (
+              <Fragment>
+                {compareModeToggle}
+                <Dropdown
+                  label="Base URL"
+                  className="dropdown--url dropdown--base-url"
+                  value={baseUrl}
+                  setValue={url => {
+                    const to = new URL(window.location.href);
+                    to.searchParams.set('baseUrl', url);
+                    to.searchParams.set('compareUrl', compareUrl);
+                    route(`${to.pathname}${to.search}`);
+                  }}
+                  options={baseUrlOptions}
+                />
+                <Dropdown
+                  label="Compare URL"
+                  className="dropdown--url dropdown--compare-url"
+                  value={compareUrl}
+                  setValue={url => {
+                    const to = new URL(window.location.href);
+                    to.searchParams.set('baseUrl', baseUrl);
+                    to.searchParams.set('compareUrl', url);
+                    route(`${to.pathname}${to.search}`);
+                  }}
+                  options={compareUrlOptions}
+                />
+              </Fragment>
+            ),
+          }}
+        />
+      ) : compareMode === 'group' ? (
+        <div className="build-view__group-mode">
+          <div className="build-view__group-controls">
+            {compareModeToggle}
+            <Dropdown
+              label="Page Type"
+              className="dropdown--url dropdown--page-type"
+              value={activeGroup}
+              setValue={setSelectedGroup}
+              options={groupOptions}
+            />
+          </div>
+          {compareStatsLoading === 'loading' || baseStatsLoading === 'loading' ? (
+            <LoadingSpinner />
+          ) : (
+            <GroupComparisonView
+              baseStats={aggregatedBaseStats}
+              compareStats={aggregatedCompareStats}
+              groupName={displayGroupName ? displayGroupName.label : groupName}
+            />
+          )}
+        </div>
+      ) : (
+        <Fragment />
+      )}
     </Page>
   );
 };

@@ -97,7 +97,7 @@ export function getGroupName(groupValue) {
 export function createGroupedDropdownOptions(groups) {
   return groups.map(g => ({
     value: g.value,
-    label: `${g.label} (${g.urls.length} ${g.urls.length === 1 ? 'page' : 'pages'})`,
+    label: g.label,
   }));
 }
 

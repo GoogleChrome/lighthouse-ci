@@ -126,6 +126,7 @@ const definitions = {
   'audit_largest-contentful-paint_median': auditNumericValueMedian('largest-contentful-paint'),
   'audit_total-blocking-time_median': auditNumericValueMedian('total-blocking-time'),
   'audit_max-potential-fid_median': auditNumericValueMedian('max-potential-fid'),
+  'audit_cumulative-layout-shift_median': auditNumericValueMedian('cumulative-layout-shift'),
   category_performance_median: categoryScoreMedian('performance'),
   category_pwa_median: categoryScoreMedian('pwa'),
   category_seo_median: categoryScoreMedian('seo'),
@@ -186,4 +187,4 @@ const definitions = {
 };
 
 // Keep the export separate from declaration to enable tsc to typecheck the `@type` annotation.
-module.exports = {definitions, VERSION: 2};
+module.exports = {definitions, VERSION: 3};

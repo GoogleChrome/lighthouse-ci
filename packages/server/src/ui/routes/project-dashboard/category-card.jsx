@@ -111,6 +111,23 @@ const MetricLineGraphs = props => {
           },
         ]}
       />
+      {stats('audit_cumulative-layout-shift_median').length > 0 && (
+        <MetricLineGraph
+          pinned={props.pinned}
+          setPinned={props.setPinned}
+          selectedBuildId={props.selectedBuildId}
+          setSelectedBuildId={props.setSelectedBuildId}
+          metrics={[
+            {
+              abbreviation: 'CLS',
+              label: 'Cumulative Layout Shift',
+              statistics: stats('audit_cumulative-layout-shift_median'),
+              scoreLevels: SCORE_LEVEL_METRIC_THRESHOLDS['cumulative-layout-shift'],
+              unit: 'unitless',
+            },
+          ]}
+        />
+      )}
     </Fragment>
   );
 };
@@ -158,6 +175,15 @@ const MetricDistributionGraphs = props => {
         statistics={stats('audit_max-potential-fid_median')}
         scoreLevels={SCORE_LEVEL_METRIC_THRESHOLDS['max-potential-fid']}
       />
+      {stats('audit_cumulative-layout-shift_median').length > 0 && (
+        <MetricDistributionGraph
+          abbreviation={'CLS'}
+          label={'Cumulative Layout Shift'}
+          statistics={stats('audit_cumulative-layout-shift_median')}
+          scoreLevels={SCORE_LEVEL_METRIC_THRESHOLDS['cumulative-layout-shift']}
+          unit={'unitless'}
+        />
+      )}
     </Fragment>
   );
 };

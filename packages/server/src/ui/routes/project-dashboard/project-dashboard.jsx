@@ -24,6 +24,12 @@ import clsx from 'clsx';
 import {ProjectBuildList} from './build-list';
 import {DocumentTitle} from '../../components/document-title';
 import {ProjectGettingStarted} from './getting-started';
+import {
+  groupUrlsByPageType,
+  createGroupedDropdownOptions,
+  isGroupValue,
+  getUrlsForGroup,
+} from '../../utils/url-grouping.js';
 
 /** @typedef {import('../../hooks/use-api-data').LoadingState} LoadingState */
 
@@ -90,20 +96,20 @@ function useUrlsAvailableForBranch(projectData, buildData, branchData, branchFro
   return useBuildURLs(argumentsToUse[0], argumentsToUse[1]);
 }
 
-/** @param {{availableUrls: Array<{url: string}>, availableBranches: Array<{branch: string}>, selectedUrl: string, selectedBranch: string}} props */
+/** @param {{availableBranches: Array<{branch: string}>, selectedUrl: string, selectedBranch: string, groupedOptions: Array<{value: string, label: string}>}} props */
 const UrlAndBranchSelector = props => {
   return (
     <div className="dashboard__url-branch-selector">
       <Dropdown
-        label="URL"
+        label="Page Type"
         className="dropdown--url"
         value={props.selectedUrl}
-        setValue={url => {
+        setValue={value => {
           const to = new URL(window.location.href);
-          to.searchParams.set('runUrl', url);
+          to.searchParams.set('runUrl', value);
           route(`${to.pathname}${to.search}`);
         }}
-        options={props.availableUrls.map(({url}) => ({value: url, label: decodeURI(url)}))}
+        options={props.groupedOptions}
       />
       <Dropdown
         label="Branch"
@@ -123,6 +129,22 @@ const UrlAndBranchSelector = props => {
 /** @param {{project: LHCI.ServerCommand.Project, builds: Array<LHCI.ServerCommand.Build>, availableUrls: Array<{url: string}>, availableBranches: Array<{branch: string}>, selectedUrl: string, selectedBranch: string}} props */
 const ProjectDashboard_ = props => {
   const [isScrolledToGraphs, setIsScrolledToGraphs] = useState(false);
+
+  // Compute grouped options from available URLs
+  const groups = groupUrlsByPageType(props.availableUrls);
+  const groupedOptions = createGroupedDropdownOptions(groups);
+
+  // Determine the effective selected value for the dropdown (always grouped mode)
+  let selectedUrl = props.selectedUrl;
+  if (!isGroupValue(selectedUrl)) {
+    // Default to the first group when selectedUrl is not a group value
+    selectedUrl = groupedOptions.length ? groupedOptions[0].value : props.selectedUrl;
+  }
+
+  // Compute groupUrls for the selected group
+  const groupUrls = isGroupValue(selectedUrl)
+    ? getUrlsForGroup(selectedUrl, props.availableUrls)
+    : null;
 
   useEffect(() => {
     const isScrolled = () => {
@@ -146,12 +168,19 @@ const ProjectDashboard_ = props => {
       <DocumentTitle title={`${props.project.name} Dashboard`} />
       <ProjectBuildList project={props.project} builds={props.builds} />
       <div id="dashboard__scroll-height-detector" />
-      <UrlAndBranchSelector {...props} />
+      <UrlAndBranchSelector
+        availableBranches={props.availableBranches}
+        selectedUrl={selectedUrl}
+        selectedBranch={props.selectedBranch}
+        groupedOptions={groupedOptions}
+      />
       <ProjectCategorySummaries
         project={props.project}
         builds={props.builds}
-        url={props.selectedUrl}
+        url={selectedUrl}
         branch={props.selectedBranch}
+        viewMode="grouped"
+        groupUrls={groupUrls}
       />
     </div>
   );

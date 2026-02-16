@@ -8,6 +8,7 @@ import {h, Fragment} from 'preact';
 import {useMemo, useState} from 'preact/hooks';
 import _ from '@lhci/utils/src/lodash.js';
 import {useBuildStatistics, useRepresentativeRun, useLhr} from '../../hooks/use-api-data';
+import {aggregateStatistics, getGroupName} from '../../utils/url-grouping.js';
 
 import './project-category-summaries.css';
 import {CategoryCard} from './category-card';
@@ -60,9 +61,9 @@ const ProjectCategorySummaries_ = props => {
   );
 };
 
-/** @param {{project: LHCI.ServerCommand.Project, builds: Array<LHCI.ServerCommand.Build>, url: string, branch: string}} props */
+/** @param {{project: LHCI.ServerCommand.Project, builds: Array<LHCI.ServerCommand.Build>, url: string, branch: string, viewMode?: 'grouped'|'individual', groupUrls?: string[]|null}} props */
 export const ProjectCategorySummaries = props => {
-  const {project, builds, branch, url} = props;
+  const {project, builds, branch, url, viewMode, groupUrls} = props;
   const [buildLimit, setBuildLimit] = useState(25);
   const buildIds = useMemo(
     () =>
@@ -74,16 +75,36 @@ export const ProjectCategorySummaries = props => {
         .slice(0, buildLimit),
     [builds, branch, buildLimit]
   );
-  const [runLoadingState, run] = useRepresentativeRun(project.id, buildIds[0], url);
+
+  // In grouped mode, use the shortest URL from the group for the representative run (LHR enumeration).
+  // In individual mode, use the selected url as-is.
+  const representativeUrl = useMemo(() => {
+    if (viewMode === 'grouped' && groupUrls && groupUrls.length > 0) {
+      return groupUrls.reduce((shortest, u) => (u.length < shortest.length ? u : shortest));
+    }
+    return url;
+  }, [viewMode, groupUrls, url]);
+
+  const [runLoadingState, run] = useRepresentativeRun(project.id, buildIds[0], representativeUrl);
   const [statLoadingState, stats] = useBuildStatistics(project.id, buildIds);
   const statsWithBuildsUnfiltered = augmentStatsWithBuilds(stats, builds);
 
-  const statsWithBuilds =
-    statsWithBuildsUnfiltered &&
-    statsWithBuildsUnfiltered
-      .filter(stat => stat.build.branch === branch)
+  const statsWithBuilds = useMemo(() => {
+    if (!statsWithBuildsUnfiltered) return undefined;
+
+    const branchStats = statsWithBuildsUnfiltered.filter(stat => stat.build.branch === branch);
+
+    if (viewMode === 'grouped' && groupUrls && groupUrls.length > 0) {
+      // Aggregate statistics across all URLs in the group
+      return aggregateStatistics(branchStats, getGroupName(url))
+        .sort((a, b) => (a.build.runAt || '').localeCompare(b.build.runAt || ''));
+    }
+
+    // Individual mode: filter to the single selected URL
+    return branchStats
       .filter(stat => stat.url === url)
       .sort((a, b) => (a.build.runAt || '').localeCompare(b.build.runAt || ''));
+  }, [statsWithBuildsUnfiltered, branch, viewMode, groupUrls, url]);
 
   return (
     <div className="project-category-summaries">
@@ -93,7 +114,7 @@ export const ProjectCategorySummaries = props => {
         render={run => (
           <ProjectCategorySummaries_
             run={run}
-            url={url}
+            url={representativeUrl}
             builds={builds}
             statistics={statsWithBuilds}
             statisticsLoadingState={statLoadingState}

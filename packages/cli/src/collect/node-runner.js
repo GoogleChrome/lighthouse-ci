@@ -8,7 +8,7 @@
 const os = require('os');
 const fs = require('fs');
 const path = require('path');
-const uuid = require('uuid');
+const {generateUUID} = require('@lhci/utils/src/uuid.js');
 const childProcess = require('child_process');
 const {getSavedReportsDirectory} = require('@lhci/utils/src/saved-reports.js');
 
@@ -62,7 +62,7 @@ class LighthouseRunner {
     const lhArgs = [url, '--output', 'json', '--output-path', 'stdout'];
 
     if (Object.keys(settings).length) {
-      const flagsFilename = `flags-${uuid.v4()}.json`;
+      const flagsFilename = `flags-${generateUUID()}.json`;
       const flagsFilePath = path.join(getSavedReportsDirectory(), flagsFilename);
       lhArgs.push('--cli-flags-path', flagsFilePath);
 

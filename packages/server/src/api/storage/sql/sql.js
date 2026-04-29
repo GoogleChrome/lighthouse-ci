@@ -8,7 +8,7 @@
 const path = require('path');
 const log = require('debug')('lhci:server:sql');
 const logVerbose = require('debug')('lhci:server:sql:verbose');
-const uuid = require('uuid');
+const {generateUUID} = require('@lhci/utils/src/uuid.js');
 const {Umzug, SequelizeStorage} = require('umzug');
 const {Sequelize, Op} = require('sequelize');
 const {omit, padEnd} = require('@lhci/utils/src/lodash.js');
@@ -393,13 +393,13 @@ class SqlStorageMethod {
     const {projectModel} = this._sql();
     if (typeof unsavedProject.name !== 'string') throw new E422('Project name missing');
     if (unsavedProject.name.length < 4) throw new E422('Project name too short');
-    const projectId = uuid.v4();
+    const projectId = generateUUID();
     const adminToken = generateAdminToken();
     const project = await projectModel.create({
       ...unsavedProject,
       baseBranch: unsavedProject.baseBranch || 'master',
       adminToken: hashAdminToken(adminToken, projectId),
-      token: uuid.v4(),
+      token: generateUUID(),
       id: projectId,
     });
 
@@ -474,7 +474,7 @@ class SqlStorageMethod {
     const existingForHash = await buildModel.findOne({where: existingWhere});
     if (existingForHash) throw new E422(`Build already exists for hash "${unsavedBuild.hash}"`);
 
-    const build = await buildModel.create({...unsavedBuild, id: uuid.v4()});
+    const build = await buildModel.create({...unsavedBuild, id: generateUUID()});
     return clone(this._value(build));
   }
 
@@ -689,7 +689,7 @@ class SqlStorageMethod {
     if (unsavedRun.representative) throw new E422('Invalid representative value');
     if (unsavedRun.url.length > 256) throw new E422('URL too long');
 
-    const run = await runModel.create({...unsavedRun, representative: false, id: uuid.v4()});
+    const run = await runModel.create({...unsavedRun, representative: false, id: generateUUID()});
     return clone(this._value(run));
   }
 
@@ -734,7 +734,7 @@ class SqlStorageMethod {
     } else {
       logVerbose('[_createOrUpdateStatistic] no existing statistic found, creating one');
       statistic = this._value(
-        await statisticModel.create({...unsavedStatistic, id: uuid.v4()}, {transaction})
+        await statisticModel.create({...unsavedStatistic, id: generateUUID()}, {transaction})
       );
     }
 
@@ -785,7 +785,7 @@ class SqlStorageMethod {
    */
   async _resetProjectToken(projectId) {
     const {projectModel} = this._sql();
-    const newToken = uuid.v4();
+    const newToken = generateUUID();
     await projectModel.update({token: newToken}, {where: {id: projectId}});
     return newToken;
   }

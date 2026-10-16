@@ -97,8 +97,10 @@ class LighthouseRunner {
     const {args, cleanupFn} = LighthouseRunner.computeArgumentsAndCleanup(url, options);
     const child = childProcess.spawn('node', [LH_CLI_PATH, ...args], {env});
 
-    child.stdout.on('data', chunk => (stdout += chunk.toString()));
-    child.stderr.on('data', chunk => (stderr += chunk.toString()));
+    child.stdout.setEncoding('utf8');
+    child.stderr.setEncoding('utf8');
+    child.stdout.on('data', chunk => (stdout += chunk));
+    child.stderr.on('data', chunk => (stderr += chunk));
 
     child.on('exit', code => {
       cleanupFn();

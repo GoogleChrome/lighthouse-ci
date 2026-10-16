@@ -69,7 +69,9 @@ describe('Lighthouse CI autorun CLI with GitHub status check', () => {
       }
     );
 
-    expect(stdout).toMatchInlineSnapshot(`
+    const stdoutClean = stdout.replace(/(Open the report at).*\n/g, '$1 <link>\n');
+
+    expect(stdoutClean).toMatchInlineSnapshot(`
       "✅  .lighthouseci/ directory writable
       ✅  Configuration file found
       ✅  Chrome installation found
@@ -88,9 +90,9 @@ describe('Lighthouse CI autorun CLI with GitHub status check', () => {
 
 
       Uploading median LHR of http://localhost:XXXX/bad.html...success!
-      Open the report at https://storage.googleapis.com/lighthouse-infrastructure.appspot.com/reports/XXXX-XXXX.report.html
+      Open the report at <link>
       Uploading median LHR of http://localhost:XXXX/good.html...success!
-      Open the report at https://storage.googleapis.com/lighthouse-infrastructure.appspot.com/reports/XXXX-XXXX.report.html
+      Open the report at <link>
       GitHub token found, attempting to set status...
       GitHub accepted "failure" status for "lhci/url/bad.html".
       GitHub accepted "success" status for "lhci/url/good.html".
@@ -146,7 +148,9 @@ describe('Lighthouse CI autorun CLI with GitHub status check', () => {
       }
     );
 
-    expect(stdout).toMatchInlineSnapshot(`
+    const stdoutClean = stdout.replace(/(Open the report at).*\n/g, '$1 <link>\n');
+
+    expect(stdoutClean).toMatchInlineSnapshot(`
       "✅  .lighthouseci/ directory writable
       ✅  Configuration file found
       ✅  Chrome installation found
@@ -165,9 +169,9 @@ describe('Lighthouse CI autorun CLI with GitHub status check', () => {
 
 
       Uploading median LHR of http://localhost:XXXX/bad.html...success!
-      Open the report at https://storage.googleapis.com/lighthouse-infrastructure.appspot.com/reports/XXXX-XXXX.report.html
+      Open the report at <link>
       Uploading median LHR of http://localhost:XXXX/good.html...success!
-      Open the report at https://storage.googleapis.com/lighthouse-infrastructure.appspot.com/reports/XXXX-XXXX.report.html
+      Open the report at <link>
       GitHub token found, attempting to set status...
       GitHub responded with 401
 

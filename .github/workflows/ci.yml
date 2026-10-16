@@ -4,6 +4,8 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+permissions:
+  contents: read
 jobs:
   basics:
     name: ${{ matrix.name }}
@@ -20,32 +22,25 @@ jobs:
       YARN_GPG: 'no'
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
           fetch-depth: 0
-      - name: Use Node.js 18
-        uses: actions/setup-node@v3
+      - name: Use Node.js 22
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
-          node-version: 18
+          node-version: 22
           cache: yarn
       - run: yarn install --frozen-lockfile
       - run: yarn build
       - run: yarn test:unit:ci || yarn test:unit:ci --onlyFailures --maxWorkers=1 || yarn test:unit:ci --onlyFailures --maxWorkers=1
       - if: ${{ failure() }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          name: screenshots
-          path: packages/server/test/ui/__image_snapshots__/__diff_output__/*.png
-      - if: ${{ failure() }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: screenshots
-          path: packages/server/test/e2e/__image_snapshots__/__diff_output__/*.png
-      - if: ${{ failure() }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: screenshots
-          path: packages/viewer/test/e2e/__image_snapshots__/__diff_output__/*.png
+          name: screenshots-${{ matrix.name }}
+          path: |
+            packages/server/test/ui/__image_snapshots__/__diff_output__/*.png
+            packages/server/test/e2e/__image_snapshots__/__diff_output__/*.png
+            packages/viewer/test/e2e/__image_snapshots__/__diff_output__/*.png
   complete:
     name: Linux
     runs-on: ubuntu-latest
@@ -68,13 +63,13 @@ jobs:
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
           fetch-depth: 0
-      - name: Use Node.js 18
-        uses: actions/setup-node@v3
+      - name: Use Node.js 22
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
-          node-version: 18
+          node-version: 22
           cache: yarn
       # Since Ubuntu 23, dev builds of Chromium need this.
       # https://chromium.googlesource.com/chromium/src/+/main/docs/security/apparmor-userns-restrictions.md

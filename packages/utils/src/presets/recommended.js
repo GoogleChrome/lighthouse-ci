@@ -22,8 +22,10 @@ module.exports = {
     interactive: ['warn', {}],
     // Flaky score but non-flaky details (error, maxLength)
     'duplicated-javascript': ['warn', {maxLength: 0}], // warn until https://github.com/GoogleChrome/lighthouse/issues/11285 is fixed
+    'duplicated-javascript-insight': ['warn', {maxLength: 0}],
     'efficient-animated-content': ['error', {maxLength: 0}],
     'legacy-javascript': ['warn', {maxLength: 0}], // warn until https://github.com/GoogleChrome/lighthouse/issues/11285 is fixed
+    'legacy-javascript-insight': ['warn', {maxLength: 0}],
     'offscreen-images': ['error', {maxLength: 0}],
     'unminified-css': ['error', {maxLength: 0}],
     'unminified-javascript': ['error', {maxLength: 0}],
@@ -34,13 +36,19 @@ module.exports = {
     'uses-responsive-images': ['error', {maxLength: 0}],
     'uses-text-compression': ['error', {maxLength: 0}],
     // Audits that don't typically apply in dev environments or are more opinionated (warn)
+    'modern-http-insight': ['off', {}], // not useful for the dev server
     'uses-http2': ['off', {}], // not useful for the dev server
+    'forced-reflow-insight': ['off', {}], // too strict
     'long-tasks': ['off', {}], // too strict
 
     'cache-insight': ['warn', {maxLength: 0}],
+    'document-latency-insight': ['warn', {}],
     'dom-size-insight': ['warn', {}],
     'dom-size': ['warn', {}],
+    'font-display-insight': ['warn', {}],
+    'image-delivery-insight': ['warn', {maxLength: 0}],
     'is-on-https': ['warn', {}], // passes on localhost, so OK to leave on
+    'lcp-discovery-insight': ['warn', {}],
     'modern-image-formats': ['warn', {maxLength: 0}],
     'render-blocking-insight': ['warn', {maxLength: 0}],
     'render-blocking-resources': ['warn', {maxLength: 0}],

@@ -576,12 +576,114 @@ function normalizeNumericValue(audit) {
 }
 
 /**
+ * Normalizes `audit.details` (`table`, `opportunity`, `checklist`, or `list`) into a
+ * flat `{headings, items}` table structure so both `findAuditDiffs` and the server UI's
+ * `TableDetails` component can diff and render them uniformly.
+ *
  * @param {LH.AuditResult} audit
  * @return {Required<Pick<Required<LH.AuditResult>['details'],'items'|'headings'>>}
  */
 function normalizeDetails(audit) {
-  if (!audit.details) return {items: [], headings: []};
-  return {items: audit.details.items || [], headings: audit.details.headings || []};
+  if (!audit || !audit.details) return {items: [], headings: []};
+
+  // Lighthouse `checklist` details (e.g. `document-latency-insight`) store `items` as a
+  // `Record<string, {label: string, value: boolean}>` map rather than an array of rows.
+  if (audit.details.type === 'checklist') {
+    const rawItems = /** @type {Record<string, any> | Array<Record<string, any>>} */ (
+      audit.details.items || {}
+    );
+    const entries = Array.isArray(rawItems)
+      ? rawItems.map((item, idx) => [String(idx), item])
+      : Object.entries(rawItems);
+    return {
+      headings: [
+        {key: 'check', valueType: 'text', label: 'Checklist'},
+        {key: 'value', valueType: 'text', label: ''},
+      ],
+      items: entries
+        .filter(([, item]) => item && typeof item === 'object')
+        .map(([key, item]) => ({
+          // `getItemKey` keys items by `name`. Keying by `<checkId>:<boolean>` serves two purposes:
+          // 1. Checks with the same pass/fail state match across runs even when `label` includes
+          //    run-specific metrics (e.g. "Initial server response arrives quickly (observed 454 ms)").
+          // 2. Checks that flip between Pass and Fail get distinct keys so `findAuditDetailItemsDiffs`
+          //    (which only diffs numeric properties on matched rows) surfaces the change as an
+          //    itemRemoval + itemAddition.
+          name: `${item.id || key}:${Boolean(item.value)}`,
+          check: item.label || '',
+          value: item.value ? 'Pass' : 'Fail',
+        })),
+    };
+  }
+
+  // Lighthouse `list` details (used by insight audits like `lcp-phases-insight`,
+  // `lcp-discovery-insight`, `cls-culprits-insight`, and `largest-contentful-paint-element`)
+  // contain heterogeneous sub-sections (`table`, `checklist`, `node`), optionally wrapped in
+  // `{type: 'list-section', value: ...}`. Flatten them into a single combined table.
+  if (audit.details.type === 'list') {
+    const rawListItems = Array.isArray(audit.details.items) ? audit.details.items : [];
+    /** @type {NonNullable<NonNullable<LH.AuditResult['details']>['headings']>} */
+    const headings = [];
+    /** @type {Array<Record<string, any>>} */
+    const items = [];
+
+    /** @param {NonNullable<NonNullable<LH.AuditResult['details']>['headings']>[number]} heading */
+    const addHeading = heading => {
+      if (!heading) return;
+      if (heading.key !== null && headings.some(h => h.key === heading.key)) return;
+      headings.push(heading);
+    };
+
+    for (const entry of rawListItems) {
+      const subDetail = entry && entry.type === 'list-section' ? entry.value : entry;
+      if (!subDetail || typeof subDetail !== 'object') continue;
+
+      if (subDetail.type === 'table' || subDetail.type === 'opportunity') {
+        for (const heading of subDetail.headings || []) {
+          addHeading(heading);
+        }
+        for (const item of Array.isArray(subDetail.items) ? subDetail.items : []) {
+          const normalizedItem = {...item};
+          // `getItemKey` looks for a known identifier field (`url`, `node.path`, `label`, `name`,
+          // etc.) before falling back to `JSON.stringify(item)`. Sub-tables in `list` audits often
+          // identify rows by `phase` (`largest-contentful-paint-element`), `subpart`
+          // (`lcp-phases-insight`), or a text-typed `node` (`cls-culprits-insight`'s "Total" row).
+          // Populate `label` so `zipBaseAndCompareItems` pairs corresponding rows across runs
+          // instead of treating timing/score changes as removed + added rows.
+          if (typeof normalizedItem.label !== 'string') {
+            if (typeof normalizedItem.phase === 'string') {
+              normalizedItem.label = normalizedItem.phase;
+            } else if (typeof normalizedItem.subpart === 'string') {
+              normalizedItem.label = normalizedItem.subpart;
+            } else if (
+              normalizedItem.node &&
+              normalizedItem.node.type === 'text' &&
+              typeof normalizedItem.node.value === 'string'
+            ) {
+              normalizedItem.label = normalizedItem.node.value;
+            }
+          }
+          items.push(normalizedItem);
+        }
+      } else if (subDetail.type === 'checklist') {
+        const normalizedChecklist = normalizeDetails({score: null, details: subDetail});
+        for (const heading of normalizedChecklist.headings) {
+          addHeading(heading);
+        }
+        items.push(...normalizedChecklist.items);
+      } else if (subDetail.type === 'node') {
+        addHeading({key: 'node', valueType: 'node', label: 'Element'});
+        items.push({node: subDetail});
+      }
+    }
+
+    return {items, headings};
+  }
+
+  return {
+    items: Array.isArray(audit.details.items) ? audit.details.items : [],
+    headings: audit.details.headings || [],
+  };
 }
 
 /**
@@ -637,14 +739,9 @@ function findAuditDiffs(baseAudit, compareAudit, options = {}) {
   const baseAuditDetails = baseAudit.details || {};
   /** @type {Partial<LH.AuditResult['details']>} */
   const compareAuditDetails = compareAudit.details || {};
-  // TODO: support checklist.
   if (
-    (baseAuditDetails.type !== 'debugdata' &&
-      baseAuditDetails.type !== 'checklist' &&
-      baseAuditDetails.items) ||
-    (compareAuditDetails.type !== 'debugdata' &&
-      compareAuditDetails.type !== 'checklist' &&
-      compareAuditDetails.items)
+    (baseAuditDetails.type !== 'debugdata' && baseAuditDetails.items) ||
+    (compareAuditDetails.type !== 'debugdata' && compareAuditDetails.items)
   ) {
     hasItemDetails = true;
     const {items: baseItems, headings: baseHeadings} = normalizeDetails(baseAudit);
@@ -706,6 +803,7 @@ function findAuditDiffs(baseAudit, compareAudit, options = {}) {
 
 module.exports = {
   findAuditDiffs,
+  normalizeDetails,
   getDiffSeverity,
   getDeltaLabel,
   getDeltaStats,

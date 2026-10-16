@@ -8,7 +8,7 @@ import * as _ from '@lhci/utils/src/lodash';
 import {h, Fragment} from 'preact';
 import {ScoreWord} from '../../../components/score-icon';
 import {NumericDiff} from './numeric-diff';
-import {getDiffLabel, getRowLabelForIndex} from '@lhci/utils/src/audit-diff-finder';
+import {getDiffLabel, getRowLabelForIndex, normalizeDetails} from '@lhci/utils/src/audit-diff-finder';
 import clsx from 'clsx';
 
 /** @type {Record<string, string>} */
@@ -106,7 +106,7 @@ function getUniqueBaseCompareIndexPairs(diffs) {
 /** @param {{diffs: Array<LHCI.AuditDiff>, audit: LH.AuditResult, baseAudit: LH.AuditResult, groupId: string, showAsNarrow?: boolean}} props */
 export const ItemDiff = props => {
   const {diffs, baseAudit, groupId} = props;
-  const baseAuditItems = (baseAudit.details && baseAudit.details.items) || [];
+  const baseAuditItems = normalizeDetails(baseAudit).items;
 
   const rowIndexes = getUniqueBaseCompareIndexPairs(diffs);
   const rowLabels = rowIndexes

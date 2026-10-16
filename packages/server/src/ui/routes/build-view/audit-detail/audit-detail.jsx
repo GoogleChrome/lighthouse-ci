@@ -11,7 +11,7 @@ import {Markdown} from '../../../components/markdown';
 import {TableDetails} from './table-details';
 import {NumericDiff} from '../audit-list/numeric-diff';
 import {ItemDiff} from '../audit-list/audit-diff';
-import {getDiffLabel} from '@lhci/utils/src/audit-diff-finder';
+import {getDiffLabel, normalizeDetails} from '@lhci/utils/src/audit-diff-finder';
 
 /** @param {{pair: LHCI.AuditPair, diff: LHCI.AuditDiff}} props */
 const ScoreOnlyDetails = props => {
@@ -53,8 +53,9 @@ const ErrorDetails = props => {
 const Details = props => {
   const {pair} = props;
   const details = pair.audit.details || {type: 'unknown'};
-  const baseDetails = (pair.baseAudit && pair.baseAudit.details) || {type: 'unknown'};
-  const hasItems = Boolean((details.items || []).length || (baseDetails.items || []).length);
+  const {items: compareItems} = normalizeDetails(pair.audit);
+  const {items: baseItems} = pair.baseAudit ? normalizeDetails(pair.baseAudit) : {items: []};
+  const hasItems = Boolean(compareItems.length || baseItems.length);
 
   let itemDiff = undefined;
   let tableDetails = undefined;
@@ -64,7 +65,13 @@ const Details = props => {
     return <ErrorDetails pair={pair} />;
   }
 
-  if ((details.type === 'table' || details.type === 'opportunity') && hasItems) {
+  if (
+    (details.type === 'table' ||
+      details.type === 'opportunity' ||
+      details.type === 'list' ||
+      details.type === 'checklist') &&
+    hasItems
+  ) {
     tableDetails = <TableDetails pair={pair} />;
     if (pair.baseAudit) {
       itemDiff = <ItemDiff {...pair} baseAudit={pair.baseAudit} groupId={pair.group.id} />;

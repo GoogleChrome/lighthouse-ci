@@ -26,18 +26,22 @@ if (process.env.CI && require('os').platform() !== 'darwin') {
 // TODO: We need to migrate away from this.
 // https://storybook.js.org/docs/writing-tests/storyshots-migration-guide
 
+/** @type {import('puppeteer').Browser|undefined} */
+let browser;
+
 initStoryshots({
   configPath: path.join(__dirname, '../../.storybook'),
   suite: 'Image Storyshots',
   // Use a storyKindRegex as an `.only`-like filter on the "Image Storyshots" tests.
   // storyKindRegex: /Graph/,
   test: imageSnapshot({
-    getCustomBrowser: () => {
-      return puppeteer.launch({
+    getCustomBrowser: async () => {
+      browser = await puppeteer.launch({
         headless: 'new',
         // Avoids "ws does not work in the browser. Browser clients must use the native WebSocket object".
         args: ['--remote-debugging-pipe'],
       });
+      return browser;
     },
     storybookUrl: `http://localhost:${process.env.STORYBOOK_PORT}`,
     beforeScreenshot: async page => {
@@ -75,3 +79,8 @@ initStoryshots({
     }),
   }),
 });
+
+afterAll(async () => {
+  if (browser) await browser.close();
+});
+

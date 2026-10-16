@@ -112,7 +112,7 @@ export const SimpleDetails = props => {
       );
     }
     case 'text':
-      return <span>{value}</span>;
+      return <span>{typeof value === 'object' && value ? value.value : value}</span>;
     case 'node':
       return <pre>{value.snippet}</pre>;
     case 'source-location': {

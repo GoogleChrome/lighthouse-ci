@@ -9,6 +9,7 @@
 
 const {
   findAuditDiffs,
+  normalizeDetails,
   getDiffSeverity,
   getDiffLabel,
   getRowLabel,
@@ -1037,5 +1038,170 @@ describe('#replaceNondeterministicStrings', () => {
     expect(
       replaceNondeterministicStrings('<a href="/app/12345678-1234-1234-1234-123456781234">Text</a>')
     ).toEqual('<a href="/app/UUID">Text</a>');
+  });
+});
+
+describe('#normalizeDetails', () => {
+  it('should normalize checklist details', () => {
+    const audit = {
+      id: 'document-latency-insight',
+      score: 0.5,
+      details: {
+        type: 'checklist',
+        items: {
+          noRedirects: {label: 'Avoids redirects', value: true},
+          usesCompression: {label: 'Applies text compression', value: false},
+        },
+      },
+    };
+
+    expect(normalizeDetails(audit)).toEqual({
+      headings: [
+        {key: 'check', valueType: 'text', label: 'Checklist'},
+        {key: 'value', valueType: 'text', label: ''},
+      ],
+      items: [
+        {name: 'noRedirects:true', check: 'Avoids redirects', value: 'Pass'},
+        {name: 'usesCompression:false', check: 'Applies text compression', value: 'Fail'},
+      ],
+    });
+  });
+
+  it('should normalize list details with table, checklist, node, and list-section items', () => {
+    const audit = {
+      id: 'lcp-breakdown-insight',
+      score: 0.5,
+      details: {
+        type: 'list',
+        items: [
+          {
+            type: 'list-section',
+            title: 'Phases',
+            value: {
+              type: 'table',
+              headings: [
+                {key: 'label', valueType: 'text', label: 'Phase'},
+                {key: 'duration', valueType: 'ms', label: 'Duration'},
+              ],
+              items: [
+                {phase: 'timeToFirstByte', label: 'Time to first byte', duration: 500},
+                {phase: 'elementRenderDelay', label: 'Element render delay', duration: 1200},
+              ],
+            },
+          },
+          {
+            type: 'node',
+            lhId: 'page-0-H2',
+            path: '1,HTML,1,BODY,0,H2',
+            snippet: '<h2>Heading</h2>',
+          },
+        ],
+      },
+    };
+
+    expect(normalizeDetails(audit)).toEqual({
+      headings: [
+        {key: 'label', valueType: 'text', label: 'Phase'},
+        {key: 'duration', valueType: 'ms', label: 'Duration'},
+        {key: 'node', valueType: 'node', label: 'Element'},
+      ],
+      items: [
+        {phase: 'timeToFirstByte', label: 'Time to first byte', duration: 500},
+        {phase: 'elementRenderDelay', label: 'Element render delay', duration: 1200},
+        {
+          node: {
+            type: 'node',
+            lhId: 'page-0-H2',
+            path: '1,HTML,1,BODY,0,H2',
+            snippet: '<h2>Heading</h2>',
+          },
+        },
+      ],
+    });
+  });
+
+  it('should find diffs for checklist and list audits', () => {
+    const baseChecklist = {
+      id: 'document-latency-insight',
+      score: 0.5,
+      details: {
+        type: 'checklist',
+        items: {
+          noRedirects: {label: 'Avoids redirects', value: true},
+          usesCompression: {label: 'Applies text compression', value: true},
+        },
+      },
+    };
+    const compareChecklist = {
+      id: 'document-latency-insight',
+      score: 0.5,
+      details: {
+        type: 'checklist',
+        items: {
+          noRedirects: {label: 'Avoids redirects', value: true},
+          usesCompression: {label: 'Applies text compression', value: false},
+        },
+      },
+    };
+
+    expect(findAuditDiffs(baseChecklist, compareChecklist)).toEqual([
+      {
+        auditId: 'document-latency-insight',
+        type: 'itemRemoval',
+        baseItemIndex: 1,
+      },
+      {
+        auditId: 'document-latency-insight',
+        type: 'itemAddition',
+        compareItemIndex: 1,
+      },
+    ]);
+
+    const baseList = {
+      id: 'lcp-breakdown-insight',
+      score: 0.5,
+      details: {
+        type: 'list',
+        items: [
+          {
+            type: 'table',
+            headings: [
+              {key: 'label', valueType: 'text', label: 'Phase'},
+              {key: 'duration', valueType: 'ms', label: 'Duration'},
+            ],
+            items: [{label: 'Time to first byte', duration: 500}],
+          },
+        ],
+      },
+    };
+    const compareList = {
+      id: 'lcp-breakdown-insight',
+      score: 0.5,
+      details: {
+        type: 'list',
+        items: [
+          {
+            type: 'table',
+            headings: [
+              {key: 'label', valueType: 'text', label: 'Phase'},
+              {key: 'duration', valueType: 'ms', label: 'Duration'},
+            ],
+            items: [{label: 'Time to first byte', duration: 800}],
+          },
+        ],
+      },
+    };
+
+    expect(findAuditDiffs(baseList, compareList)).toEqual([
+      {
+        auditId: 'lcp-breakdown-insight',
+        type: 'itemDelta',
+        itemKey: 'duration',
+        baseItemIndex: 0,
+        compareItemIndex: 0,
+        baseValue: 500,
+        compareValue: 800,
+      },
+    ]);
   });
 });

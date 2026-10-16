@@ -431,7 +431,7 @@ function getAllAssertionResultsForUrl(baseOptions, unfilteredLhrs) {
       auditProperty,
       auditResults,
       options,
-      lhrs
+      lhrsToUseForAudit
     );
 
     for (const result of assertionResults) {

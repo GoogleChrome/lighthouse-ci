@@ -448,6 +448,56 @@ describe('getAllAssertionResults', () => {
       ]);
     });
 
+    it('should use aggregationMethod median-run for categories', () => {
+      const lhrs = [
+        // This is the "median-run" by FCP and interactive.
+        {
+          finalUrl: 'http://example.com',
+          categories: {performance: {score: 0.5}},
+          audits: {
+            'first-contentful-paint': {numericValue: 5000},
+            interactive: {numericValue: 10000},
+          },
+        },
+        {
+          finalUrl: 'http://example.com',
+          categories: {performance: {score: 0.9}},
+          audits: {
+            'first-contentful-paint': {numericValue: 1000},
+            interactive: {numericValue: 5000},
+          },
+        },
+        {
+          finalUrl: 'http://example.com',
+          categories: {performance: {score: 0.3}},
+          audits: {
+            'first-contentful-paint': {numericValue: 10000},
+            interactive: {numericValue: 15000},
+          },
+        },
+      ];
+
+      const assertions = {
+        'categories:performance': ['error', {aggregationMethod: 'median-run', minScore: 0.8}],
+      };
+
+      const results = getAllAssertionResults({assertions}, lhrs);
+      expect(results).toEqual([
+        {
+          level: 'error',
+          auditId: 'categories',
+          auditProperty: 'performance',
+          actual: 0.5,
+          expected: 0.8,
+          name: 'minScore',
+          operator: '>=',
+          url: 'http://example.com',
+          values: [0.5],
+          passed: false,
+        },
+      ]);
+    });
+
     it('should use file-wide default when set', () => {
       const assertions = {
         'first-contentful-paint': ['warn', {minScore: 1}],

@@ -19,6 +19,15 @@ const {
 } = require('@lhci/utils/src/child-process-helper.js');
 
 /**
+ * Escapes special characters in a string so it can be used as a literal pattern in a RegExp.
+ * @param {string} value
+ * @return {string}
+ */
+function escapeRegExp(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+/**
  * @param {import('yargs').Argv} yargs
  */
 function buildCommand(yargs) {
@@ -159,7 +168,8 @@ async function startServerAndDetermineUrls(options) {
 
     let close = async () => undefined;
     if (options.startServerCommand) {
-      const regexPattern = new RegExp(options.startServerReadyPattern, 'i');
+      const safePattern = escapeRegExp(String(options.startServerReadyPattern || ''));
+      const regexPattern = new RegExp(safePattern, 'i');
       const {child, patternMatch, stdout, stderr} = await runCommandAndWaitForPattern(
         options.startServerCommand,
         regexPattern,

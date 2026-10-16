@@ -8,6 +8,15 @@
 const crypto = require('crypto');
 const childProcess = require('child_process');
 
+/**
+ * Escape special characters in a string so it can be used safely inside a RegExp.
+ * @param {string} string
+ * @return {string}
+ */
+function escapeRegExp(string) {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 /** @param {Array<string>} namesInPriorityOrder @return {string|undefined} */
 function getEnvVarIfSet(namesInPriorityOrder) {
   for (const name of namesInPriorityOrder) {
@@ -372,7 +381,8 @@ function getGitHubRepoSlug(apiHost = undefined) {
   if (remote && apiHost && !apiHost.includes('github.com')) {
     const hostMatch = apiHost.match(/:\/\/(.*?)(\/|$)/);
     if (!hostMatch) return undefined;
-    const remoteRegex = new RegExp(`${hostMatch[1]}(:|\\/)([^/]+\\/.+)\\.git`);
+    const safeHost = escapeRegExp(hostMatch[1]);
+    const remoteRegex = new RegExp(`${safeHost}(:|\\/)([^/]+\\/.+)\\.git`);
     const remoteMatch = remote.match(remoteRegex);
     if (remoteMatch) return remoteMatch[2];
   }

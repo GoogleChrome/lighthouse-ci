@@ -13,6 +13,16 @@ const LH_HTML_REPORT_REGEX = /^lhr-\d+\.html$/;
 const ASSERTION_RESULTS_PATH = path.join(LHCI_DIR, 'assertion-results.json');
 const URL_LINK_MAP_PATH = path.join(LHCI_DIR, 'links.json');
 
+/**
+ * Escape special characters in a string to be used in a RegExp as a literal.
+ * This mirrors lodash's _.escapeRegExp behavior.
+ * @param {string} string
+ * @return {string}
+ */
+function escapeRegExp(string) {
+  return string.replace(/[\\^$.*+?()[\]{}|]/g, '\\$&');
+}
+
 function ensureDirectoryExists(baseDir = LHCI_DIR) {
   if (!fs.existsSync(baseDir)) fs.mkdirSync(baseDir, {recursive: true});
 }
@@ -101,10 +111,33 @@ function replaceUrlPatterns(url, sedLikeReplacementPatterns) {
   let replaced = url;
 
   for (const pattern of sedLikeReplacementPatterns) {
-    const match = pattern.match(/^s(.)(.*)\1(.*)\1([gim]*)$/);
+    // sed-like syntax: s<delim>needle<delim>replacement<delim>[flags]
+    // Supports standard JS flags g/i/m and an optional custom flag "L"
+    // which makes the pattern literal (needle is escaped before use).
+    const match = pattern.match(/^s(.)(.*)\1(.*)\1([gimL]*)$/);
     if (!match) throw new Error(`Invalid URL replacement pattern "${pattern}"`);
-    const [needle, replacement, flags] = match.slice(2);
-    const regex = new RegExp(needle, flags);
+    let [needle, replacement, flags] = match.slice(2);
+
+    const flagChars = flags.split('');
+    const literalIndex = flagChars.indexOf('L');
+    const isLiteral = literalIndex !== -1;
+    if (isLiteral) flagChars.splice(literalIndex, 1);
+
+    const allowedFlags = ['g', 'i', 'm'];
+    const seen = new Set();
+    for (const flag of flagChars) {
+      if (!allowedFlags.includes(flag) || seen.has(flag)) {
+        throw new Error(`Invalid flags in URL replacement pattern "${pattern}"`);
+      }
+      seen.add(flag);
+    }
+    const finalFlags = flagChars.join('');
+
+    if (isLiteral) {
+      needle = escapeRegExp(needle);
+    }
+
+    const regex = new RegExp(needle, finalFlags);
     replaced = replaced.replace(regex, replacement);
   }
 

@@ -101,6 +101,28 @@ describe('Statistic Definitions', () => {
     });
   });
 
+  describe('audit_cumulative-layout-shift_median()', () => {
+    const run = definitions['audit_cumulative-layout-shift_median'];
+
+    it('should extract the median value', () => {
+      const low = JSON.parse(JSON.stringify(baseLhr6));
+      const high = JSON.parse(JSON.stringify(baseLhr6));
+      low.audits['cumulative-layout-shift'].numericValue = 0;
+      high.audits['cumulative-layout-shift'].numericValue = 100;
+      expect(run([baseLhr5]).value).toBe(-1);
+      expect(run([baseLhr6, low, high]).value).toBeCloseTo(0.134375, 4);
+      expect(run([high, baseLhr62, low]).value).toBeCloseTo(0.15072, 4);
+      expect(run([high, baseLhr641, low]).value).toBeCloseTo(0.15057, 4);
+      expect(run([high, baseLhr700, low]).value).toBeCloseTo(0.151162, 4);
+      expect(run([high, baseLhr800, low]).value).toBeCloseTo(0.111612, 4);
+      expect(run([high, baselhr930, low]).value).toBeCloseTo(0.150538, 4);
+      expect(run([high, baselhr1010, low]).value).toBeCloseTo(0.17634, 4);
+      expect(run([high, baselhr1140, low]).value).toBeCloseTo(0.030344, 4);
+      expect(run([high, baselhr1200, low]).value).toBeCloseTo(0.000917, 4);
+      expect(run([high, baselhr1261, low]).value).toBeCloseTo(0.028675, 4);
+    });
+  });
+
   describe('category_performance_median()', () => {
     const run = definitions.category_performance_median;
 

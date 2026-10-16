@@ -10,6 +10,35 @@ const preset = require('./presets/all.js');
 const {splitMarkdownLink} = require('./markdown.js');
 const {computeRepresentativeRuns} = require('./representative-runs.js');
 
+/** @type {Record<string, string>} */
+const REPLACED_AUDITS_MAP = {
+  'critical-request-chains': 'network-dependency-tree-insight',
+  'dom-size': 'dom-size-insight',
+  'duplicated-javascript': 'duplicated-javascript-insight',
+  'efficient-animated-content': 'image-delivery-insight',
+  'font-display': 'font-display-insight',
+  'interaction-to-next-paint-insight': 'inp-breakdown-insight',
+  'largest-contentful-paint-element': 'lcp-breakdown-insight',
+  'layout-shifts': 'cls-culprits-insight',
+  'lcp-lazy-loaded': 'lcp-discovery-insight',
+  'lcp-phases-insight': 'lcp-breakdown-insight',
+  'legacy-javascript': 'legacy-javascript-insight',
+  'modern-image-formats': 'image-delivery-insight',
+  'prioritize-lcp-image': 'lcp-discovery-insight',
+  redirects: 'document-latency-insight',
+  'render-blocking-resources': 'render-blocking-insight',
+  'server-response-time': 'document-latency-insight',
+  'third-party-summary': 'third-parties-insight',
+  'uses-http2': 'modern-http-insight',
+  'uses-long-cache-ttl': 'cache-insight',
+  'uses-optimized-images': 'image-delivery-insight',
+  'uses-rel-preconnect': 'network-dependency-tree-insight',
+  'uses-responsive-images': 'image-delivery-insight',
+  'uses-text-compression': 'document-latency-insight',
+  viewport: 'viewport-insight',
+  'work-during-interaction': 'inp-breakdown-insight',
+};
+
 /** @type {Record<LHCI.AssertResults.AssertionType, (result: LH.AuditResult) => number | undefined>} */
 const AUDIT_TYPE_VALUE_GETTERS = {
   auditRan: result => (result === undefined ? 0 : 1),
@@ -351,17 +380,64 @@ function getAssertionResultsForAudit(auditId, auditProperty, auditResults, asser
  */
 function resolveAssertionOptionsAndLhrs(baseOptions, unfilteredLhrs) {
   const {preset = '', ...optionOverrides} = baseOptions;
+  const lhrs = optionOverrides.matchingUrlPattern
+    ? unfilteredLhrs.filter(lhr =>
+        doesLHRMatchPattern(optionOverrides.matchingUrlPattern || '', lhr)
+      )
+    : unfilteredLhrs;
+
+  if (optionOverrides.assertions && lhrs.length) {
+    /** @type {LHCI.AssertCommand.Assertions} */
+    const mappedAssertions = {};
+    const explicitKebabKeys = new Set(
+      Object.keys(optionOverrides.assertions).map(k => _.kebabCase(k))
+    );
+
+    for (const [rawKey, value] of Object.entries(optionOverrides.assertions)) {
+      const kebabKey = _.kebabCase(rawKey);
+      const [auditId, ...rest] = kebabKey.split(/\.|:/g).filter(Boolean);
+      const replacementId = REPLACED_AUDITS_MAP[auditId];
+      const auditMissing = lhrs.every(lhr => !lhr.audits[auditId]);
+      const replacementPresent =
+        replacementId && lhrs.some(lhr => Boolean(lhr.audits[replacementId]));
+
+      if (replacementId && auditMissing && replacementPresent) {
+        // eslint-disable-next-line no-console
+        console.warn(
+          `Audit "${auditId}" was replaced by "${replacementId}" and will be removed in a future version of LHCI.`
+        );
+        const replacementKey = [replacementId, ...rest].join(':');
+        if (!explicitKebabKeys.has(replacementKey)) {
+          mappedAssertions[replacementKey] = value;
+        }
+      } else {
+        mappedAssertions[rawKey] = value;
+      }
+    }
+
+    optionOverrides.assertions = mappedAssertions;
+  }
+
   let optionsToUse = optionOverrides;
   const presetMatch = preset.match(/lighthouse:(.*)$/);
   if (presetMatch) {
-    const presetData = require(`./presets/${presetMatch[1]}.js`);
-    optionsToUse = _.merge(_.cloneDeep(presetData), optionsToUse);
+    const presetData = _.cloneDeep(require(`./presets/${presetMatch[1]}.js`));
+    if (presetData.assertions && lhrs.length) {
+      for (const presetAuditId of Object.keys(presetData.assertions)) {
+        const replacementId = REPLACED_AUDITS_MAP[presetAuditId];
+        if (
+          replacementId &&
+          lhrs.every(lhr => !lhr.audits[presetAuditId]) &&
+          lhrs.some(lhr => Boolean(lhr.audits[replacementId]))
+        ) {
+          delete presetData.assertions[presetAuditId];
+        }
+      }
+    }
+    optionsToUse = _.merge(presetData, optionOverrides);
   }
 
-  const {assertions = {}, matchingUrlPattern: urlPattern, aggregationMethod} = optionsToUse;
-  const lhrs = urlPattern
-    ? unfilteredLhrs.filter(lhr => doesLHRMatchPattern(urlPattern, lhr))
-    : unfilteredLhrs;
+  const {assertions = {}, aggregationMethod} = optionsToUse;
 
   // Double-check we've only got one URL to look at that should have been pre-grouped in `getAllAssertionResults`.
   const uniqueURLs = new Set(lhrs.map(lhr => lhr.finalUrl));
@@ -431,7 +507,7 @@ function getAllAssertionResultsForUrl(baseOptions, unfilteredLhrs) {
       auditProperty,
       auditResults,
       options,
-      lhrs
+      lhrsToUseForAudit
     );
 
     for (const result of assertionResults) {

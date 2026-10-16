@@ -448,6 +448,56 @@ describe('getAllAssertionResults', () => {
       ]);
     });
 
+    it('should use aggregationMethod median-run for categories', () => {
+      const lhrs = [
+        // This is the "median-run" by FCP and interactive.
+        {
+          finalUrl: 'http://example.com',
+          categories: {performance: {score: 0.5}},
+          audits: {
+            'first-contentful-paint': {numericValue: 5000},
+            interactive: {numericValue: 10000},
+          },
+        },
+        {
+          finalUrl: 'http://example.com',
+          categories: {performance: {score: 0.9}},
+          audits: {
+            'first-contentful-paint': {numericValue: 1000},
+            interactive: {numericValue: 5000},
+          },
+        },
+        {
+          finalUrl: 'http://example.com',
+          categories: {performance: {score: 0.3}},
+          audits: {
+            'first-contentful-paint': {numericValue: 10000},
+            interactive: {numericValue: 15000},
+          },
+        },
+      ];
+
+      const assertions = {
+        'categories:performance': ['error', {aggregationMethod: 'median-run', minScore: 0.8}],
+      };
+
+      const results = getAllAssertionResults({assertions}, lhrs);
+      expect(results).toEqual([
+        {
+          level: 'error',
+          auditId: 'categories',
+          auditProperty: 'performance',
+          actual: 0.5,
+          expected: 0.8,
+          name: 'minScore',
+          operator: '>=',
+          url: 'http://example.com',
+          values: [0.5],
+          passed: false,
+        },
+      ]);
+    });
+
     it('should use file-wide default when set', () => {
       const assertions = {
         'first-contentful-paint': ['warn', {minScore: 1}],
@@ -1110,6 +1160,106 @@ describe('getAllAssertionResults', () => {
     it('should not throw when trying to use assertMatrix with other unrelated options', () => {
       const options = {assertMatrix: [], config: 'path/to/file', serverBaseUrl: ''};
       expect(() => getAllAssertionResults(options, [])).not.toThrow();
+    });
+  });
+
+  describe('replaced audits mapping', () => {
+    let warnSpy;
+
+    beforeEach(() => {
+      warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+    });
+
+    afterEach(() => {
+      warnSpy.mockRestore();
+    });
+
+    it('should map replaced legacy audit to insight audit and emit warning when legacy audit is absent', () => {
+      const insightLhrs = [
+        {
+          finalUrl: 'http://page-1.com',
+          audits: {
+            'dom-size-insight': {score: 0.5, numericValue: 4000},
+          },
+        },
+      ];
+
+      const results = getAllAssertionResults(
+        {assertions: {'dom-size': ['error', {maxNumericValue: 3000}]}},
+        insightLhrs
+      );
+
+      expect(warnSpy).toHaveBeenCalledWith(
+        'Audit "dom-size" was replaced by "dom-size-insight" and will be removed in a future version of LHCI.'
+      );
+      expect(results).toEqual([
+        {
+          url: 'http://page-1.com',
+          actual: 4000,
+          auditId: 'dom-size-insight',
+          expected: 3000,
+          level: 'error',
+          name: 'maxNumericValue',
+          operator: '<=',
+          values: [4000],
+          passed: false,
+        },
+      ]);
+    });
+
+    it('should not remap when legacy audit is still present in the LHR', () => {
+      const legacyLhrs = [
+        {
+          finalUrl: 'http://page-1.com',
+          audits: {
+            'dom-size': {score: 0.5, numericValue: 4000},
+            'dom-size-insight': {score: 1, numericValue: 100},
+          },
+        },
+      ];
+
+      const results = getAllAssertionResults(
+        {assertions: {'dom-size': ['error', {maxNumericValue: 3000}]}},
+        legacyLhrs
+      );
+
+      expect(warnSpy).not.toHaveBeenCalled();
+      expect(results).toEqual([
+        {
+          url: 'http://page-1.com',
+          actual: 4000,
+          auditId: 'dom-size',
+          expected: 3000,
+          level: 'error',
+          name: 'maxNumericValue',
+          operator: '<=',
+          values: [4000],
+          passed: false,
+        },
+      ]);
+    });
+
+    it('should allow legacy audit override to disable replacement insight in preset', () => {
+      const insightLhr = {
+        finalUrl: 'http://page-1.com',
+        audits: {
+          'dom-size-insight': {score: 0},
+        },
+      };
+
+      const results = getAllAssertionResults(
+        {
+          preset: 'lighthouse:recommended',
+          assertions: {'dom-size': 'off'},
+        },
+        [insightLhr]
+      );
+
+      expect(warnSpy).toHaveBeenCalledWith(
+        'Audit "dom-size" was replaced by "dom-size-insight" and will be removed in a future version of LHCI.'
+      );
+      expect(results.find(r => r.auditId === 'dom-size-insight')).toBeUndefined();
+      expect(results.find(r => r.auditId === 'dom-size')).toBeUndefined();
     });
   });
 });

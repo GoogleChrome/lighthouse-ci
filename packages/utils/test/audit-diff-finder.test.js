@@ -673,6 +673,18 @@ describe('#zipBaseAndCompareItems', () => {
     ]);
   });
 
+  it('should zip string entities (third-parties-insight)', () => {
+    const base = [{entity: 'Google Tag Manager', transferSize: 1000, mainThreadTime: 50}];
+    const compare = [{entity: 'Google Tag Manager', transferSize: 2000, mainThreadTime: 80}];
+    const zipped = zipBaseAndCompareItems(base, compare);
+    expect(zipped).toEqual([
+      {
+        base: {item: base[0], kind: 'base', index: 0},
+        compare: {item: compare[0], kind: 'compare', index: 0},
+      },
+    ]);
+  });
+
   it('should zip nodes', () => {
     const base = [{node: {snippet: '<a>Text</a>'}, count: 1}];
     const compare = [{node: {snippet: '<a>Text</a>'}, count: 1}];

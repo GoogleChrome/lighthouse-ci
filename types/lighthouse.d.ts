@@ -35,6 +35,7 @@ declare global {
       score: number | null;
       displayValue?: string;
       numericValue?: number;
+      numericUnit?: string;
       details?: {
         type: string;
         items?: Array<Record<string, any>>;

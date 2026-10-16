@@ -398,7 +398,8 @@ function getItemKey(item) {
   if (typeof item.name === 'string') return item.name;
   // For dom-size
   if (typeof item.statistic === 'string') return item.statistic;
-  // For third-party-summary
+  // For third-party-summary and third-parties-insight
+  if (typeof item.entity === 'string') return item.entity;
   if (item.entity && typeof item.entity.text === 'string') return item.entity.text;
   // For node
   if (typeof item.node?.path === 'string') return item.node.path;

@@ -765,6 +765,30 @@ describe('#zipBaseAndCompareItems', () => {
       },
     ]);
   });
+
+  it('should zip third-parties-insight items with string entity', () => {
+    const base = [
+      {entity: 'Google Tag Manager', transferSize: 50000, mainThreadTime: 120},
+      {entity: 'Facebook', transferSize: 30000, mainThreadTime: 80},
+    ];
+    const compare = [
+      {entity: 'Google Tag Manager', transferSize: 55000, mainThreadTime: 140},
+      {entity: 'Stripe', transferSize: 20000, mainThreadTime: 40},
+    ];
+    const zipped = zipBaseAndCompareItems(base, compare);
+    expect(zipped).toEqual([
+      {
+        base: {item: base[0], kind: 'base', index: 0},
+        compare: {item: compare[0], kind: 'compare', index: 0},
+      },
+      {
+        base: {item: base[1], kind: 'base', index: 1},
+      },
+      {
+        compare: {item: compare[1], kind: 'compare', index: 1},
+      },
+    ]);
+  });
 });
 
 describe('#sortZippedBaseAndCompareItems', () => {

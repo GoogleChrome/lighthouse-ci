@@ -45,7 +45,7 @@ describe('Lighthouse CI autorun CLI with startServerCommand', () => {
         'autorun',
         '--collect.url=http://localhost:52425',
         '--collect.n=1',
-        '--assert.assertions.viewport=error',
+        '--assert.assertions.viewport-insight=error',
       ],
       {cwd: autorunDir}
     );
@@ -69,13 +69,13 @@ describe('Lighthouse CI autorun CLI with startServerCommand', () => {
 
       1 result(s) for [1mhttp://localhost:XXXX/[0m :
 
-        [31mX[0m  [1mviewport[0m failure for [1mminScore[0m assertion
-             Does not have a \`<meta name="viewport">\` tag with \`width\` or \`initial-scale\`
-             https://developer.chrome.com/docs/lighthouse/pwa/viewport/
+        [31mX[0m  [1mviewport-insight[0m failure for [1mminScore[0m assertion
+             Optimize viewport for mobile
+             https://developer.chrome.com/docs/performance/insights/viewport
 
               expected: >=[32m0.9[0m
-                 found: [31m0[0m
-            [2mall values: 0[0m
+                 found: [31m0.5[0m
+            [2mall values: 0.5[0m
 
       Assertion failed. Exiting with status code 1.
       assert command failed. Exiting with status code 1.

@@ -10,28 +10,18 @@ module.exports = {
     assert: {
       preset: 'lighthouse:recommended',
       assertions: {
-        'dom-size': ['error', {maxNumericValue: 3000}],
+        'dom-size-insight': ['error', {maxNumericValue: 3000}],
 
         'csp-xss': 'off',
         'unsized-images': 'off',
-        'uses-rel-preload': 'off',
-        'uses-responsive-images': 'off',
-        'uses-rel-preconnect': 'off',
-        'preload-lcp-image': 'off',
-        'offscreen-images': 'off',
+        'image-delivery-insight': 'off',
+        'lcp-discovery-insight': 'off',
         'unused-javascript': 'off',
 
         label: 'off',
         'color-contrast': 'off',
         bypass: 'off',
-        'tap-targets': 'off',
-
-        'apple-touch-icon': 'off',
-        'maskable-icon': 'off',
-        'installable-manifest': 'off',
-        'service-worker': 'off',
-        'splash-screen': 'off',
-        'themed-omnibox': 'off',
+        'target-size': 'off',
       },
     },
     upload: {

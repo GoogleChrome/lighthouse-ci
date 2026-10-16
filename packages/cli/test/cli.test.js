@@ -318,7 +318,7 @@ describe('Lighthouse CI CLI', () => {
     it('should assert failures', async () => {
       const {stdout, stderr, status} = await runCLI([
         'assert',
-        `--assertions.prioritize-lcp-image=error`,
+        `--assertions.lcp-discovery-insight=error`,
       ]);
 
       expect(stdout).toMatchInlineSnapshot(`""`);
@@ -327,9 +327,9 @@ describe('Lighthouse CI CLI', () => {
 
         1 result(s) for [1mhttp://localhost:XXXX/app/[0m :
 
-          [31mX[0m  [1mprioritize-lcp-image[0m failure for [1mminScore[0m assertion
-               Preload Largest Contentful Paint image
-               https://web.dev/articles/optimize-lcp#optimize_when_the_resource_is_discovered
+          [31mX[0m  [1mlcp-discovery-insight[0m failure for [1mminScore[0m assertion
+               LCP request discovery
+               https://developer.chrome.com/docs/performance/insights/lcp-discovery
 
                 expected: >=[32m0.9[0m
                    found: [31m0[0m
@@ -356,9 +356,9 @@ describe('Lighthouse CI CLI', () => {
 
         1 result(s) for [1mhttp://localhost:XXXX/app/[0m :
 
-          [31mX[0m  [1mprioritize-lcp-image[0m failure for [1mminScore[0m assertion
-               Preload Largest Contentful Paint image
-               https://web.dev/articles/optimize-lcp#optimize_when_the_resource_is_discovered
+          [31mX[0m  [1mlcp-discovery-insight[0m failure for [1mminScore[0m assertion
+               LCP request discovery
+               https://developer.chrome.com/docs/performance/insights/lcp-discovery
 
                 expected: >=[32m1[0m
                    found: [31m0[0m
@@ -379,9 +379,9 @@ describe('Lighthouse CI CLI', () => {
 
         1 result(s) for [1mhttp://localhost:XXXX/app/[0m :
 
-          [31mX[0m  [1mprioritize-lcp-image[0m failure for [1mminScore[0m assertion
-               Preload Largest Contentful Paint image
-               https://web.dev/articles/optimize-lcp#optimize_when_the_resource_is_discovered
+          [31mX[0m  [1mlcp-discovery-insight[0m failure for [1mminScore[0m assertion
+               LCP request discovery
+               https://developer.chrome.com/docs/performance/insights/lcp-discovery
 
                 expected: >=[32m0.9[0m
                    found: [31m0[0m
@@ -416,9 +416,9 @@ describe('Lighthouse CI CLI', () => {
               [2mall values: XXXX, XXXX[0m
 
 
-          [31mX[0m  [1mprioritize-lcp-image[0m failure for [1mminScore[0m assertion
-               Preload Largest Contentful Paint image
-               https://web.dev/articles/optimize-lcp#optimize_when_the_resource_is_discovered
+          [31mX[0m  [1mlcp-discovery-insight[0m failure for [1mminScore[0m assertion
+               LCP request discovery
+               https://developer.chrome.com/docs/performance/insights/lcp-discovery
 
                 expected: >=[32m1[0m
                    found: [31m0[0m

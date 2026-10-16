@@ -133,9 +133,14 @@ export const CategoryScoreTimelineGraph = props => {
   const {selectedBuildId, setSelectedBuildId, pinned, setPinned} = props;
 
   const categoryId = props.category.id;
-  const allStats = props.statistics.filter(s => s.name.startsWith(`category_${categoryId}`));
+  const allStats = props.statistics.filter(
+    s => s.value !== -1 && s.name.startsWith(`category_${categoryId}`)
+  );
   const medianStats = allStats.filter(s => s.name.endsWith('_median'));
-  const versionStatistics = props.statistics.filter(s => s.name === 'meta_lighthouse_version');
+  const buildIdsWithStats = new Set(medianStats.map(s => s.buildId));
+  const versionStatistics = props.statistics.filter(
+    s => s.name === 'meta_lighthouse_version' && buildIdsWithStats.has(s.buildId)
+  );
   const versionChanges = versionStatistics
     .map((statistic, index) => ({
       build: statistic.build,
@@ -196,7 +201,9 @@ export const CategoryScoreTimelineGraph = props => {
 export const CategoryScoreDistributionGraph = props => {
   const [selectedBinIndex, setSelectedBinIndex] = useState(-1);
   const categoryId = props.category.id;
-  const statistics = props.statistics.filter(s => s.name.startsWith(`category_${categoryId}`));
+  const statistics = props.statistics.filter(
+    s => s.value !== -1 && s.name.startsWith(`category_${categoryId}`)
+  );
 
   if (!statistics.length) return <span>No data available</span>;
 

@@ -14,13 +14,16 @@ import clsx from 'clsx';
 /** @type {Record<string, string>} */
 const ICONS_BY_AUDIT_ID = {
   'font-display': 'font_download',
+  'font-display-insight': 'font_download',
   'uses-rel-preconnect': 'language',
+  'network-dependency-tree-insight': 'language',
 
   'user-timings': 'timer',
   'bootup-time': 'speed',
   'mainthread-work-breakdown': 'speed',
 
   'third-party-summary': 'language',
+  'third-parties-insight': 'language',
 
   deprecations: 'error',
   'errors-in-console': 'error',

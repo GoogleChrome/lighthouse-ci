@@ -1,4 +1,4 @@
-FROM node:18-bullseye-slim
+FROM node:24-bullseye-slim
 
 # Install utilities
 RUN apt-get update --fix-missing && apt-get install -y python build-essential && apt-get clean

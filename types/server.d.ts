@@ -64,6 +64,7 @@ declare global {
         | 'audit_largest-contentful-paint_median'
         | 'audit_total-blocking-time_median'
         | 'audit_max-potential-fid_median'
+        | 'audit_cumulative-layout-shift_median'
         | 'category_performance_median'
         | 'category_pwa_median'
         | 'category_seo_median'

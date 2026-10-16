@@ -580,8 +580,71 @@ function normalizeNumericValue(audit) {
  * @return {Required<Pick<Required<LH.AuditResult>['details'],'items'|'headings'>>}
  */
 function normalizeDetails(audit) {
-  if (!audit.details) return {items: [], headings: []};
-  return {items: audit.details.items || [], headings: audit.details.headings || []};
+  if (!audit || !audit.details) return {items: [], headings: []};
+
+  if (audit.details.type === 'checklist') {
+    const rawItems = /** @type {Record<string, any> | Array<Record<string, any>>} */ (
+      audit.details.items || {}
+    );
+    const entries = Array.isArray(rawItems) ? rawItems : Object.values(rawItems);
+    return {
+      headings: [
+        {key: 'check', valueType: 'text', label: 'Checklist'},
+        {key: 'value', valueType: 'text', label: ''},
+      ],
+      items: entries
+        .filter(item => item && typeof item === 'object')
+        .map(item => ({
+          check: item.label || '',
+          value: item.value ? 'Pass' : 'Fail',
+        })),
+    };
+  }
+
+  if (audit.details.type === 'list') {
+    const rawListItems = Array.isArray(audit.details.items) ? audit.details.items : [];
+    /** @type {NonNullable<NonNullable<LH.AuditResult['details']>['headings']>} */
+    const headings = [];
+    /** @type {Array<Record<string, any>>} */
+    const items = [];
+
+    /** @param {NonNullable<NonNullable<LH.AuditResult['details']>['headings']>[number]} heading */
+    const addHeading = heading => {
+      if (!heading) return;
+      if (heading.key !== null && headings.some(h => h.key === heading.key)) return;
+      headings.push(heading);
+    };
+
+    for (const entry of rawListItems) {
+      const subDetail = entry && entry.type === 'list-section' ? entry.value : entry;
+      if (!subDetail || typeof subDetail !== 'object') continue;
+
+      if (subDetail.type === 'table' || subDetail.type === 'opportunity') {
+        for (const heading of subDetail.headings || []) {
+          addHeading(heading);
+        }
+        for (const item of Array.isArray(subDetail.items) ? subDetail.items : []) {
+          items.push(item);
+        }
+      } else if (subDetail.type === 'checklist') {
+        const normalizedChecklist = normalizeDetails({score: null, details: subDetail});
+        for (const heading of normalizedChecklist.headings) {
+          addHeading(heading);
+        }
+        items.push(...normalizedChecklist.items);
+      } else if (subDetail.type === 'node') {
+        addHeading({key: 'node', valueType: 'node', label: 'Element'});
+        items.push({node: subDetail});
+      }
+    }
+
+    return {items, headings};
+  }
+
+  return {
+    items: Array.isArray(audit.details.items) ? audit.details.items : [],
+    headings: audit.details.headings || [],
+  };
 }
 
 /**
@@ -637,14 +700,9 @@ function findAuditDiffs(baseAudit, compareAudit, options = {}) {
   const baseAuditDetails = baseAudit.details || {};
   /** @type {Partial<LH.AuditResult['details']>} */
   const compareAuditDetails = compareAudit.details || {};
-  // TODO: support checklist.
   if (
-    (baseAuditDetails.type !== 'debugdata' &&
-      baseAuditDetails.type !== 'checklist' &&
-      baseAuditDetails.items) ||
-    (compareAuditDetails.type !== 'debugdata' &&
-      compareAuditDetails.type !== 'checklist' &&
-      compareAuditDetails.items)
+    (baseAuditDetails.type !== 'debugdata' && baseAuditDetails.items) ||
+    (compareAuditDetails.type !== 'debugdata' && compareAuditDetails.items)
   ) {
     hasItemDetails = true;
     const {items: baseItems, headings: baseHeadings} = normalizeDetails(baseAudit);
@@ -706,6 +764,7 @@ function findAuditDiffs(baseAudit, compareAudit, options = {}) {
 
 module.exports = {
   findAuditDiffs,
+  normalizeDetails,
   getDiffSeverity,
   getDeltaLabel,
   getDeltaStats,

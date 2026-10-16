@@ -11,6 +11,7 @@ import {
   zipBaseAndCompareItems,
   sortZippedBaseAndCompareItems,
   getRowLabelForIndex,
+  normalizeDetails,
 } from '@lhci/utils/src/audit-diff-finder';
 
 /** @param {LH.DetailsType} itemType @return {boolean} */
@@ -30,11 +31,11 @@ function isNumericValueType(itemType) {
 export const TableDetails = props => {
   const {audit, baseAudit, diffs: allDiffs} = props.pair;
   if (!audit.details) return <Fragment />;
-  const {headings: compareHeadings, items: compareItems} = audit.details;
-  if (!compareHeadings || !compareItems) return <Fragment />;
-
-  const baseHeadings = (baseAudit && baseAudit.details && baseAudit.details.headings) || [];
-  const baseItems = (baseAudit && baseAudit.details && baseAudit.details.items) || [];
+  const {headings: compareHeadings, items: compareItems} = normalizeDetails(audit);
+  const {headings: baseHeadings, items: baseItems} = baseAudit
+    ? normalizeDetails(baseAudit)
+    : {headings: [], items: []};
+  if (!compareHeadings.length && !baseHeadings.length) return <Fragment />;
 
   const zippedItems = zipBaseAndCompareItems(baseItems, compareItems);
   const sortedItems = sortZippedBaseAndCompareItems(allDiffs, zippedItems);

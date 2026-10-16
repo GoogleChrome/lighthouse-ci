@@ -89,6 +89,19 @@ const auditPairsSubitems = createAuditPairs(lhrSubitemsA, lhrSubitemsB, {
       'legacy-javascript',
     ].includes(pair.audit.id || ''),
 });
+const lhr1261ChecklistDiffB = JSON.parse(JSON.stringify(lhr1261B));
+lhr1261ChecklistDiffB.audits[
+  'document-latency-insight'
+].details.items.serverResponseIsFast.value = false;
+const auditPairsListAndChecklist = createAuditPairs(lhr1261A, lhr1261ChecklistDiffB, {
+  filter: pair =>
+    [
+      'largest-contentful-paint-element',
+      'cls-culprits-insight',
+      'document-latency-insight',
+      'lcp-phases-insight',
+    ].includes(pair.audit.id || ''),
+});
 
 export const Default = () => (
   <AuditDetailPane
@@ -204,6 +217,15 @@ export const VersionSubitems = () => (
     setSelectedAuditId={action('setSelectedAuditId')}
     pairs={auditPairsSubitems}
     baseLhr={lhrSubitemsA}
+  />
+);
+
+export const VersionListAndChecklist = () => (
+  <AuditDetailPane
+    selectedAuditId={auditPairsListAndChecklist[0].audit.id || ''}
+    setSelectedAuditId={action('setSelectedAuditId')}
+    pairs={auditPairsListAndChecklist}
+    baseLhr={lhr1261ChecklistDiffB}
   />
 );
 

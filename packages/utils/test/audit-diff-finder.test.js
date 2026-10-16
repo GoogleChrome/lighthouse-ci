@@ -1061,8 +1061,8 @@ describe('#normalizeDetails', () => {
         {key: 'value', valueType: 'text', label: ''},
       ],
       items: [
-        {check: 'Avoids redirects', value: 'Pass'},
-        {check: 'Applies text compression', value: 'Fail'},
+        {name: 'noRedirects:true', check: 'Avoids redirects', value: 'Pass'},
+        {name: 'usesCompression:false', check: 'Applies text compression', value: 'Fail'},
       ],
     });
   });

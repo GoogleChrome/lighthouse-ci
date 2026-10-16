@@ -586,15 +586,18 @@ function normalizeDetails(audit) {
     const rawItems = /** @type {Record<string, any> | Array<Record<string, any>>} */ (
       audit.details.items || {}
     );
-    const entries = Array.isArray(rawItems) ? rawItems : Object.values(rawItems);
+    const entries = Array.isArray(rawItems)
+      ? rawItems.map((item, idx) => [String(idx), item])
+      : Object.entries(rawItems);
     return {
       headings: [
         {key: 'check', valueType: 'text', label: 'Checklist'},
         {key: 'value', valueType: 'text', label: ''},
       ],
       items: entries
-        .filter(item => item && typeof item === 'object')
-        .map(item => ({
+        .filter(([, item]) => item && typeof item === 'object')
+        .map(([key, item]) => ({
+          name: `${item.id || key}:${Boolean(item.value)}`,
           check: item.label || '',
           value: item.value ? 'Pass' : 'Fail',
         })),
@@ -624,7 +627,21 @@ function normalizeDetails(audit) {
           addHeading(heading);
         }
         for (const item of Array.isArray(subDetail.items) ? subDetail.items : []) {
-          items.push(item);
+          const normalizedItem = {...item};
+          if (typeof normalizedItem.label !== 'string') {
+            if (typeof normalizedItem.phase === 'string') {
+              normalizedItem.label = normalizedItem.phase;
+            } else if (typeof normalizedItem.subpart === 'string') {
+              normalizedItem.label = normalizedItem.subpart;
+            } else if (
+              normalizedItem.node &&
+              normalizedItem.node.type === 'text' &&
+              typeof normalizedItem.node.value === 'string'
+            ) {
+              normalizedItem.label = normalizedItem.node.value;
+            }
+          }
+          items.push(normalizedItem);
         }
       } else if (subDetail.type === 'checklist') {
         const normalizedChecklist = normalizeDetails({score: null, details: subDetail});

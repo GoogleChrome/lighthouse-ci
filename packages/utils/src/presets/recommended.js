@@ -14,45 +14,37 @@ module.exports = {
     'bootup-time': ['warn', {}],
     'cumulative-layout-shift': ['warn', {}],
     'first-contentful-paint': ['warn', {}],
-    'first-meaningful-paint': ['warn', {}],
     'largest-contentful-paint': ['warn', {}],
     'mainthread-work-breakdown': ['warn', {}],
     'max-potential-fid': ['warn', {}],
     'speed-index': ['warn', {}],
     interactive: ['warn', {}],
     // Flaky score but non-flaky details (error, maxLength)
-    'duplicated-javascript': ['warn', {maxLength: 0}], // warn until https://github.com/GoogleChrome/lighthouse/issues/11285 is fixed
-    'duplicated-javascript-insight': ['warn', {maxLength: 0}],
-    'efficient-animated-content': ['error', {maxLength: 0}],
-    'legacy-javascript': ['warn', {maxLength: 0}], // warn until https://github.com/GoogleChrome/lighthouse/issues/11285 is fixed
-    'legacy-javascript-insight': ['warn', {maxLength: 0}],
-    'offscreen-images': ['error', {maxLength: 0}],
+    'duplicated-javascript-insight': ['warn', {maxLength: 0}], // warn until https://github.com/GoogleChrome/lighthouse/issues/11285 is fixed
+    'legacy-javascript-insight': ['warn', {maxLength: 0}], // warn until https://github.com/GoogleChrome/lighthouse/issues/11285 is fixed
     'unminified-css': ['error', {maxLength: 0}],
     'unminified-javascript': ['error', {maxLength: 0}],
     'unused-css-rules': ['error', {maxLength: 0}],
     'unused-javascript': ['error', {maxLength: 0}],
-    'uses-optimized-images': ['error', {maxLength: 0}],
-    'uses-rel-preconnect': ['error', {maxLength: 0}],
-    'uses-responsive-images': ['error', {maxLength: 0}],
-    'uses-text-compression': ['error', {maxLength: 0}],
     // Audits that don't typically apply in dev environments or are more opinionated (warn)
     'modern-http-insight': ['off', {}], // not useful for the dev server
-    'uses-http2': ['off', {}], // not useful for the dev server
     'forced-reflow-insight': ['off', {}], // too strict
     'long-tasks': ['off', {}], // too strict
+    // Experimental agentic-browsing audits
+    'agent-accessibility-tree': ['off', {}],
+    'ard-schema': ['off', {}],
+    'llms-txt': ['off', {}],
+    'webmcp-form-coverage': ['off', {}],
+    'webmcp-schema-validity': ['off', {}],
 
     'cache-insight': ['warn', {maxLength: 0}],
     'document-latency-insight': ['warn', {}],
     'dom-size-insight': ['warn', {}],
-    'dom-size': ['warn', {}],
     'font-display-insight': ['warn', {}],
     'image-delivery-insight': ['warn', {maxLength: 0}],
     'is-on-https': ['warn', {}], // passes on localhost, so OK to leave on
     'lcp-discovery-insight': ['warn', {}],
-    'modern-image-formats': ['warn', {maxLength: 0}],
     'render-blocking-insight': ['warn', {maxLength: 0}],
-    'render-blocking-resources': ['warn', {maxLength: 0}],
     'server-response-time': ['warn', {}],
-    'uses-long-cache-ttl': ['warn', {maxLength: 0}],
   },
 };

@@ -15,5 +15,6 @@ module.exports = {
     // Every PWA audit is disabled
     'is-on-https': 'off',
     viewport: 'off',
+    'viewport-insight': 'off',
   },
 };

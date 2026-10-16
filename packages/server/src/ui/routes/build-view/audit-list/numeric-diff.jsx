@@ -53,6 +53,9 @@ const getUnitFromAudit = (audit, groupId) => {
   if (groupId === 'load-opportunities') return 'ms';
   if (!audit) return 'none';
 
+  if (audit.numericUnit === 'millisecond' || audit.numericUnit === 'second') return 'ms';
+  if (audit.numericUnit === 'byte') return 'bytes';
+
   if (audit.details) {
     const details = audit.details;
     if (details.overallSavingsMs) return 'ms';
@@ -60,7 +63,7 @@ const getUnitFromAudit = (audit, groupId) => {
 
   const displayValue = audit.displayValue || '';
   if (/[0-9,.]+\s(ms|s)$/.test(displayValue)) return 'ms';
-  if (/[0-9,.]+\s(KB|MB)$/.test(displayValue)) return 'bytes';
+  if (/[0-9,.]+\s(KB|MB|KiB|MiB)$/.test(displayValue)) return 'bytes';
 
   return 'none';
 };

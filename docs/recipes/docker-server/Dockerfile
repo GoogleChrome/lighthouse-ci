@@ -1,7 +1,7 @@
-FROM node:18-bullseye-slim
+FROM node:22-bookworm-slim
 
 # Install utilities
-RUN apt-get update --fix-missing && apt-get install -y python build-essential && apt-get clean
+RUN apt-get update --fix-missing && apt-get install -y python3 build-essential && apt-get clean
 
 WORKDIR /usr/src/lhci
 COPY package.json .

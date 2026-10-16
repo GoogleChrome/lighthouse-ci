@@ -21,11 +21,22 @@ class PuppeteerManager {
 
   /**
    * Returns the puppeteer module. First attempts to require `puppeteer` and then `puppeteer-core`
-   * if puppeteer is not available. They are the exact same API but puppeteer-core requires explicit
-   * setting of `collect.chromePath`.
+   * from the current project, then falls back to this package's dependency tree. They are the exact
+   * same API but puppeteer-core requires explicit setting of `collect.chromePath`.
    * @return {typeof import('puppeteer')|undefined}
    */
   static _requirePuppeteer() {
+    // Prefer the version the user installed for their puppeteerScript.
+    try {
+      return require(path.join(process.cwd(), 'node_modules/puppeteer'));
+    } catch (_) {}
+
+    try {
+      // @ts-ignore - puppeteer-core is API-compatible with puppeteer
+      return require(path.join(process.cwd(), 'node_modules/puppeteer-core'));
+    } catch (_) {}
+
+    // Fall back to the CLI's dependency tree.
     try {
       // eslint-disable-next-line import/no-extraneous-dependencies
       return require('puppeteer');
@@ -35,15 +46,6 @@ class PuppeteerManager {
       // @ts-ignore - puppeteer-core is API-compatible with puppeteer
       // eslint-disable-next-line import/no-extraneous-dependencies
       return require('puppeteer-core');
-    } catch (_) {}
-
-    // Try relative to the CWD too in case we're installed globally
-    try {
-      return require(path.join(process.cwd(), 'node_modules/puppeteer'));
-    } catch (_) {}
-
-    try {
-      return require(path.join(process.cwd(), 'node_modules/puppeteer-core'));
     } catch (_) {}
   }
 

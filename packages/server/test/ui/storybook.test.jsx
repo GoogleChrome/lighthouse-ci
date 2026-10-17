@@ -37,7 +37,7 @@ initStoryshots({
   test: imageSnapshot({
     getCustomBrowser: async () => {
       browser = await puppeteer.launch({
-        headless: 'new',
+        headless: true,
         // Avoids "ws does not work in the browser. Browser clients must use the native WebSocket object".
         args: ['--remote-debugging-pipe'],
       });
@@ -51,7 +51,7 @@ initStoryshots({
       // wait for the webfont request to avoid flakiness with webfont display
       await page.waitForNetworkIdle();
       // wait more for good measure.
-      await page.waitForTimeout(2000);
+      await new Promise(r => setTimeout(r, 2000));
 
       const dimensions = await page.evaluate(() => {
         // Note: #storybook-root is made by storybook, #storybook-test-root is made by us in preview.jsx

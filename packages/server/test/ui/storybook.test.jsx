@@ -7,9 +7,12 @@
  */
 
 import * as path from 'path';
+import {setImmediate} from 'timers';
 import initStoryshots_ from '@storybook/addon-storyshots';
 import {imageSnapshot} from '@storybook/addon-storyshots-puppeteer';
 import puppeteer from 'puppeteer';
+
+global.setImmediate = setImmediate;
 
 let initStoryshots = initStoryshots_;
 

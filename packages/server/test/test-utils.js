@@ -205,8 +205,8 @@ function waitForNetworkIdle0(page) {
     };
 
     const cleanup = () => {
-      page.removeListener('request', requestListener);
-      page.removeListener('response', responseListener);
+      page.off('request', requestListener);
+      page.off('response', responseListener);
       clearTimeout(timeoutTimeout);
     };
 
@@ -301,7 +301,7 @@ module.exports = {
   /** @param {LHCI.E2EState} state */
   launchBrowser: async state => {
     state.browser = await puppeteer.launch({
-      headless: state.debug ? false : 'new',
+      headless: state.debug ? false : true,
       slowMo: state.debug ? 250 : undefined,
       devtools: state.debug,
       env: {...process.env, TZ: 'America/Chicago'},

@@ -34,6 +34,26 @@ describe('PuppeteerManager', () => {
     }
   );
 
+  it('prefers puppeteer over puppeteer-core in the current project', () => {
+    const projectDir = fs.mkdtempSync(path.join(os.tmpdir(), 'lhci-puppeteer-'));
+    for (const packageName of ['puppeteer', 'puppeteer-core']) {
+      const puppeteerDir = path.join(projectDir, 'node_modules', packageName);
+      fs.mkdirSync(puppeteerDir, {recursive: true});
+      fs.writeFileSync(
+        path.join(puppeteerDir, 'index.js'),
+        `module.exports = {source: '${packageName}'};`
+      );
+    }
+    const cwdSpy = jest.spyOn(process, 'cwd').mockReturnValue(projectDir);
+
+    try {
+      expect(PuppeteerManager._requirePuppeteer().source).toBe('puppeteer');
+    } finally {
+      cwdSpy.mockRestore();
+      fs.rmSync(projectDir, {recursive: true, force: true});
+    }
+  });
+
   it('falls back to the CLI dependency tree', () => {
     const projectDir = fs.mkdtempSync(path.join(os.tmpdir(), 'lhci-puppeteer-'));
     const cwdSpy = jest.spyOn(process, 'cwd').mockReturnValue(projectDir);
@@ -70,6 +90,18 @@ describe('PuppeteerManager', () => {
 
       await manager.close();
       expect(close).toHaveBeenCalledTimes(1);
+    } finally {
+      requireSpy.mockRestore();
+    }
+  });
+
+  it('returns undefined from getChromiumPath when using puppeteer-core', () => {
+    const requireSpy = jest
+      .spyOn(PuppeteerManager, '_requirePuppeteer')
+      .mockReturnValue(require('puppeteer-core'));
+
+    try {
+      expect(PuppeteerManager.getChromiumPath({puppeteerScript: 'script.js'})).toBeUndefined();
     } finally {
       requireSpy.mockRestore();
     }

@@ -32,7 +32,6 @@ class PuppeteerManager {
     } catch (_) {}
 
     try {
-      // @ts-ignore - puppeteer-core is API-compatible with puppeteer
       return require(path.join(process.cwd(), 'node_modules/puppeteer-core'));
     } catch (_) {}
 
@@ -91,13 +90,17 @@ class PuppeteerManager {
     if (!options.puppeteerScript) return undefined;
 
     // Otherwise, check to see if the expected puppeteer download exists.
-    const puppeteer = PuppeteerManager._requirePuppeteer();
-    const puppeteerUnknown = /** @type {unknown} */ (puppeteer);
-    const pupppeteerNode = /** @type {import('puppeteer').PuppeteerNode | undefined} */ (
-      puppeteerUnknown
-    );
-    const chromiumPath = pupppeteerNode && pupppeteerNode.executablePath();
-    return chromiumPath && fs.existsSync(chromiumPath) ? chromiumPath : undefined;
+    try {
+      const puppeteer = PuppeteerManager._requirePuppeteer();
+      const puppeteerUnknown = /** @type {unknown} */ (puppeteer);
+      const pupppeteerNode = /** @type {import('puppeteer').PuppeteerNode | undefined} */ (
+        puppeteerUnknown
+      );
+      const chromiumPath = pupppeteerNode && pupppeteerNode.executablePath();
+      return chromiumPath && fs.existsSync(chromiumPath) ? chromiumPath : undefined;
+    } catch (_) {
+      return undefined;
+    }
   }
 
   /** @return {Promise<number>} */

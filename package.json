@@ -87,6 +87,6 @@
     "sqlite3": "^6.0.1",
     "storybook": "^7.6.24",
     "ts-jest": "^29.1.1",
-    "typescript": "^5.3.3"
+    "typescript": "^6.0.3"
   }
 }

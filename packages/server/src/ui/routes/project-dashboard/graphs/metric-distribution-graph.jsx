@@ -35,9 +35,9 @@ const GRAPH_MARGIN = {top: 20, right: 20, bottom: 20, left: 50};
  * @prop {[number, number]} scoreLevels
  * @prop {number} xMax
  * @prop {boolean} pinned
- * @prop {import('preact/hooks/src').StateUpdater<boolean>} setPinned
+ * @prop {import('preact/hooks').StateUpdater<boolean>} setPinned
  * @prop {number} selectedBinIndex
- * @prop {import('preact/hooks/src').StateUpdater<number>} setSelectedBinIndex
+ * @prop {import('preact/hooks').StateUpdater<number>} setSelectedBinIndex
  */
 
 /**

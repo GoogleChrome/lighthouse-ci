@@ -26,7 +26,7 @@ import {MetricDistributionGraph} from './graphs/metric-distribution-graph';
 /** @typedef {import('./project-category-summaries.jsx').StatisticWithBuild} StatisticWithBuild */
 /** @typedef {import('../../hooks/use-api-data').LoadingState} LoadingState */
 /** @typedef {{category: LH.CategoryResult, categoryGroups: LH.Result['categoryGroups'], statistics?: Array<StatisticWithBuild>, loadingState: import('../../components/async-loader').LoadingState, builds: LHCI.ServerCommand.Build[], buildLimit: number, setBuildLimit: (n: number) => void, lhr: LH.Result, url: string}} Props */
-/** @typedef {Props & {statistics: Array<StatisticWithBuild>, latestBuild: LHCI.ServerCommand.Build|undefined, selectedBuildId: string|undefined, setSelectedBuildId: import('preact/hooks/src').StateUpdater<string|undefined>, pinned: boolean, setPinned: import('preact/hooks/src').StateUpdater<boolean>, visualizationType: 'timeline'|'distribution'}} PropsWithState */
+/** @typedef {Props & {statistics: Array<StatisticWithBuild>, latestBuild: LHCI.ServerCommand.Build|undefined, selectedBuildId: string|undefined, setSelectedBuildId: import('preact/hooks').StateUpdater<string|undefined>, pinned: boolean, setPinned: import('preact/hooks').StateUpdater<boolean>, visualizationType: 'timeline'|'distribution'}} PropsWithState */
 /** @typedef {{id: string, title?: string, pass: number, fail: number, na: number}} AuditGroupCounts */
 /** @typedef {PropsWithState & {groupId: string, variant: 'pass'|'fail'}} PropsForHoverCard */
 

@@ -24,8 +24,8 @@ import {
  * @prop {Array<StatisticWithBuild>} statistics
  * @prop {Array<import('d3').Bin<StatisticWithBuild, number>>} binnedStatistics
  * @prop {number} selectedBinIndex
- * @prop {import('preact/hooks/src').StateUpdater<number>} setSelectedBinIndex
- * @prop {import('preact/hooks/src').StateUpdater<boolean>} setPinned
+ * @prop {import('preact/hooks').StateUpdater<number>} setSelectedBinIndex
+ * @prop {import('preact/hooks').StateUpdater<boolean>} setPinned
  */
 
 /**

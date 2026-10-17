@@ -45,9 +45,9 @@ const STROKE_DASHARRAY_OPTIONS = [
  * @prop {string|undefined} selectedBuildId
  * @prop {number} selectedMetricIndex
  * @prop {number|undefined} [__selectedMetricIndexForTest]
- * @prop {import('preact/hooks/src').StateUpdater<string|undefined>} setSelectedBuildId
- * @prop {import('preact/hooks/src').StateUpdater<boolean>} setPinned
- * @prop {import('preact/hooks/src').StateUpdater<number>} setMetricIndex
+ * @prop {import('preact/hooks').StateUpdater<string|undefined>} setSelectedBuildId
+ * @prop {import('preact/hooks').StateUpdater<boolean>} setPinned
+ * @prop {import('preact/hooks').StateUpdater<number>} setMetricIndex
  */
 
 /**

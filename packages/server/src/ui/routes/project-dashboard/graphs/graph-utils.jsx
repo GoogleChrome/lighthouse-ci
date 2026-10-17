@@ -46,7 +46,7 @@ export function computeStatisticRerenderKey(statistics) {
  * @param {Array<T>} dataItems
  * @param {(n: number) => number} xScale
  * @param {(item: T | undefined) => void} setSelectedId
- * @param {import('preact/hooks/src').StateUpdater<boolean>} setPinned
+ * @param {import('preact/hooks').StateUpdater<boolean>} setPinned
  */
 export function appendHoverCardHitboxElements(
   rootEl,

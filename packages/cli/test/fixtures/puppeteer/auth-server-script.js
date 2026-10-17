@@ -5,8 +5,9 @@
  */
 'use strict';
 
-/** @param {import('puppeteer').Browser} */
+/** @param {import('puppeteer').Browser} browser */
 module.exports = async browser => {
   const page = await browser.newPage();
   await page.goto('http://localhost:52426/login');
+  await page.close();
 };

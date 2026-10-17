@@ -45,4 +45,33 @@ describe('PuppeteerManager', () => {
       fs.rmSync(projectDir, {recursive: true, force: true});
     }
   });
+
+  it('closes the launched browser when close() is called', async () => {
+    const close = jest.fn().mockResolvedValue(undefined);
+    const mockBrowser = {
+      wsEndpoint: () => 'ws://127.0.0.1:9222/devtools/browser/123',
+      close,
+    };
+    const launch = jest.fn().mockResolvedValue(mockBrowser);
+    const requireSpy = jest
+      .spyOn(PuppeteerManager, '_requirePuppeteer')
+      .mockReturnValue(/** @type {any} */ ({launch}));
+
+    try {
+      const manager = new PuppeteerManager({puppeteerScript: './script.js'});
+      await manager.close();
+      expect(close).not.toHaveBeenCalled();
+
+      await expect(manager.getBrowserPort()).resolves.toBe(9222);
+      expect(launch).toHaveBeenCalledTimes(1);
+
+      await manager.close();
+      expect(close).toHaveBeenCalledTimes(1);
+
+      await manager.close();
+      expect(close).toHaveBeenCalledTimes(1);
+    } finally {
+      requireSpy.mockRestore();
+    }
+  });
 });

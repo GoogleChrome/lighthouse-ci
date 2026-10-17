@@ -72,7 +72,7 @@ describe('#saveLHR', () => {
     await withTmpDir(async dir => {
       await saveLHR(JSON.stringify({lighthouseVersion: '5.6.0'}), dir);
       const files = fs.readdirSync(dir);
-      expect(files.map(name => name.replace(/-\d+/, '-XXX'))).toContain('lhr-XXX.json');
+      expect(files.map(name => name.replace(/-\d+/g, '-XXX'))).toContain('lhr-XXX-XXX.json');
 
       const jsonFilePath = path.join(
         dir,
@@ -87,7 +87,7 @@ describe('#saveLHR', () => {
     await withTmpDir(async dir => {
       await saveLHR(JSON.stringify({lighthouseVersion: '5.6.0'}), dir);
       const files = fs.readdirSync(dir);
-      expect(files.map(name => name.replace(/-\d+/, '-XXX'))).toContain('lhr-XXX.html');
+      expect(files.map(name => name.replace(/-\d+/g, '-XXX'))).toContain('lhr-XXX-XXX.html');
 
       const jsonFilePath = path.join(
         dir,
@@ -96,6 +96,21 @@ describe('#saveLHR', () => {
       const contents = fs.readFileSync(jsonFilePath, 'utf8');
       expect(contents).toMatch(/<!DOCTYPE html>/i);
       expect(contents).toMatch(/__LIGHTHOUSE_JSON__ = /);
+    });
+  });
+
+  it('should not overwrite files saved in the same millisecond', async () => {
+    await withTmpDir(async dir => {
+      const nowSpy = jest.spyOn(Date, 'now').mockReturnValue(1000);
+      try {
+        await saveLHR(JSON.stringify({lighthouseVersion: '5.6.0'}), dir);
+        await saveLHR(JSON.stringify({lighthouseVersion: '5.6.0'}), dir);
+      } finally {
+        nowSpy.mockRestore();
+      }
+
+      const files = fs.readdirSync(dir);
+      expect(files).toHaveLength(4);
     });
   });
 });

@@ -8,8 +8,8 @@
 const fs = require('fs');
 const path = require('path');
 const LHCI_DIR = path.join(process.cwd(), '.lighthouseci');
-const LHR_REGEX = /^lhr-\d+\.json$/;
-const LH_HTML_REPORT_REGEX = /^lhr-\d+\.html$/;
+const LHR_REGEX = /^lhr-\d+(-\d+)?\.json$/;
+const LH_HTML_REPORT_REGEX = /^lhr-\d+(-\d+)?\.html$/;
 const ASSERTION_RESULTS_PATH = path.join(LHCI_DIR, 'assertion-results.json');
 const URL_LINK_MAP_PATH = path.join(LHCI_DIR, 'links.json');
 
@@ -48,7 +48,7 @@ function loadSavedLHRs(directoryOrPath) {
  * @param {string} lhr
  */
 async function saveLHR(lhr, baseDir = LHCI_DIR) {
-  const baseFilename = `lhr-${Date.now()}`;
+  const baseFilename = `lhr-${Date.now()}-${process.hrtime.bigint() % 1000000n}`;
   const basePath = path.join(baseDir, baseFilename);
   ensureDirectoryExists(baseDir);
   fs.writeFileSync(`${basePath}.json`, lhr);

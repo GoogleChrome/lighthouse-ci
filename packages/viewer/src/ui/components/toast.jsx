@@ -10,7 +10,7 @@ import {useEffect} from 'preact/hooks';
 
 /** @typedef {import('../app.jsx').ToastMessage} ToastMessage */
 
-/** @param {{toast: ToastMessage, setToasts: import('preact/hooks/src').StateUpdater<Array<ToastMessage>>}} props */
+/** @param {{toast: ToastMessage, setToasts: import('preact/hooks').StateUpdater<Array<ToastMessage>>}} props */
 export const Toast = props => {
   const setToasts = props.setToasts;
   const {message, level = 'info'} = props.toast;

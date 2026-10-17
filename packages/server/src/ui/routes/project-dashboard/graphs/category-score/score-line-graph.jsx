@@ -48,8 +48,8 @@ function buildXScale(graphWidth, data) {
  * @prop {Array<StatisticWithBuild>} statisticsWithMinMax
  * @prop {Array<{index: number}>} versionChanges
  * @prop {string|undefined} selectedBuildId
- * @prop {import('preact/hooks/src').StateUpdater<string|undefined>} setSelectedBuildId
- * @prop {import('preact/hooks/src').StateUpdater<boolean>} setPinned
+ * @prop {import('preact/hooks').StateUpdater<string|undefined>} setSelectedBuildId
+ * @prop {import('preact/hooks').StateUpdater<boolean>} setPinned
  */
 
 /**

@@ -128,7 +128,7 @@ const HoverCardWithDistribution = props => {
   );
 };
 
-/** @param {{category: LH.CategoryResult, statistics: Array<StatisticWithBuild>, selectedBuildId: string|undefined, setSelectedBuildId: import('preact/hooks/src').StateUpdater<string|undefined>, pinned: boolean, setPinned: import('preact/hooks/src').StateUpdater<boolean>}} props */
+/** @param {{category: LH.CategoryResult, statistics: Array<StatisticWithBuild>, selectedBuildId: string|undefined, setSelectedBuildId: import('preact/hooks').StateUpdater<string|undefined>, pinned: boolean, setPinned: import('preact/hooks').StateUpdater<boolean>}} props */
 export const CategoryScoreTimelineGraph = props => {
   const {selectedBuildId, setSelectedBuildId, pinned, setPinned} = props;
 
@@ -192,7 +192,7 @@ export const CategoryScoreTimelineGraph = props => {
   );
 };
 
-/** @param {{category: LH.CategoryResult, statistics: Array<StatisticWithBuild>, pinned: boolean, setPinned: import('preact/hooks/src').StateUpdater<boolean>}} props */
+/** @param {{category: LH.CategoryResult, statistics: Array<StatisticWithBuild>, pinned: boolean, setPinned: import('preact/hooks').StateUpdater<boolean>}} props */
 export const CategoryScoreDistributionGraph = props => {
   const [selectedBinIndex, setSelectedBinIndex] = useState(-1);
   const categoryId = props.category.id;

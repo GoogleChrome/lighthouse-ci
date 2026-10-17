@@ -8,6 +8,7 @@
     "checkJs": true,
     "strict": true,
     "useUnknownInCatchVariables": false,
+    "noUncheckedSideEffectImports": false,
 
     "skipLibCheck": true,
 

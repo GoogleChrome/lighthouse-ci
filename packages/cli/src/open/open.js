@@ -6,7 +6,8 @@
 'use strict';
 
 const fs = require('fs');
-const tmp = require('tmp');
+const os = require('os');
+const path = require('path');
 const open = require('open');
 const _ = require('@lhci/utils/src/lodash.js');
 const {computeRepresentativeRuns} = require('@lhci/utils/src/representative-runs.js');
@@ -44,9 +45,10 @@ async function runCommand(options) {
     if (targetUrls.length && !targetUrls.includes(lhr.finalUrl)) continue;
 
     process.stdout.write(`Opening median report for ${lhr.finalUrl}...\n`);
-    const tmpFile = tmp.fileSync({postfix: '.html'});
-    fs.writeFileSync(tmpFile.name, await getHTMLReportForLHR(lhr));
-    await open(tmpFile.name);
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'lhci-'));
+    const tmpFile = path.join(tmpDir, 'report.html');
+    fs.writeFileSync(tmpFile, await getHTMLReportForLHR(lhr));
+    await open(tmpFile);
   }
 
   process.stdout.write('Done!\n');

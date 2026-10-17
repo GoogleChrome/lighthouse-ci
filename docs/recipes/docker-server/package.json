@@ -7,9 +7,9 @@
   "dependencies": {
     "@lhci/cli": "0.15.1",
     "@lhci/server": "0.15.1",
-    "mysql2": "^2.1.0",
-    "pg": "^8.2.1",
-    "pg-hstore": "^2.3.3",
-    "sqlite3": "^5.0.0"
+    "mysql2": "^3.24.6",
+    "pg": "^8.23.1",
+    "pg-hstore": "^2.3.4",
+    "sqlite3": "^6.0.1"
   }
 }

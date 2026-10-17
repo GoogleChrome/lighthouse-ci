@@ -60,10 +60,10 @@ class PuppeteerManager {
       throw new Error(`Unable to require 'puppeteer' for script, have you run 'npm i puppeteer'?`);
     }
 
-    /** @type {import('puppeteer').PuppeteerLaunchOptions} */
+    /** @type {import('puppeteer').LaunchOptions} */
     const args = {
       ...(this._options.puppeteerLaunchOptions || {}),
-      headless: 'new',
+      headless: true,
       pipe: false,
       devtools: false,
       // The default value for `chromePath` is determined by yargs using the `getChromiumPath` method.

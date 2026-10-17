@@ -255,6 +255,7 @@ async function runCommand(options) {
       await runOnUrl(url, options, {puppeteer});
     }
   } finally {
+    await puppeteer.close();
     await close();
   }
 

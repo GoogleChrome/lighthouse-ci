@@ -119,6 +119,15 @@ class PuppeteerManager {
     const script = require(path.join(process.cwd(), scriptPath));
     await script(browser, {url, options: this._options});
   }
+
+  /**
+   * @return {Promise<void>}
+   */
+  async close() {
+    if (!this._browser) return;
+    await this._browser.close();
+    this._browser = null;
+  }
 }
 
 module.exports = PuppeteerManager;

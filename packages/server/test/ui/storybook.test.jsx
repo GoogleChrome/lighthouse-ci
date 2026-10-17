@@ -76,6 +76,7 @@ initStoryshots({
       failureThreshold: process.env.CI ? 0.12 : 0.0015,
       // failureThreshold: process.env.CI ? 0.005 : 0.0015,
       failureThresholdType: 'percent',
+      maxChildProcessBufferSizeInBytes: 50 * 1024 * 1024,
     }),
     getScreenshotOptions: () => ({
       fullPage: false,

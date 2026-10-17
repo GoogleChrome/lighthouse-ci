@@ -81,7 +81,7 @@ function parseFileContentToJSON(pathToRcFile, contents) {
   // Check if file path ends in .yaml or .yml
   if (YAML_FILE_EXTENSION_REGEX.test(pathToRcFile)) {
     // Parse yaml content to JSON
-    return yaml.safeLoad(contents);
+    return /** @type {LHCI.LighthouseRc} */ (yaml.load(contents));
   }
 
   // Fallback to JSON parsing

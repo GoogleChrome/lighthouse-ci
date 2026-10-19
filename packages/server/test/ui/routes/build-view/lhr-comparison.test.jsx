@@ -10,6 +10,12 @@
 
 import {h} from 'preact';
 import {computeAuditGroups} from '../../../../src/ui/routes/build-view/lhr-comparison.jsx';
+import {
+  swapLocaleWithMessages,
+  resolveLocaleFile,
+  hasIcuMessagePaths,
+  formatLocaleOptionLabel,
+} from '../../../../src/ui/routes/build-view/lhr-locale.jsx';
 import {cleanup} from '../../../test-utils.js';
 
 jest.mock('../../../../src/ui/layout/page');
@@ -260,6 +266,86 @@ describe('LhrComparison', () => {
           showAsUnchanged: true,
         },
       ]);
+    });
+  });
+
+  describe('lhr-locale', () => {
+    it('should resolve locale aliases to canonical locale files', () => {
+      expect(resolveLocaleFile('en')).toEqual('en-US');
+      expect(resolveLocaleFile('en-AU')).toEqual('en-GB');
+      expect(resolveLocaleFile('es-MX')).toEqual('es-419');
+      expect(resolveLocaleFile('fr-FR')).toEqual('fr');
+      expect(resolveLocaleFile('fr')).toEqual('fr');
+    });
+
+    it('should format locale option labels with native and current locale names', () => {
+      expect(formatLocaleOptionLabel('en-US', 'en-US')).toEqual('American English');
+      expect(formatLocaleOptionLabel('fr', 'en-US')).toEqual('français – French');
+      expect(formatLocaleOptionLabel('ja', 'en-US')).toEqual('日本語 – Japanese');
+    });
+
+    it('should detect whether an LHR has icuMessagePaths', () => {
+      expect(hasIcuMessagePaths(undefined)).toEqual(false);
+      expect(hasIcuMessagePaths(/** @type {any} */ ({i18n: {icuMessagePaths: {}}})).valueOf()).toEqual(
+        false
+      );
+      expect(
+        hasIcuMessagePaths(
+          /** @type {any} */ ({
+            i18n: {icuMessagePaths: {'core/config/default-config.js | title': ['title']}},
+          })
+        )
+      ).toEqual(true);
+    });
+
+    it('should swap locale strings for both modern and legacy icuMessagePaths', () => {
+      /** @type {any} */
+      const lhr = {
+        configSettings: {locale: 'en-US'},
+        categories: {
+          performance: {title: 'Performance'},
+        },
+        audits: {
+          'first-contentful-paint': {
+            title: 'First Contentful Paint',
+            displayValue: '1.5 s',
+          },
+        },
+        i18n: {
+          icuMessagePaths: {
+            'lighthouse-core/config/default-config.js | performanceCategoryTitle': [
+              'categories.performance.title',
+            ],
+            'core/lib/i18n/i18n.js | seconds': [
+              {
+                path: 'audits[first-contentful-paint].displayValue',
+                values: {timeInMs: 1500},
+              },
+            ],
+          },
+          rendererFormattedStrings: {},
+        },
+      };
+
+      const frMessages = {
+        'core/config/default-config.js | performanceCategoryTitle': {
+          message: 'Performances',
+        },
+        'core/lib/i18n/i18n.js | seconds': {
+          message: '{timeInMs, number, seconds}\xa0s',
+        },
+        'report/renderer/report-utils.js | passedAuditsGroupTitle': {
+          message: 'Audits réussis',
+        },
+      };
+
+      const localized = swapLocaleWithMessages(lhr, 'fr', frMessages);
+      expect(localized.configSettings.locale).toEqual('fr');
+      expect(localized.categories.performance.title).toEqual('Performances');
+      expect(localized.audits['first-contentful-paint'].displayValue).toEqual('1,5\xa0s');
+      expect(localized.i18n.rendererFormattedStrings).toEqual({
+        passedAuditsGroupTitle: 'Audits réussis',
+      });
     });
   });
 });

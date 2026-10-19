@@ -1,0 +1,37 @@
+/**
+ * @license Copyright 2026 Google Inc. All Rights Reserved.
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
+ */
+
+.lhr-locale-selector {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  height: var(--page-header-height);
+  padding: 0 calc(var(--base-spacing) * 0.75);
+  border-left: 1px solid var(--base-border-color);
+  flex-shrink: 0;
+}
+
+.page-header__right .lhr-locale-selector {
+  border-left: none;
+  border-right: 1px solid var(--base-border-color);
+}
+
+.lhr-locale-selector__icon {
+  font-size: 18px;
+  color: var(--secondary-text-color);
+  margin-right: 6px;
+}
+
+.lhr-locale-selector .dropdown--locale {
+  border-bottom: none;
+}
+
+.lhr-locale-selector .dropdown--locale select {
+  max-width: 170px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

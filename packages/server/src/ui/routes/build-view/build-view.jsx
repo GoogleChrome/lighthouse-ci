@@ -28,6 +28,7 @@ import {DocumentTitle} from '../../components/document-title';
 import {LoadingSpinner} from '../../components/loading-spinner';
 import {LhrComparison} from './lhr-comparison.jsx';
 import {Dropdown} from '../../components/dropdown';
+import {useLocalizedLhrs, LocaleDropdown} from './lhr-locale.jsx';
 
 /**
  * @param {{compareUrl?: string, runs: Array<LHCI.ServerCommand.Run>}} props
@@ -67,23 +68,32 @@ const BuildView_ = props => {
   const availableUrlOptions = availableUrls.map(url => ({value: url, label: decodeURI(url)}));
 
   /** @type {LH.Result|undefined} */
-  let lhr;
+  let rawLhr;
   /** @type {LH.Result|undefined} */
-  let baseLhr;
+  let rawBaseLhr;
   /** @type {Error|undefined} */
   let lhrError;
 
   try {
-    lhr = useMemo(() => run && JSON.parse(run.lhr), [run]);
+    rawLhr = useMemo(() => run && JSON.parse(run.lhr), [run]);
   } catch (err) {
     lhrError = err;
   }
 
   try {
-    baseLhr = useMemo(() => baseRun && JSON.parse(baseRun.lhr), [baseRun]);
+    rawBaseLhr = useMemo(() => baseRun && JSON.parse(baseRun.lhr), [baseRun]);
   } catch (err) {
     lhrError = err;
   }
+
+  const {
+    lhr,
+    baseLhr,
+    locale,
+    setLocale,
+    availableLocales,
+    canSwapLocale,
+  } = useLocalizedLhrs(rawLhr, rawBaseLhr);
 
   if (!run || !lhr) {
     return (
@@ -136,13 +146,25 @@ const BuildView_ = props => {
         </Fragment>
       }
       headerRight={
-        <a
-          href="https://github.com/GoogleChrome/lighthouse-ci"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <i className="material-icons">info</i>
-        </a>
+        <Fragment>
+          {canSwapLocale ? (
+            <LocaleDropdown
+              locale={locale}
+              setLocale={setLocale}
+              availableLocales={availableLocales}
+            />
+          ) : (
+            <Fragment />
+          )}
+          <a
+            className="build-view__info-link"
+            href="https://github.com/GoogleChrome/lighthouse-ci"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <i className="material-icons">info</i>
+          </a>
+        </Fragment>
       }
     >
       <DocumentTitle title={`Compare "${props.build.commitMessage}"`} />

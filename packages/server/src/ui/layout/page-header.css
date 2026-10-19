@@ -35,7 +35,8 @@
 
 .page-header__center {
   height: var(--page-header-height);
-  width: calc(100% - var(--page-header-height) * 2);
+  flex: 1;
+  min-width: 0;
 }
 
 .page-header__sidebar-button {
@@ -47,7 +48,7 @@
 
 .page-header__right {
   height: var(--page-header-height);
-  width: var(--page-header-height);
+  min-width: var(--page-header-height);
   flex-shrink: 0;
 }
 

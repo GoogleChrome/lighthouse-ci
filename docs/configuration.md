@@ -483,6 +483,8 @@ Options:
   --reportFilenamePattern        [filesystem only] The pattern to use for naming Lighthouse reports.
                                                                        [string] [default:
   "%%HOSTNAME%%-%%PATHNAME%%-%%DATETIME%%.report.%%EXTENSION%%"]
+  --locales                      [filesystem only] The locales to generate Lighthouse reports in.
+                                 Defaults to the locale in which each LHR was collected.     [array]
 ```
 
 #### `target`
@@ -638,9 +640,15 @@ The `manifest.json` has the following structure.
 
 _target=filesystem only_
 
-The pattern to use for report filenames when writing the reports to the filesystem. Basic string interpolation is supported replacing `%%HOSTNAME%%` with the URL's hostname, `%%PATHNAME%%` with the page path, `%%DATETIME%%` with the ISO string of the UTC report generated timestamp, `%%DATE%%` with the ISO-style string of the UTC report generated date, `%%EXTENSION%%` with the extension of the file.
+The pattern to use for report filenames when writing the reports to the filesystem. Basic string interpolation is supported replacing `%%HOSTNAME%%` with the URL's hostname, `%%PATHNAME%%` with the page path, `%%DATETIME%%` with the ISO string of the UTC report generated timestamp, `%%DATE%%` with the ISO-style string of the UTC report generated date, `%%LOCALE%%` with the report's locale, `%%EXTENSION%%` with the extension of the file.
 
 In the case of filename collisions between runs, the last written report wins and all others will be overwritten. Median reports are written to disk last.
+
+#### `locales`
+
+_target=filesystem only_
+
+An array of locales (e.g. `["en-US", "fr", "ja"]`) in which to generate the HTML and JSON reports on disk using Lighthouse's `swapLocale`. This allows collecting a Lighthouse run once and outputting localized reports in multiple languages without re-running Lighthouse. When multiple locales are provided and `reportFilenamePattern` does not already include `%%LOCALE%%`, `-%%LOCALE%%` is automatically inserted before `.report.%%EXTENSION%%` (or `.%%EXTENSION%%`) to avoid filename collisions.
 
 #### Build Context
 

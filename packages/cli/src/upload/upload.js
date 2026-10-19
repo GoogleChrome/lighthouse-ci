@@ -17,6 +17,7 @@ const {
   loadAssertionResults,
   replaceUrlPatterns,
   getHTMLReportForLHR,
+  swapLocale,
 } = require('@lhci/utils/src/saved-reports.js');
 const {
   getCurrentHash,
@@ -127,6 +128,11 @@ function buildCommand(yargs) {
       type: 'string',
       description: '[filesystem only] The pattern to use for naming Lighthouse reports.',
       default: '%%HOSTNAME%%-%%PATHNAME%%-%%DATETIME%%.report.%%EXTENSION%%',
+    },
+    locales: {
+      type: 'array',
+      description:
+        '[filesystem only] The locales to generate Lighthouse reports in. Defaults to the locale in which each LHR was collected.',
     },
     githubAppUrl: {
       type: 'string',
@@ -535,43 +541,56 @@ async function runFilesystemTarget(options) {
   const targetDir = path.resolve(process.cwd(), options.outputDir || '');
   if (!fs.existsSync(targetDir)) fs.mkdirSync(targetDir, {recursive: true});
 
-  print(`Dumping ${lhrs.length} reports to disk at ${targetDir}...\n`);
+  const locales = options.locales && options.locales.length ? options.locales : [undefined];
+  let filePattern = options.reportFilenamePattern;
+  if (locales.length > 1 && !/%%locale%%/i.test(filePattern)) {
+    filePattern = filePattern.replace(
+      /(\.report)?\.%%EXTENSION%%$/i,
+      '-%%LOCALE%%$1.%%EXTENSION%%'
+    );
+  }
+
+  print(`Dumping ${lhrs.length * locales.length} reports to disk at ${targetDir}...\n`);
   /** @type {Array<LHCI.UploadCommand.ManifestEntry>} */
   const manifest = [];
   // Process the median LHRs last so duplicate filenames will be overwritten by the median run
-  for (const lhr of _.sortBy(lhrs, lhr => (representativeLhrs.includes(lhr) ? 10 : 1))) {
-    const url = new URL(lhr.requestedUrl);
-    const fetchTimeDate = new Date(new Date(lhr.fetchTime).getTime() || Date.now());
-    const context = {
-      hostname: url.hostname,
-      pathname: url.pathname,
-      hash: url.hash,
-      date: fetchTimeDate.toISOString().replace(/T.*/, ''),
-      datetime: fetchTimeDate
-        .toISOString()
-        .replace(/\.\d{3}Z/, '')
-        .replace('T', ' '),
-    };
+  for (const baseLhr of _.sortBy(lhrs, lhr => (representativeLhrs.includes(lhr) ? 10 : 1))) {
+    const isRepresentativeRun = representativeLhrs.includes(baseLhr);
+    for (const requestedLocale of locales) {
+      const lhr = requestedLocale ? await swapLocale(baseLhr, String(requestedLocale)) : baseLhr;
+      const url = new URL(lhr.requestedUrl);
+      const fetchTimeDate = new Date(new Date(lhr.fetchTime).getTime() || Date.now());
+      const context = {
+        hostname: url.hostname,
+        pathname: url.pathname,
+        hash: url.hash,
+        locale: (lhr.configSettings && lhr.configSettings.locale) || 'en-US',
+        date: fetchTimeDate.toISOString().replace(/T.*/, ''),
+        datetime: fetchTimeDate
+          .toISOString()
+          .replace(/\.\d{3}Z/, '')
+          .replace('T', ' '),
+      };
 
-    const filePattern = options.reportFilenamePattern;
-    const htmlPath = getFileOutputPath(filePattern, {...context, extension: 'html'});
-    const jsonPath = getFileOutputPath(filePattern, {...context, extension: 'json'});
+      const htmlPath = getFileOutputPath(filePattern, {...context, extension: 'html'});
+      const jsonPath = getFileOutputPath(filePattern, {...context, extension: 'json'});
 
-    /** @type {LHCI.UploadCommand.ManifestEntry} */
-    const entry = {
-      url: lhr.requestedUrl,
-      isRepresentativeRun: representativeLhrs.includes(lhr),
-      htmlPath: path.join(targetDir, htmlPath),
-      jsonPath: path.join(targetDir, jsonPath),
-      summary: Object.keys(lhr.categories).reduce((summary, key) => {
-        summary[key] = lhr.categories[key].score;
-        return summary;
-      }, /** @type {Record<string, number>} */ ({})),
-    };
+      /** @type {LHCI.UploadCommand.ManifestEntry} */
+      const entry = {
+        url: lhr.requestedUrl,
+        isRepresentativeRun,
+        htmlPath: path.join(targetDir, htmlPath),
+        jsonPath: path.join(targetDir, jsonPath),
+        summary: Object.keys(lhr.categories).reduce((summary, key) => {
+          summary[key] = lhr.categories[key].score;
+          return summary;
+        }, /** @type {Record<string, number>} */ ({})),
+      };
 
-    fs.writeFileSync(entry.htmlPath, await getHTMLReportForLHR(lhr));
-    fs.writeFileSync(entry.jsonPath, JSON.stringify(lhr));
-    manifest.push(entry);
+      fs.writeFileSync(entry.htmlPath, await getHTMLReportForLHR(lhr));
+      fs.writeFileSync(entry.jsonPath, JSON.stringify(lhr));
+      manifest.push(entry);
+    }
   }
 
   const manifestPath = path.join(targetDir, 'manifest.json');

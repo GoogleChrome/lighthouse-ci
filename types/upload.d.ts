@@ -22,6 +22,7 @@ declare global {
         /** Filesystem only */
         outputDir?: string;
         reportFilenamePattern: string;
+        locales?: string[];
         /** Applies to multiple targets */
         githubToken?: string;
         githubApiHost?: string;

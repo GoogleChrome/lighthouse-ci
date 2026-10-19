@@ -222,4 +222,68 @@ describe('Lighthouse CI upload CLI', () => {
       },
     ]);
   }, 15000);
+
+  it('should support target=filesystem with multiple locales', async () => {
+    const lhr3Path = fakeLhrPath.replace(/lhr-\d+/, 'lhr-3');
+    const lhr = JSON.parse(fs.readFileSync(lhr3Path, 'utf8'));
+    lhr.categories.performance.title = 'Performance';
+    lhr.i18n = {
+      icuMessagePaths: {
+        'core/config/default-config.js | performanceCategoryTitle': [
+          'categories.performance.title',
+        ],
+      },
+    };
+    fs.writeFileSync(lhr3Path, JSON.stringify(lhr));
+
+    const {stdout, stderr, status} = await runCLI(
+      [
+        'upload',
+        `--target=filesystem`,
+        `--outputDir=.lighthouseci/targetfs-locales`,
+        `--locales=en-US`,
+        `--locales=fr`,
+      ],
+      {cwd: uploadDir}
+    );
+
+    expect(stdout.replace(/at .*\.\.\./, 'at FOLDER...')).toMatchInlineSnapshot(`
+      "Dumping 6 reports to disk at FOLDER...
+      Done writing reports to disk.
+      "
+    `);
+    expect(stderr).toMatchInlineSnapshot(`""`);
+    expect(status).toEqual(0);
+
+    const outputDir = path.join(uploadDir, '.lighthouseci/targetfs-locales');
+    const files = fs.readdirSync(outputDir).sort();
+    expect(files).toEqual([
+      'manifest.json',
+      'www_example_com-page-2020_05_22_22_12_01-en_US.report.html',
+      'www_example_com-page-2020_05_22_22_12_01-en_US.report.json',
+      'www_example_com-page-2020_05_22_22_12_01-fr.report.html',
+      'www_example_com-page-2020_05_22_22_12_01-fr.report.json',
+      'www_example_com-page-2020_05_22_22_12_02-en_US.report.html',
+      'www_example_com-page-2020_05_22_22_12_02-en_US.report.json',
+      'www_example_com-page-2020_05_22_22_12_02-fr.report.html',
+      'www_example_com-page-2020_05_22_22_12_02-fr.report.json',
+      'www_example_com-page-2020_05_22_22_12_03-en_US.report.html',
+      'www_example_com-page-2020_05_22_22_12_03-en_US.report.json',
+      'www_example_com-page-2020_05_22_22_12_03-fr.report.html',
+      'www_example_com-page-2020_05_22_22_12_03-fr.report.json',
+    ]);
+
+    const frLhr = JSON.parse(
+      fs.readFileSync(
+        path.join(outputDir, 'www_example_com-page-2020_05_22_22_12_03-fr.report.json'),
+        'utf8'
+      )
+    );
+    expect(frLhr.configSettings.locale).toEqual('fr');
+    expect(frLhr.categories.performance.title).toEqual('Performances');
+
+    const manifest = JSON.parse(fs.readFileSync(path.join(outputDir, 'manifest.json'), 'utf8'));
+    expect(manifest).toHaveLength(6);
+    expect(manifest.filter(entry => entry.isRepresentativeRun)).toHaveLength(2);
+  }, 15000);
 });

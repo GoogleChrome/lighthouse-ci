@@ -65,6 +65,34 @@ async function getHTMLReportForLHR(lhr) {
   return generateReport(lhr);
 }
 
+/**
+ * @param {LH.Result} lhr
+ * @param {string} locale
+ * @return {Promise<LH.Result>}
+ */
+async function swapLocale(lhr, locale) {
+  const [{swapLocale: lhSwapLocale}, {lookupLocale}] = await Promise.all([
+    import('lighthouse/shared/localization/swap-locale.js'),
+    import('lighthouse/core/lib/i18n/i18n.js'),
+  ]);
+
+  /** @type {LH.Result} */
+  const clonedLhr = JSON.parse(JSON.stringify(lhr));
+  clonedLhr.configSettings = clonedLhr.configSettings || /** @type {any} */ ({locale: 'en-US'});
+  clonedLhr.i18n =
+    clonedLhr.i18n || /** @type {any} */ ({icuMessagePaths: {}, rendererFormattedStrings: {}});
+  clonedLhr.i18n.icuMessagePaths = clonedLhr.i18n.icuMessagePaths || {};
+  for (const [key, value] of Object.entries(clonedLhr.i18n.icuMessagePaths)) {
+    if (key.startsWith('lighthouse-core/')) {
+      delete clonedLhr.i18n.icuMessagePaths[key];
+      clonedLhr.i18n.icuMessagePaths[key.replace(/^lighthouse-core\//, 'core/')] = value;
+    }
+  }
+
+  const canonicalLocale = lookupLocale(locale);
+  return lhSwapLocale(clonedLhr, canonicalLocale).lhr;
+}
+
 function clearSavedReportsAndLHRs() {
   ensureDirectoryExists();
   for (const file of fs.readdirSync(LHCI_DIR)) {
@@ -127,6 +155,7 @@ function writeUrlMapToFile(targetUrlMap) {
 
 module.exports = {
   getHTMLReportForLHR,
+  swapLocale,
   loadSavedLHRs,
   saveLHR,
   clearSavedReportsAndLHRs,

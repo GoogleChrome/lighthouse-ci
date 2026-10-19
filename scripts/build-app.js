@@ -78,6 +78,16 @@ function fixHtmlSubresourceUrls(result, buildOptions) {
       .replaceAll('sourceMappingURL=chunks/', 'sourceMappingURL=');
     fs.writeFileSync(jsPath, newJsText);
   }
+
+  const lhLocalesDir = path.dirname(
+    require.resolve('lighthouse/shared/localization/locales/en-US.json')
+  );
+  const targetLocalesDir = path.join(buildOptions.outdir, 'locales');
+  fs.mkdirSync(targetLocalesDir, {recursive: true});
+  for (const file of fs.readdirSync(lhLocalesDir)) {
+    if (!file.endsWith('.json') || file.endsWith('.ctc.json')) continue;
+    fs.copyFileSync(path.join(lhLocalesDir, file), path.join(targetLocalesDir, file));
+  }
 }
 
 async function main() {
@@ -119,6 +129,7 @@ async function main() {
     },
     define: {
       'process.env.VIEWER_ORIGIN': JSON.stringify(process.env.VIEWER_ORIGIN || ''),
+      'process.env.PUBLIC_PATH': JSON.stringify(publicPath || '/'),
     },
     publicPath,
     bundle: true,

@@ -20,3 +20,11 @@
   padding-left: calc(var(--base-spacing) / 4);
   margin-right: calc(var(--base-spacing) / 4);
 }
+
+.build-view__info-link {
+  width: var(--page-header-height);
+  height: var(--page-header-height);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

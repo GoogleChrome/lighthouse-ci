@@ -9,25 +9,34 @@ import './comparison.css';
 import {LH_LOGO_PATH} from '../../components/lhci-components.jsx';
 import {ReportUploadBox, computeBestDisplayType} from '../../components/report-upload-box';
 import {LhrComparison} from '../../../../../server/src/ui/routes/build-view/lhr-comparison';
+import {
+  useLocalizedLhrs,
+  LocaleDropdown,
+} from '../../../../../server/src/ui/routes/build-view/lhr-locale';
 
 /** @typedef {import('../../app.jsx').ToastMessage} ToastMessage */
 /** @typedef {import('../../app.jsx').ReportData} ReportData */
 
 /** @param {{baseReport: ReportData, compareReport: ReportData, setBaseReport: (d: ReportData|undefined) => void, setCompareReport: (d: ReportData|undefined) => void, addToast: (t: ToastMessage) => void}} props */
 export const ComparisonRoute = props => {
-  const displayType = computeBestDisplayType(props.baseReport.lhr, props.compareReport.lhr);
+  const {
+    lhr: localizedCompareLhr,
+    baseLhr: localizedBaseLhr,
+    locale,
+    setLocale,
+    availableLocales,
+    canSwapLocale,
+  } = useLocalizedLhrs(props.compareReport.lhr, props.baseReport.lhr);
+  const compareReport = localizedCompareLhr
+    ? {...props.compareReport, lhr: localizedCompareLhr}
+    : props.compareReport;
+  const baseReport = localizedBaseLhr
+    ? {...props.baseReport, lhr: localizedBaseLhr}
+    : props.baseReport;
+  const displayType = computeBestDisplayType(baseReport.lhr, compareReport.lhr);
   return (
     <div className="comparison">
       <div className="comparison-header">
-        <div
-          className="comparison-header__switcher"
-          onClick={() => {
-            props.setBaseReport(props.compareReport);
-            props.setCompareReport(props.baseReport);
-          }}
-        >
-          <i className="material-icons">swap_horiz</i>
-        </div>
         <div className="comparison-header__logo">
           <img
             src={LH_LOGO_PATH}
@@ -42,7 +51,7 @@ export const ComparisonRoute = props => {
           <ReportUploadBox
             variant="base"
             dragTarget="self"
-            report={props.baseReport}
+            report={baseReport}
             setReport={props.setBaseReport}
             addToast={props.addToast}
             displayType={displayType}
@@ -51,21 +60,37 @@ export const ComparisonRoute = props => {
           <ReportUploadBox
             variant="compare"
             dragTarget="self"
-            report={props.compareReport}
+            report={compareReport}
             setReport={props.setCompareReport}
             addToast={props.addToast}
             displayType={displayType}
             showOpenLhrLink
           />
+          <div
+            className="comparison-header__switcher"
+            onClick={() => {
+              props.setBaseReport(props.compareReport);
+              props.setCompareReport(props.baseReport);
+            }}
+          >
+            <i className="material-icons">swap_horiz</i>
+          </div>
         </div>
+        {canSwapLocale ? (
+          <LocaleDropdown
+            locale={locale}
+            setLocale={setLocale}
+            availableLocales={availableLocales}
+          />
+        ) : null}
         <a className="comparison-header__info" href="https://github.com/GoogleChrome/lighthouse-ci">
           <i className="material-icons">info</i>
         </a>
       </div>
       <div className="comparison-body">
         <LhrComparison
-          lhr={props.compareReport.lhr}
-          baseLhr={props.baseReport.lhr}
+          lhr={compareReport.lhr}
+          baseLhr={baseReport.lhr}
           hookElements={{}}
         />
       </div>

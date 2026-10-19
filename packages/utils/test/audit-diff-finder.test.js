@@ -686,6 +686,28 @@ describe('#zipBaseAndCompareItems', () => {
     ]);
   });
 
+  it('should prefer url over entity when both are present (network-requests)', () => {
+    const base = [
+      {url: 'https://example.com/a.js', entity: 'Example', transferSize: 100},
+      {url: 'https://example.com/b.js', entity: 'Example', transferSize: 200},
+    ];
+    const compare = [
+      {url: 'https://example.com/a.js', entity: 'Example', transferSize: 150},
+      {url: 'https://example.com/b.js', entity: 'Example', transferSize: 250},
+    ];
+    const zipped = zipBaseAndCompareItems(base, compare);
+    expect(zipped).toEqual([
+      {
+        base: {item: base[0], kind: 'base', index: 0},
+        compare: {item: compare[0], kind: 'compare', index: 0},
+      },
+      {
+        base: {item: base[1], kind: 'base', index: 1},
+        compare: {item: compare[1], kind: 'compare', index: 1},
+      },
+    ]);
+  });
+
   it('should zip nodes', () => {
     const base = [{node: {snippet: '<a>Text</a>'}, count: 1}];
     const compare = [{node: {snippet: '<a>Text</a>'}, count: 1}];

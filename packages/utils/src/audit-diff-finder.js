@@ -398,9 +398,6 @@ function getItemKey(item) {
   if (typeof item.name === 'string') return item.name;
   // For dom-size
   if (typeof item.statistic === 'string') return item.statistic;
-  // For third-party-summary / third-parties-insight
-  if (typeof item.entity === 'string') return item.entity;
-  if (item.entity && typeof item.entity.text === 'string') return item.entity.text;
   // For node
   if (typeof item.node?.path === 'string') return item.node.path;
   // Tap-targets
@@ -413,6 +410,10 @@ function getItemKey(item) {
   // For most opportunities, diagnostics, etc where 1 row === 1 resource
   if (typeof item.url === 'string' && item.url) return item.url;
   if (typeof item.origin === 'string' && item.origin) return item.origin;
+  // For third-party-summary / third-parties-insight (must be after url/origin since
+  // resource-level audits like network-requests also include an entity property)
+  if (typeof item.entity === 'string') return item.entity;
+  if (item.entity && typeof item.entity.text === 'string') return item.entity.text;
 
   // For everything else, use the entire object, actually works OK on most nodes.
   return JSON.stringify(deepPruneItemForKeySerialization(item));

@@ -317,6 +317,101 @@ describe('#findAuditDiffs', () => {
     ]);
   });
 
+  it('should match resource-summary and mainthread-work-breakdown items across locales', () => {
+    const baseResourceAudit = {
+      id: 'resource-summary',
+      score: 1,
+      details: {
+        headings: [{key: 'label'}, {key: 'requestCount'}],
+        items: [{resourceType: 'total', label: 'Total', requestCount: 10}],
+      },
+    };
+    const compareResourceAudit = {
+      id: 'resource-summary',
+      score: 1,
+      details: {
+        headings: [{key: 'label'}, {key: 'requestCount'}],
+        items: [{resourceType: 'total', label: 'Gesamt', requestCount: 12}],
+      },
+    };
+
+    expect(findAuditDiffs(baseResourceAudit, compareResourceAudit)).toEqual([
+      {
+        auditId: 'resource-summary',
+        type: 'itemDelta',
+        itemKey: 'requestCount',
+        baseItemIndex: 0,
+        compareItemIndex: 0,
+        baseValue: 10,
+        compareValue: 12,
+      },
+    ]);
+
+    const baseMainthreadAudit = {
+      id: 'mainthread-work-breakdown',
+      score: 0.5,
+      details: {
+        headings: [{key: 'groupLabel'}, {key: 'duration'}],
+        items: [{group: 'scriptEvaluation', groupLabel: 'Script Evaluation', duration: 500}],
+      },
+    };
+    const compareMainthreadAudit = {
+      id: 'mainthread-work-breakdown',
+      score: 0.5,
+      details: {
+        headings: [{key: 'groupLabel'}, {key: 'duration'}],
+        items: [{group: 'scriptEvaluation', groupLabel: 'Skriptauswertung', duration: 600}],
+      },
+    };
+
+    expect(findAuditDiffs(baseMainthreadAudit, compareMainthreadAudit)).toEqual([
+      {
+        auditId: 'mainthread-work-breakdown',
+        type: 'itemDelta',
+        itemKey: 'duration',
+        baseItemIndex: 0,
+        compareItemIndex: 0,
+        baseValue: 500,
+        compareValue: 600,
+      },
+    ]);
+
+    const baseNetworkAudit = {
+      id: 'network-requests',
+      score: 1,
+      details: {
+        headings: [{key: 'url'}, {key: 'transferSize'}],
+        items: [
+          {url: 'https://example.com/a.js', resourceType: 'Script', transferSize: 100},
+          {url: 'https://example.com/b.js', resourceType: 'Script', transferSize: 200},
+        ],
+      },
+    };
+    const compareNetworkAudit = {
+      id: 'network-requests',
+      score: 1,
+      details: {
+        headings: [{key: 'url'}, {key: 'transferSize'}],
+        items: [
+          {url: 'https://example.com/a.js', resourceType: 'Script', transferSize: 100},
+          {url: 'https://example.com/b.js', resourceType: 'Script', transferSize: 250},
+        ],
+      },
+    };
+
+    expect(findAuditDiffs(baseNetworkAudit, compareNetworkAudit)).toEqual([
+      {
+        auditId: 'network-requests',
+        type: 'itemDelta',
+        itemKey: 'transferSize',
+        baseItemIndex: 1,
+        compareItemIndex: 1,
+        baseValue: 200,
+        compareValue: 250,
+      },
+    ]);
+  });
+
   it('should find a details item property diff', () => {
     const detailsItem = {url: 'http://example.com/foo.js'};
     const baseAudit = {

@@ -391,9 +391,13 @@ function getItemKey(item) {
   if (typeof source === 'string') return source;
   if (source && source.url) return `${source.url}:${source.line}:${source.column}`;
   // For the pre-grouped audits like resource-summary
-  if (typeof item.label === 'string') return item.label;
+  if (typeof item.label === 'string') {
+    return typeof item.resourceType === 'string' ? item.resourceType : item.label;
+  }
   // For the pre-grouped audits like mainthread-work-breakdown
-  if (typeof item.groupLabel === 'string') return item.groupLabel;
+  if (typeof item.groupLabel === 'string') {
+    return typeof item.group === 'string' ? item.group : item.groupLabel;
+  }
   // For user-timings
   if (typeof item.name === 'string') return item.name;
   // For dom-size

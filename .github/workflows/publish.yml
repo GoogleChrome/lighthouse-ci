@@ -7,7 +7,7 @@ on:
         required: true
         type: string
       dry_run:
-        description: 'Dry run (validate tokens, build, test, and print changelog/diffs without publishing)'
+        description: 'Dry run (validate auth, build, test, and print changelog/diffs without publishing)'
         required: false
         default: false
         type: boolean
@@ -26,17 +26,17 @@ jobs:
     if: ${{ !inputs.skip_npm }}
     runs-on: ubuntu-latest
     permissions:
+      id-token: write
       contents: write
     steps:
-      - name: Validate required secrets are set
+      - name: Validate required secrets and OIDC permissions
         env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
           DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
         run: |
           MISSING=0
-          if [ -z "$NPM_TOKEN" ]; then
-            echo "::error::Missing required secret: NPM_TOKEN"
+          if [ -z "$ACTIONS_ID_TOKEN_REQUEST_URL" ] || [ -z "$ACTIONS_ID_TOKEN_REQUEST_TOKEN" ]; then
+            echo "::error::GitHub OIDC token environment variables are missing (ensure id-token: write permission is enabled)"
             MISSING=1
           fi
           if [ -z "$DOCKERHUB_USERNAME" ]; then
@@ -51,6 +51,12 @@ jobs:
             exit 1
           fi
 
+      - name: Verify Docker Hub authentication
+        uses: docker/login-action@74a5d142397b4f367a81961eba4e8cd7edddf772 # v3.4.0
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
       - name: Checkout repository
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
@@ -63,17 +69,8 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
           cache: yarn
 
-      - name: Verify npm authentication
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: |
-          echo "Authenticated with npm as: $(npm whoami)"
-
-      - name: Verify Docker Hub authentication
-        uses: docker/login-action@74a5d142397b4f367a81961eba4e8cd7edddf772 # v3.4.0
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Update npm for Trusted Publishing (OIDC)
+        run: npm install -g npm@latest
 
       - name: Validate branch, version, and compute tags
         env:
@@ -110,22 +107,45 @@ jobs:
           yarn clean
           yarn build
 
-      - name: Publish packages to npm
+      - name: Publish packages to npm via OIDC Trusted Publishing
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           DRY_RUN: ${{ inputs.dry_run }}
         run: |
-          if [[ "$DRY_RUN" == "true" ]]; then
-            echo "[Dry Run] Simulating npm pack for all workspace packages..."
-            yarn lerna exec -- npm pack --dry-run
-          else
-            yarn lerna publish '--force-publish=*' --exact --skip-git --repo-version="$NEXT_VERSION" --npm-tag=latest --yes
-            git checkout lerna.json packages/*/package.json
+          node -e '
+            const fs = require("fs");
+            const path = require("path");
+            const ver = process.env.NEXT_VERSION;
+            for (const pkgName of ["utils", "cli", "server", "viewer"]) {
+              const pkgDir = path.join("packages", pkgName);
+              const pkgPath = path.join(pkgDir, "package.json");
+              const pkg = JSON.parse(fs.readFileSync(pkgPath, "utf8"));
+              pkg.version = ver;
+              if (pkg.dependencies && pkg.dependencies["@lhci/utils"]) {
+                pkg.dependencies["@lhci/utils"] = ver;
+              }
+              fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + "\n");
+              fs.copyFileSync("LICENSE", path.join(pkgDir, "LICENSE"));
+            }
+          '
 
-            npm dist-tag add "@lhci/utils@$NEXT_VERSION" next
-            npm dist-tag add "@lhci/server@$NEXT_VERSION" next
-            npm dist-tag add "@lhci/cli@$NEXT_VERSION" next
+          for pkg in utils cli server viewer; do
+            echo "=== Publishing @lhci/$pkg@$NEXT_VERSION ==="
+            if [[ "$DRY_RUN" == "true" ]]; then
+              (cd "packages/$pkg" && npm pack --dry-run)
+            else
+              (cd "packages/$pkg" && npm publish --provenance --access public --registry https://registry.npmjs.org/ --tag latest)
+            fi
+          done
+
+          if [[ "$DRY_RUN" != "true" ]]; then
+            for pkg in utils server cli; do
+              npm dist-tag add "@lhci/$pkg@$NEXT_VERSION" next --registry https://registry.npmjs.org/ || \
+                echo "::warning::Could not update 'next' dist-tag for @lhci/$pkg"
+            done
           fi
+
+          rm -f packages/*/LICENSE
+          git checkout packages/*/package.json
 
       - name: Tag and create GitHub Release
         env:

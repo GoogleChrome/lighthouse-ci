@@ -1,0 +1,318 @@
+name: Publish
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to publish (e.g. 0.16.0)'
+        required: true
+        type: string
+      dry_run:
+        description: 'Dry run (validate tokens, build, test, and print changelog/diffs without publishing)'
+        required: false
+        default: false
+        type: boolean
+      skip_npm:
+        description: 'Skip npm/GitHub release and only publish Docker images'
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+jobs:
+  publish-npm:
+    name: Publish npm & GitHub Release ${{ inputs.dry_run && '(Dry Run)' || '' }}
+    if: ${{ !inputs.skip_npm }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Validate required secrets are set
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+        run: |
+          MISSING=0
+          if [ -z "$NPM_TOKEN" ]; then
+            echo "::error::Missing required secret: NPM_TOKEN"
+            MISSING=1
+          fi
+          if [ -z "$DOCKERHUB_USERNAME" ]; then
+            echo "::error::Missing required secret: DOCKERHUB_USERNAME"
+            MISSING=1
+          fi
+          if [ -z "$DOCKERHUB_TOKEN" ]; then
+            echo "::error::Missing required secret: DOCKERHUB_TOKEN"
+            MISSING=1
+          fi
+          if [ "$MISSING" -ne 0 ]; then
+            exit 1
+          fi
+
+      - name: Checkout repository
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          fetch-depth: 0
+
+      - name: Use Node.js 22
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 22
+          registry-url: 'https://registry.npmjs.org'
+          cache: yarn
+
+      - name: Verify npm authentication
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          echo "Authenticated with npm as: $(npm whoami)"
+
+      - name: Verify Docker Hub authentication
+        uses: docker/login-action@74a5d142397b4f367a81961eba4e8cd7edddf772 # v3.4.0
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Validate branch, version, and compute tags
+        env:
+          INPUT_VERSION: ${{ inputs.version }}
+          DRY_RUN: ${{ inputs.dry_run }}
+        run: |
+          if [[ "$DRY_RUN" != "true" && "$GITHUB_REF" != "refs/heads/main" ]]; then
+            echo "::error::Real releases must be run from the 'main' branch (current ref: $GITHUB_REF)."
+            exit 1
+          fi
+
+          NEXT_VERSION="${INPUT_VERSION#v}"
+          if ! [[ "$NEXT_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::Invalid version format: '$NEXT_VERSION' (expected X.Y.Z)"
+            exit 1
+          fi
+
+          NEXT_TAG="v$NEXT_VERSION"
+          if git rev-parse "$NEXT_TAG" >/dev/null 2>&1; then
+            echo "::error::Tag $NEXT_TAG already exists!"
+            exit 1
+          fi
+
+          CURRENT_TAG=$(git describe --abbrev=0 --tags)
+          echo "Releasing $CURRENT_TAG -> $NEXT_TAG (dry_run=$DRY_RUN)"
+
+          echo "NEXT_VERSION=$NEXT_VERSION" >> "$GITHUB_ENV"
+          echo "NEXT_TAG=$NEXT_TAG" >> "$GITHUB_ENV"
+          echo "CURRENT_TAG=$CURRENT_TAG" >> "$GITHUB_ENV"
+
+      - name: Install and build
+        run: |
+          yarn install --frozen-lockfile
+          yarn clean
+          yarn build
+
+      - name: Publish packages to npm
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          DRY_RUN: ${{ inputs.dry_run }}
+        run: |
+          if [[ "$DRY_RUN" == "true" ]]; then
+            echo "[Dry Run] Simulating npm pack for all workspace packages..."
+            yarn lerna exec -- npm pack --dry-run
+          else
+            yarn lerna publish '--force-publish=*' --exact --skip-git --repo-version="$NEXT_VERSION" --npm-tag=latest --yes
+            git checkout lerna.json packages/*/package.json
+
+            npm dist-tag add "@lhci/utils@$NEXT_VERSION" next
+            npm dist-tag add "@lhci/server@$NEXT_VERSION" next
+            npm dist-tag add "@lhci/cli@$NEXT_VERSION" next
+          fi
+
+      - name: Tag and create GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DRY_RUN: ${{ inputs.dry_run }}
+        run: |
+          node ./scripts/print-changelog.js "$CURRENT_TAG" "$NEXT_TAG" > /tmp/changelog.md
+          echo "=== Generated Changelog ==="
+          cat /tmp/changelog.md
+          echo "==========================="
+
+          if [[ "$DRY_RUN" == "true" ]]; then
+            echo "[Dry Run] Skipping git tag push and GitHub Release creation."
+          else
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+            git tag "$NEXT_TAG"
+            git push origin "$NEXT_TAG"
+            gh release create "$NEXT_TAG" --title "$NEXT_TAG" --notes-file /tmp/changelog.md
+          fi
+
+      - name: Deploy gh-pages
+        env:
+          DRY_RUN: ${{ inputs.dry_run }}
+        run: |
+          if [[ "$DRY_RUN" == "true" ]]; then
+            echo "[Dry Run] Skipping gh-pages deployment."
+          else
+            ./scripts/deploy-gh-pages.sh
+          fi
+
+      - name: Update Docker version references on main
+        env:
+          DRY_RUN: ${{ inputs.dry_run }}
+        run: |
+          node -e '
+            const fs = require("fs");
+            const ver = process.env.NEXT_VERSION;
+
+            const clientDockerfile = "docs/recipes/docker-client/Dockerfile";
+            fs.writeFileSync(
+              clientDockerfile,
+              fs.readFileSync(clientDockerfile, "utf8").replace(/@lhci\/cli@\S+/, `@lhci/cli@${ver}`)
+            );
+
+            const serverPkgPath = "docs/recipes/docker-server/package.json";
+            const serverPkg = JSON.parse(fs.readFileSync(serverPkgPath, "utf8"));
+            serverPkg.dependencies["@lhci/cli"] = ver;
+            serverPkg.dependencies["@lhci/server"] = ver;
+            fs.writeFileSync(serverPkgPath, JSON.stringify(serverPkg, null, 2) + "\n");
+
+            const k8sPath = "docs/recipes/docker-server/kubernetes/lhci-deployment.yml";
+            fs.writeFileSync(
+              k8sPath,
+              fs.readFileSync(k8sPath, "utf8").replace(/patrickhulce\/lhci-server:\S+/, `patrickhulce/lhci-server:${ver}`)
+            );
+          '
+
+          git --no-pager diff ./docs
+
+          if [[ "$DRY_RUN" == "true" ]]; then
+            echo "[Dry Run] Skipping commit and push of ./docs changes."
+            git checkout -- ./docs
+          elif [ -n "$(git status --porcelain ./docs)" ]; then
+            git add ./docs
+            git commit -m "chore: update docker images with latest version"
+            git push origin main
+          fi
+
+  build-and-test-docker:
+    name: Build & Test Docker (${{ matrix.arch }}) ${{ inputs.dry_run && '(Dry Run)' || '' }}
+    needs: [publish-npm]
+    if: ${{ !cancelled() && (needs.publish-npm.result == 'success' || needs.publish-npm.result == 'skipped') }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: amd64
+            os: ubuntu-latest
+          - arch: arm64
+            os: ubuntu-24.04-arm
+    steps:
+      - name: Validate Docker Hub secrets are set
+        env:
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+        run: |
+          if [ -z "$DOCKERHUB_USERNAME" ] || [ -z "$DOCKERHUB_TOKEN" ]; then
+            echo "::error::Missing DOCKERHUB_USERNAME or DOCKERHUB_TOKEN secret"
+            exit 1
+          fi
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@74a5d142397b4f367a81961eba4e8cd7edddf772 # v3.4.0
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Checkout repository
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+
+      - name: Prepare Docker files for target version
+        env:
+          INPUT_VERSION: ${{ inputs.version }}
+          DRY_RUN: ${{ inputs.dry_run }}
+          SKIP_NPM: ${{ inputs.skip_npm }}
+        run: |
+          VERSION="${INPUT_VERSION#v}"
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+
+          # In dry_run mode (when npm was not actually published), keep the existing published
+          # npm version in the Dockerfiles unless the requested version already exists on npm.
+          if [[ "$DRY_RUN" == "true" ]] && ! npm view "@lhci/cli@$VERSION" version >/dev/null 2>&1; then
+            echo "[Dry Run] @lhci/cli@$VERSION is not published on npm yet; testing Docker build with existing version in ./docs."
+            exit 0
+          fi
+
+          node -e '
+            const fs = require("fs");
+            const ver = process.env.VERSION;
+
+            const clientDockerfile = "docs/recipes/docker-client/Dockerfile";
+            fs.writeFileSync(
+              clientDockerfile,
+              fs.readFileSync(clientDockerfile, "utf8").replace(/@lhci\/cli@\S+/, `@lhci/cli@${ver}`)
+            );
+
+            const serverPkgPath = "docs/recipes/docker-server/package.json";
+            const serverPkg = JSON.parse(fs.readFileSync(serverPkgPath, "utf8"));
+            serverPkg.dependencies["@lhci/cli"] = ver;
+            serverPkg.dependencies["@lhci/server"] = ver;
+            fs.writeFileSync(serverPkgPath, JSON.stringify(serverPkg, null, 2) + "\n");
+          '
+
+      - name: Allow unprivileged user namespaces for Chrome
+        run: sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+
+      - name: Build and test Docker images
+        run: bash scripts/test-docker.sh
+
+      - name: Push architecture-specific Docker images
+        env:
+          DRY_RUN: ${{ inputs.dry_run }}
+        run: |
+          docker tag lhci-client:latest "patrickhulce/lhci-client:${VERSION}-${{ matrix.arch }}"
+          docker tag lhci-server:latest "patrickhulce/lhci-server:${VERSION}-${{ matrix.arch }}"
+
+          if [[ "$DRY_RUN" == "true" ]]; then
+            echo "[Dry Run] Skipping docker push for patrickhulce/lhci-client:${VERSION}-${{ matrix.arch }} and patrickhulce/lhci-server:${VERSION}-${{ matrix.arch }}"
+          else
+            docker push "patrickhulce/lhci-client:${VERSION}-${{ matrix.arch }}"
+            docker push "patrickhulce/lhci-server:${VERSION}-${{ matrix.arch }}"
+          fi
+
+  publish-docker-manifests:
+    name: Publish Multi-Arch Docker Manifests ${{ inputs.dry_run && '(Dry Run)' || '' }}
+    needs: [build-and-test-docker]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Log in to Docker Hub
+        uses: docker/login-action@74a5d142397b4f367a81961eba4e8cd7edddf772 # v3.4.0
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Create and push multi-arch manifests
+        env:
+          INPUT_VERSION: ${{ inputs.version }}
+          DRY_RUN: ${{ inputs.dry_run }}
+        run: |
+          VERSION="${INPUT_VERSION#v}"
+
+          if [[ "$DRY_RUN" == "true" ]]; then
+            echo "[Dry Run] Skipping multi-arch manifest push for version ${VERSION}."
+            exit 0
+          fi
+
+          docker buildx imagetools create \
+            -t "patrickhulce/lhci-client:${VERSION}" \
+            -t "patrickhulce/lhci-client:latest" \
+            "patrickhulce/lhci-client:${VERSION}-amd64" \
+            "patrickhulce/lhci-client:${VERSION}-arm64"
+
+          docker buildx imagetools create \
+            -t "patrickhulce/lhci-server:${VERSION}" \
+            -t "patrickhulce/lhci-server:latest" \
+            "patrickhulce/lhci-server:${VERSION}-amd64" \
+            "patrickhulce/lhci-server:${VERSION}-arm64"

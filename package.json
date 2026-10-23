@@ -30,7 +30,6 @@
   },
   "devDependencies": {
     "@chialab/esbuild-plugin-html": "^0.17.3",
-    "@patrickhulce/scripts": "^0.4.1",
     "@storybook/addon-actions": "^7.6.24",
     "@storybook/addon-links": "^7.6.24",
     "@storybook/addon-storyshots": "^7.6.24",

@@ -63,6 +63,10 @@ describe('build-context.js', () => {
       process.env.LHCI_BUILD_CONTEXT__COMMIT_TIME = '2019-12-11T16:54:32.000Z';
       expect(buildContext.getCommitTime(hash)).toEqual('2019-12-11T16:54:32.000Z');
     });
+
+    it('should reject hash starting with a dash', () => {
+      expect(() => buildContext.getCommitTime('--output=/tmp/lhci-test')).toThrow();
+    });
   });
 
   describe('#getCurrentBranch()', () => {
@@ -257,6 +261,12 @@ describe('build-context.js', () => {
 
     it('should return empty string when it fails', () => {
       expect(buildContext.getAncestorHashForBase('random' + Math.random())).toEqual('');
+    });
+
+    it('should reject refs starting with a dash', () => {
+      expect(buildContext.getAncestorHashForBase('--output=/tmp/lhci-test')).toEqual('');
+      expect(buildContext.getAncestorHashForBranch('--output=/tmp/lhci-test', 'main')).toEqual('');
+      expect(buildContext.getAncestorHashForBranch(hash, '--output=/tmp/lhci-test')).toEqual('');
     });
   });
 

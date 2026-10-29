@@ -97,9 +97,11 @@ function getCommitTime(hash) {
   ]);
   if (envHash) return envHash;
 
-  const result = childProcess.spawnSync('git', ['log', '-n1', '--pretty=%cI', hash], {
-    encoding: 'utf8',
-  });
+  const result = hash.startsWith('-')
+    ? {status: 1, stdout: ''}
+    : childProcess.spawnSync('git', ['log', '-n1', '--pretty=%cI', hash], {
+        encoding: 'utf8',
+      });
   if (result.status !== 0) {
     throw new Error(
       'Unable to retrieve committer timestamp from commit. ' +
@@ -202,9 +204,11 @@ function getCommitMessage(hash = 'HEAD') {
   ]);
   if (envHash) return envHash.trim().slice(0, 80);
 
-  const result = childProcess.spawnSync('git', ['log', '--format=%s', '-n', '1', hash], {
-    encoding: 'utf8',
-  });
+  const result = hash.startsWith('-')
+    ? {status: 1, stdout: ''}
+    : childProcess.spawnSync('git', ['log', '--format=%s', '-n', '1', hash], {
+        encoding: 'utf8',
+      });
   if (result.status !== 0) {
     throw new Error(
       'Unable to determine commit message with `git log --format=%s -n 1`. ' +
@@ -228,9 +232,11 @@ function getAuthor(hash = 'HEAD') {
   ]);
   if (envHash) return envHash.trim().slice(0, 256);
 
-  const result = childProcess.spawnSync('git', ['log', '--format=%aN <%aE>', '-n', '1', hash], {
-    encoding: 'utf8',
-  });
+  const result = hash.startsWith('-')
+    ? {status: 1, stdout: ''}
+    : childProcess.spawnSync('git', ['log', '--format=%aN <%aE>', '-n', '1', hash], {
+        encoding: 'utf8',
+      });
   if (result.status !== 0) {
     throw new Error(
       'Unable to determine commit author with `git log --format=%aN <%aE> -n 1`. ' +
@@ -269,9 +275,11 @@ function getAvatarUrl(hash = 'HEAD') {
   if (email) return getGravatarUrlFromEmail(email);
 
   // Finally fallback to git again if we couldn't parse the email out of the author.
-  const result = childProcess.spawnSync('git', ['log', '--format=%aE', '-n', '1', hash], {
-    encoding: 'utf8',
-  });
+  const result = hash.startsWith('-')
+    ? {status: 1, stdout: ''}
+    : childProcess.spawnSync('git', ['log', '--format=%aE', '-n', '1', hash], {
+        encoding: 'utf8',
+      });
   if (result.status !== 0) {
     throw new Error(
       "Unable to determine commit author's avatar URL because `git log --format=%aE -n 1` failed to provide author's email. " +
@@ -298,6 +306,7 @@ function getGravatarUrlFromEmail(email) {
  * @return {string}
  */
 function getAncestorHashForBase(hash) {
+  if (hash.startsWith('-')) return '';
   const result = childProcess.spawnSync('git', ['rev-parse', `${hash}^`], {encoding: 'utf8'});
   // Ancestor hash is optional, so do not throw if it can't be computed.
   // See https://github.com/GoogleChrome/lighthouse-ci/issues/36
@@ -312,6 +321,7 @@ function getAncestorHashForBase(hash) {
  * @return {string}
  */
 function getAncestorHashForBranch(hash, baseBranch) {
+  if (hash.startsWith('-') || (baseBranch && baseBranch.startsWith('-'))) return '';
   const result = runCommandsUntilFirstSuccess([
     ['git', ['merge-base', hash, `origin/${baseBranch}`]],
     ['git', ['merge-base', hash, baseBranch]],

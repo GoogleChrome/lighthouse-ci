@@ -410,6 +410,85 @@ describe('#findAuditDiffs', () => {
         compareValue: 250,
       },
     ]);
+
+    const sharedSource = {
+      type: 'source-location',
+      url: 'https://example.com/bundle.js',
+      line: 0,
+      column: 100,
+    };
+    const baseBaselineAudit = {
+      id: 'baseline',
+      score: 1,
+      details: {
+        headings: [{key: 'featureId'}, {key: 'displayStatus'}, {key: 'source'}],
+        items: [
+          {
+            featureId: {
+              type: 'link',
+              text: 'device-posture',
+              url: 'https://webstatus.dev/features/device-posture',
+            },
+            displayStatus: {
+              type: 'baseline-status',
+              status: 'limited',
+              displayString: 'Limited Availability',
+            },
+            source: sharedSource,
+          },
+          {
+            featureId: {
+              type: 'link',
+              text: 'view-transitions',
+              url: 'https://webstatus.dev/features/view-transitions',
+            },
+            displayStatus: {
+              type: 'baseline-status',
+              status: 'limited',
+              displayString: 'Limited Availability',
+            },
+            source: sharedSource,
+          },
+        ],
+      },
+    };
+    const compareBaselineAudit = {
+      id: 'baseline',
+      score: 1,
+      details: {
+        headings: [{key: 'featureId'}, {key: 'displayStatus'}, {key: 'source'}],
+        items: [
+          {
+            featureId: {
+              type: 'link',
+              text: 'device-posture',
+              url: 'https://webstatus.dev/features/device-posture',
+            },
+            displayStatus: {
+              type: 'baseline-status',
+              status: 'limited',
+              displayString: 'Limited Availability',
+            },
+            source: sharedSource,
+          },
+          {
+            featureId: {
+              type: 'link',
+              text: 'view-transitions',
+              url: 'https://webstatus.dev/features/view-transitions',
+            },
+            displayStatus: {
+              type: 'baseline-status',
+              status: 'limited',
+              displayString: 'Limited Availability',
+            },
+            source: sharedSource,
+          },
+        ],
+      },
+    };
+
+    expect(findAuditDiffs(baseBaselineAudit, compareBaselineAudit)).toEqual([]);
   });
 
   it('should find a details item property diff', () => {

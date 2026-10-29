@@ -386,6 +386,8 @@ function deepPruneItemForKeySerialization(item) {
 function getItemKey(item) {
   // Do most specific checks at the top. most general at bottom..
   //
+  // For baseline features audit (must be before source since multiple features can share a bundle location)
+  if (typeof item.featureId?.text === 'string') return item.featureId.text;
   // For sourcemapped opportunities that identify a source location
   const source = item.source;
   if (typeof source === 'string') return source;

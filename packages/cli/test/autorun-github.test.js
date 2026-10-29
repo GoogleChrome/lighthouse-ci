@@ -104,19 +104,19 @@ describe('Lighthouse CI autorun CLI with GitHub status check', () => {
 
       1 result(s) for [1mhttp://localhost:XXXX/bad.html[0m :
 
-        [31mX[0m  [1mviewport[0m failure for [1mminScore[0m assertion
-             Does not have a \`<meta name="viewport">\` tag with \`width\` or \`initial-scale\`
-             https://developer.chrome.com/docs/lighthouse/pwa/viewport/
+        [31mX[0m  [1mviewport-insight[0m failure for [1mminScore[0m assertion
+             Optimize viewport for mobile
+             https://developer.chrome.com/docs/performance/insights/viewport
 
               expected: >=[32m0.9[0m
-                 found: [31m0[0m
-            [2mall values: 0[0m
+                 found: [31m0.5[0m
+            [2mall values: 0.5[0m
 
       1 result(s) for [1mhttp://localhost:XXXX/good.html[0m :
 
-        ✅  [1mviewport[0m passing for [1mminScore[0m assertion
-             Has a \`<meta name="viewport">\` tag with \`width\` or \`initial-scale\`
-             https://developer.chrome.com/docs/lighthouse/pwa/viewport/
+        ✅  [1mviewport-insight[0m passing for [1mminScore[0m assertion
+             Optimize viewport for mobile
+             https://developer.chrome.com/docs/performance/insights/viewport
 
               expected: >=[32m0.9[0m
                  found: [32m1[0m
@@ -187,19 +187,19 @@ describe('Lighthouse CI autorun CLI with GitHub status check', () => {
 
       1 result(s) for [1mhttp://localhost:XXXX/bad.html[0m :
 
-        [31mX[0m  [1mviewport[0m failure for [1mminScore[0m assertion
-             Does not have a \`<meta name="viewport">\` tag with \`width\` or \`initial-scale\`
-             https://developer.chrome.com/docs/lighthouse/pwa/viewport/
+        [31mX[0m  [1mviewport-insight[0m failure for [1mminScore[0m assertion
+             Optimize viewport for mobile
+             https://developer.chrome.com/docs/performance/insights/viewport
 
               expected: >=[32m0.9[0m
-                 found: [31m0[0m
-            [2mall values: 0[0m
+                 found: [31m0.5[0m
+            [2mall values: 0.5[0m
 
       1 result(s) for [1mhttp://localhost:XXXX/good.html[0m :
 
-        ✅  [1mviewport[0m passing for [1mminScore[0m assertion
-             Has a \`<meta name="viewport">\` tag with \`width\` or \`initial-scale\`
-             https://developer.chrome.com/docs/lighthouse/pwa/viewport/
+        ✅  [1mviewport-insight[0m passing for [1mminScore[0m assertion
+             Optimize viewport for mobile
+             https://developer.chrome.com/docs/performance/insights/viewport
 
               expected: >=[32m0.9[0m
                  found: [32m1[0m

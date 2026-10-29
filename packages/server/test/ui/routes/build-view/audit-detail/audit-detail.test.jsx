@@ -130,4 +130,46 @@ describe('AuditDetail', () => {
     expect(getByText('Avoids redirects')).toBeTruthy();
     expect(getByText('Fail')).toBeTruthy();
   });
+
+  it('should render baseline-status items using displayString instead of raw JSON', () => {
+    const audit = {
+      id: 'baseline',
+      title: 'Baseline Features',
+      description: 'Lists web features used on the page.',
+      score: 1,
+      details: {
+        type: 'table',
+        headings: [
+          {key: 'featureId', valueType: 'link', label: 'Web-features'},
+          {key: 'displayStatus', valueType: 'baseline-status', label: 'Baseline Status'},
+        ],
+        items: [
+          {
+            featureId: {
+              type: 'link',
+              text: 'device-posture',
+              url: 'https://webstatus.dev/features/device-posture',
+            },
+            displayStatus: {
+              type: 'baseline-status',
+              status: 'limited',
+              displayString: 'Limited Availability',
+            },
+          },
+        ],
+      },
+    };
+
+    const pair = {
+      audit,
+      baseAudit: undefined,
+      diffs: [],
+      maxSeverity: 0,
+      group: {id: 'best-practices-browser-compat', title: 'Browser Compatibility'},
+    };
+
+    const {getByText} = render(<AuditDetail pair={pair} />);
+    expect(getByText('device-posture')).toBeTruthy();
+    expect(getByText('Limited Availability')).toBeTruthy();
+  });
 });

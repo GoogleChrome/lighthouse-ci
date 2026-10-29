@@ -13,7 +13,7 @@
     "debug": "^4.3.1",
     "isomorphic-fetch": "^3.0.0",
     "js-yaml": "^5.4.1",
-    "lighthouse": "12.6.1",
+    "lighthouse": "13.6.0",
     "tree-kill": "^1.2.1"
   }
 }

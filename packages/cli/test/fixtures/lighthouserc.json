@@ -4,7 +4,7 @@
       "assertions": {
         "speed-index": ["error", {"minScore": 0.8}],
         "interactive": ["error", {"minScore": 0.8}],
-        "prioritize-lcp-image": ["error", {"minScore": 1}]
+        "lcp-discovery-insight": ["error", {"minScore": 1}]
       }
     },
     "collect": {

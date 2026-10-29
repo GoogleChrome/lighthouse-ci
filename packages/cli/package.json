@@ -21,7 +21,7 @@
     "proxy-agent": "^6.5.0",
     "inquirer": "^8.2.7",
     "isomorphic-fetch": "^3.0.0",
-    "lighthouse": "12.6.1",
+    "lighthouse": "13.6.0",
     "lighthouse-logger": "1.2.0",
     "open": "^7.1.0",
     "uuid": "^14.0.0",

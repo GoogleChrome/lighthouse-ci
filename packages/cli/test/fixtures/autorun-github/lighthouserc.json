@@ -7,7 +7,7 @@
       "assertMatrix": [
         {
           "assertions": {
-            "viewport": "error"
+            "viewport-insight": "error"
           }
         }
       ],

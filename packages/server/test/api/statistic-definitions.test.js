@@ -29,6 +29,8 @@ const baselhr1140_ = require('../fixtures/lh-11-4-0-coursehero-a.json');
 const baselhr1200_ = require('../fixtures/lh-12-0-0-coursehero-a.json');
 /** @type {any} */
 const baselhr1261_ = require('../fixtures/lh-12-6-1-coursehero-a.json');
+/** @type {any} */
+const baselhr1360_ = require('../fixtures/lh-13-6-0-coursehero-a.json');
 const {definitions} = require('../../src/api/statistic-definitions.js');
 
 describe('Statistic Definitions', () => {
@@ -54,6 +56,8 @@ describe('Statistic Definitions', () => {
   const baselhr1200 = baselhr1200_;
   /** @type {LH.Result} */
   const baselhr1261 = baselhr1261_;
+  /** @type {LH.Result} */
+  const baselhr1360 = baselhr1360_;
 
   describe('meta_lighthouse_version()', () => {
     const run = definitions.meta_lighthouse_version;
@@ -70,6 +74,7 @@ describe('Statistic Definitions', () => {
       expect(run([baselhr1140])).toEqual({value: 110400});
       expect(run([baselhr1200])).toEqual({value: 120000});
       expect(run([baselhr1261])).toEqual({value: 120601});
+      expect(run([baselhr1360])).toEqual({value: 130600});
       expect(run([{...baseLhr5, lighthouseVersion: '1.2.3-beta.0'}])).toEqual({value: 10203});
     });
 
@@ -98,6 +103,7 @@ describe('Statistic Definitions', () => {
       expect(run([high, baselhr1140, low]).value).toBeCloseTo(80796.283);
       expect(run([high, baselhr1200, low]).value).toBeCloseTo(82970.673);
       expect(run([high, baselhr1261, low]).value).toBeCloseTo(84118.687);
+      expect(run([high, baselhr1360, low]).value).toBeCloseTo(10702.407);
     });
   });
 
@@ -120,6 +126,7 @@ describe('Statistic Definitions', () => {
       expect(run([high, baselhr1140, low]).value).toBeCloseTo(0.030344, 4);
       expect(run([high, baselhr1200, low]).value).toBeCloseTo(0.000917, 4);
       expect(run([high, baselhr1261, low]).value).toBeCloseTo(0.028675, 4);
+      expect(run([high, baselhr1360, low]).value).toBeCloseTo(0.018181, 4);
     });
   });
 
@@ -142,6 +149,7 @@ describe('Statistic Definitions', () => {
       expect(run([high, baselhr1140, low]).value).toBeCloseTo(0.32);
       expect(run([high, baselhr1200, low]).value).toBeCloseTo(0.34);
       expect(run([high, baselhr1261, low]).value).toBeCloseTo(0.27);
+      expect(run([high, baselhr1360, low]).value).toBeCloseTo(0.65);
     });
   });
 
@@ -164,6 +172,7 @@ describe('Statistic Definitions', () => {
       expect(run([high, baselhr1140, low]).value).toBeCloseTo(0.01);
       expect(run([high, baselhr1200, low]).value).toBeCloseTo(0.01);
       expect(run([high, baselhr1261, low]).value).toBeCloseTo(0.01);
+      expect(run([high, baselhr1360, low]).value).toBeCloseTo(0.01);
     });
   });
 
@@ -186,6 +195,26 @@ describe('Statistic Definitions', () => {
       expect(run([high, baselhr1140, low]).value).toBeCloseTo(0.99);
       expect(run([high, baselhr1200, low]).value).toBeCloseTo(0.99);
       expect(run([high, baselhr1261, low]).value).toBeCloseTo(0.99);
+      expect(run([high, baselhr1360, low]).value).toBeCloseTo(0.99);
+    });
+  });
+
+  describe('category_agentic-browsing_*()', () => {
+    it('should extract the median, min, and max values', () => {
+      const low = JSON.parse(JSON.stringify(baselhr1360));
+      const high = JSON.parse(JSON.stringify(baselhr1360));
+      low.categories['agentic-browsing'].score = 0.25;
+      high.categories['agentic-browsing'].score = 0.75;
+      expect(definitions['category_agentic-browsing_median']([baselhr1261]).value).toBe(-1);
+      expect(
+        definitions['category_agentic-browsing_median']([low, baselhr1360, high]).value
+      ).toBeCloseTo(0.5);
+      expect(
+        definitions['category_agentic-browsing_min']([low, baselhr1360, high]).value
+      ).toBeCloseTo(0.25);
+      expect(
+        definitions['category_agentic-browsing_max']([low, baselhr1360, high]).value
+      ).toBeCloseTo(0.75);
     });
   });
 
@@ -202,6 +231,7 @@ describe('Statistic Definitions', () => {
       expect(definitions['auditgroup_a11y-aria_pass']([baselhr1140])).toEqual({value: 9});
       expect(definitions['auditgroup_a11y-aria_pass']([baselhr1200])).toEqual({value: 12});
       expect(definitions['auditgroup_a11y-aria_pass']([baselhr1261])).toEqual({value: 12});
+      expect(definitions['auditgroup_a11y-aria_pass']([baselhr1360])).toEqual({value: 11});
       expect(definitions['auditgroup_a11y-color-contrast_fail']([baseLhr5])).toEqual({value: 0});
       expect(definitions['auditgroup_a11y-color-contrast_fail']([baseLhr6])).toEqual({value: 1});
       expect(definitions['auditgroup_a11y-color-contrast_fail']([baseLhr62])).toEqual({value: 1});
@@ -213,6 +243,7 @@ describe('Statistic Definitions', () => {
       expect(definitions['auditgroup_a11y-color-contrast_fail']([baselhr1140])).toEqual({value: 1});
       expect(definitions['auditgroup_a11y-color-contrast_fail']([baselhr1200])).toEqual({value: 1});
       expect(definitions['auditgroup_a11y-color-contrast_fail']([baselhr1261])).toEqual({value: 1});
+      expect(definitions['auditgroup_a11y-color-contrast_fail']([baselhr1360])).toEqual({value: 1});
       expect(definitions['auditgroup_a11y-aria_na']([baseLhr5])).toEqual({value: 0});
       expect(definitions['auditgroup_a11y-aria_na']([baseLhr6])).toEqual({value: 2});
       expect(definitions['auditgroup_a11y-aria_na']([baseLhr62])).toEqual({value: 2});
@@ -224,6 +255,7 @@ describe('Statistic Definitions', () => {
       expect(definitions['auditgroup_a11y-aria_na']([baselhr1140])).toEqual({value: 9});
       expect(definitions['auditgroup_a11y-aria_na']([baselhr1200])).toEqual({value: 9});
       expect(definitions['auditgroup_a11y-aria_na']([baselhr1261])).toEqual({value: 9});
+      expect(definitions['auditgroup_a11y-aria_na']([baselhr1360])).toEqual({value: 9});
     });
   });
 });

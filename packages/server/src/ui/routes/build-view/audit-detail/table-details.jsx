@@ -86,13 +86,14 @@ export const TableDetails = props => {
                   );
 
                   // With the introduction of subitems, not every item will have a value for every heading.
-                  const compareItem = heading.key && compare && compare.item[heading.key];
-                  const baseItem = heading.key && base && base.item[heading.key];
+                  const compareItem =
+                    heading.key && compare ? compare.item[heading.key] : undefined;
+                  const baseItem = heading.key && base ? base.item[heading.key] : undefined;
 
                   return (
                     <Fragment key={j}>
                       <td className={`table-column--${itemType}`}>
-                        {compareItem || baseItem ? (
+                        {compareItem !== undefined || baseItem !== undefined ? (
                           <SimpleDetails
                             type={itemType}
                             compareValue={compareItem}

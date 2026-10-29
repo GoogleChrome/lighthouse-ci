@@ -1206,6 +1206,46 @@ If you're a Lighthouse pro, assert the recommended preset, increase the number o
 }
 ```
 
+### Collecting Multiple Configurations (e.g. Mobile and Desktop)
+
+Lighthouse CI groups runs by URL to compute a single median ("representative") run per URL. To collect and view multiple configurations (such as both mobile and desktop, or runs with different `chromeFlags` / throttling settings) for the same page, use one of the following patterns:
+
+#### Option 1: Single build using `lhci collect --additive` and distinct URLs
+
+Invoke `lhci collect` once per configuration using `--additive` so previous runs in `.lighthouseci/` are preserved, and append a query parameter to distinguish the URLs for `lhci assert` and `lhci upload`:
+
+```bash
+# Collect mobile (default)
+lhci collect --url=http://localhost:3000/?lhci=mobile
+# Collect desktop without clearing .lighthouseci/
+lhci collect --additive --settings.preset=desktop --url=http://localhost:3000/?lhci=desktop
+# Assert and upload both configurations together in a single build
+lhci assert
+lhci upload
+```
+
+> **Tip:** If you run Lighthouse programmatically and write LHR files to `.lighthouseci/lhr-*.json` yourself, you can append the configuration identifier to `lhr.finalUrl` before saving the JSON so the actual URL requested in Chrome does not need to change.
+
+#### Option 2: Separate `autorun` invocations per configuration
+
+If you prefer not to modify URLs:
+- **With `target=lhci` (LHCI Server):** Create two projects on the server (e.g., `my-site-mobile` and `my-site-desktop`) because LHCI Server only accepts one build per commit hash per project.
+- **With `target=temporary-public-storage`:** You can run `lhci autorun` twice directly.
+- Set `--upload.githubStatusContextSuffix` so the second run does not overwrite the first run's GitHub status check:
+
+```bash
+# Mobile
+lhci autorun \
+  --upload.token="$LHCI_MOBILE_TOKEN" \
+  --upload.githubStatusContextSuffix="/mobile"
+
+# Desktop
+lhci autorun \
+  --collect.settings.preset=desktop \
+  --upload.token="$LHCI_DESKTOP_TOKEN" \
+  --upload.githubStatusContextSuffix="/desktop"
+```
+
 ### Custom Chrome Flags
 
 ```jsonc

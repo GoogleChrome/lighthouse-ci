@@ -48,6 +48,16 @@ git:
 
 This is a precautionary measure to prevent the effective deletion of historical data from the server. As workaround, you can create empty commits to rerun builds `git commit --allow-empty -m 'rerun CI' && git push`.
 
+## I uploaded multiple reports with different configurations (e.g. mobile and desktop) for the same URL, why can I only open one in LHCI server?
+
+Within a build, LHCI server groups runs by `url` and marks only one median ("representative") run per unique URL to display in the UI. If you upload both mobile and desktop runs under the exact same URL in a single build, their runs are grouped together and only one report will be selectable.
+
+To view both reports in LHCI server, either:
+1. Give each configuration a distinct URL (for example, `https://example.com/?lhci=mobile` and `https://example.com/?lhci=desktop`, or by modifying `lhr.finalUrl` before uploading when running Lighthouse programmatically) and collect them with `lhci collect --additive` before running `lhci upload`.
+2. Create separate LHCI server projects for each configuration (e.g., `my-app-mobile` and `my-app-desktop`) and upload each set of reports to its respective project token.
+
+See [Collecting Multiple Configurations](./configuration.md#collecting-multiple-configurations-eg-mobile-and-desktop) for full examples.
+
 ## My URLs change between builds and LHCI server can't link them.
 
 If the URLs that you audit contain random components (ports, UUIDs, hashes, etc), then you'll need to tell LHCI how to normalize your data when you upload it with the `--url-replacement-patterns` option.

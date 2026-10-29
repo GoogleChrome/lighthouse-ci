@@ -7,7 +7,7 @@
 
 const basicAuth = require('express-basic-auth');
 const ApiClient = require('@lhci/utils/src/api-client.js');
-const {hashAdminToken} = require('./storage/auth.js');
+const {hashAdminToken, timingSafeEqual} = require('./storage/auth.js');
 
 class E404 extends Error {}
 class E422 extends Error {}
@@ -46,7 +46,7 @@ module.exports = {
           if (!project) throw new Error('Invalid token');
 
           const buildToken = req.header('x-lhci-build-token') || '';
-          if (buildToken !== project.token) throw new Error('Invalid token');
+          if (!timingSafeEqual(buildToken, project.token)) throw new Error('Invalid token');
 
           next();
         })
@@ -69,7 +69,9 @@ module.exports = {
 
           const adminToken = req.header('x-lhci-admin-token') || '';
           const hashedAdminToken = hashAdminToken(adminToken, project.id);
-          if (hashedAdminToken !== project.adminToken) throw new Error('Invalid token');
+          if (!timingSafeEqual(hashedAdminToken, project.adminToken)) {
+            throw new Error('Invalid token');
+          }
 
           next();
         })

@@ -959,6 +959,15 @@ function runTests(state) {
       });
     });
 
+    it('should fail to create a build with an invalid build token', async () => {
+      const payload = {...buildA, hash: 'newhash', id: undefined};
+      client.setBuildToken(projectB.token);
+      await expect(client.createBuild(payload)).rejects.toMatchObject({
+        status: 403,
+        body: '{"message":"Invalid token"}',
+      });
+    });
+
     it('should fail to create a run without a build token', async () => {
       client.setBuildToken(undefined);
       await expect(client.createRun({...runA, buildId: buildB.id})).rejects.toMatchObject({

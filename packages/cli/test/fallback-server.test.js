@@ -43,6 +43,10 @@ describe('fallbackServer', () => {
       const body = await fetchBody('/missing');
       expect(body).toContain('Cannot GET /missing');
     });
+
+    it('should bind to loopback address only', () => {
+      expect(server._server.address()).toMatchObject({address: '127.0.0.1'});
+    });
   });
 
   describe('with isSinglePageApplication', () => {

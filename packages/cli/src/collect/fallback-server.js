@@ -48,7 +48,7 @@ class FallbackServer {
     this._server = server;
 
     return new Promise((resolve, reject) => {
-      server.listen(0, () => {
+      server.listen(0, '127.0.0.1', () => {
         const serverAddress = server.address();
         if (typeof serverAddress === 'string' || !serverAddress) {
           return reject(new Error(`Invalid server address "${serverAddress}"`));

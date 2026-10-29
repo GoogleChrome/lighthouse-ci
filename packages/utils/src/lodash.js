@@ -32,6 +32,7 @@ function merge(v1, v2) {
     const o1Keys = new Set(Object.keys(o1));
     const o2Keys = new Set(Object.keys(o2));
     for (const key of new Set([...o1Keys, ...o2Keys])) {
+      if (key === '__proto__' || key === 'constructor' || key === 'prototype') continue;
       o1[key] = key in o2 ? merge(o1[key], o2[key]) : o1[key];
     }
 

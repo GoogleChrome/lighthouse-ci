@@ -70,6 +70,13 @@ describe('lodash.js', () => {
         baz: undefined,
       });
     });
+
+    it('should not pollute Object.prototype', () => {
+      _.merge({}, JSON.parse('{"__proto__":{"polluted":1}}'));
+      expect(/** @type {any} */ ({}).polluted).toBeUndefined();
+      _.merge({}, JSON.parse('{"constructor":{"prototype":{"polluted":1}}}'));
+      expect(/** @type {any} */ ({}).polluted).toBeUndefined();
+    });
   });
 
   describe('#range', () => {

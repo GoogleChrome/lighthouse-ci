@@ -172,4 +172,60 @@ describe('AuditDetail', () => {
     expect(getByText('device-posture')).toBeTruthy();
     expect(getByText('Limited Availability')).toBeTruthy();
   });
+
+  it('should render 0 values in table details instead of blank cells', () => {
+    const baseAudit = {
+      id: 'bootup-time',
+      title: 'Reduce JavaScript execution time',
+      description: 'Consider reducing the time spent parsing, compiling, and executing JS.',
+      score: 0.5,
+      details: {
+        type: 'table',
+        headings: [
+          {key: 'url', valueType: 'url', label: 'URL'},
+          {key: 'total', valueType: 'ms', label: 'Total CPU Time'},
+          {key: 'scripting', valueType: 'ms', label: 'Script Evaluation'},
+          {key: 'scriptParseCompile', valueType: 'ms', label: 'Script Parse'},
+        ],
+        items: [
+          {
+            url: 'https://example.com/app.js',
+            total: 100,
+            scripting: 80,
+            scriptParseCompile: 0,
+          },
+        ],
+      },
+    };
+
+    const compareAudit = {
+      ...baseAudit,
+      details: {
+        ...baseAudit.details,
+        items: [
+          {
+            url: 'https://example.com/app.js',
+            total: 120,
+            scripting: 90,
+            scriptParseCompile: 0,
+          },
+        ],
+      },
+    };
+
+    const diffs = findAuditDiffs(baseAudit, compareAudit, {synthesizeItemKeyDiffs: true});
+    const pair = {
+      audit: compareAudit,
+      baseAudit,
+      diffs,
+      maxSeverity: 1,
+      group: {id: 'diagnostics', title: 'Diagnostics'},
+    };
+
+    const {container} = render(<AuditDetail pair={pair} />);
+    const cells = Array.from(container.querySelectorAll('.table-details tbody td')).map(td =>
+      td.textContent.replace(/\s+/g, ' ').trim()
+    );
+    expect(cells).toEqual(['/app.js(example.com)', '', '+20ms (20%)', '+10ms (13%)', '+0ms']);
+  });
 });

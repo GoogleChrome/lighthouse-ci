@@ -3,3 +3,8 @@
 .lighthouseci/
 .cache/
 test/
+.storybook/
+storybook-static/
+**/*.stories.jsx
+**/__mocks__/
+!dist/

@@ -3,3 +3,4 @@
 .lighthouseci/
 .cache/
 test/
+!dist/

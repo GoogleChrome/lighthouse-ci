@@ -28,17 +28,17 @@
   "dependencies": {
     "@lhci/utils": "0.1.0",
     "bluebird": "^3.7.2",
-    "body-parser": "^1.20.8",
+    "body-parser": "^1.20.9",
     "compression": "^1.8.2",
-    "cron": "^1.8.2",
-    "dayjs": "^1.8.28",
-    "debug": "^4.3.1",
+    "cron": "^4.4.0",
+    "dayjs": "^1.11.23",
+    "debug": "^4.4.3",
     "express": "^4.22.3",
-    "express-basic-auth": "^1.2.0",
+    "express-basic-auth": "^1.2.1",
     "morgan": "^1.12.1",
     "sequelize": "^6.37.8",
     "umzug": "^3.8.3",
-    "uuid": "^14.0.0"
+    "uuid": "^14.0.3"
   },
   "devDependencies": {
     "clsx": "^1.0.4",

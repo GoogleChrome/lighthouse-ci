@@ -17,6 +17,7 @@
     "jsxFragmentFactory": "Fragment",
     "resolveJsonModule": true,
     "esModuleInterop": true,
+    "isolatedModules": true,
     "diagnostics": true
   },
   "include": [

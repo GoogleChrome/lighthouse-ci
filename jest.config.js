@@ -13,7 +13,6 @@ module.exports = {
       {
         // Disable typechecking.
         diagnostics: false,
-        isolatedModules: true,
       },
     ],
   },

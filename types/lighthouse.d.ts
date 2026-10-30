@@ -44,7 +44,11 @@ declare global {
         overallSavingsBytes?: number;
         headings?: Array<{
           key: string | null;
-          subItemsHeading?: {key: string};
+          subItemsHeading?: {
+            key: string;
+            valueType?: DetailsType;
+            itemType?: DetailsType;
+          };
           valueType?: DetailsType;
           itemType?: DetailsType;
           label?: string;

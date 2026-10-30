@@ -14,6 +14,7 @@ export const SimpleDetails = props => {
   let type = props.type;
   const {compareValue, baseValue, diff} = props;
   const value = compareValue === undefined ? baseValue : compareValue;
+  if (value === null || value === undefined) return <Fragment />;
 
   if (typeof value === 'object' && value.type) {
     type = value.type;
@@ -21,8 +22,16 @@ export const SimpleDetails = props => {
 
   const label = diff ? getDiffLabel(diff) : 'neutral';
 
-  const numericBase = Number.isFinite(baseValue) ? baseValue : 0;
-  const numericCompare = Number.isFinite(compareValue) ? compareValue : 0;
+  const rawNumericBase =
+    baseValue && typeof baseValue === 'object' && 'value' in baseValue
+      ? baseValue.value
+      : baseValue;
+  const rawNumericCompare =
+    compareValue && typeof compareValue === 'object' && 'value' in compareValue
+      ? compareValue.value
+      : compareValue;
+  const numericBase = Number.isFinite(rawNumericBase) ? rawNumericBase : 0;
+  const numericCompare = Number.isFinite(rawNumericCompare) ? rawNumericCompare : 0;
   const baseDisplay = `Base Value: ${Math.round(numericBase).toLocaleString()}`;
   const compareDisplay = `Compare Value: ${Math.round(numericCompare).toLocaleString()}`;
   const numericTitle = `${baseDisplay}, ${compareDisplay}`;
@@ -63,7 +72,7 @@ export const SimpleDetails = props => {
       return (
         <img
           style={{width: 48, height: 48, objectFit: 'cover'}}
-          src={value}
+          src={typeof value === 'object' && value.value ? value.value : value}
           onError={evt => {
             const img = evt.srcElement;
             if (!(img instanceof HTMLImageElement)) return;
@@ -76,17 +85,18 @@ export const SimpleDetails = props => {
         />
       );
     case 'url': {
-      let display = value;
+      const urlString = typeof value === 'object' && value ? value.value : value;
+      let display = urlString;
       let hostname = '';
       try {
-        const url = new URL(value);
+        const url = new URL(urlString);
         display = url.pathname;
         hostname = url.hostname;
       } catch (_) {}
 
       // FIXME: use title instead of data-tooltip because of the `overflow: hidden` constraints on the table cell.
       return (
-        <span title={value}>
+        <span title={urlString}>
           {display}
           {hostname ? <span className="simple-details__url-hostname">({hostname})</span> : ''}
         </span>
@@ -101,7 +111,7 @@ export const SimpleDetails = props => {
       );
     }
     case 'code':
-      return <pre>{value}</pre>;
+      return <pre>{typeof value === 'object' && value ? value.value : value}</pre>;
     case 'numeric': {
       return (
         <pre className={`simple-details--${label}`}>

@@ -15,8 +15,97 @@
   word-break: normal;
 }
 
-.table-details tbody tr:nth-child(odd) {
+.table-details tbody:nth-of-type(odd) tr {
   background-color: var(--color-gray-100);
+}
+
+.table-details__parent-row--expandable {
+  cursor: pointer;
+}
+
+.table-details__parent-row--expandable td:first-child {
+  position: relative;
+  padding-left: 20px;
+}
+
+.table-details__chevron {
+  position: absolute;
+  left: 4px;
+  top: 8px;
+  width: 14px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--color-gray-600);
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  text-align: left;
+  cursor: pointer;
+  user-select: none;
+}
+
+.table-details__subitems-badge {
+  display: inline-block;
+  margin-left: calc(var(--base-spacing) / 2);
+  padding: 1px 6px;
+  border-radius: 4px;
+  background-color: var(--color-gray-200);
+  color: var(--color-gray-800);
+  font-size: var(--subtext-font-size);
+}
+
+.table-details__sub-row td {
+  padding-top: 4px;
+  padding-bottom: 4px;
+  font-size: var(--smaller-font-size);
+}
+
+.table-details__tree-guide {
+  position: relative;
+  padding-left: 24px !important;
+}
+
+.table-details__tree-guide::before {
+  content: '';
+  position: absolute;
+  left: 10px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background-color: var(--color-gray-400);
+}
+
+.table-details__tree-guide--last::before {
+  bottom: 50%;
+}
+
+.table-details__tree-guide::after {
+  content: '';
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  width: 8px;
+  height: 2px;
+  background-color: var(--color-gray-400);
+}
+
+.table-details__show-unchanged-btn {
+  border: none;
+  background: none;
+  padding: 0;
+  color: var(--compare-color);
+  font-family: var(--base-font-family);
+  font-size: var(--subtext-font-size);
+  cursor: pointer;
+}
+
+.table-details__show-unchanged-btn:hover {
+  text-decoration: underline;
+}
+
+.table-details td pre {
+  display: inline;
 }
 
 .table-details th,
@@ -35,7 +124,8 @@
 /* .table-column--thumbnail, */
 /* .table-column--empty,*/
 .table-column--code,
-.table-column--node {
+.table-column--node,
+.table-column--source-location {
   text-align: left;
   max-width: 30vw;
   overflow: hidden;

@@ -78,8 +78,10 @@ function createLHR(pageUrl, auditDefs, prandom) {
         numericValue,
         scoreDisplayMode: 'numeric',
         displayValue:
-          groupId === 'metrics'
-            ? `${(numericValue / 1000).toLocaleString(undefined, {maximumFractionDigits: 1})} s`
+          auditId === 'cumulative-layout-shift'
+            ? numericValue.toLocaleString('en-US', {maximumFractionDigits: 2})
+            : groupId === 'metrics'
+            ? `${(numericValue / 1000).toLocaleString('en-US', {maximumFractionDigits: 1})} s`
             : `${Math.round(numericValue)} ${unit}`,
       };
     } else if (typeof averageWastedMs === 'number') {
@@ -93,10 +95,10 @@ function createLHR(pageUrl, auditDefs, prandom) {
         score,
         scoreDisplayMode: 'numeric',
         displayValue: hasBytes
-          ? `${(wastedBytes / 1024).toLocaleString(undefined, {
+          ? `${(wastedBytes / 1024).toLocaleString('en-US', {
               maximumFractionDigits: 0,
             })} KB`
-          : `${(wastedMs / 1000).toLocaleString(undefined, {
+          : `${(wastedMs / 1000).toLocaleString('en-US', {
               maximumFractionDigits: 1,
             })} s`,
         details: {
@@ -179,7 +181,7 @@ function createLHR(pageUrl, auditDefs, prandom) {
     };
   }
 
-  const fetchTimeBase = new Date('2019-08-01T12:00:00').getTime();
+  const fetchTimeBase = new Date('2019-08-01T17:00:00.000Z').getTime();
   const fetchTimeOffset = Math.round(prandom.next() * 1000 * 60 * 60 * 24 * 7);
   const fetchTime = new Date(fetchTimeBase + fetchTimeOffset).toISOString();
 

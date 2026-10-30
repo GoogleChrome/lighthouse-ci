@@ -13,17 +13,29 @@ const {createLHR, generateNumericValue} = require('@lhci/utils/src/seed-data/lhr
 describe('createLHR', () => {
   it('should create the correct shape', () => {
     const random = new PRandom();
-    const lhr = createLHR('http://example.com', [{auditId: 'seo-audit', passRate: 1}], random);
+    const lhr = createLHR(
+      'http://example.com',
+      [
+        {auditId: 'seo-audit', passRate: 1},
+        {auditId: 'cumulative-layout-shift', averageNumericValue: 0.5},
+      ],
+      random
+    );
 
     expect(lhr).toMatchObject({
       requestedUrl: 'http://example.com',
       finalUrl: 'http://example.com',
+      fetchTime: '2019-08-05T15:36:59.345Z',
       audits: {
         'seo-audit': {
           title: 'Seo Audit',
           description: expect.stringContaining('Seo Audit'),
           score: 1,
           scoreDisplayMode: 'binary',
+        },
+        'cumulative-layout-shift': {
+          scoreDisplayMode: 'numeric',
+          displayValue: '0.48',
         },
       },
       categories: {

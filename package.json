@@ -84,7 +84,7 @@
     "shelljs": "^0.8.5",
     "sqlite3": "^6.0.1",
     "storybook": "^7.6.24",
-    "ts-jest": "^29.1.1",
+    "ts-jest": "^29.4.15",
     "typescript": "^6.0.3"
   }
 }

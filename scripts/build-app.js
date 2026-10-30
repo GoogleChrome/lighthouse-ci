@@ -47,7 +47,7 @@ function fixHtmlSubresourceUrls(result, buildOptions) {
   if (!buildOptions.outdir || !buildOptions.publicPath) {
     throw new Error('missing args');
   }
-  const relativeCssPath = path.relative(buildOptions.outdir, cssDistPath);
+  const relativeCssPath = path.relative(buildOptions.outdir, cssDistPath).replace(/\\/g, '/');
 
   // Rewrite the HTML
   const htmlText = fs.readFileSync(htmlDistPath, 'utf-8');
@@ -108,7 +108,10 @@ async function main() {
           b.onEnd((result) => {
             // For some reason onEnd fires twice, but only the second one has
             // the html output. Maybe issue with html plugin?
-            if (!result.metafile?.outputs['dist/index.html']) {
+            const hasHtmlOutput = Object.keys(result.metafile?.outputs || {}).some(o =>
+              o.replace(/\\/g, '/').endsWith('dist/index.html')
+            );
+            if (!hasHtmlOutput) {
               return;
             }
 

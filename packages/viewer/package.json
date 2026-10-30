@@ -9,6 +9,10 @@
   "publishConfig": {
     "access": "public"
   },
+  "files": [
+    "src",
+    "dist"
+  ],
   "scripts": {
     "clean": "rm -rf ./dist",
     "start": "npm run build:watch",

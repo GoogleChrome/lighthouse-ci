@@ -9,6 +9,9 @@
   "publishConfig": {
     "access": "public"
   },
+  "files": [
+    "src"
+  ],
   "dependencies": {
     "debug": "^4.3.1",
     "isomorphic-fetch": "^3.0.0",

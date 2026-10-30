@@ -10,6 +10,12 @@
   "publishConfig": {
     "access": "public"
   },
+  "files": [
+    "src",
+    "dist",
+    "!src/**/*.stories.jsx",
+    "!src/**/__mocks__"
+  ],
   "scripts": {
     "clean": "rm -rf ./dist ./storybook-static",
     "build": "npm run build:esbuild && npm run build:storybook",

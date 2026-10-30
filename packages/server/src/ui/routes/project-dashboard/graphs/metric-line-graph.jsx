@@ -41,6 +41,7 @@ const STROKE_DASHARRAY_OPTIONS = [
 /**
  * @typedef LineGraphData
  * @prop {Array<MetricLineDef>} metrics
+ * @prop {'ms'|'unitless'} [unit]
  * @prop {boolean} pinned
  * @prop {string|undefined} selectedBuildId
  * @prop {number} selectedMetricIndex
@@ -67,17 +68,24 @@ function buildXScale(graphWidth, data) {
  */
 function renderLineGraph(rootEl, data) {
   const {metrics} = data;
+  const isUnitless = data.unit === 'unitless';
+  const unitDivisor = isUnitless ? 1 : 1000;
   const {svg, masks, graphWidth, graphHeight} = createRootSvg(rootEl, GRAPH_MARGIN);
 
-  const yMax = Math.max(...metrics.map(m => Math.max(...m.statistics.map(s => s.value))));
-  const yMaxSeconds = Math.ceil((yMax * 1.1) / 1000);
+  const validValues = metrics
+    .map(m => m.statistics.filter(s => s.value >= 0).map(s => s.value))
+    .reduce((a, b) => a.concat(b), []);
+  const yMax = validValues.length ? Math.max(...validValues) : 0;
+  const yMaxDomain = isUnitless
+    ? Math.max(Math.ceil(yMax * 1.1 * 10) / 10, 0.2)
+    : Math.max(Math.ceil((yMax * 1.1) / 1000), 1);
 
   const xScale = buildXScale(graphWidth, data);
-  const yScale = d3.scaleLinear().domain([0, yMaxSeconds]).range([graphHeight, 0]);
+  const yScale = d3.scaleLinear().domain([0, yMaxDomain]).range([graphHeight, 0]);
   const yAxis = d3
     .axisRight(yScale)
-    .ticks(Math.min(yMaxSeconds, 6))
-    .tickFormat(d => d3.format('.0f')(d) + 's')
+    .ticks(isUnitless ? 5 : Math.min(yMaxDomain, 6))
+    .tickFormat(isUnitless ? d3.format('.2~f') : d => d3.format('.0f')(d) + 's')
     .tickSize(0);
   /** @type {() => import('d3').Line<StatisticWithBuild>} */
   const statisticLine = d3.line;
@@ -99,14 +107,18 @@ function renderLineGraph(rootEl, data) {
     .attr('x2', 0)
     .attr('y2', graphHeight);
 
+  /** @param {number} y */
+  const clampY = y => Math.max(0, Math.min(graphHeight, y));
+
   for (const metric of metrics) {
     const metricIndex = metrics.indexOf(metric);
     const lineMaskId = `metricLineMask-${_.uniqueId()}`;
     const dasharray = STROKE_DASHARRAY_OPTIONS[metricIndex % STROKE_DASHARRAY_OPTIONS.length];
     const metricLine = statisticLine()
+      .defined(d => d.value >= 0)
       .curve(d3.curveMonotoneX)
       .x(d => xScale(metric.statistics.indexOf(d)))
-      .y(d => yScale(d.value / 1000));
+      .y(d => yScale(d.value / unitDivisor));
 
     // The plain gray line of the metric values
     svg
@@ -127,16 +139,16 @@ function renderLineGraph(rootEl, data) {
       .attr('d', metricLine);
 
     // The mask fills to colorize the masked line
-    const passThreshold = yScale(metric.scoreLevels[0] / 1000);
-    const averageThreshold = yScale(metric.scoreLevels[1] / 1000);
+    const passThreshold = clampY(yScale(metric.scoreLevels[0] / unitDivisor));
+    const averageThreshold = clampY(yScale(metric.scoreLevels[1] / unitDivisor));
     const scoreSectionMaskFills = [
       {type: 'pass', start: yScale(0), end: passThreshold},
       {type: 'average', start: passThreshold, end: averageThreshold},
-      {type: 'fail', start: averageThreshold, end: yScale(yMaxSeconds)},
+      {type: 'fail', start: averageThreshold, end: yScale(yMaxDomain)},
     ];
 
     for (const scoreSectionMaskFill of scoreSectionMaskFills) {
-      if (scoreSectionMaskFill.start < 0) continue;
+      if (scoreSectionMaskFill.start <= scoreSectionMaskFill.end) continue;
 
       svg
         .append('rect')
@@ -173,7 +185,7 @@ function renderLineGraph(rootEl, data) {
     if (!graphContainer) return;
     const graphY = d3.mouse(graphContainer)[1];
     const yValue = yScale.invert(graphY);
-    updateMetricIndex(i, yValue * 1000);
+    updateMetricIndex(i, yValue * unitDivisor);
   });
 }
 
@@ -227,6 +239,13 @@ const HoverCardWithMetricValue = props => {
         >
           {statistic.value === -1 ? (
             <span>Not Available</span>
+          ) : props.unit === 'unitless' ? (
+            <span>
+              {statistic.value.toLocaleString(undefined, {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 3,
+              })}
+            </span>
           ) : (
             <Fragment>
               {statistic.value.toLocaleString(undefined, {maximumFractionDigits: 0})}
@@ -249,9 +268,14 @@ const HoverCardWithMetricValue = props => {
 
 /** @param {StrictOmit<LineGraphData, 'setMetricIndex'|'selectedMetricIndex'>} props */
 export const MetricLineGraph = props => {
-  const firstStat = props.metrics[0].statistics[0];
-  const lastStat = props.metrics[0].statistics[props.metrics[0].statistics.length - 1];
-  const [selectedMetricIndex, setMetricIndex] = useState(props.__selectedMetricIndexForTest || -1);
+  const firstStat = props.metrics[0] && props.metrics[0].statistics[0];
+  const lastStat =
+    props.metrics[0] && props.metrics[0].statistics[props.metrics[0].statistics.length - 1];
+  const [selectedMetricIndex, setMetricIndex] = useState(
+    typeof props.__selectedMetricIndexForTest === 'number' ? props.__selectedMetricIndexForTest : -1
+  );
+
+  if (!firstStat || !lastStat) return <Fragment />;
 
   return (
     <div className="metric-line-graph graph-root-el" onMouseLeave={() => setMetricIndex(-1)}>

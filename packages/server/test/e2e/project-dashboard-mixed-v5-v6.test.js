@@ -45,8 +45,8 @@ describe('Project dashboard', () => {
     it('should render graphs for previously unavailable data', async () => {
       await state.page.evaluate(() => {
         const graphs = Array.from(document.querySelectorAll('.metric-line-graph__graph'));
-        if (graphs.length !== 2) {
-          throw new Error(`Should have found 2 metric graphs, but got ${graphs.length}`);
+        if (graphs.length !== 3) {
+          throw new Error(`Should have found 3 metric graphs, but got ${graphs.length}`);
         }
 
         window.scrollTo({top: graphs[0].getBoundingClientRect().top - 50});

@@ -13,7 +13,6 @@ import {D3Graph, createRootSvg, findRootSvg} from '../../../components/d3-graph'
 import {
   computeStatisticRerenderKey,
   getExactTicks,
-  getClassNameFromStatistic,
   updateGraphHoverElements,
   appendHoverCardHitboxElements,
 } from './graph-utils';
@@ -21,6 +20,7 @@ import {
 import './metric-distribution-graph.css';
 import clsx from 'clsx';
 import {HoverCard} from './hover-card';
+import {getMetricScoreLevel} from '@lhci/utils/src/audit-diff-finder';
 
 const GRAPH_MARGIN = {top: 20, right: 20, bottom: 20, left: 50};
 
@@ -30,6 +30,7 @@ const GRAPH_MARGIN = {top: 20, right: 20, bottom: 20, left: 50};
  * @typedef GraphData
  * @prop {Array<StatisticWithBuild>} statistics
  * @prop {Array<import('d3').Bin<StatisticWithBuild, number>>} binnedStatistics
+ * @prop {'ms'|'unitless'} [unit]
  * @prop {string} abbreviation
  * @prop {string} label
  * @prop {[number, number]} scoreLevels
@@ -55,7 +56,7 @@ function renderHistogram(rootEl, data) {
     .domain([0, binnedStatistics.length])
     .range([0, graphWidth]);
 
-  const yMax = Math.max(...binnedStatistics.map(bin => bin.length));
+  const yMax = Math.max(1, ...binnedStatistics.map(bin => bin.length));
   const yScale = d3.scaleLinear().domain([0, yMax]).range([graphHeight, 10]);
   const yAxis = d3.axisLeft(yScale).ticks(Math.min(3, yMax)).tickSize(0);
 
@@ -109,8 +110,9 @@ const HoverCardWithDistribution = props => {
   const {selectedBinIndex, binnedStatistics: bins} = props;
   const bin = selectedBinIndex !== -1 ? bins[selectedBinIndex] : undefined;
   const statWithBuild = bin && bin[0];
+  const isUnitless = props.unit === 'unitless';
   /** @param {number} x */
-  const toDisplay = x => `${Math.round(x / 100) / 10}s`;
+  const toDisplay = x => (isUnitless ? x.toFixed(2) : `${Math.round(x / 100) / 10}s`);
 
   let children = <Fragment />;
   if (bin && bin.length) {
@@ -132,7 +134,9 @@ const HoverCardWithDistribution = props => {
         </div>
         {bin.slice(0, 5).map(stat => (
           <div className="distribution-example" key={stat.id}>
-            <span className={getClassNameFromStatistic(stat, 'text')}>{toDisplay(stat.value)}</span>
+            <span className={`text--${getMetricScoreLevel(stat.value, props.scoreLevels)}`}>
+              {toDisplay(stat.value)}
+            </span>
             {stat.build.commitMessage}
           </div>
         ))}
@@ -180,13 +184,17 @@ function updateGraph(rootEl, data) {
 export const MetricDistributionGraph = props => {
   const [pinned, setPinned] = useState(false);
   const [selectedBinIndex, setSelectedBinIndex] = useState(-1);
-  const xMax = Math.ceil((props.scoreLevels[1] * 2) / 1000) * 1000;
+  const isUnitless = props.unit === 'unitless';
+  const xMax = isUnitless
+    ? Math.ceil(props.scoreLevels[1] * 2 * 10) / 10
+    : Math.ceil((props.scoreLevels[1] * 2) / 1000) * 1000;
   /** @type {() => import('d3').HistogramGeneratorNumber<StatisticWithBuild, number>} */
   const statisticHistogram = d3.histogram;
+  const validStatistics = props.statistics.filter(s => s.value >= 0);
   const binnedStatistics = statisticHistogram()
     .thresholds(getExactTicks([0, xMax], 25))
     .domain([0, xMax])
-    .value(stat => Math.min(stat.value, xMax))(props.statistics);
+    .value(stat => Math.min(stat.value, xMax))(validStatistics);
 
   const graphData = {
     ...props,
@@ -213,9 +221,9 @@ export const MetricDistributionGraph = props => {
       />
       <HoverCardWithDistribution {...graphData} />
       <div className="metric-distribution-graph__x-axis">
-        <div style={{marginLeft: GRAPH_MARGIN.left}}>0s</div>
+        <div style={{marginLeft: GRAPH_MARGIN.left}}>{isUnitless ? '0' : '0s'}</div>
         <div style={{flexGrow: 1}} />
-        <div style={{marginRight: GRAPH_MARGIN.right}}>{xMax / 1000}s</div>
+        <div style={{marginRight: GRAPH_MARGIN.right}}>{isUnitless ? xMax : `${xMax / 1000}s`}</div>
       </div>
     </div>
   );

@@ -91,7 +91,16 @@ export function computeAuditGroups(lhr, baseLhr, options) {
             ? findAuditDiffs(baseAudit, audit, {...options, synthesizeItemKeyDiffs: true})
             : [];
           const maxSeverity = Math.max(...diffs.map(getDiffSeverity), 0);
-          return {audit, baseAudit, diffs, maxSeverity, group};
+          return {
+            audit,
+            baseAudit,
+            diffs,
+            maxSeverity,
+            group,
+            ...(options && options.percentAbsoluteDeltaThreshold !== undefined
+              ? {percentAbsoluteDeltaThreshold: options.percentAbsoluteDeltaThreshold}
+              : {}),
+          };
         })
         .sort((a, b) => (a.audit.score || 0) - (b.audit.score || 0));
 

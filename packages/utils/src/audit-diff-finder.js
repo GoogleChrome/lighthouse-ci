@@ -259,6 +259,7 @@ function createAuditDiff(diff) {
 function findAuditDetailItemKeyDiffs(auditId, baseEntry, compareEntry, headings) {
   /** @type {Array<LHCI.AuditDiff>} */
   const diffs = [];
+  let hasComparableNumericColumn = false;
 
   for (const key of Object.keys(baseEntry.item)) {
     const baseValue = baseEntry.item[key];
@@ -267,6 +268,7 @@ function findAuditDetailItemKeyDiffs(auditId, baseEntry, compareEntry, headings)
     if (typeof baseValue !== 'number' || typeof compareValue !== 'number') continue;
     // If these aren't shown in the table, skip the key.
     if (!headings.some(heading => heading.key === key)) continue;
+    hasComparableNumericColumn = true;
 
     diffs.push(
       createAuditDiff({
@@ -279,6 +281,52 @@ function findAuditDetailItemKeyDiffs(auditId, baseEntry, compareEntry, headings)
         compareValue,
       })
     );
+  }
+
+  // When a paired parent row has no numeric columns of its own (e.g., `valid-source-maps`,
+  // `inspector-issues`, `deprecations`), surface subitem additions/removals so the audit and
+  // parent row are not treated as unchanged when subitems were added or removed.
+  if (!hasComparableNumericColumn) {
+    const rawBaseSubItems = getSubItems(baseEntry.item);
+    const rawCompareSubItems = getSubItems(compareEntry.item);
+    if (rawBaseSubItems.length || rawCompareSubItems.length) {
+      /** @param {any} subItem @return {Record<string, any>} */
+      const toSubRecord = subItem =>
+        typeof subItem === 'object' && subItem !== null ? subItem : {value: String(subItem)};
+      const zippedSubItems = zipBaseAndCompareItems(
+        rawBaseSubItems.map(toSubRecord),
+        rawCompareSubItems.map(toSubRecord),
+        {pairCollisionBucketsByRawKey: true}
+      );
+      const addedSubCount = zippedSubItems.filter(entry => !entry.base && entry.compare).length;
+      const removedSubCount = zippedSubItems.filter(entry => entry.base && !entry.compare).length;
+      if (addedSubCount > 0) {
+        diffs.push(
+          createAuditDiff({
+            auditId,
+            type: 'itemDelta',
+            itemKey: '__subItemsAdded',
+            baseItemIndex: baseEntry.index,
+            compareItemIndex: compareEntry.index,
+            baseValue: 0,
+            compareValue: addedSubCount,
+          })
+        );
+      }
+      if (removedSubCount > 0) {
+        diffs.push(
+          createAuditDiff({
+            auditId,
+            type: 'itemDelta',
+            itemKey: '__subItemsRemoved',
+            baseItemIndex: baseEntry.index,
+            compareItemIndex: compareEntry.index,
+            baseValue: removedSubCount,
+            compareValue: 0,
+          })
+        );
+      }
+    }
   }
 
   return diffs;
@@ -358,6 +406,7 @@ function replaceNondeterministicStrings(s) {
 /**
  * The items passed to this method can be dirtied by other libraries and contain circular structures.
  * Prune any private-looking properties that start with `_` throughout the entire object.
+ * Also prune `subItems` so parent row keys remain stable even when subitems change.
  *
  * @see https://github.com/GoogleChrome/lighthouse-ci/issues/666
  * @param {unknown} item
@@ -372,7 +421,7 @@ function deepPruneItemForKeySerialization(item) {
   } else {
     const itemAsRecord = /** @type {Record<string, unknown>} */ (item);
     const keys = Object.keys(item);
-    const keysToKeep = keys.filter(key => !key.startsWith('_'));
+    const keysToKeep = keys.filter(key => !key.startsWith('_') && key !== 'subItems');
     /** @type {Record<string, any>} */
     const copy = {};
     for (const key of keysToKeep) {
@@ -392,6 +441,12 @@ function getItemKey(item) {
   const source = item.source;
   if (typeof source === 'string') return source;
   if (source && source.url) return `${source.url}:${source.line}:${source.column}`;
+  // For legacy-javascript / legacy-javascript-insight subitems (key by signal so polyfills match
+  // even when minified bundle line/column numbers shift)
+  if (typeof item.signal === 'string' && item.signal) return item.signal;
+  if (item.location && typeof item.location.url === 'string') {
+    return `${item.location.url}:${item.location.line}:${item.location.column}`;
+  }
   // For the pre-grouped audits like resource-summary
   if (typeof item.label === 'string') {
     return typeof item.resourceType === 'string' ? item.resourceType : item.label;
@@ -404,8 +459,11 @@ function getItemKey(item) {
   if (typeof item.name === 'string') return item.name;
   // For dom-size
   if (typeof item.statistic === 'string') return item.statistic;
-  // For node
+  // For node / relatedNode (accessibility subitems) / extra (layout-shifts / cls-culprits-insight)
   if (typeof item.node?.path === 'string') return item.node.path;
+  if (typeof item.relatedNode?.path === 'string') return item.relatedNode.path;
+  if (typeof item.extra?.path === 'string') return item.extra.path;
+  if (typeof item.extra?.value === 'string') return item.extra.value;
   // Tap-targets
   if (
     typeof item.tapTarget?.path === 'string' &&
@@ -415,11 +473,23 @@ function getItemKey(item) {
   }
   // For most opportunities, diagnostics, etc where 1 row === 1 resource
   if (typeof item.url === 'string' && item.url) return item.url;
+  if (typeof item.scriptUrl === 'string' && item.scriptUrl) return item.scriptUrl;
+  if (typeof item.frameUrl === 'string' && item.frameUrl) return item.frameUrl;
   if (typeof item.origin === 'string' && item.origin) return item.origin;
-  // For third-party-summary / third-parties-insight (must be after url/origin since
-  // resource-level audits like network-requests also include an entity property)
+  // For third-party-summary / third-parties-insight / third-party-facades (must be after url/origin
+  // since resource-level audits like network-requests also include an entity property)
   if (typeof item.entity === 'string') return item.entity;
   if (item.entity && typeof item.entity.text === 'string') return item.entity.text;
+  if (typeof item.product === 'string' && item.product) return item.product;
+  // For diagnostic subitems (non-composited-animations, image-delivery-insight, valid-source-maps, layout-shifts)
+  if (typeof item.failureReason === 'string') {
+    return typeof item.animation === 'string'
+      ? `${item.animation}:${item.failureReason}`
+      : item.failureReason;
+  }
+  if (typeof item.reason === 'string') return item.reason;
+  if (typeof item.cause === 'string') return item.cause;
+  if (typeof item.error === 'string') return item.error;
 
   // For everything else, use the entire object, actually works OK on most nodes.
   return JSON.stringify(deepPruneItemForKeySerialization(item));
@@ -428,9 +498,11 @@ function getItemKey(item) {
 /**
  * @param {Array<Record<string, any>>} baseItems
  * @param {Array<Record<string, any>>} compareItems
+ * @param {{pairCollisionBucketsByRawKey?: boolean}} [options]
  * @return {Array<{base?: DetailItemEntry, compare?: DetailItemEntry}>}
  */
-function zipBaseAndCompareItems(baseItems, compareItems) {
+function zipBaseAndCompareItems(baseItems, compareItems, options = {}) {
+  const {pairCollisionBucketsByRawKey = false} = options;
   const groupedByKey = _.groupIntoMap(
     [
       ...baseItems.map((item, i) => ({item, kind: 'base', index: i})),
@@ -447,9 +519,42 @@ function zipBaseAndCompareItems(baseItems, compareItems) {
     const compareItems = entries.filter(entry => entry.kind === 'compare');
 
     if (baseItems.length > 1 || compareItems.length > 1) {
-      // The key is not actually unique, just treat all as added/removed.
-      for (const entry of entries) {
-        zipped.push({[entry.kind]: entry});
+      if (!pairCollisionBucketsByRawKey) {
+        // The key is not actually unique, just treat all as added/removed.
+        for (const entry of entries) {
+          zipped.push(entry.kind === 'base' ? {base: entry} : {compare: entry});
+        }
+        continue;
+      }
+
+      // Multiple subitems collided after stripping query strings/hashes (e.g. `css2?family=Inter` and
+      // `css2?family=IBM+Plex+Mono`, or `sdk.js?hash=...` and `sdk.js`). Try pairing exact raw keys
+      // first before falling back to treating ambiguous collisions as added/removed.
+      const subGroupedByRawKey = _.groupIntoMap(entries, entry => getItemKey(entry.item));
+      /** @type {Array<DetailItemEntry>} */
+      const remainingBase = [];
+      /** @type {Array<DetailItemEntry>} */
+      const remainingCompare = [];
+
+      for (const subEntries of subGroupedByRawKey.values()) {
+        const subBase = subEntries.filter(entry => entry.kind === 'base');
+        const subCompare = subEntries.filter(entry => entry.kind === 'compare');
+        if (subBase.length === 1 && subCompare.length === 1) {
+          zipped.push({base: subBase[0], compare: subCompare[0]});
+        } else {
+          remainingBase.push(...subBase);
+          remainingCompare.push(...subCompare);
+        }
+      }
+
+      if (remainingBase.length <= 1 && remainingCompare.length <= 1) {
+        if (remainingBase.length || remainingCompare.length) {
+          zipped.push({base: remainingBase[0], compare: remainingCompare[0]});
+        }
+      } else {
+        for (const entry of [...remainingBase, ...remainingCompare]) {
+          zipped.push(entry.kind === 'base' ? {base: entry} : {compare: entry});
+        }
       }
 
       continue;
@@ -518,13 +623,14 @@ function sortZippedBaseAndCompareItems(diffs, zippedItems) {
  * @param {Array<Record<string, any>>} baseItems
  * @param {Array<Record<string, any>>} compareItems
  * @param {Array<{key: string | null}>} headings
+ * @param {{pairCollisionBucketsByRawKey?: boolean}} [options]
  * @return {Array<LHCI.AuditDiff>}
  */
-function findAuditDetailItemsDiffs(auditId, baseItems, compareItems, headings) {
+function findAuditDetailItemsDiffs(auditId, baseItems, compareItems, headings, options = {}) {
   /** @type {Array<LHCI.AuditDiff>} */
   const diffs = [];
 
-  for (const {base, compare} of zipBaseAndCompareItems(baseItems, compareItems)) {
+  for (const {base, compare} of zipBaseAndCompareItems(baseItems, compareItems, options)) {
     if (base && compare) {
       diffs.push(...findAuditDetailItemKeyDiffs(auditId, base, compare, headings));
     } else if (compare) {
@@ -537,6 +643,212 @@ function findAuditDetailItemsDiffs(auditId, baseItems, compareItems, headings) {
   }
 
   return diffs;
+}
+
+/**
+ * Extracts normalized subitems from a detail item (`item.subItems.items` or `item.subItems`).
+ *
+ * @param {Record<string, any> | undefined} item
+ * @return {Array<any>}
+ */
+function getSubItems(item) {
+  if (!item || !item.subItems) return [];
+  /** @type {Array<any>} */
+  const raw = Array.isArray(item.subItems)
+    ? item.subItems
+    : Array.isArray(item.subItems.items)
+    ? item.subItems.items
+    : [];
+  return raw.filter(entry => entry !== null && entry !== undefined);
+}
+
+/**
+ * Merges two heading arrays while preserving `subItemsHeading` metadata from either list.
+ *
+ * @param {NonNullable<NonNullable<LH.AuditResult['details']>['headings']>} primaryHeadings
+ * @param {NonNullable<NonNullable<LH.AuditResult['details']>['headings']>} secondaryHeadings
+ * @return {NonNullable<NonNullable<LH.AuditResult['details']>['headings']>}
+ */
+function mergeHeadings(primaryHeadings, secondaryHeadings) {
+  /** @type {NonNullable<NonNullable<LH.AuditResult['details']>['headings']>} */
+  const headings = [];
+
+  /** @param {NonNullable<NonNullable<LH.AuditResult['details']>['headings']>[number]} heading */
+  const addHeading = heading => {
+    if (!heading) return;
+    const subKey = heading.subItemsHeading && heading.subItemsHeading.key;
+    const existingIndex = headings.findIndex(h => {
+      if (heading.key !== null) return h.key === heading.key;
+      const existingSubKey = h.subItemsHeading && h.subItemsHeading.key;
+      return h.key === null && Boolean(subKey) && existingSubKey === subKey;
+    });
+    if (existingIndex !== -1) {
+      if (!headings[existingIndex].subItemsHeading && heading.subItemsHeading) {
+        headings[existingIndex] = {
+          ...headings[existingIndex],
+          subItemsHeading: heading.subItemsHeading,
+        };
+      }
+      return;
+    }
+    headings.push(heading);
+  };
+
+  for (const heading of primaryHeadings || []) addHeading(heading);
+  for (const heading of secondaryHeadings || []) addHeading(heading);
+
+  return headings;
+}
+
+/**
+ * Maps table headings to their corresponding subitem headings (`heading.subItemsHeading`).
+ * When no heading defines `subItemsHeading` (e.g. `deprecations`), the first column is mapped
+ * to a synthetic `__self` key so 1D subitem values (links, text) can be rendered in column 0.
+ *
+ * @param {NonNullable<NonNullable<LH.AuditResult['details']>['headings']>} headings
+ * @return {Array<{key: string | null, valueType: LH.DetailsType, isSelfValue?: boolean}>}
+ */
+function getSubItemHeadings(headings) {
+  const hasExplicitSubItemsHeading = headings.some(
+    heading => heading && heading.subItemsHeading && heading.subItemsHeading.key
+  );
+
+  return headings.map((heading, index) => {
+    const parentType = heading.valueType || heading.itemType || 'unknown';
+    if (!hasExplicitSubItemsHeading) {
+      if (index === 0) {
+        return {key: '__self', valueType: 'text', isSelfValue: true};
+      }
+      return {key: null, valueType: 'unknown'};
+    }
+
+    const subHeading = heading.subItemsHeading;
+    if (!subHeading || !subHeading.key) {
+      return {key: null, valueType: parentType};
+    }
+
+    return {
+      key: subHeading.key,
+      valueType: subHeading.valueType || subHeading.itemType || parentType,
+    };
+  });
+}
+
+/**
+ * Zips, diffs, and sorts subitems for a matched or unmatched parent row.
+ *
+ * @param {string} auditId
+ * @param {Record<string, any> | undefined} baseItem
+ * @param {Record<string, any> | undefined} compareItem
+ * @param {NonNullable<NonNullable<LH.AuditResult['details']>['headings']>} headings
+ * @param {{hasBaseAudit?: boolean, percentAbsoluteDeltaThreshold?: number}} [options]
+ * @return {{subHeadings: Array<{key: string | null, valueType: LH.DetailsType, isSelfValue?: boolean}>, sortedSubItems: Array<{base?: DetailItemEntry, compare?: DetailItemEntry, diffs: Array<LHCI.AuditDiff>, state: RowLabel}>}}
+ */
+function diffAndSortSubItems(auditId, baseItem, compareItem, headings, options = {}) {
+  const {hasBaseAudit = true, percentAbsoluteDeltaThreshold = 0} = options;
+  const subHeadings = getSubItemHeadings(headings);
+  const rawBaseSubItems = getSubItems(baseItem);
+  const rawCompareSubItems = getSubItems(compareItem);
+
+  if (!rawBaseSubItems.length && !rawCompareSubItems.length) {
+    return {subHeadings, sortedSubItems: []};
+  }
+
+  /**
+   * @param {any} subItem
+   * @return {Record<string, any>}
+   */
+  const normalizeSubItem = subItem => {
+    if (typeof subItem !== 'object' || subItem === null) {
+      return {value: String(subItem), __self: subItem};
+    }
+    if (subHeadings[0] && subHeadings[0].isSelfValue) {
+      return {...subItem, __self: subItem};
+    }
+    return subItem;
+  };
+
+  // Case 1: Parent row is unmatched (added or removed, or viewed in single-report mode with no baseAudit).
+  // Construct single-sided entries directly rather than zipping against themselves so duplicate keys
+  // (e.g., query-string-stripped font URLs) never split into phantom rows or duplicate Preact keys.
+  if (!baseItem || !compareItem) {
+    const isAddedParent = Boolean(compareItem);
+    const parentSubItems = (isAddedParent ? rawCompareSubItems : rawBaseSubItems).map(
+      normalizeSubItem
+    );
+    const singleSideEntries = parentSubItems.map((item, i) =>
+      isAddedParent
+        ? {compare: {item, kind: 'compare', index: i}}
+        : {base: {item, kind: 'base', index: i}}
+    );
+
+    /** @type {Array<LHCI.AuditDiff>} */
+    const synthesizedParentDiffs = [];
+    if (hasBaseAudit) {
+      for (let i = 0; i < parentSubItems.length; i++) {
+        const subItem = parentSubItems[i];
+        for (const subHeading of subHeadings) {
+          if (!subHeading.key) continue;
+          const val = subItem[subHeading.key];
+          if (typeof val !== 'number' || val === 0) continue;
+          synthesizedParentDiffs.push(
+            createAuditDiff({
+              auditId,
+              type: 'itemDelta',
+              itemKey: subHeading.key,
+              ...(isAddedParent ? {compareItemIndex: i} : {baseItemIndex: i}),
+              baseValue: isAddedParent ? 0 : val,
+              compareValue: isAddedParent ? val : 0,
+            })
+          );
+        }
+      }
+    }
+
+    const sortedSingle = sortZippedBaseAndCompareItems(
+      synthesizedParentDiffs,
+      singleSideEntries
+    ).map(entry => ({
+      ...entry,
+      state: /** @type {RowLabel} */ ('no change'),
+    }));
+
+    return {subHeadings, sortedSubItems: sortedSingle};
+  }
+
+  // Case 2: Both baseItem and compareItem exist — pair, diff, and sort their subitems.
+  const baseSubItems = rawBaseSubItems.map(normalizeSubItem);
+  const compareSubItems = rawCompareSubItems.map(normalizeSubItem);
+
+  const rawDiffs = findAuditDetailItemsDiffs(auditId, baseSubItems, compareSubItems, subHeadings, {
+    pairCollisionBucketsByRawKey: true,
+  });
+  const rawWithSynthesized = [
+    ...rawDiffs,
+    ...synthesizeItemKeyDiffs(rawDiffs, baseSubItems, compareSubItems),
+  ];
+  // Filter out itemDelta diffs below threshold (or 0 -> 0 synthesized diffs) so unchanged/noisy numeric subitems have `no change` row state.
+  const allSubDiffs = rawWithSynthesized.filter(diff => {
+    if (diff.type === 'itemDelta') {
+      const stats = getDeltaStats(diff);
+      return stats.absoluteDelta > 0 && stats.percentAbsoluteDelta > percentAbsoluteDeltaThreshold;
+    }
+    return true;
+  });
+
+  const zippedSubItems = zipBaseAndCompareItems(baseSubItems, compareSubItems, {
+    pairCollisionBucketsByRawKey: true,
+  });
+  const sorted = sortZippedBaseAndCompareItems(allSubDiffs, zippedSubItems).map(entry => ({
+    ...entry,
+    state: getRowLabelForIndex(
+      allSubDiffs,
+      entry.compare && entry.compare.index,
+      entry.base && entry.base.index
+    ),
+  }));
+
+  return {subHeadings, sortedSubItems: sorted};
 }
 
 /**
@@ -637,7 +949,18 @@ function normalizeDetails(audit) {
     /** @param {NonNullable<NonNullable<LH.AuditResult['details']>['headings']>[number]} heading */
     const addHeading = heading => {
       if (!heading) return;
-      if (heading.key !== null && headings.some(h => h.key === heading.key)) return;
+      if (heading.key !== null) {
+        const existingIndex = headings.findIndex(h => h.key === heading.key);
+        if (existingIndex !== -1) {
+          if (!headings[existingIndex].subItemsHeading && heading.subItemsHeading) {
+            headings[existingIndex] = {
+              ...headings[existingIndex],
+              subItemsHeading: heading.subItemsHeading,
+            };
+          }
+          return;
+        }
+      }
       headings.push(heading);
     };
 
@@ -811,6 +1134,10 @@ function findAuditDiffs(baseAudit, compareAudit, options = {}) {
 module.exports = {
   findAuditDiffs,
   normalizeDetails,
+  mergeHeadings,
+  getSubItems,
+  getSubItemHeadings,
+  diffAndSortSubItems,
   getDiffSeverity,
   getDeltaLabel,
   getDeltaStats,
@@ -819,6 +1146,7 @@ module.exports = {
   getRowLabelForIndex,
   getMostSevereDiffLabel,
   getMetricScoreLevel,
+  getItemKey,
   zipBaseAndCompareItems,
   synthesizeItemKeyDiffs,
   sortZippedBaseAndCompareItems,

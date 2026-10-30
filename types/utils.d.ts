@@ -87,6 +87,7 @@ declare global {
       diffs: Array<AuditDiff>;
       maxSeverity: number;
       group: {id: string; title: string};
+      percentAbsoluteDeltaThreshold?: number;
     }
 
     export type PreactNode = ComponentChildren;

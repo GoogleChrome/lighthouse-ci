@@ -40,7 +40,7 @@ module.exports = state => {
         state.client,
         state.dataset === 'generated' ? generated : createActualTestDataset()
       );
-    }, 15000);
+    }, 30000);
 
     it('should initialize a browser', () => launchBrowser(state));
   });

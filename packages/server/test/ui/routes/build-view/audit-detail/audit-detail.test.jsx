@@ -594,4 +594,51 @@ describe('AuditDetail', () => {
     chevronBtn.click();
     await wait(() => expect(getByLabelText('Expand subitems')).toBeTruthy());
   });
+
+  it('should preserve Error: and Warning: prefixes on valid-source-maps subitems with url valueType', () => {
+    const audit = {
+      id: 'valid-source-maps',
+      title: 'Missing source maps for large first-party JavaScript',
+      description: 'Source maps translate minified code to the original source code.',
+      score: 0,
+      details: {
+        type: 'table',
+        headings: [
+          {
+            key: 'scriptUrl',
+            valueType: 'url',
+            subItemsHeading: {key: 'error'},
+            label: 'URL',
+          },
+          {
+            key: 'sourceMapUrl',
+            valueType: 'url',
+            label: 'Map URL',
+          },
+        ],
+        items: [
+          {
+            scriptUrl: 'https://example.com/bundle.js',
+            subItems: {
+              type: 'subitems',
+              items: [{error: 'Error: Failed fetching source map (403)'}],
+            },
+          },
+        ],
+      },
+    };
+
+    const baseAudit = {...audit, details: {...audit.details, items: []}};
+    const diffs = findAuditDiffs(baseAudit, audit, {synthesizeItemKeyDiffs: true});
+    const pair = {
+      audit,
+      baseAudit,
+      diffs,
+      maxSeverity: 1,
+      group: {id: 'best-practices-general', title: 'General'},
+    };
+
+    const {getByText} = render(<AuditDetail pair={pair} />);
+    expect(getByText('Error: Failed fetching source map (403)')).toBeTruthy();
+  });
 });

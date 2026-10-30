@@ -90,8 +90,10 @@ export const SimpleDetails = props => {
       let hostname = '';
       try {
         const url = new URL(urlString);
-        display = url.pathname;
-        hostname = url.hostname;
+        if (url.protocol === 'http:' || url.protocol === 'https:') {
+          display = url.pathname;
+          hostname = url.hostname;
+        }
       } catch (_) {}
 
       // FIXME: use title instead of data-tooltip because of the `overflow: hidden` constraints on the table cell.

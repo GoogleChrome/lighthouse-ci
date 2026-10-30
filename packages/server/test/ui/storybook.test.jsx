@@ -8,9 +8,12 @@
 
 import * as path from 'path';
 import {setImmediate} from 'timers';
+import {PNG} from 'pngjs';
 import initStoryshots_ from '@storybook/addon-storyshots';
 import {imageSnapshot} from '@storybook/addon-storyshots-puppeteer';
 import puppeteer from 'puppeteer';
+
+const MAX_SCREENSHOT_CHUNK_HEIGHT = 8000;
 
 global.setImmediate = setImmediate;
 
@@ -65,10 +68,32 @@ initStoryshots({
           height: Math.ceil(Math.max(...elements.map(e => e.clientHeight))),
         };
       });
-      await page.setViewport(dimensions);
+      await page.setViewport({
+        width: dimensions.width,
+        height: Math.min(dimensions.height, MAX_SCREENSHOT_CHUNK_HEIGHT),
+      });
       await page.evaluate(() => new Promise(r => window.requestAnimationFrame(r)));
       await page.waitForNetworkIdle();
+
+      if (dimensions.height > MAX_SCREENSHOT_CHUNK_HEIGHT) {
+        return /** @type {any} */ ({
+          screenshot: async () => {
+            const outPng = new PNG({width: dimensions.width, height: dimensions.height});
+            for (let y = 0; y < dimensions.height; y += MAX_SCREENSHOT_CHUNK_HEIGHT) {
+              const chunkHeight = Math.min(MAX_SCREENSHOT_CHUNK_HEIGHT, dimensions.height - y);
+              const chunkBuffer = await page.screenshot({
+                captureBeyondViewport: true,
+                clip: {x: 0, y, width: dimensions.width, height: chunkHeight},
+              });
+              const chunkPng = PNG.sync.read(Buffer.from(chunkBuffer));
+              PNG.bitblt(chunkPng, outPng, 0, 0, dimensions.width, chunkHeight, 0, y);
+            }
+            return PNG.sync.write(outPng, {filterType: 0});
+          },
+        });
+      }
     },
+    testTimeout: 30000,
     getMatchOptions: () => ({
       // TODO: Why does CI have slightly different sizes?
       allowSizeMismatch: true,

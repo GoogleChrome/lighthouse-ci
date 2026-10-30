@@ -1663,4 +1663,157 @@ describe('#diffAndSortSubItems', () => {
       {key: 'origin', valueType: 'text', label: 'Origin', subItemsHeading: {key: 'warning'}},
     ]);
   });
+
+  it('should surface subitem additions and removals in findAuditDiffs for non-numeric parent rows', () => {
+    const baseAudit = {
+      id: 'valid-source-maps',
+      score: 0,
+      details: {
+        type: 'table',
+        headings: [
+          {key: 'scriptUrl', itemType: 'url', subItemsHeading: {key: 'error'}},
+          {key: 'sourceMapUrl', itemType: 'url'},
+        ],
+        items: [
+          {
+            scriptUrl: 'https://example.com/app.js',
+            subItems: {type: 'subitems', items: [{error: 'Error: Missing source map'}]},
+          },
+        ],
+      },
+    };
+    const compareAudit = {
+      ...baseAudit,
+      details: {
+        ...baseAudit.details,
+        items: [
+          {
+            scriptUrl: 'https://example.com/app.js',
+            subItems: {
+              type: 'subitems',
+              items: [
+                {error: 'Error: Missing source map'},
+                {error: 'Warning: Timed out fetching source map'},
+              ],
+            },
+          },
+        ],
+      },
+    };
+
+    const diffs = findAuditDiffs(baseAudit, compareAudit, {
+      percentAbsoluteDeltaThreshold: 0.05,
+      synthesizeItemKeyDiffs: true,
+    });
+    expect(diffs).toEqual([
+      {
+        auditId: 'valid-source-maps',
+        type: 'itemDelta',
+        itemKey: '__subItemsAdded',
+        baseItemIndex: 0,
+        compareItemIndex: 0,
+        baseValue: 0,
+        compareValue: 1,
+      },
+    ]);
+  });
+
+  it('should pair multi-item buckets that share a query-stripped URL by raw key first', () => {
+    const headings = [
+      {
+        key: 'entity',
+        valueType: 'text',
+        subItemsHeading: {key: 'url', valueType: 'url'},
+      },
+      {
+        key: 'transferSize',
+        valueType: 'bytes',
+        subItemsHeading: {key: 'transferSize'},
+      },
+    ];
+    const baseItem = {
+      entity: 'Google Fonts',
+      transferSize: 1808,
+      subItems: {
+        type: 'subitems',
+        items: [
+          {url: 'https://fonts.googleapis.com/css2?family=Inter&display=swap', transferSize: 1164},
+          {
+            url: 'https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap',
+            transferSize: 644,
+          },
+        ],
+      },
+    };
+    const compareItem = JSON.parse(JSON.stringify(baseItem));
+
+    const {sortedSubItems} = diffAndSortSubItems(
+      'third-party-summary',
+      baseItem,
+      compareItem,
+      headings
+    );
+    expect(sortedSubItems).toHaveLength(2);
+    expect(sortedSubItems.every(sub => sub.state === 'no change')).toBe(true);
+  });
+
+  it('should omit 0-to-0 synthesized itemDelta diffs on added/removed subitems', () => {
+    const headings = [
+      {
+        key: 'entity',
+        valueType: 'text',
+        subItemsHeading: {key: 'url', valueType: 'url'},
+      },
+      {
+        key: 'transferSize',
+        valueType: 'bytes',
+        subItemsHeading: {key: 'transferSize'},
+      },
+      {
+        key: 'blockingTime',
+        valueType: 'ms',
+        subItemsHeading: {key: 'blockingTime'},
+      },
+    ];
+    const baseItem = {
+      entity: 'Ads',
+      transferSize: 1000,
+      blockingTime: 0,
+      subItems: {
+        type: 'subitems',
+        items: [{url: 'https://ads.example.com/a.js', transferSize: 1000, blockingTime: 0}],
+      },
+    };
+    const compareItem = {
+      entity: 'Ads',
+      transferSize: 1500,
+      blockingTime: 0,
+      subItems: {
+        type: 'subitems',
+        items: [
+          {url: 'https://ads.example.com/a.js', transferSize: 1000, blockingTime: 0},
+          {url: 'https://ads.example.com/b.js', transferSize: 500, blockingTime: 0},
+        ],
+      },
+    };
+
+    const {sortedSubItems} = diffAndSortSubItems(
+      'third-party-summary',
+      baseItem,
+      compareItem,
+      headings
+    );
+    expect(sortedSubItems[0].state).toBe('added');
+    expect(sortedSubItems[0].diffs).toEqual([
+      {type: 'itemAddition', auditId: 'third-party-summary', compareItemIndex: 1},
+      {
+        auditId: 'third-party-summary',
+        type: 'itemDelta',
+        itemKey: 'transferSize',
+        compareItemIndex: 1,
+        baseValue: 0,
+        compareValue: 500,
+      },
+    ]);
+  });
 });

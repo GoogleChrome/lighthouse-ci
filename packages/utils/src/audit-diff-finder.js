@@ -259,6 +259,7 @@ function createAuditDiff(diff) {
 function findAuditDetailItemKeyDiffs(auditId, baseEntry, compareEntry, headings) {
   /** @type {Array<LHCI.AuditDiff>} */
   const diffs = [];
+  let hasComparableNumericColumn = false;
 
   for (const key of Object.keys(baseEntry.item)) {
     const baseValue = baseEntry.item[key];
@@ -267,6 +268,7 @@ function findAuditDetailItemKeyDiffs(auditId, baseEntry, compareEntry, headings)
     if (typeof baseValue !== 'number' || typeof compareValue !== 'number') continue;
     // If these aren't shown in the table, skip the key.
     if (!headings.some(heading => heading.key === key)) continue;
+    hasComparableNumericColumn = true;
 
     diffs.push(
       createAuditDiff({
@@ -279,6 +281,52 @@ function findAuditDetailItemKeyDiffs(auditId, baseEntry, compareEntry, headings)
         compareValue,
       })
     );
+  }
+
+  // When a paired parent row has no numeric columns of its own (e.g., `valid-source-maps`,
+  // `inspector-issues`, `deprecations`), surface subitem additions/removals so the audit and
+  // parent row are not treated as unchanged when subitems were added or removed.
+  if (!hasComparableNumericColumn) {
+    const rawBaseSubItems = getSubItems(baseEntry.item);
+    const rawCompareSubItems = getSubItems(compareEntry.item);
+    if (rawBaseSubItems.length || rawCompareSubItems.length) {
+      /** @param {any} subItem @return {Record<string, any>} */
+      const toSubRecord = subItem =>
+        typeof subItem === 'object' && subItem !== null ? subItem : {value: String(subItem)};
+      const zippedSubItems = zipBaseAndCompareItems(
+        rawBaseSubItems.map(toSubRecord),
+        rawCompareSubItems.map(toSubRecord),
+        {pairCollisionBucketsByRawKey: true}
+      );
+      const addedSubCount = zippedSubItems.filter(entry => !entry.base && entry.compare).length;
+      const removedSubCount = zippedSubItems.filter(entry => entry.base && !entry.compare).length;
+      if (addedSubCount > 0) {
+        diffs.push(
+          createAuditDiff({
+            auditId,
+            type: 'itemDelta',
+            itemKey: '__subItemsAdded',
+            baseItemIndex: baseEntry.index,
+            compareItemIndex: compareEntry.index,
+            baseValue: 0,
+            compareValue: addedSubCount,
+          })
+        );
+      }
+      if (removedSubCount > 0) {
+        diffs.push(
+          createAuditDiff({
+            auditId,
+            type: 'itemDelta',
+            itemKey: '__subItemsRemoved',
+            baseItemIndex: baseEntry.index,
+            compareItemIndex: compareEntry.index,
+            baseValue: removedSubCount,
+            compareValue: 0,
+          })
+        );
+      }
+    }
   }
 
   return diffs;
@@ -450,9 +498,11 @@ function getItemKey(item) {
 /**
  * @param {Array<Record<string, any>>} baseItems
  * @param {Array<Record<string, any>>} compareItems
+ * @param {{pairCollisionBucketsByRawKey?: boolean}} [options]
  * @return {Array<{base?: DetailItemEntry, compare?: DetailItemEntry}>}
  */
-function zipBaseAndCompareItems(baseItems, compareItems) {
+function zipBaseAndCompareItems(baseItems, compareItems, options = {}) {
+  const {pairCollisionBucketsByRawKey = false} = options;
   const groupedByKey = _.groupIntoMap(
     [
       ...baseItems.map((item, i) => ({item, kind: 'base', index: i})),
@@ -469,9 +519,42 @@ function zipBaseAndCompareItems(baseItems, compareItems) {
     const compareItems = entries.filter(entry => entry.kind === 'compare');
 
     if (baseItems.length > 1 || compareItems.length > 1) {
-      // The key is not actually unique, just treat all as added/removed.
-      for (const entry of entries) {
-        zipped.push({[entry.kind]: entry});
+      if (!pairCollisionBucketsByRawKey) {
+        // The key is not actually unique, just treat all as added/removed.
+        for (const entry of entries) {
+          zipped.push(entry.kind === 'base' ? {base: entry} : {compare: entry});
+        }
+        continue;
+      }
+
+      // Multiple subitems collided after stripping query strings/hashes (e.g. `css2?family=Inter` and
+      // `css2?family=IBM+Plex+Mono`, or `sdk.js?hash=...` and `sdk.js`). Try pairing exact raw keys
+      // first before falling back to treating ambiguous collisions as added/removed.
+      const subGroupedByRawKey = _.groupIntoMap(entries, entry => getItemKey(entry.item));
+      /** @type {Array<DetailItemEntry>} */
+      const remainingBase = [];
+      /** @type {Array<DetailItemEntry>} */
+      const remainingCompare = [];
+
+      for (const subEntries of subGroupedByRawKey.values()) {
+        const subBase = subEntries.filter(entry => entry.kind === 'base');
+        const subCompare = subEntries.filter(entry => entry.kind === 'compare');
+        if (subBase.length === 1 && subCompare.length === 1) {
+          zipped.push({base: subBase[0], compare: subCompare[0]});
+        } else {
+          remainingBase.push(...subBase);
+          remainingCompare.push(...subCompare);
+        }
+      }
+
+      if (remainingBase.length <= 1 && remainingCompare.length <= 1) {
+        if (remainingBase.length || remainingCompare.length) {
+          zipped.push({base: remainingBase[0], compare: remainingCompare[0]});
+        }
+      } else {
+        for (const entry of [...remainingBase, ...remainingCompare]) {
+          zipped.push(entry.kind === 'base' ? {base: entry} : {compare: entry});
+        }
       }
 
       continue;
@@ -540,13 +623,14 @@ function sortZippedBaseAndCompareItems(diffs, zippedItems) {
  * @param {Array<Record<string, any>>} baseItems
  * @param {Array<Record<string, any>>} compareItems
  * @param {Array<{key: string | null}>} headings
+ * @param {{pairCollisionBucketsByRawKey?: boolean}} [options]
  * @return {Array<LHCI.AuditDiff>}
  */
-function findAuditDetailItemsDiffs(auditId, baseItems, compareItems, headings) {
+function findAuditDetailItemsDiffs(auditId, baseItems, compareItems, headings, options = {}) {
   /** @type {Array<LHCI.AuditDiff>} */
   const diffs = [];
 
-  for (const {base, compare} of zipBaseAndCompareItems(baseItems, compareItems)) {
+  for (const {base, compare} of zipBaseAndCompareItems(baseItems, compareItems, options)) {
     if (base && compare) {
       diffs.push(...findAuditDetailItemKeyDiffs(auditId, base, compare, headings));
     } else if (compare) {
@@ -736,21 +820,25 @@ function diffAndSortSubItems(auditId, baseItem, compareItem, headings, options =
   const baseSubItems = rawBaseSubItems.map(normalizeSubItem);
   const compareSubItems = rawCompareSubItems.map(normalizeSubItem);
 
-  const rawDiffs = findAuditDetailItemsDiffs(auditId, baseSubItems, compareSubItems, subHeadings);
-  // Filter out itemDelta diffs below threshold so unchanged/noisy numeric subitems have `no change` row state.
-  const nonZeroDiffs = rawDiffs.filter(diff => {
+  const rawDiffs = findAuditDetailItemsDiffs(auditId, baseSubItems, compareSubItems, subHeadings, {
+    pairCollisionBucketsByRawKey: true,
+  });
+  const rawWithSynthesized = [
+    ...rawDiffs,
+    ...synthesizeItemKeyDiffs(rawDiffs, baseSubItems, compareSubItems),
+  ];
+  // Filter out itemDelta diffs below threshold (or 0 -> 0 synthesized diffs) so unchanged/noisy numeric subitems have `no change` row state.
+  const allSubDiffs = rawWithSynthesized.filter(diff => {
     if (diff.type === 'itemDelta') {
       const stats = getDeltaStats(diff);
       return stats.absoluteDelta > 0 && stats.percentAbsoluteDelta > percentAbsoluteDeltaThreshold;
     }
     return true;
   });
-  const allSubDiffs = [
-    ...nonZeroDiffs,
-    ...synthesizeItemKeyDiffs(nonZeroDiffs, baseSubItems, compareSubItems),
-  ];
 
-  const zippedSubItems = zipBaseAndCompareItems(baseSubItems, compareSubItems);
+  const zippedSubItems = zipBaseAndCompareItems(baseSubItems, compareSubItems, {
+    pairCollisionBucketsByRawKey: true,
+  });
   const sorted = sortZippedBaseAndCompareItems(allSubDiffs, zippedSubItems).map(entry => ({
     ...entry,
     state: getRowLabelForIndex(

@@ -31,7 +31,8 @@
 .table-details__chevron {
   position: absolute;
   left: 4px;
-  top: 8px;
+  top: 50%;
+  transform: translateY(-50%);
   width: 14px;
   padding: 0;
   border: none;

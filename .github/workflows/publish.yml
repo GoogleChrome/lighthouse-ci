@@ -28,11 +28,14 @@ jobs:
     permissions:
       id-token: write
       contents: write
+      pages: read
     steps:
       - name: Validate required secrets and OIDC permissions
         env:
           DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
           DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DRY_RUN: ${{ inputs.dry_run }}
         run: |
           MISSING=0
           if [ -z "$ACTIONS_ID_TOKEN_REQUEST_URL" ] || [ -z "$ACTIONS_ID_TOKEN_REQUEST_TOKEN" ]; then
@@ -46,6 +49,16 @@ jobs:
           if [ -z "$DOCKERHUB_TOKEN" ]; then
             echo "::error::Missing required secret: DOCKERHUB_TOKEN"
             MISSING=1
+          fi
+          PAGES_BUILD_TYPE=$(gh api "repos/${GITHUB_REPOSITORY}/pages" --jq '.build_type' 2>/dev/null || echo "unknown")
+          if [ "$PAGES_BUILD_TYPE" != "workflow" ]; then
+            MSG="GitHub Pages source is '${PAGES_BUILD_TYPE}' (expected 'workflow'). Set Settings -> Pages -> Source to 'GitHub Actions' (or run: gh api -X PUT repos/${GITHUB_REPOSITORY}/pages -f build_type=workflow)."
+            if [ "$DRY_RUN" = "true" ]; then
+              echo "::warning::$MSG"
+            else
+              echo "::error::$MSG"
+              MISSING=1
+            fi
           fi
           if [ "$MISSING" -ne 0 ]; then
             exit 1
@@ -168,16 +181,6 @@ jobs:
             gh release create "$NEXT_TAG" --title "$NEXT_TAG" --notes-file /tmp/changelog.md
           fi
 
-      - name: Deploy gh-pages
-        env:
-          DRY_RUN: ${{ inputs.dry_run }}
-        run: |
-          if [[ "$DRY_RUN" == "true" ]]; then
-            echo "[Dry Run] Skipping gh-pages deployment."
-          else
-            ./scripts/deploy-gh-pages.sh
-          fi
-
       - name: Update Docker version references on main
         env:
           DRY_RUN: ${{ inputs.dry_run }}
@@ -215,6 +218,73 @@ jobs:
             git commit -m "chore: update docker images with latest version"
             git push origin main
           fi
+
+  build-gh-pages:
+    name: Build GitHub Pages ${{ inputs.dry_run && '(Dry Run)' || '' }}
+    needs: [publish-npm]
+    if: ${{ !inputs.skip_npm && !cancelled() && needs.publish-npm.result == 'success' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+
+      - name: Use Node.js 22
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 22
+          cache: yarn
+
+      - name: Build viewer and stage Pages source
+        run: |
+          yarn install --frozen-lockfile
+          yarn --cwd packages/viewer clean
+          yarn --cwd packages/viewer build
+
+          mkdir -p .gh-pages-src
+          git archive HEAD | tar -x -C .gh-pages-src
+          cp -R packages/viewer/dist .gh-pages-src/viewer
+          cp -R packages/viewer/dist .gh-pages-src/difftool
+
+      - name: Configure Pages
+        if: ${{ !inputs.dry_run }}
+        uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
+
+      - name: Build with Jekyll
+        uses: actions/jekyll-build-pages@44a6e6beabd48582f863aeeb6cb2151cc1716697 # v1.0.13
+        with:
+          source: ./.gh-pages-src
+          destination: ./_site
+
+      - name: Verify built Pages output
+        run: |
+          test -f ./_site/index.html
+          test -f ./_site/docs/getting-started.html
+          test -f ./_site/viewer/index.html
+          test -f ./_site/difftool/index.html
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
+        with:
+          path: ./_site
+
+  deploy-gh-pages:
+    name: Deploy GitHub Pages
+    needs: [build-gh-pages]
+    if: ${{ !inputs.dry_run && !inputs.skip_npm }}
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1
 
   build-and-test-docker:
     name: Build & Test Docker (${{ matrix.arch }}) ${{ inputs.dry_run && '(Dry Run)' || '' }}

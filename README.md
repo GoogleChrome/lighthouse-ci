@@ -21,7 +21,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - run: npm install && npm install -g @lhci/cli@0.15.x
+      - run: npm install && npm install -g @lhci/cli@0.16.x
       - run: npm run build
       - run: lhci autorun
 ```

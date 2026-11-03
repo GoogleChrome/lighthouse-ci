@@ -325,7 +325,16 @@ jobs:
           DRY_RUN: ${{ inputs.dry_run }}
           SKIP_NPM: ${{ inputs.skip_npm }}
         run: |
-          VERSION="${INPUT_VERSION#v}"
+          if [[ "$DRY_RUN" != "true" && "$GITHUB_REF" != "refs/heads/main" ]]; then
+            echo "::error::Real releases must be run from the 'main' branch (current ref: $GITHUB_REF)."
+            exit 1
+          fi
+
+          export VERSION="${INPUT_VERSION#v}"
+          if ! [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::Invalid version format: '$VERSION' (expected X.Y.Z)"
+            exit 1
+          fi
           echo "VERSION=$VERSION" >> "$GITHUB_ENV"
 
           # In dry_run mode (when npm was not actually published), keep the existing published
@@ -338,6 +347,7 @@ jobs:
           node -e '
             const fs = require("fs");
             const ver = process.env.VERSION;
+            if (!ver) throw new Error("Missing VERSION environment variable");
 
             const clientDockerfile = "docs/recipes/docker-client/Dockerfile";
             fs.writeFileSync(
@@ -375,6 +385,7 @@ jobs:
   publish-docker-manifests:
     name: Publish Multi-Arch Docker Manifests ${{ inputs.dry_run && '(Dry Run)' || '' }}
     needs: [build-and-test-docker]
+    if: ${{ !cancelled() && needs.build-and-test-docker.result == 'success' }}
     runs-on: ubuntu-latest
     steps:
       - name: Log in to Docker Hub

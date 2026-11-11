@@ -10,9 +10,18 @@ const path = require('path');
 const yaml = require('js-yaml');
 const _ = require('./lodash.js');
 
+// Node >=22.12 can `require()` ESM (.mjs and "type": "module" .js) config files natively.
+// Use a `require` built from the real `module` builtin so Jest's CJS runtime doesn't intercept it.
+/** @type {NodeRequire} */
+const nativeRequire = /** @type {any} */ (process)
+  .getBuiltinModule('module')
+  .createRequire(__filename);
+
 const RC_FILE_NAMES = [
   '.lighthouserc.cjs',
   'lighthouserc.cjs',
+  '.lighthouserc.mjs',
+  'lighthouserc.mjs',
   '.lighthouserc.js',
   'lighthouserc.js',
   '.lighthouserc.json',
@@ -23,7 +32,7 @@ const RC_FILE_NAMES = [
   'lighthouserc.yaml',
 ];
 
-const JS_FILE_EXTENSION_REGEX = /\.(cjs|js)$/i;
+const JS_FILE_EXTENSION_REGEX = /\.(cjs|mjs|js)$/i;
 const YAML_FILE_EXTENSION_REGEX = /\.(yml|yaml)$/i;
 
 /**
@@ -73,9 +82,14 @@ function loadRcFile(pathToRcFile) {
  * @return {LHCI.LighthouseRc}
  */
 function parseFileContentToJSON(pathToRcFile, contents) {
-  // Check if file path ends in .js
+  // Check if file path ends in .cjs, .mjs, or .js
   if (JS_FILE_EXTENSION_REGEX.test(pathToRcFile)) {
-    return require(pathToRcFile);
+    const mod = nativeRequire(pathToRcFile);
+    // ESM modules with a default export are returned as `{__esModule: true, default}`.
+    const cfg = mod && mod.__esModule && 'default' in mod ? mod.default : mod;
+    // Shallow copy so top-level keys can be renamed even on a sealed ESM namespace object,
+    // without altering non-JSON values (functions, RegExps, Buffers, etc.) in the config.
+    return {...cfg};
   }
 
   // Check if file path ends in .yaml or .yml

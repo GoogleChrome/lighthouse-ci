@@ -34,23 +34,31 @@ describe('lighthouserc.js', () => {
     fs.writeFileSync(path, `module.exports = JSON.parse(${doubleWrappedJson})`);
   }
 
+  function writeMjsFile(path, json) {
+    const doubleWrappedJson = JSON.stringify(JSON.stringify(json));
+    fs.writeFileSync(path, `export default JSON.parse(${doubleWrappedJson})`);
+  }
+
   function getRandomFilePath(ext = 'json') {
     return path.join(tempDir, `rc-${Math.random()}.tmp.${ext}`);
   }
 
   describe('#loadAndParseRcFile', () => {
     let rcJsFilePath;
+    let rcMjsFilePath;
     let rcJSONFilePath;
     let rcYamlFilePath;
 
     beforeEach(() => {
       rcJsFilePath = getRandomFilePath('js');
+      rcMjsFilePath = getRandomFilePath('mjs');
       rcJSONFilePath = getRandomFilePath('json');
       rcYamlFilePath = getRandomFilePath('yml');
     });
 
     afterEach(async () => {
       await safeDeleteFile(rcJsFilePath);
+      await safeDeleteFile(rcMjsFilePath);
       await safeDeleteFile(rcJSONFilePath);
       await safeDeleteFile(rcYamlFilePath);
     });
@@ -90,6 +98,26 @@ describe('lighthouserc.js', () => {
         expect(rc.loadAndParseRcFile(rcJsFilePath)).toEqual(parsedContent);
       });
 
+      it('Mjs (ESM)', () => {
+        writeMjsFile(rcMjsFilePath, content);
+        expect(rc.loadAndParseRcFile(rcMjsFilePath)).toEqual(parsedContent);
+      });
+
+      it('Js in ESM package ("type": "module")', async () => {
+        const esmDir = fs.mkdtempSync(path.join(tempDir, 'esm-pkg-'));
+        const pkgJsonPath = path.join(esmDir, 'package.json');
+        const esmRcPath = path.join(esmDir, '.lighthouserc.js');
+        try {
+          writeJSONFile(pkgJsonPath, {type: 'module'});
+          writeMjsFile(esmRcPath, content);
+          expect(rc.loadAndParseRcFile(esmRcPath)).toEqual(parsedContent);
+        } finally {
+          await safeDeleteFile(esmRcPath);
+          await safeDeleteFile(pkgJsonPath);
+          fs.rmdirSync(esmDir);
+        }
+      });
+
       it('JSON', () => {
         writeJSONFile(rcJSONFilePath, content);
         expect(rc.loadAndParseRcFile(rcJSONFilePath)).toEqual(parsedContent);
@@ -103,17 +131,35 @@ describe('lighthouserc.js', () => {
 
     describe('should convert keys with . in them', () => {
       const content = {
-        ci: {assert: {assertions: {'resource-summary.script.size': 'off'}}},
+        ci: {
+          assert: {
+            assertions: {
+              'resource-summary.script.size': 'off',
+              'categories.performance': ['warn', {minScore: 0.9}],
+            },
+          },
+        },
       };
       const parsedContent = {
         assertions: {
           'resource-summary:script:size': 'off',
+          'categories:performance': ['warn', {minScore: 0.9}],
         },
       };
 
       it('Js', () => {
         writeJsFile(rcJsFilePath, content);
         expect(rc.loadAndParseRcFile(rcJsFilePath)).toEqual(parsedContent);
+      });
+
+      it('Mjs (ESM default export)', () => {
+        writeMjsFile(rcMjsFilePath, content);
+        expect(rc.loadAndParseRcFile(rcMjsFilePath)).toEqual(parsedContent);
+      });
+
+      it('Mjs (ESM named export)', () => {
+        fs.writeFileSync(rcMjsFilePath, `export const ci = ${JSON.stringify(content.ci)};`);
+        expect(rc.loadAndParseRcFile(rcMjsFilePath)).toEqual(parsedContent);
       });
 
       it('JSON', () => {
@@ -124,6 +170,54 @@ describe('lighthouserc.js', () => {
       it('YAML', () => {
         writeYAMLFile(rcYamlFilePath, content);
         expect(rc.loadAndParseRcFile(rcYamlFilePath)).toEqual(parsedContent);
+      });
+    });
+
+    describe('should preserve non-JSON values in JS configs', () => {
+      const configBody = `{
+        ci: {
+          assert: {assertions: {'resource-summary.script.size': 'off'}},
+          server: {
+            maxSize: Infinity,
+            storage: {
+              sequelizeOptions: {
+                logging: (msg) => 'logged:' + msg,
+                dialectOptions: {ssl: {ca: Buffer.from('my-cert')}},
+              },
+            },
+          },
+          upload: {urlReplacementPatterns: [/foo/gi]},
+        },
+      }`;
+
+      function expectNonJsonValuesPreserved(parsed) {
+        expect(parsed.assertions).toEqual({'resource-summary:script:size': 'off'});
+        expect(parsed.maxSize).toBe(Infinity);
+        const {logging, dialectOptions} = parsed.storage.sequelizeOptions;
+        expect(typeof logging).toBe('function');
+        expect(logging('hi')).toBe('logged:hi');
+        // Config modules are loaded outside of Jest's VM context, so avoid `instanceof` checks.
+        expect(Buffer.isBuffer(dialectOptions.ssl.ca)).toBe(true);
+        expect(dialectOptions.ssl.ca.toString()).toBe('my-cert');
+        const [regex] = parsed.urlReplacementPatterns;
+        expect(Object.prototype.toString.call(regex)).toBe('[object RegExp]');
+        expect(regex.source).toBe('foo');
+        expect(regex.flags).toBe('gi');
+      }
+
+      it('Js', () => {
+        fs.writeFileSync(rcJsFilePath, `module.exports = ${configBody};`);
+        expectNonJsonValuesPreserved(rc.loadAndParseRcFile(rcJsFilePath));
+      });
+
+      it('Mjs (ESM default export)', () => {
+        fs.writeFileSync(rcMjsFilePath, `export default ${configBody};`);
+        expectNonJsonValuesPreserved(rc.loadAndParseRcFile(rcMjsFilePath));
+      });
+
+      it('Mjs (ESM named export)', () => {
+        fs.writeFileSync(rcMjsFilePath, `export const {ci} = ${configBody};`);
+        expectNonJsonValuesPreserved(rc.loadAndParseRcFile(rcMjsFilePath));
       });
     });
 
@@ -235,6 +329,18 @@ describe('lighthouserc.js', () => {
       it('.cjs', () => {
         tempFile = path.join(tempDir, 'lighthouserc.cjs');
         writeJsFile(tempFile, {});
+        expect(rc.findRcFile(tempDir)).toEqual(tempFile);
+      });
+
+      it('.mjs', () => {
+        tempFile = path.join(tempDir, 'lighthouserc.mjs');
+        writeMjsFile(tempFile, {});
+        expect(rc.findRcFile(tempDir)).toEqual(tempFile);
+      });
+
+      it('.lighthouserc.mjs', () => {
+        tempFile = path.join(tempDir, '.lighthouserc.mjs');
+        writeMjsFile(tempFile, {});
         expect(rc.findRcFile(tempDir)).toEqual(tempFile);
       });
 

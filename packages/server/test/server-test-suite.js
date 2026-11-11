@@ -699,6 +699,7 @@ function runTests(state) {
         lhr: JSON.stringify({
           finalUrl: 'https://example.com/blog',
           lighthouseVersion: '4.2.0',
+          requestedUrl: 'https://example.com/blog?title=\u202aFrançais\u202c👀',
           audits: {
             interactive: {numericValue: 1000},
             'speed-index': {numericValue: 1000},

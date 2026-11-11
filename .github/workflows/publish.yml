@@ -362,6 +362,21 @@ jobs:
             fs.writeFileSync(serverPkgPath, JSON.stringify(serverPkg, null, 2) + "\n");
           '
 
+          for pkg in utils cli server; do
+            echo "Waiting for @lhci/$pkg@$VERSION to be available on npm..."
+            for attempt in $(seq 1 60); do
+              if curl -fsSL -H "Accept: application/vnd.npm.install-v1+json" "https://registry.npmjs.org/@lhci%2f${pkg}" | jq -e --arg v "$VERSION" '.versions[$v] != null' >/dev/null 2>&1; then
+                echo "@lhci/$pkg@$VERSION is available on npm."
+                break
+              fi
+              if [[ "$attempt" -eq 60 ]]; then
+                echo "::error::Timed out waiting for @lhci/$pkg@$VERSION to become available on npm."
+                exit 1
+              fi
+              sleep 10
+            done
+          done
+
       - name: Allow unprivileged user namespaces for Chrome
         run: sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
 

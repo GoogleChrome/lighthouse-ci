@@ -8,10 +8,12 @@ Lighthouse CI configuration can be managed through a config file, environment va
 
 Lighthouse CI will automatically look for a configuration file in the current working directory in the following priority order:
 
-1. `.lighthouserc.js`
-1. `lighthouserc.js`
 1. `.lighthouserc.cjs`
 1. `lighthouserc.cjs`
+1. `.lighthouserc.mjs`
+1. `lighthouserc.mjs`
+1. `.lighthouserc.js`
+1. `lighthouserc.js`
 1. `.lighthouserc.json`
 1. `lighthouserc.json`
 1. `.lighthouserc.yml`

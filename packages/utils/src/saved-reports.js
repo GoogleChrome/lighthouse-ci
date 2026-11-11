@@ -140,6 +140,29 @@ function replaceUrlPatterns(url, sedLikeReplacementPatterns) {
 }
 
 /**
+ * Returns `lhr.finalUrl` with any `#hash` fragment from `lhr.requestedUrl` preserved.
+ * In Lighthouse 10+, `lhr.finalUrl` is set to `mainDocumentUrl` which strips `#hash` fragments.
+ * We intentionally do not return `lhr.finalDisplayedUrl` directly because `finalDisplayedUrl`
+ * reflects client-side navigations (`history.pushState`) and runtime hash mutations (e.g. OAuth
+ * `#access_token=...` or random state), which would split runs across dynamic hashes or alter
+ * the URL for pages that were requested without a hash.
+ *
+ * @param {Pick<LH.Result, 'finalUrl' | 'requestedUrl'>} lhr
+ * @return {string}
+ */
+function getFinalUrl(lhr) {
+  try {
+    const requestedHash = lhr.requestedUrl ? new URL(lhr.requestedUrl).hash : '';
+    if (!requestedHash) return lhr.finalUrl;
+    const url = new URL(lhr.finalUrl);
+    url.hash = requestedHash;
+    return url.href;
+  } catch (_) {
+    return lhr.finalUrl;
+  }
+}
+
+/**
  * @param {Map<string, string>} targetUrlMap
  */
 function writeUrlMapToFile(targetUrlMap) {
@@ -163,5 +186,6 @@ module.exports = {
   saveAssertionResults,
   getSavedReportsDirectory,
   replaceUrlPatterns,
+  getFinalUrl,
   writeUrlMapToFile,
 };

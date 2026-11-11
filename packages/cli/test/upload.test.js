@@ -156,6 +156,61 @@ describe('Lighthouse CI upload CLI', () => {
     expect(await apiClient.getBuilds(project.id)).toHaveLength(2);
   }, 15000);
 
+  it('should upload for a build with hash-based URLs', async () => {
+    const originalLhrContent = fs.readFileSync(fakeLhrPath, 'utf8');
+    const lhr1Path = fakeLhrPath.replace(/lhr-\d+/, 'lhr-101');
+    const lhr2Path = fakeLhrPath.replace(/lhr-\d+/, 'lhr-102');
+
+    try {
+      const lhr1 = JSON.parse(originalLhrContent);
+      lhr1.finalUrl = 'http://example.com/app/index.html';
+      lhr1.requestedUrl = 'http://example.com/app/index.html#/home';
+      fs.writeFileSync(lhr1Path, JSON.stringify(lhr1));
+
+      const lhr2 = JSON.parse(originalLhrContent);
+      lhr2.finalUrl = 'http://example.com/app/index.html';
+      lhr2.requestedUrl =
+        'http://example.com/app/index.html#/document/12345678-1234-1234-1234-123456789012';
+      fs.writeFileSync(lhr2Path, JSON.stringify(lhr2));
+      fs.unlinkSync(fakeLhrPath);
+
+      const {stdout, stderr, status} = await runCLI(
+        ['upload', `--serverBaseUrl=${serverBaseUrl}`, `--token=${project.token}`],
+        {
+          cwd: uploadDir,
+          env: {
+            LHCI_BUILD_CONTEXT__CURRENT_HASH: 'ada2782081bfdfdac506a61964f801ca33c5a292',
+          },
+        }
+      );
+
+      expect(stdout).toMatchInlineSnapshot(`
+        "Saving CI project Test (<UUID>)
+        Saving CI build (<UUID>)
+        Saved LHR to http://localhost:XXXX/ (<UUID>)
+        Saved LHR to http://localhost:XXXX/ (<UUID>)
+        Done saving build results to Lighthouse CI
+        View build diff at http://localhost:XXXX/app/projects/test/compare/<UUID>
+        No GitHub token set, skipping GitHub status check.
+        "
+      `);
+      expect(stderr).toMatchInlineSnapshot(`""`);
+      expect(status).toEqual(0);
+
+      const builds = await apiClient.getBuilds(project.id);
+      expect(builds).toHaveLength(3);
+      const urls = await apiClient.getUrls(project.id, builds[0].id);
+      expect(urls.map(u => u.url).sort()).toEqual([
+        'http://example.com/app/index.html#/document/UUID',
+        'http://example.com/app/index.html#/home',
+      ]);
+    } finally {
+      if (fs.existsSync(lhr1Path)) fs.unlinkSync(lhr1Path);
+      if (fs.existsSync(lhr2Path)) fs.unlinkSync(lhr2Path);
+      fs.writeFileSync(fakeLhrPath, originalLhrContent);
+    }
+  }, 15000);
+
   it('should support target=filesystem', async () => {
     const lhr = JSON.parse(fs.readFileSync(fakeLhrPath, 'utf8'));
     lhr.requestedUrl = `https://www.example.com/page`;

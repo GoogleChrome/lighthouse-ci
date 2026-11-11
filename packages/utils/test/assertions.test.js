@@ -1262,4 +1262,33 @@ describe('getAllAssertionResults', () => {
       expect(results.find(r => r.auditId === 'dom-size')).toBeUndefined();
     });
   });
+
+  it('should group LHRs by hash-based URLs when requestedUrl has a hash', () => {
+    const lhrHome = {
+      finalUrl: 'http://example.com/app/index.html',
+      requestedUrl: 'http://example.com/app/index.html#/home',
+      categories: {},
+      audits: {
+        'first-contentful-paint': {score: 0},
+      },
+    };
+    const lhrDoc = {
+      finalUrl: 'http://example.com/app/index.html',
+      requestedUrl: 'http://example.com/app/index.html#/document/123',
+      categories: {},
+      audits: {
+        'first-contentful-paint': {score: 0},
+      },
+    };
+
+    const results = getAllAssertionResults({assertions: {'first-contentful-paint': 'error'}}, [
+      lhrHome,
+      lhrDoc,
+    ]);
+
+    expect(results.map(r => r.url)).toEqual([
+      'http://example.com/app/index.html#/home',
+      'http://example.com/app/index.html#/document/123',
+    ]);
+  });
 });

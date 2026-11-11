@@ -9,6 +9,7 @@ const _ = require('./lodash.js');
 const preset = require('./presets/all.js');
 const {splitMarkdownLink} = require('./markdown.js');
 const {computeRepresentativeRuns} = require('./representative-runs.js');
+const {getFinalUrl} = require('./saved-reports.js');
 
 /** @type {Record<string, string>} */
 const REPLACED_AUDITS_MAP = {
@@ -313,7 +314,7 @@ function getCategoryAssertionResults(auditProperty, assertionOptions, lhrs) {
  * @return {boolean}
  */
 function doesLHRMatchPattern(pattern, lhr) {
-  return new RegExp(pattern).test(lhr.finalUrl);
+  return new RegExp(pattern).test(getFinalUrl(lhr));
 }
 
 /**
@@ -440,7 +441,7 @@ function resolveAssertionOptionsAndLhrs(baseOptions, unfilteredLhrs) {
   const {assertions = {}, aggregationMethod} = optionsToUse;
 
   // Double-check we've only got one URL to look at that should have been pre-grouped in `getAllAssertionResults`.
-  const uniqueURLs = new Set(lhrs.map(lhr => lhr.finalUrl));
+  const uniqueURLs = new Set(lhrs.map(lhr => getFinalUrl(lhr)));
   if (uniqueURLs.size > 1) throw new Error('Can only assert one URL at a time!');
 
   const medianLhrs = computeRepresentativeRuns([
@@ -475,7 +476,7 @@ function resolveAssertionOptionsAndLhrs(baseOptions, unfilteredLhrs) {
     medianLhrs,
     aggregationMethod,
     lhrs: lhrs,
-    url: (lhrs[0] && lhrs[0].finalUrl) || '',
+    url: (lhrs[0] && getFinalUrl(lhrs[0])) || '',
   };
 }
 
@@ -532,7 +533,7 @@ function getAllAssertionResultsForUrl(baseOptions, unfilteredLhrs) {
  * @return {LHCI.AssertResults.AssertionResult[]}
  */
 function getAllAssertionResults(options, lhrs) {
-  const groupedByURL = _.groupBy(lhrs, lhr => lhr.finalUrl);
+  const groupedByURL = _.groupBy(lhrs, lhr => getFinalUrl(lhr));
 
   /** @type {LHCI.AssertCommand.BaseOptions[]} */
   let arrayOfOptions = [options];

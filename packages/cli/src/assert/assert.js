@@ -8,7 +8,11 @@
 const fs = require('fs');
 const path = require('path');
 const _ = require('@lhci/utils/src/lodash.js');
-const {loadSavedLHRs, saveAssertionResults} = require('@lhci/utils/src/saved-reports.js');
+const {
+  loadSavedLHRs,
+  saveAssertionResults,
+  getFinalUrl,
+} = require('@lhci/utils/src/saved-reports.js');
 const {getAllAssertionResults} = require('@lhci/utils/src/assertions.js');
 const {convertBudgetsToAssertions} = require('@lhci/utils/src/budgets-converter.js');
 const log = require('lighthouse-logger');
@@ -58,7 +62,7 @@ async function runCommand(options) {
   if (budgetsFile) options = await convertBudgetsToAssertions(readBudgets(budgetsFile));
 
   const lhrs = loadSavedLHRs(lhr).map(json => JSON.parse(json));
-  const uniqueUrls = new Set(lhrs.map(lhr => lhr.finalUrl));
+  const uniqueUrls = new Set(lhrs.map(lhr => getFinalUrl(lhr)));
   const allResults = getAllAssertionResults(options, lhrs);
   const groupedResults = _.groupBy(allResults, result => result.url);
 

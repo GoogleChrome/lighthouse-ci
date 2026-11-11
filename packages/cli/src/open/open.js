@@ -11,7 +11,11 @@ const path = require('path');
 const open = require('open');
 const _ = require('@lhci/utils/src/lodash.js');
 const {computeRepresentativeRuns} = require('@lhci/utils/src/representative-runs.js');
-const {loadSavedLHRs, getHTMLReportForLHR} = require('@lhci/utils/src/saved-reports.js');
+const {
+  loadSavedLHRs,
+  getHTMLReportForLHR,
+  getFinalUrl,
+} = require('@lhci/utils/src/saved-reports.js');
 
 /**
  * @param {import('yargs').Argv} yargs
@@ -30,7 +34,7 @@ async function runCommand(options) {
   /** @type {Array<LH.Result>} */
   const lhrs = loadSavedLHRs().map(lhr => JSON.parse(lhr));
   /** @type {Array<Array<[LH.Result, LH.Result]>>} */
-  const groupedByUrl = _.groupBy(lhrs, lhr => lhr.finalUrl).map(lhrs =>
+  const groupedByUrl = _.groupBy(lhrs, lhr => getFinalUrl(lhr)).map(lhrs =>
     lhrs.map(lhr => [lhr, lhr])
   );
   const representativeLhrs = computeRepresentativeRuns(groupedByUrl);
@@ -42,9 +46,10 @@ async function runCommand(options) {
   const targetUrls = typeof options.url === 'string' ? [options.url] : options.url || [];
 
   for (const lhr of representativeLhrs) {
-    if (targetUrls.length && !targetUrls.includes(lhr.finalUrl)) continue;
+    const url = getFinalUrl(lhr);
+    if (targetUrls.length && !targetUrls.includes(url)) continue;
 
-    process.stdout.write(`Opening median report for ${lhr.finalUrl}...\n`);
+    process.stdout.write(`Opening median report for ${url}...\n`);
     const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'lhci-'));
     const tmpFile = path.join(tmpDir, 'report.html');
     fs.writeFileSync(tmpFile, await getHTMLReportForLHR(lhr));

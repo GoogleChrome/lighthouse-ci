@@ -10,7 +10,7 @@
 const fs = require('fs');
 const path = require('path');
 const {withTmpDir} = require('../../cli/test/test-utils.js');
-const {replaceUrlPatterns, saveLHR} = require('../src/saved-reports.js');
+const {replaceUrlPatterns, getFinalUrl, saveLHR} = require('../src/saved-reports.js');
 const {promisify} = require('util');
 const {exec} = require('child_process');
 
@@ -64,6 +64,52 @@ describe('#replaceUrlPatterns', () => {
     expect(() => replaceUrlPatterns('foo', ['s/foo/bar'])).toThrow();
     expect(() => replaceUrlPatterns('foo', ['foo/bar'])).toThrow();
     expect(() => replaceUrlPatterns('foo', ['nothing'])).toThrow();
+  });
+});
+
+describe('#getFinalUrl', () => {
+  it('should return finalUrl when no hash is present', () => {
+    expect(
+      getFinalUrl({
+        finalUrl: 'http://example.com/app/index.html',
+        requestedUrl: 'http://example.com/app/index.html',
+      })
+    ).toEqual('http://example.com/app/index.html');
+  });
+
+  it('should preserve hash from requestedUrl on finalUrl', () => {
+    expect(
+      getFinalUrl({
+        finalUrl: 'http://example.com/app/index.html',
+        requestedUrl: 'http://example.com/app/index.html#/document/123',
+      })
+    ).toEqual('http://example.com/app/index.html#/document/123');
+  });
+
+  it('should apply hash from requestedUrl to a redirected finalUrl', () => {
+    expect(
+      getFinalUrl({
+        finalUrl: 'https://example.com/app/',
+        requestedUrl: 'http://example.com/app#/home',
+      })
+    ).toEqual('https://example.com/app/#/home');
+  });
+
+  it('should ignore a runtime hash on finalDisplayedUrl when requestedUrl has no hash', () => {
+    /** @type {any} */
+    const lhr = {
+      finalUrl: 'http://example.com/app/index.html',
+      finalDisplayedUrl: 'http://example.com/app/index.html#access_token=abc123',
+      requestedUrl: 'http://example.com/app/index.html',
+    };
+    expect(getFinalUrl(lhr)).toEqual('http://example.com/app/index.html');
+  });
+
+  it('should fallback gracefully when urls are not parseable', () => {
+    expect(getFinalUrl({finalUrl: 'foo.com', requestedUrl: 'foo.com'})).toEqual('foo.com');
+    expect(getFinalUrl({finalUrl: 'foo.com', requestedUrl: 'http://foo.com/#/home'})).toEqual(
+      'foo.com'
+    );
   });
 });
 

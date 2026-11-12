@@ -10,7 +10,6 @@
 const os = require('os');
 const fs = require('fs');
 const path = require('path');
-const rimraf = require('rimraf');
 const {spawn} = require('child_process');
 const testingLibrary = require('@testing-library/dom');
 const FallbackServer = require('../src/collect/fallback-server.js');
@@ -89,7 +88,7 @@ async function safeDeleteFile(filePath) {
 async function withTmpDir(fn) {
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'lighthouse-ci-'));
   await fn(tmpDir);
-  rimraf.sync(tmpDir);
+  fs.rmSync(tmpDir, {recursive: true, force: true});
 }
 
 async function startServer(sqlFile, extraArgs = []) {

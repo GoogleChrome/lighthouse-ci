@@ -11,7 +11,6 @@ jest.retryTimes(3);
 
 const fs = require('fs');
 const path = require('path');
-const rimraf = require('rimraf');
 const fullPreset = require('@lhci/utils/src/presets/all.js');
 const {runCLI} = require('./test-utils.js');
 
@@ -36,8 +35,8 @@ describe('Lighthouse CI assert CLI', () => {
   };
 
   const writeLhr = (passingAuditIds = []) => {
-    if (fs.existsSync(lighthouseciDir)) rimraf.sync(lighthouseciDir);
-    if (!fs.existsSync(lighthouseciDir)) fs.mkdirSync(lighthouseciDir, {recursive: true});
+    fs.rmSync(lighthouseciDir, {recursive: true, force: true});
+    fs.mkdirSync(lighthouseciDir, {recursive: true});
     const fakeLhrPath = path.join(lighthouseciDir, 'lhr-12345.json');
     const fakeLhr = {categories: {}, audits: {}};
     fakeLhr.audits['performance-budget'] = {score: 0};

@@ -8,7 +8,6 @@
 /* eslint-env jest */
 
 const path = require('path');
-const rimraf = require('rimraf');
 const fs = require('fs');
 
 const ApiClient = require('@lhci/utils/src/api-client.js');
@@ -30,7 +29,7 @@ describe('Lighthouse CI autorun CLI with GitHub status check', () => {
   let githubServer;
 
   beforeAll(async () => {
-    if (fs.existsSync(lighthouseciDir)) rimraf.sync(lighthouseciDir);
+    fs.rmSync(lighthouseciDir, {recursive: true, force: true});
     githubServer = await createGithubServer();
 
     server = await startServer();

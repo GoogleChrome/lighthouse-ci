@@ -109,7 +109,9 @@ initStoryshots({
   }),
 });
 
+// Closing the browser after a long storyshots run can exceed jest's default 5s hook timeout
+// (seen on macOS CI). A hook failure fails the whole suite and isn't retried by `--onlyFailures`.
 afterAll(async () => {
   if (browser) await browser.close();
-});
+}, 30000);
 

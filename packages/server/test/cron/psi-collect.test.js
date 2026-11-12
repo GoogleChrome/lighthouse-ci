@@ -15,7 +15,6 @@ jest.mock('cron', () => ({
     return cronJob(...args);
   },
 }));
-const Bluebird = require('bluebird');
 const {psiCollectForProject, startPsiCollectCron} = require('../../src/cron/psi-collect.js');
 
 describe('cron/psi-collect', () => {
@@ -153,17 +152,32 @@ describe('cron/psi-collect', () => {
     });
 
     it('should respect maxNumberOfParallelUrls', async () => {
-      const mapSpy = jest.spyOn(Bluebird, 'map');
-      const site = {
-        maxNumberOfParallelUrls: 1,
-        urls: ['http://example.com', 'http://example2.com'],
+      /** @param {number} maxNumberOfParallelUrls */
+      const measureMaxInFlight = async maxNumberOfParallelUrls => {
+        let inFlight = 0;
+        let maxInFlight = 0;
+        psi.runUntilSuccess.mockReset();
+        psi.runUntilSuccess.mockImplementation(async () => {
+          inFlight++;
+          maxInFlight = Math.max(maxInFlight, inFlight);
+          await new Promise(r => setTimeout(r, 5));
+          inFlight--;
+          return '{"lhr": true}';
+        });
+
+        const site = {
+          maxNumberOfParallelUrls,
+          numberOfRuns: 1,
+          urls: ['http://example.com', 'http://example2.com', 'http://example3.com'],
+        };
+        await psiCollectForProject(storageMethod, psi, site);
+        expect(psi.runUntilSuccess).toHaveBeenCalledTimes(site.urls.length);
+        return maxInFlight;
       };
-      await psiCollectForProject(storageMethod, psi, site);
-      expect(mapSpy).toHaveBeenCalledWith(
-        site.urls,
-        expect.any(Function),
-        expect.objectContaining({concurrency: site.maxNumberOfParallelUrls})
-      );
+
+      expect(await measureMaxInFlight(1)).toEqual(1);
+      expect(await measureMaxInFlight(2)).toEqual(2);
+      expect(await measureMaxInFlight(Infinity)).toEqual(3);
     });
 
     it('should collect all urls', async () => {

@@ -6,7 +6,7 @@
 'use strict';
 
 const {CronJob} = require('cron');
-const Bluebird = require('bluebird');
+const _ = require('@lhci/utils/src/lodash.js');
 const {getGravatarUrlFromEmail} = require('@lhci/utils/src/build-context');
 const PsiRunner = require('@lhci/utils/src/psi-runner.js');
 const {normalizeCronSchedule} = require('./utils');
@@ -48,7 +48,7 @@ async function psiCollectForProject(storageMethod, psi, site) {
   });
 
   // Run 'maxNumberOfParallelUrls' URLs in parallel
-  await Bluebird.map(
+  await _.mapWithConcurrency(
     urls,
     async url => {
       for (let i = 0; i < numberOfRuns; i++) {

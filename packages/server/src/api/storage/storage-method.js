@@ -14,7 +14,6 @@ const {
   VERSION: STATISTIC_VERSION,
 } = require('../statistic-definitions.js');
 const {E404} = require('../express-utils.js');
-const Bluebird = require('bluebird');
 
 /** @param {string} name @return {{end(): void}} */
 const startDebugTimer = name => {
@@ -328,14 +327,14 @@ class StorageMethod {
     const existingStatistics = context.existingStatistics || [];
 
     const statisticsTimer = startDebugTimer('createStatistics.getStatistics');
-    const statistics = await Bluebird.map(
+    const statistics = await _.mapWithConcurrency(
       statisicDefinitionEntries,
       async ([key, fn]) => {
         const name = /** @type {LHCI.ServerCommand.StatisticName} */ (key);
 
-        const statistics = Bluebird.map(
+        const statistics = await _.mapWithConcurrency(
           runsByUrl,
-          runs => {
+          async runs => {
             const url = runs[0][0].url;
             const {value} = fn(runs.map(([_, lhr]) => lhr));
             const existing = existingStatistics.find(

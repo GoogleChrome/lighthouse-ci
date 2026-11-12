@@ -12,7 +12,6 @@ const os = require('os');
 const path = require('path');
 const FallbackServer = require('../src/collect/fallback-server.js');
 const {startFallbackServer} = require('./test-utils.js');
-const fetch = require('isomorphic-fetch');
 
 describe('fallbackServer', () => {
   let server;

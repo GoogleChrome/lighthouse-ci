@@ -17,6 +17,13 @@ module.exports = {
     node: true,
     es6: true,
   },
+  // Fetch API globals built into Node (eslint 8's `node` env predates them).
+  globals: {
+    fetch: 'readonly',
+    Headers: 'readonly',
+    Request: 'readonly',
+    Response: 'readonly',
+  },
   rules: {
     'import/no-extraneous-dependencies': 'error',
     'prettier/prettier': 'error',

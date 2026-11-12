@@ -6,18 +6,17 @@
 'use strict';
 
 const URL = require('url').URL;
-const fetch = require('isomorphic-fetch');
 
 const PSI_URL = 'https://www.googleapis.com/pagespeedonline/v5/runPagespeed';
 
 class PsiClient {
   /**
-   * @param {{apiKey: string, endpointURL?: string, fetch?: import('isomorphic-fetch'), URL?: typeof import('url').URL, extraHeaders?: Record<string, string>, basicAuth?: LHCI.ServerCommand.Options['basicAuth']}} options
+   * @param {{apiKey: string, endpointURL?: string, fetch?: typeof fetch, URL?: typeof import('url').URL, extraHeaders?: Record<string, string>, basicAuth?: LHCI.ServerCommand.Options['basicAuth']}} options
    */
   constructor(options) {
     this._apiKey = options.apiKey;
     this._endpointURL = options.endpointURL || PSI_URL;
-    this._fetch = options.fetch || fetch;
+    this._fetch = options.fetch || ((input, init) => fetch(input, init));
     this._URL = options.URL || URL;
   }
 

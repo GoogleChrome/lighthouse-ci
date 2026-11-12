@@ -11,7 +11,6 @@ const assert = require('assert');
 const path = require('path');
 const os = require('os');
 const fs = require('fs');
-const fetch = require('isomorphic-fetch');
 const log = require('lighthouse-logger');
 const puppeteer = require('puppeteer');
 const ApiClient = require('../../utils/src/api-client.js');

@@ -8,7 +8,6 @@
 /* eslint-env jest */
 
 const path = require('path');
-const fetch = require('isomorphic-fetch');
 const runTests = require('./server-test-suite.js').runTests;
 const runServer = require('../src/server.js').createServer;
 const {safeDeleteFile} = require('../../cli/test/test-utils.js');

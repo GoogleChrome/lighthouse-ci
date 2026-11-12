@@ -29,7 +29,8 @@ import _ from '@lhci/utils/src/lodash.js';
 export const api = new ApiClient({
   rootURL: window.location.origin,
   URL: window.URL,
-  fetch: window.fetch.bind(window),
+  // Resolve `window.fetch` at call time (always invoked on `window`, as browsers require).
+  fetch: (input, init) => window.fetch(input, init),
 });
 
 /** @param {string} projectId @return {string|undefined} */

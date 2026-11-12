@@ -6,20 +6,19 @@
 'use strict';
 
 const log = require('debug')('lhci:utils:api-client');
-const fetch = require('isomorphic-fetch');
 
 /** @type {(s: string) => string} */
 const btoa = typeof window === 'undefined' ? s => Buffer.from(s).toString('base64') : window.btoa; // eslint-disable-line no-undef
 
 class ApiClient {
   /**
-   * @param {{rootURL: string, fetch?: import('isomorphic-fetch'), URL?: typeof URL, extraHeaders?: Record<string, string>, basicAuth?: LHCI.ServerCommand.Options['basicAuth']}} options
+   * @param {{rootURL: string, fetch?: typeof fetch, URL?: typeof URL, extraHeaders?: Record<string, string>, basicAuth?: LHCI.ServerCommand.Options['basicAuth']}} options
    */
   constructor(options) {
     this._rootURL = options.rootURL;
     /** @type {Record<string, string>} */
     this._extraHeaders = options.extraHeaders || {};
-    this._fetch = options.fetch || fetch;
+    this._fetch = options.fetch || ((input, init) => fetch(input, init));
     this._URL = options.URL || URL;
 
     if (options.basicAuth && options.basicAuth.password) {

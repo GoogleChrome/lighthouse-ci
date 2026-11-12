@@ -8,8 +8,10 @@
 const treeKill = require('tree-kill');
 const childProcess = require('child_process');
 
-/** @param {number} pid */
+/** @param {number|undefined} pid */
 async function killProcessTree(pid) {
+  // `pid` is undefined when the child process failed to spawn, so there is nothing to kill.
+  if (pid === undefined) return;
   return new Promise(resolve => treeKill(pid, resolve));
 }
 

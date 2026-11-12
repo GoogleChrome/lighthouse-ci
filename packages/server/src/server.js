@@ -48,7 +48,12 @@ async function createApp(options) {
     // 1. Optional if you want to overwrite by other middleware like koa or fastify
     // 2. Support large payloads because LHRs are big.
     // 3. Support JSON primitives because `PUT /builds/<id>/lifecycle "sealed"`
-    app.use(bodyParser.json({limit: '10mb', strict: false}));
+    // body-parser's connect-style handler type is incompatible with express's `RequestHandler`
+    // under newer @types/node (`ServerResponse.req` is required), so cast it to the express type.
+    const jsonParser = /** @type {import('express').RequestHandler} */ (
+      bodyParser.json({limit: '10mb', strict: false})
+    );
+    app.use(jsonParser);
   }
 
   // Add a health check route before auth

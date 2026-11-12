@@ -9,7 +9,6 @@
 
 const fs = require('fs');
 const path = require('path');
-const rimraf = require('rimraf');
 const ApiClient = require('@lhci/utils/src/api-client.js');
 const fullPreset = require('@lhci/utils/src/presets/all.js');
 const {runCLI, startServer, safeDeleteFile} = require('./test-utils.js');
@@ -39,8 +38,8 @@ describe('Lighthouse CI upload CLI', () => {
     process.env.LHCI_BUILD_CONTEXT__CURRENT_HASH = 'e7f1b0fa3aebb6ef95e44c0d0b820433ffdd2e63';
     process.env.LHCI_BUILD_CONTEXT__ANCESTOR_HASH = 'e7f1b0fa3aebb6ef95e44c0d0b820433ffdd2e63';
 
-    if (fs.existsSync(lighthouseciDir)) rimraf.sync(lighthouseciDir);
-    if (!fs.existsSync(lighthouseciDir)) fs.mkdirSync(lighthouseciDir, {recursive: true});
+    fs.rmSync(lighthouseciDir, {recursive: true, force: true});
+    fs.mkdirSync(lighthouseciDir, {recursive: true});
 
     writeLhr();
     server = await startServer();

@@ -83,7 +83,6 @@
     "prop-types": "^15.7.2",
     "puppeteer": "^24.43.1",
     "puppeteer-core": "^24.43.1",
-    "rimraf": "^3.0.2",
     "shelljs": "^0.8.5",
     "sqlite3": "^6.0.1",
     "storybook": "^7.6.24",

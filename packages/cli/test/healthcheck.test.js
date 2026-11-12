@@ -10,7 +10,6 @@
 const os = require('os');
 const fs = require('fs');
 const path = require('path');
-const rimraf = require('rimraf');
 const {runCLI} = require('./test-utils.js');
 
 jest.setTimeout(60_000);
@@ -132,7 +131,7 @@ describe('Lighthouse CI healthcheck CLI', () => {
     });
 
     afterEach(() => {
-      rimraf.sync(fixtureDir);
+      fs.rmSync(fixtureDir, {recursive: true, force: true});
     });
 
     it('should find a chrome installation installed on the system', async () => {

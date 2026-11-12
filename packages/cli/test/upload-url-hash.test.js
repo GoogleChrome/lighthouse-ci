@@ -9,7 +9,6 @@
 
 const fs = require('fs');
 const path = require('path');
-const rimraf = require('rimraf');
 const fullPreset = require('@lhci/utils/src/presets/all.js');
 const {runCLI} = require('./test-utils.js');
 
@@ -30,8 +29,8 @@ describe('Lighthouse CI upload filesystem reports with url hash', () => {
   };
 
   beforeAll(async () => {
-    if (fs.existsSync(lighthouseciDir)) rimraf.sync(lighthouseciDir);
-    if (!fs.existsSync(lighthouseciDir)) fs.mkdirSync(lighthouseciDir, {recursive: true});
+    fs.rmSync(lighthouseciDir, {recursive: true, force: true});
+    fs.mkdirSync(lighthouseciDir, {recursive: true});
     writeLhr();
   });
 

@@ -26,7 +26,6 @@
     "express": "^4.22.3",
     "proxy-agent": "^8.0.2",
     "inquirer": "^8.2.7",
-    "isomorphic-fetch": "^3.0.0",
     "lighthouse": "13.6.0",
     "lighthouse-logger": "1.2.0",
     "open": "^8.4.2",

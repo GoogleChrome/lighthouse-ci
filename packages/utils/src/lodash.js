@@ -305,6 +305,39 @@ module.exports = {
     pluralForm = pluralForm || `${string}s`;
     return number === 1 ? string : pluralForm;
   },
+  /**
+   * Maps `items` through the async `mapper`, running at most `concurrency` mappers at once.
+   * Resolves with the results in input order, or rejects with the first error (no new mappers
+   * are started after a failure).
+   *
+   * @template TItem, TResult
+   * @param {Array<TItem>} items
+   * @param {(item: TItem, index: number) => Promise<TResult>} mapper
+   * @param {{concurrency: number}} options `Infinity` (or any value < 1) means unlimited.
+   * @return {Promise<Array<TResult>>}
+   */
+  async mapWithConcurrency(items, mapper, {concurrency}) {
+    /** @type {Array<TResult>} */
+    const results = new Array(items.length);
+    let nextIndex = 0;
+    let failed = false;
+
+    const worker = async () => {
+      while (!failed && nextIndex < items.length) {
+        const index = nextIndex++;
+        try {
+          results[index] = await mapper(items[index], index);
+        } catch (err) {
+          failed = true;
+          throw err;
+        }
+      }
+    };
+
+    const workerCount = Math.min(items.length, concurrency >= 1 ? concurrency : items.length);
+    await Promise.all(Array.from({length: workerCount}, () => worker()));
+    return results;
+  },
   uniqueId: (() => {
     let id = 1;
     return () => id++;

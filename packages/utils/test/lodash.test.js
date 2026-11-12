@@ -234,4 +234,70 @@ describe('lodash.js', () => {
       expect(_.omit(o, [], {dropUndefined: true})).toEqual({a: 1, b: 2, c: 3});
     });
   });
+
+  describe('#mapWithConcurrency', () => {
+    /** @param {number} ms */
+    const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
+
+    /** @param {number} concurrency @param {number} numItems */
+    async function measureMaxInFlight(concurrency, numItems) {
+      let inFlight = 0;
+      let maxInFlight = 0;
+      const items = _.range(0, numItems);
+      const results = await _.mapWithConcurrency(
+        items,
+        async item => {
+          inFlight++;
+          maxInFlight = Math.max(maxInFlight, inFlight);
+          await delay(5);
+          inFlight--;
+          return item * 2;
+        },
+        {concurrency}
+      );
+
+      expect(results).toEqual(items.map(item => item * 2));
+      return maxInFlight;
+    }
+
+    it('should respect the concurrency limit', async () => {
+      expect(await measureMaxInFlight(1, 5)).toEqual(1);
+      expect(await measureMaxInFlight(2, 5)).toEqual(2);
+      expect(await measureMaxInFlight(4, 3)).toEqual(3);
+    });
+
+    it('should treat Infinity as unlimited', async () => {
+      expect(await measureMaxInFlight(Infinity, 6)).toEqual(6);
+    });
+
+    it('should preserve input order when mappers resolve out of order', async () => {
+      const results = await _.mapWithConcurrency(
+        [30, 10, 20],
+        async (ms, index) => {
+          await delay(ms);
+          return `${index}:${ms}`;
+        },
+        {concurrency: 3}
+      );
+      expect(results).toEqual(['0:30', '1:10', '2:20']);
+    });
+
+    it('should handle empty input', async () => {
+      const mapper = jest.fn();
+      expect(await _.mapWithConcurrency([], mapper, {concurrency: 2})).toEqual([]);
+      expect(mapper).not.toHaveBeenCalled();
+    });
+
+    it('should reject with the first error and stop starting new mappers', async () => {
+      const mapper = jest.fn(async item => {
+        await delay(1);
+        if (item === 2) throw new Error('boom');
+        return item;
+      });
+      await expect(_.mapWithConcurrency([1, 2, 3, 4, 5], mapper, {concurrency: 1})).rejects.toThrow(
+        'boom'
+      );
+      expect(mapper).toHaveBeenCalledTimes(2);
+    });
+  });
 });

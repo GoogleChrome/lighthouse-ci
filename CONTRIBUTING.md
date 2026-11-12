@@ -33,7 +33,7 @@ Before contributing to the code, get an overview of how Lighthouse works in the 
 
 ## Monorepo
 
-The codebase is organized in a typical monorepo setup using [yarn workspaces](https://classic.yarnpkg.com/en/docs/workspaces/) and [lerna](https://github.com/lerna/lerna). Individual packages are located in `packages/*` directories each with their own `package.json`, scripts, and tests. Running `yarn` at the repository root will create symlinks for all local packages in `node_modules/@lhci` meaning changes you make in `packages/utils` will automatically be used by `require('@lhci/utils')` in `packages/cli` without further build steps.
+The codebase is organized in a typical monorepo setup using [yarn workspaces](https://classic.yarnpkg.com/en/docs/workspaces/). Individual packages are located in `packages/*` directories each with their own `package.json`, scripts, and tests. Running `yarn` at the repository root will create symlinks for all local packages in `node_modules/@lhci` meaning changes you make in `packages/utils` will automatically be used by `require('@lhci/utils')` in `packages/cli` without further build steps.
 
 ## Dependencies
 

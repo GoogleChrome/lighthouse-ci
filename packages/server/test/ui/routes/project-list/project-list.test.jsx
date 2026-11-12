@@ -9,23 +9,19 @@
 import {h} from 'preact';
 import {api} from '../../../../src/ui/hooks/use-api-data.jsx';
 import {ProjectList} from '../../../../src/ui/routes/project-list/project-list.jsx';
-import {render, cleanup, wait} from '../../../test-utils.js';
+import {render, cleanup, wait, createFetchMock} from '../../../test-utils.js';
 
 jest.mock('../../../../src/ui/layout/page');
 
 afterEach(cleanup);
 
 describe('ProjectList', () => {
-  /** @type {import('jest-fetch-mock/types').GlobalWithFetchMock['fetch']} */
+  /** @type {ReturnType<typeof createFetchMock>} */
   let fetchMock;
 
   beforeEach(() => {
-    fetchMock = global.fetch = require('jest-fetch-mock');
+    fetchMock = global.fetch = createFetchMock();
     api._fetch = fetchMock;
-  });
-
-  afterEach(() => {
-    global.fetch.resetMocks();
   });
 
   it('should render a message when no projects available', async () => {

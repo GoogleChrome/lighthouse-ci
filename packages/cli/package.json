@@ -30,7 +30,6 @@
     "lighthouse": "13.6.0",
     "lighthouse-logger": "1.2.0",
     "open": "^8.4.2",
-    "uuid": "^14.0.3",
     "yargs": "^15.4.1",
     "yargs-parser": "^13.1.2"
   }

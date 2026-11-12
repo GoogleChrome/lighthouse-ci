@@ -28,7 +28,7 @@ THE SOFTWARE.
 'use strict';
 
 const parseCommit = require('conventional-commits-parser').sync;
-const shelljs = require('shelljs');
+const {execFileSync} = require('node:child_process');
 
 const lastTag = process.argv[2];
 const nextTag = process.argv[3];
@@ -53,8 +53,6 @@ const COMMIT_TYPE_ORDER = {
   misc: 7,
 };
 
-const exec = cmd => shelljs.exec(cmd, {silent: true});
-
 function compareCommitSortOrder(commitA, commitB) {
   if (!commitA.scope) return -1;
   if (!commitB.scope) return 1;
@@ -64,9 +62,12 @@ function compareCommitSortOrder(commitA, commitB) {
 
 function getCommits(fromTag) {
   const commitRange = `${fromTag}...HEAD`;
-  const flags = `--pretty=format:'${GIT_LOG_JSON_FORMAT}' --no-merges`;
-  const command = `git log ${commitRange} ${flags}`;
-  let logs = exec(command).stdout;
+  const args = ['log', commitRange, `--pretty=format:${GIT_LOG_JSON_FORMAT}`, '--no-merges'];
+  let logs = execFileSync('git', args, {
+    encoding: 'utf8',
+    maxBuffer: 100 * 1024 * 1024,
+    stdio: ['ignore', 'pipe', 'pipe'],
+  });
   // Replace all the newlines in the body so it's valid JSON
   const regex = new RegExp(`${GIT_BODY_DELIMITER}"((.|[\n\r\f])*?)"${GIT_BODY_DELIMITER}}`, 'gim');
   logs = logs.replace(regex, (s, body) => `"${body.replace(/\r?\n/g, '\\n')}"}`);

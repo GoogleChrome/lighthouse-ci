@@ -91,7 +91,7 @@ describe('fetch', () => {
           res.writeHead(204);
           res.end();
         } else {
-          res.end(`${req.method} ${req.url}`);
+          res.end('ok');
         }
       });
     });
@@ -127,10 +127,11 @@ describe('fetch', () => {
         headers: {'content-type': 'application/json', 'x-token': 'secret'},
         body: JSON.stringify({a: 1}),
       });
-      expect(await response.text()).toEqual('POST /echo');
+      expect(await response.text()).toEqual('ok');
       expect(target.requests).toHaveLength(1);
       expect(target.requests[0]).toMatchObject({
         method: 'POST',
+        url: '/echo',
         body: '{"a":1}',
         headers: {'content-type': 'application/json', 'x-token': 'secret', 'content-length': '7'},
       });
@@ -169,7 +170,7 @@ describe('fetch', () => {
         method: 'PUT',
         body: 'data',
       });
-      expect(await response.text()).toEqual('PUT /echo');
+      expect(await response.text()).toEqual('ok');
       expect(target.requests[1]).toMatchObject({method: 'PUT', url: '/echo', body: 'data'});
     });
 
@@ -201,8 +202,7 @@ describe('fetch', () => {
   describe('with proxy env vars', () => {
     it('should route requests through the HTTP_PROXY', async () => {
       const proxy = await startServer((req, res) => {
-        res.setHeader('content-type', 'application/json');
-        res.end(JSON.stringify({proxiedUrl: req.url}));
+        res.end('proxied');
       });
 
       try {
@@ -214,9 +214,10 @@ describe('fetch', () => {
           headers: {'x-test': '1'},
         });
         expect(response.status).toEqual(200);
-        expect(await response.json()).toEqual({
-          proxiedUrl: 'http://lhci-proxy-test.example/some/path?q=1',
-        });
+        expect(await response.text()).toEqual('proxied');
+        expect(proxy.requests).toHaveLength(1);
+        // An HTTP proxy receives the absolute target URL as the request target.
+        expect(proxy.requests[0].url).toEqual('http://lhci-proxy-test.example/some/path?q=1');
         expect(proxy.requests[0].headers).toMatchObject({
           host: 'lhci-proxy-test.example',
           'x-test': '1',

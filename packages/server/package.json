@@ -33,7 +33,6 @@
     "body-parser": "^1.20.9",
     "compression": "^1.8.2",
     "cron": "^4.4.0",
-    "dayjs": "^1.11.23",
     "debug": "^4.4.3",
     "express": "^4.22.3",
     "express-basic-auth": "^1.2.1",

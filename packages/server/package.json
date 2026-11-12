@@ -44,7 +44,6 @@
     "d3": "^5.15.0",
     "plotly.js": "^4.1.2",
     "preact": "^10.19.3",
-    "preact-jsx-runtime": "^1.2.0",
     "preact-async-route": "^2.2.1",
     "preact-router": "^3.1.0",
     "@fontsource/material-icons": "^4.4.5",

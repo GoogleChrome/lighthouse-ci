@@ -11,23 +11,19 @@
 import {h} from 'preact';
 import {api} from '../../../../src/ui/hooks/use-api-data.jsx';
 import {BuildView} from '../../../../src/ui/routes/build-view/build-view.jsx';
-import {render, cleanup, wait} from '../../../test-utils.js';
+import {render, cleanup, wait, createFetchMock} from '../../../test-utils.js';
 
 jest.mock('../../../../src/ui/layout/page');
 
 afterEach(cleanup);
 
 describe('BuildView', () => {
-  /** @type {import('jest-fetch-mock/types').GlobalWithFetchMock['fetch']} */
+  /** @type {ReturnType<typeof createFetchMock>} */
   let fetchMock;
 
   beforeEach(() => {
-    fetchMock = global.fetch = require('jest-fetch-mock');
+    fetchMock = global.fetch = createFetchMock();
     api._fetch = fetchMock;
-  });
-
-  afterEach(() => {
-    global.fetch.resetMocks();
   });
 
   it('should render the build and missing comparison build', async () => {

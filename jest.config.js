@@ -18,7 +18,6 @@ module.exports = {
   },
   transformIgnorePatterns: ['node_modules/@storybook/.*'],
   testEnvironment: 'node',
-  testRunner: require.resolve('jest-circus/runner'),
   globalSetup: require.resolve('./packages/server/test/storybook-setup.js'),
   globalTeardown: require.resolve('./packages/server/test/storybook-teardown.js'),
   moduleNameMapper: {

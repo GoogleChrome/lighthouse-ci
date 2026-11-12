@@ -262,6 +262,34 @@ const snapshotDOM = (el, maxLength) => {
   return prettified.replace(/\[\d{1,2}m/g, '');
 };
 
+/**
+ * Creates a `jest.fn()` to use as a mock `fetch` in UI tests. Queue responses with
+ * `mockResponseOnce(body, init)` or set the response for every call with `mockResponse(body, init)`.
+ * Unmocked calls resolve to an empty 200 response.
+ */
+function createFetchMock() {
+  /** @param {string} body @param {{status?: number}} [init] */
+  const createResponse = (body, init = {}) => {
+    const status = init.status === undefined ? 200 : init.status;
+    return {
+      status,
+      ok: status >= 200 && status < 300,
+      text: async () => body,
+      json: async () => JSON.parse(body),
+    };
+  };
+
+  const fetchMock = jest.fn(async () => createResponse(''));
+  return Object.assign(fetchMock, {
+    /** @param {string} body @param {{status?: number}} [init] */
+    mockResponse: (body, init) =>
+      fetchMock.mockImplementation(async () => createResponse(body, init)),
+    /** @param {string} body @param {{status?: number}} [init] */
+    mockResponseOnce: (body, init) =>
+      fetchMock.mockImplementationOnce(async () => createResponse(body, init)),
+  });
+}
+
 /** @param {'5.6.0'|'7.0.0'} version_ @param {'verge'|'coursehero'|'coursehero-perf'} site @param {'a'|'b'} variant  */
 function getTestLHRPath(version_, site, variant) {
   const version = version_.replace(/\./g, '-');
@@ -275,6 +303,7 @@ module.exports = {
   cleanup,
   cleanupE2E,
   wait,
+  createFetchMock,
   dispatchEvent,
   prettyDOM,
   snapshotDOM,

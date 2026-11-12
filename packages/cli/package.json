@@ -20,7 +20,7 @@
   },
   "dependencies": {
     "@lhci/utils": "0.1.0",
-    "chrome-launcher": "^0.13.4",
+    "chrome-launcher": "^1.2.3",
     "compression": "^1.8.2",
     "debug": "^4.4.3",
     "express": "^4.22.3",

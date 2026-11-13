@@ -12,7 +12,7 @@ jest.retryTimes(3);
 const fs = require('fs');
 const path = require('path');
 const fullPreset = require('@lhci/utils/src/presets/all.js');
-const {runCLI} = require('./test-utils.js');
+const {runCLI, withTmpDir} = require('./test-utils.js');
 
 describe('Lighthouse CI assert CLI', () => {
   const rootFixturesDir = path.join(__dirname, 'fixtures');
@@ -128,7 +128,7 @@ describe('Lighthouse CI assert CLI', () => {
     const result = await run([
       `--no-lighthouserc`,
       `--budgetsFile=${path.join(rootFixturesDir, 'budgets.json')}`,
-      `--lhr ${path.join(lighthouseciDir, 'lhr-12345.json')}`,
+      `--lhr=${path.join(lighthouseciDir, 'lhr-12345.json')}`,
     ]);
     expect(result.status).toEqual(1);
     expect(result.failures.length).toMatchInlineSnapshot(`1`);
@@ -139,10 +139,28 @@ describe('Lighthouse CI assert CLI', () => {
     const result = await run([
       `--no-lighthouserc`,
       `--budgetsFile=${path.join(rootFixturesDir, 'budgets.json')}`,
-      `--lhr ${lighthouseciDir}`,
+      `--lhr=${lighthouseciDir}`,
     ]);
     expect(result.status).toEqual(1);
     expect(result.failures.length).toMatchInlineSnapshot(`1`);
     expect(result.stderr).toContain('Checking assertions against 1 URL(s), 1 total run(s)');
+  });
+
+  it('should load LHRs from a directory other than .lighthouseci', async () => {
+    await withTmpDir(async lhrDir => {
+      fs.copyFileSync(
+        path.join(lighthouseciDir, 'lhr-12345.json'),
+        path.join(lhrDir, 'lhr-67890.json')
+      );
+      const result = await run([
+        `--no-lighthouserc`,
+        `--budgetsFile=${path.join(rootFixturesDir, 'budgets.json')}`,
+        `--lhr=${lhrDir}`,
+      ]);
+      expect(result.stderr).not.toContain('ENOENT');
+      expect(result.status).toEqual(1);
+      expect(result.failures.length).toMatchInlineSnapshot(`1`);
+      expect(result.stderr).toContain('Checking assertions against 1 URL(s), 1 total run(s)');
+    });
   });
 });

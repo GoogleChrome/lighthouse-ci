@@ -148,9 +148,9 @@ describe('Lighthouse CI assert CLI', () => {
 
   it('should load LHRs from a directory other than .lighthouseci', async () => {
     await withTmpDir(async lhrDir => {
-      fs.copyFileSync(
-        path.join(lighthouseciDir, 'lhr-12345.json'),
-        path.join(lhrDir, 'lhr-67890.json')
+      fs.writeFileSync(
+        path.join(lhrDir, 'lhr-67890.json'),
+        JSON.stringify({finalUrl: 'https://example.com/custom', categories: {}, audits: {}})
       );
       const result = await run([
         `--no-lighthouserc`,
@@ -161,6 +161,7 @@ describe('Lighthouse CI assert CLI', () => {
       expect(result.status).toEqual(1);
       expect(result.failures.length).toMatchInlineSnapshot(`1`);
       expect(result.stderr).toContain('Checking assertions against 1 URL(s), 1 total run(s)');
+      expect(result.stderr).toContain('https://example.com/custom');
     });
   });
 });

@@ -37,7 +37,7 @@ function loadSavedLHRs(directoryOrPath) {
   for (const file of fs.readdirSync(directoryOrPath)) {
     if (!LHR_REGEX.test(file)) continue;
 
-    const filePath = path.join(LHCI_DIR, file);
+    const filePath = path.join(directoryOrPath, file);
     lhrs.push(fs.readFileSync(filePath, 'utf8'));
   }
 

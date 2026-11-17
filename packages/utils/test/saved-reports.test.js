@@ -10,7 +10,12 @@
 const fs = require('fs');
 const path = require('path');
 const {withTmpDir} = require('../../cli/test/test-utils.js');
-const {replaceUrlPatterns, getFinalUrl, saveLHR} = require('../src/saved-reports.js');
+const {
+  replaceUrlPatterns,
+  getFinalUrl,
+  saveLHR,
+  loadSavedLHRs,
+} = require('../src/saved-reports.js');
 const {promisify} = require('util');
 const {exec} = require('child_process');
 
@@ -110,6 +115,28 @@ describe('#getFinalUrl', () => {
     expect(getFinalUrl({finalUrl: 'foo.com', requestedUrl: 'http://foo.com/#/home'})).toEqual(
       'foo.com'
     );
+  });
+});
+
+describe('#loadSavedLHRs', () => {
+  it('should read LHRs from the directory that was passed in', async () => {
+    await withTmpDir(async dir => {
+      const lhr = JSON.stringify({finalUrl: 'https://example.com/from-custom-dir'});
+      fs.writeFileSync(path.join(dir, 'lhr-1234567890123.json'), lhr);
+      fs.writeFileSync(path.join(dir, 'not-an-lhr.json'), '{}');
+
+      expect(loadSavedLHRs(dir)).toEqual([lhr]);
+    });
+  });
+
+  it('should read a single LHR file', async () => {
+    await withTmpDir(async dir => {
+      const lhr = JSON.stringify({finalUrl: 'https://example.com/single-file'});
+      const lhrPath = path.join(dir, 'lhr-1234567890123.json');
+      fs.writeFileSync(lhrPath, lhr);
+
+      expect(loadSavedLHRs(lhrPath)).toEqual([lhr]);
+    });
   });
 });
 

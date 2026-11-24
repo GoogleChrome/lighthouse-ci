@@ -8,6 +8,7 @@
 const fs = require('fs');
 const path = require('path');
 const childProcess = require('child_process');
+const yargsParser = require('yargs-parser');
 const _ = require('@lhci/utils/src/lodash.js');
 const version = require('../../package.json').version;
 const {
@@ -52,10 +53,11 @@ function buildCommand(yargs) {
 /**
  * @param {'collect'|'assert'|'upload'|'healthcheck'} command
  * @param {string[]} [args]
+ * @param {string[]} [overrideArgs]
  * @return {{status: number}}
  */
-function runChildCommand(command, args = []) {
-  const combinedArgs = [process.argv[1], command, ...args, ...getOverrideArgsForCommand(command)];
+function runChildCommand(command, args = [], overrideArgs = getOverrideArgsForCommand(command)) {
+  const combinedArgs = [process.argv[1], command, ...args, ...overrideArgs];
   const {status = -1} = childProcess.spawnSync(process.argv[0], combinedArgs.filter(Boolean), {
     stdio: 'inherit',
   });
@@ -108,6 +110,18 @@ function getOverrideArgsForCommand(command, args = process.argv) {
     .map(arg => arg.replace(argPrefix, '--'));
 }
 
+/** @param {string[]} collectOverrideArgs */
+function getHealthcheckOverrideArgs(collectOverrideArgs) {
+  const healthcheckArgs = getOverrideArgsForCommand('healthcheck');
+  const healthcheckOptions = yargsParser(healthcheckArgs);
+  const collectOptions = yargsParser(collectOverrideArgs, {envPrefix: 'LHCI'});
+  const collectOverrides = {...collectOptions, ...collectOptions.collect};
+  const chromeArgs = ['method', 'chromePath', 'puppeteerScript']
+    .filter(key => healthcheckOptions[key] === undefined && collectOverrides[key] !== undefined)
+    .map(key => `--${key}=${collectOverrides[key]}`);
+  return [...healthcheckArgs, ...chromeArgs];
+}
+
 /**
  * @param {LHCI.AutorunCommand.Options} options
  * @return {Promise<void>}
@@ -121,7 +135,12 @@ async function runCommand(options) {
   const defaultFlags = options.config ? [`--config=${options.config}`] : [];
   let hasFailure = false;
 
-  const healthcheckStatus = runChildCommand('healthcheck', [...defaultFlags, '--fatal']).status;
+  const collectOverrideArgs = getOverrideArgsForCommand('collect');
+  const healthcheckStatus = runChildCommand(
+    'healthcheck',
+    [...defaultFlags, '--fatal'],
+    getHealthcheckOverrideArgs(collectOverrideArgs)
+  ).status;
   if (healthcheckStatus !== 0) process.exit(healthcheckStatus);
 
   const collectHasUrlOrBuildDir =
@@ -130,7 +149,11 @@ async function runCommand(options) {
   const collectArgs = collectHasUrlOrBuildDir
     ? [getStartServerCommandFlag()]
     : [`--static-dist-dir=${findBuildDir()}`];
-  const collectStatus = runChildCommand('collect', [...defaultFlags, ...collectArgs]).status;
+  const collectStatus = runChildCommand(
+    'collect',
+    [...defaultFlags, ...collectArgs],
+    collectOverrideArgs
+  ).status;
   if (collectStatus !== 0) process.exit(collectStatus);
 
   // We'll run assertions if there's assert options OR they haven't configured anything to do with the results
